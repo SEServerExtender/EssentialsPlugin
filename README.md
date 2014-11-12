@@ -31,6 +31,7 @@ Options:
 - BackupCleanupTime - The amount of time, in days, for a cleanup to occur
 - BackupCreateSubdirectories - This option forces the backup to put a separate backup in a new directory each time it occurs
 - BackupItems - This is where you define when you want a backup to occur.  You specify the hour and minute of the day you wish the backup to happen.  If you set hour to -1, this will allow you to backup hourly.  So if you set hour -1 and minute 30, it will backup on 30 minute mark of every hour.  
+- BackupAsteroids - This includes asteroids in the backup file.  If off, the .vx2 files will not be saved.
 
 Automated Restart with Notifications
 ------------------------------------
