@@ -334,7 +334,15 @@ namespace EssentialsPlugin
 						{
 							if (handler.CanProcess())
 							{
-								handler.Handle();
+								try
+								{
+									handler.Handle();
+								}
+								catch (Exception ex)
+								{
+									Logging.WriteLineAndConsole(String.Format("Handler Problems: {0} - {1}", handler.GetUpdateResolution(), ex.ToString()));
+								}
+
 								// Let's make sure LastUpdate is set to now otherwise we may start processing too quickly
 								handler.LastUpdate = DateTime.Now;
 							}

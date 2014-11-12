@@ -26,6 +26,9 @@ namespace EssentialsPlugin.ProcessHandler
 					if (item.SubText == "")
 						continue;
 
+					if (item.IntervalSeconds < 1)
+						continue;
+
 					if (DateTime.Now - item.lastUpdate > TimeSpan.FromSeconds(item.IntervalSeconds))
 					{
 						item.lastUpdate = DateTime.Now;
