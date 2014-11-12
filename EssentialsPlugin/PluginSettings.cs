@@ -37,6 +37,7 @@ namespace EssentialsPlugin
 		private string m_backupBaseDirectory;
 		private bool m_backupCleanup;
 		private int m_backupCleanupTime;
+		private bool m_backupAsteroids;
 
 		private bool m_newUserTransportEnabled;
 		private int m_newUserTransportDistance;
@@ -236,6 +237,16 @@ namespace EssentialsPlugin
 			}
 		}
 
+		public bool BackupAsteroids
+		{
+			get { return m_backupAsteroids; }
+			set 
+			{ 
+				m_backupAsteroids = value;
+				Save();
+			}
+		}
+
 		#endregion
 
 		#region Constructor
@@ -245,6 +256,7 @@ namespace EssentialsPlugin
 			m_restartTime = 720;
 			m_start = DateTime.Now;
 			m_newUserTransportDistance = 500;
+			m_backupAsteroids = true;
 
 			m_informationItems = new MTObservableCollection<InformationItem>();
 			m_restartItems = new MTObservableCollection<RestartItem>();

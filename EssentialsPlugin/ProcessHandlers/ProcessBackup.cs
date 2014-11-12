@@ -1,25 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using EssentialsPlugin.Utility;
-using System.Windows.Forms;
-using SEModAPIInternal.API.Common;
 using SEModAPIExtensions.API;
-using Sandbox.ModAPI;
-using VRageMath;
-using VRage.Common.Utils;
 using System.IO.Compression;
-using Sandbox.Common;
-//using VRage.Compression;
 
 namespace EssentialsPlugin.ProcessHandler
 {
 	class ProcessBackup : ProcessHandlerBase
 	{
-		private DateTime m_start;
+		private DateTime m_start = DateTime.Now;
 
 		public ProcessBackup()
 		{
@@ -97,10 +86,24 @@ namespace EssentialsPlugin.ProcessHandler
 			File.Copy(savePath + "\\" + "SANDBOX_0_0_0_.sbs", tempDirectory + "\\" + "SANDBOX_0_0_0_.sbs", true);
 			File.Copy(savePath + "\\" + "Sandbox.sbc", tempDirectory + "\\" + "Sandbox.sbc", true);
 
+			if(PluginSettings.Instance.BackupAsteroids)
+			{
+				foreach (string file in Directory.GetFiles(savePath))
+				{
+					FileInfo info = new FileInfo(file);
+					if (!info.Extension.Equals(".vx2"))
+						continue;
+
+					File.Copy(file, tempDirectory + "\\" + info.Name);
+				}
+			}
+
 			ZipFile.CreateFromDirectory(tempDirectory, finalDirectory + "\\" + string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-hh-mm")) + ".zip");
 
-			File.Delete(tempDirectory + "\\" + "SANDBOX_0_0_0_.sbs");
-			File.Delete(tempDirectory + "\\" + "Sandbox.sbc");
+			foreach(string file in Directory.GetFiles(tempDirectory))
+			{
+				File.Delete(file);
+			}
 
 			Logging.WriteLineAndConsole(string.Format("Backup created: {0}", finalDirectory + "\\" + string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-hh-mm")) + ".zip"));
 		}

@@ -156,9 +156,9 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override void OnPlayerJoined(ulong remoteUserId)
 		{
-//			Logging.WriteLineAndConsole(string.Format("Queuing New User Transport Queued: {0}", remoteUserId));
-			//if (PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Count() > 0)
-				//return;
+			Logging.WriteLineAndConsole(string.Format("Queuing New User Transport Queued: {0}", remoteUserId));
+			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Count() > 0)
+				return;
 
 			lock (m_newUserList)
 			{

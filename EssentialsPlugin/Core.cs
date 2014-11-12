@@ -234,6 +234,19 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.BackupCleanupTime = value; }
 		}
 
+		[Category("Automated Backup")]
+		[Description("Enable / Disable backing up of asteroids")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool BackupAsteroids
+		{
+			get { return PluginSettings.Instance.BackupAsteroids; }
+			set 
+			{
+				PluginSettings.Instance.BackupAsteroids = value; 
+			}
+		}
+
 		[Category("Automated New User Transport")]
 		[Description("Enable / Disable New User Transport.  This option will transport new user ships closer to asteroids.  It will randomly choose an appropriate asteroid that has enough resources inside it, and move them closer to that asteroid.  This helps on servers that have asteroids far apart.")]
 		[Browsable(true)]
