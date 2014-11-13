@@ -68,14 +68,12 @@ namespace EssentialsPlugin.ChatHandlers
 
 			string userName = words[0];
 			Vector3D startPosition = new Vector3D(double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]));
-
-			CharacterEntity charEntity = SectorObjectManager.Instance.GetTypedInternalData<CharacterEntity>().Where(x => x.DisplayName == userName && x.Health > 0).First();
-
+			CharacterEntity charEntity = SectorObjectManager.Instance.GetTypedInternalData<CharacterEntity>().Where(x => x.DisplayName.ToLower() == userName.ToLower() && x.Health > 0).First();
 			CubeGridEntity gridEntity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "MovePlayer.sbc"));
 			gridEntity.EntityId = BaseEntity.GenerateEntityId();
-
 			foreach (MyObjectBuilder_CubeBlock block in gridEntity.BaseCubeBlocks)
 			{
+				// set ownership
 				if(block is MyObjectBuilder_Cockpit)
 				{
 					MyObjectBuilder_Cockpit cockpit = (MyObjectBuilder_Cockpit)block;
@@ -115,7 +113,7 @@ namespace EssentialsPlugin.ChatHandlers
 					Logging.WriteLineAndConsole("Removing User From Cockpit");
 				}
 			}
-
+			
 			gridEntity.Dispose();
 
 			return true;
