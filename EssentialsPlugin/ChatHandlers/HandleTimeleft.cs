@@ -31,10 +31,10 @@ namespace EssentialsPlugin.ChatHandlers
 
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			if(!PluginSettings.Instance.RestartEnabled)
-				Communication.SendPrivateInformation(userId, "Automatic Restarts are disabled.");
+//			if(!PluginSettings.Instance.RestartEnabled)
+//				Communication.SendPrivateInformation(userId, "Automatic Restarts are disabled.");
 
-			Communication.SendPrivateInformation(userId, string.Format("Time remaining until restart: {0}", General.TimeSpanToString(TimeSpan.FromMinutes(PluginSettings.Instance.RestartTime) - (DateTime.Now - PluginSettings.RestartStartTime))));
+//			Communication.SendPrivateInformation(userId, string.Format("Time remaining until restart: {0}", General.TimeSpanToString(TimeSpan.FromMinutes(PluginSettings.Instance.RestartTime) - (DateTime.Now - PluginSettings.RestartStartTime))));
 			return true;
 		}
 	}

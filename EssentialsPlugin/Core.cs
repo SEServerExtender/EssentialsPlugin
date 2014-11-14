@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Threading;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Windows.Forms.Design;
+using System.Drawing.Design;
 
 using SEModAPIExtensions.API;
 using SEModAPIExtensions.API.Plugin;
@@ -29,7 +31,6 @@ namespace EssentialsPlugin
 		#region Private Fields
 		private static string m_pluginPath;
 		//private static ControlForm controlForm;
-
 		private DateTime m_lastProcessUpdate;
 		private Thread m_processThread;
 		private List<ProcessHandlerBase> m_processHandlers;
@@ -106,28 +107,40 @@ namespace EssentialsPlugin
 		[Description("Restart Notification Items.  Each item is a notification sent to the user at specified intervals.  Use this to warn users that a restart is going to occur before it happens.")]
 		[Browsable(true)]
 		[ReadOnly(false)]
-		public MTObservableCollection<RestartItem> RestartItems
+		public MTObservableCollection<RestartNotificationItem> RestartNotificationItems
 		{
 			get
 			{
-				return PluginSettings.Instance.RestartItems;
+				return PluginSettings.Instance.RestartNotificationItems;
 			}
 		}
 
 		[Category("Automated Restart")]
-		[Description("The amount of minutes before the automated restart should occur.")]
+		[Description("Restart Time Items.  Each item is a time of day when a restart will occur.")]
 		[Browsable(true)]
 		[ReadOnly(false)]
-		public int RestartTime
+		public MTObservableCollection<RestartTimeItem> RestartTimeItems
 		{
 			get
 			{
-				return PluginSettings.Instance.RestartTime;
+				return PluginSettings.Instance.RestartTimeItems;
 			}
+		}
 
+		[Category("Automated Restart")]
+		[Description("Extra processes to run before the server is restarted.  Allows adding custom scripts during restart.  Each line is a seperate process.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		[EditorAttribute(typeof(System.ComponentModel.Design.MultilineStringEditor), typeof(System.Drawing.Design.UITypeEditor))]
+		public string RestartAddedProcesses
+		{
+			get
+			{
+				return PluginSettings.Instance.RestartAddedProcesses;
+			}
 			set
 			{
-				PluginSettings.Instance.RestartTime = value;
+				PluginSettings.Instance.RestartAddedProcesses = value;
 			}
 		}
 
@@ -198,6 +211,7 @@ namespace EssentialsPlugin
 		[Description("Base directory to put backups into")]
 		[Browsable(true)]
 		[ReadOnly(false)]
+		[EditorAttribute(typeof(System.Windows.Forms.Design.FolderNameEditor), typeof(System.Drawing.Design.UITypeEditor))]		
 		public string BackupBaseDirectory
 		{
 			get { return PluginSettings.Instance.BackupBaseDirectory; }

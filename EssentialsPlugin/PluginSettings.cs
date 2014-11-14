@@ -9,6 +9,10 @@ using System.Xml.Serialization;
 using EssentialsPlugin.Utility;
 using EssentialsPlugin.UtilityClasses;
 using VRage.Common.Utils;
+using System.Windows.Forms.Design;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Windows.Forms;
 
 namespace EssentialsPlugin
 {
@@ -28,8 +32,9 @@ namespace EssentialsPlugin
 		private string m_greetingNewUserMessage;
 
 		private bool m_restartEnabled;
-		private MTObservableCollection<RestartItem> m_restartItems;
-		private int m_restartTime;
+		private MTObservableCollection<RestartNotificationItem> m_restartNotificationItems;
+		private MTObservableCollection<RestartTimeItem> m_restartTimeItems;
+		private string m_restartAddedProcesses;
 
 		private bool m_backupEnabled;
 		private MTObservableCollection<BackupItem> m_backupItems;
@@ -99,32 +104,29 @@ namespace EssentialsPlugin
 			}
 		}
 
-		public int RestartTime
+		public MTObservableCollection<RestartNotificationItem> RestartNotificationItems
 		{
-			get { return m_restartTime; }
+			get { return m_restartNotificationItems; }
+			set { m_restartNotificationItems = value; }
+		}
+
+		public MTObservableCollection<RestartTimeItem> RestartTimeItems
+		{
+			get { return m_restartTimeItems; }
+			set { m_restartTimeItems = value; }
+		}
+
+		public string RestartAddedProcesses
+		{
+			get { return m_restartAddedProcesses; }
 			set 
 			{ 
-				m_restartTime = value;
+				m_restartAddedProcesses = value;
 				Save();
-
-				if(m_restartEnabled)
-				{
-					Communication.SendPublicInformation(string.Format("[NOTICE]: Automatic restart time has been changed by the Administrator.  The new time is: {0}", General.TimeSpanToString(TimeSpan.FromMinutes(m_restartTime))));
-				}
-
-				foreach (RestartItem item in m_restartItems)
-					item.completed = false;
 			}
 		}
 
-		public MTObservableCollection<RestartItem> RestartItems
-		{
-			get { return m_restartItems; }
-			set { m_restartItems = value; }
-		}
-
 		// Greetings
-
 		public bool GreetingEnabled
 		{
 			get { return m_greetingEnabled; }
@@ -253,16 +255,17 @@ namespace EssentialsPlugin
 		public PluginSettings()
 		{
 			// Default is 12 hours
-			m_restartTime = 720;
 			m_start = DateTime.Now;
 			m_newUserTransportDistance = 500;
 			m_backupAsteroids = true;
 
 			m_informationItems = new MTObservableCollection<InformationItem>();
-			m_restartItems = new MTObservableCollection<RestartItem>();
+			m_restartNotificationItems = new MTObservableCollection<RestartNotificationItem>();
+			m_restartTimeItems = new MTObservableCollection<RestartTimeItem>();
 			m_backupItems = new MTObservableCollection<BackupItem>();
 			m_informationItems.CollectionChanged += ItemsCollectionChanged;
-			m_restartItems.CollectionChanged += ItemsCollectionChanged;
+			m_restartNotificationItems.CollectionChanged += ItemsCollectionChanged;
+			m_restartTimeItems.CollectionChanged += ItemsCollectionChanged;
 			m_backupItems.CollectionChanged += ItemsCollectionChanged;
 
 			m_greetingMessage = "";
@@ -401,7 +404,32 @@ namespace EssentialsPlugin
 	}
 
 	[Serializable]
-	public class RestartItem
+	public class RestartTimeItem
+	{
+		public DateTime Restart = DateTime.Now.AddDays(1);
+
+		private bool enabled;
+		public bool Enabled
+		{
+			get { return enabled; }
+			set { enabled = value; }
+		}
+
+		private string restartTime;
+		[Editor(typeof(TimePickerEditor), typeof(UITypeEditor))]
+		public string RestartTime
+		{
+			get { return restartTime; }
+			set 
+			{ 
+				restartTime = value;
+				Restart = DateTime.Parse(restartTime);
+			}
+		}
+	}
+
+	[Serializable]
+	public class RestartNotificationItem
 	{
 		internal bool completed;
 
@@ -433,9 +461,46 @@ namespace EssentialsPlugin
 			set { stopAllShips = value; }
 		}
 
-		public RestartItem()
+		public RestartNotificationItem()
 		{
 			completed = false;
+		}
+	}
+
+	internal class TimePickerEditor : UITypeEditor {
+		IWindowsFormsEditorService editorService;
+		string time;
+
+		public override object EditValue(System.ComponentModel.ITypeDescriptorContext context, IServiceProvider provider, object value) 
+		{
+			if (provider != null) 
+			{
+				this.editorService = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+			}
+			if (this.editorService != null) 
+			{
+				if (value == null) {
+					time = DateTime.Now.ToString("HH:mm");
+				}
+
+				DateTimePicker picker = new DateTimePicker();
+				picker.Format = DateTimePickerFormat.Custom;
+				picker.CustomFormat = "HH:mm";
+				picker.ShowUpDown = true;
+
+				if(value != null)
+				{
+					picker.Value = DateTime.Parse((string)value);
+				}
+
+				this.editorService.DropDownControl(picker);
+				value = picker.Value.ToString("HH:mm");
+			}
+			return value;
+		}
+
+		public override UITypeEditorEditStyle GetEditStyle(System.ComponentModel.ITypeDescriptorContext context) {
+			return UITypeEditorEditStyle.DropDown;
 		}
 	}
 }

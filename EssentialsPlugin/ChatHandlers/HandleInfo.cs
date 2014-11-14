@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EssentialsPlugin.Utility;
+using SEModAPIInternal.API.Common;
 
 namespace EssentialsPlugin.ChatHandlers
 {
@@ -55,7 +56,8 @@ namespace EssentialsPlugin.ChatHandlers
 					{
 						if (item.SubCommand.ToLower() == words[0].ToLower() && item.Enabled)
 						{
-							Communication.SendPrivateInformation(userId, item.SubText);
+							string userName = PlayerMap.Instance.GetPlayerNameFromSteamId(userId);
+							Communication.SendPrivateInformation(userId, item.SubText.Replace("%name%", userName));
 							break;
 						}
 					}

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EssentialsPlugin.Utility;
+using SEModAPIInternal.API.Common;
 
 namespace EssentialsPlugin.ProcessHandler
 {
@@ -32,7 +33,19 @@ namespace EssentialsPlugin.ProcessHandler
 					if (DateTime.Now - item.lastUpdate > TimeSpan.FromSeconds(item.IntervalSeconds))
 					{
 						item.lastUpdate = DateTime.Now;
-						Communication.SendPublicInformation(item.SubText);
+
+						if (item.SubText.ToLower().Contains("%name%"))
+						{
+							foreach(ulong userId in PlayerManager.Instance.ConnectedPlayers)
+							{
+								string userName = PlayerMap.Instance.GetPlayerNameFromSteamId(userId);
+								Communication.SendPrivateInformation(userId, item.SubText.Replace("%name%", userName));
+							}							
+						}
+						else
+						{
+							Communication.SendPublicInformation(item.SubText);
+						}
 					}
 				}
 			}

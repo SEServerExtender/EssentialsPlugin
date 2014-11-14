@@ -15,14 +15,15 @@ namespace EssentialsPlugin.ProcessHandler
 {
 	class ProcessRestart : ProcessHandlerBase
 	{
-		#region Private Fields
 		private DateTime m_start;
-		#endregion
+		private int m_done = -1;
 
 		public ProcessRestart()
 		{
 			m_start = DateTime.Now;
+			SetRestartTime();
 		}
+
 		public override int GetUpdateResolution()
 		{
 			return 10000;
@@ -30,18 +31,27 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override void Handle()
 		{
-			if(DateTime.Now - m_start > TimeSpan.FromMinutes(PluginSettings.Instance.RestartTime))
+			if(!PluginSettings.Instance.RestartEnabled)
+				return;
+
+			SetRestartTime();
+			if(m_done < 0)
+				return;
+
+			//Logging.WriteLineAndConsole(string.Format("Restart in {0} minutes", m_done));
+
+			if (DateTime.Now - m_start > TimeSpan.FromMinutes(m_done))
 			{
 				DoRestart();
 				return;
 			}
 
-			foreach(RestartItem item in PluginSettings.Instance.RestartItems)
+			foreach (RestartNotificationItem item in PluginSettings.Instance.RestartNotificationItems)
 			{
 				if (item.completed)
 					continue;
 
-				if(DateTime.Now - m_start > TimeSpan.FromMinutes(PluginSettings.Instance.RestartTime - item.MinutesBeforeRestart))
+				if(DateTime.Now - m_start > TimeSpan.FromMinutes(m_done - item.MinutesBeforeRestart))
 				{
 					item.completed = true;					
 					Communication.SendPublicInformation(item.Message);
@@ -68,6 +78,7 @@ namespace EssentialsPlugin.ProcessHandler
 			{
 				String restartText = "timeout /t 20\r\n";
 				restartText += String.Format("cd /d \"{0}\"\r\n", System.IO.Path.GetDirectoryName(Application.ExecutablePath));
+				restartText += PluginSettings.Instance.RestartAddedProcesses + "\r\n";
 				restartText += System.IO.Path.GetFileName(Application.ExecutablePath) + " " + Server.Instance.CommandLineArgs.args + "\r\n";
 
 				File.WriteAllText("RestartApp.bat", restartText);
@@ -104,6 +115,42 @@ namespace EssentialsPlugin.ProcessHandler
 			});
 
 			Logging.WriteLineAndConsole(string.Format("{0} ships have been stopped", shipsStopped));
+		}
+
+		private void SetRestartTime()
+		{
+			DateTime? restartTime = GetNextRestartTime();
+			if (restartTime != null)
+				m_done = (int)(restartTime.Value - m_start).TotalMinutes;
+			else
+				m_done = -1;
+		}
+
+		private DateTime? GetNextRestartTime()
+		{
+			DateTime? result = null;
+
+			foreach (RestartTimeItem item in PluginSettings.Instance.RestartTimeItems)
+			{
+				if (!item.Enabled)
+					continue;
+
+				DateTime time = new DateTime(m_start.Year, m_start.Month, m_start.Day, item.Restart.Hour, item.Restart.Minute, 0);
+				if (time < m_start.AddMinutes(-1))
+					time = time.AddDays(1);
+
+				//Logging.WriteLineAndConsole(string.Format("Time: {0}", time));
+
+				if (result == null)
+					result = time;
+				else
+				{
+					if (result.Value > time)
+						result = time;
+				}
+			}
+
+			return result;
 		}
 	}
 }

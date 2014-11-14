@@ -44,3 +44,5 @@ Temporary Items
 
 EssentialsPlugin/bin/Debug/Essentials.dll
 EssentialsPlugin/bin/Debug/Essentials.dll
+*.dll
+*.dll

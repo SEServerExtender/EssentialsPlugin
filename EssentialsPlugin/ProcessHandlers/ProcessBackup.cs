@@ -71,7 +71,7 @@ namespace EssentialsPlugin.ProcessHandler
 			string finalDirectory = baseDirectory;
 			if(PluginSettings.Instance.BackupCreateSubDirectories)
 			{
-				string subDirectory = string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-hh-mm"));
+				string subDirectory = string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-HH-mm"));
 				if (!Directory.Exists(baseDirectory + "\\" + subDirectory))
 					Directory.CreateDirectory(baseDirectory + "\\" + subDirectory);
 
@@ -94,11 +94,11 @@ namespace EssentialsPlugin.ProcessHandler
 					if (!info.Extension.Equals(".vx2"))
 						continue;
 
-					File.Copy(file, tempDirectory + "\\" + info.Name);
+					File.Copy(file, tempDirectory + "\\" + info.Name, true);
 				}
 			}
 
-			ZipFile.CreateFromDirectory(tempDirectory, finalDirectory + "\\" + string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-hh-mm")) + ".zip");
+			ZipFile.CreateFromDirectory(tempDirectory, finalDirectory + "\\" + string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-HH-mm")) + ".zip");
 
 			foreach(string file in Directory.GetFiles(tempDirectory))
 			{
