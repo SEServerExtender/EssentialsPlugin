@@ -39,20 +39,22 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyFileVersion.tt</DependentUpon>
     </Compile>
+    <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveGridTo.cs" />
     <Compile Include="ChatHandlers\ChatHandlerBase.cs" />
-    <Compile Include="ChatHandlers\HandleAdminDeleteNoBeacon.cs" />
-    <Compile Include="ChatHandlers\HandleAdminDeleteStationsArea.cs" />
-    <Compile Include="ChatHandlers\HandleAdminDeleteShipsArea.cs" />
-    <Compile Include="ChatHandlers\HandleAdminMovePlayer.cs" />
-    <Compile Include="ChatHandlers\HandleAdminMoveAreaTowards.cs" />
-    <Compile Include="ChatHandlers\HandleAdminScanAreaTowards.cs" />
+    <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteNoBeacon.cs" />
+    <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteStationsArea.cs" />
+    <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteShipsArea.cs" />
+    <Compile Include="ChatHandlers\AdminMove\HandleAdminMovePlayerTo.cs" />
+    <Compile Include="ChatHandlers\AdminMove\HandleAdminMovePlayerPosition.cs" />
+    <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveAreaTowards.cs" />
+    <Compile Include="ChatHandlers\AdminScan\HandleAdminScanAreaTowards.cs" />
     <Compile Include="ChatHandlers\HandleAdminOwnershipChange.cs" />
-    <Compile Include="ChatHandlers\HandleAdminScanNoPower.cs" />
+    <Compile Include="ChatHandlers\AdminScan\HandleAdminScanNoPower.cs" />
     <Compile Include="ChatHandlers\HandleAdminTest.cs" />
-    <Compile Include="ChatHandlers\HandleAdminDeleteGridsArea.cs" />
-    <Compile Include="ChatHandlers\HandleAdminScanNoBeacon.cs" />
-    <Compile Include="ChatHandlers\HandleAdminScanAreaAt.cs" />
-    <Compile Include="ChatHandlers\HandleAdminMoveAreaTo.cs" />
+    <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteGridsArea.cs" />
+    <Compile Include="ChatHandlers\AdminScan\HandleAdminScanNoBeacon.cs" />
+    <Compile Include="ChatHandlers\AdminScan\HandleAdminScanAreaAt.cs" />
+    <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveAreaToPosition.cs" />
     <Compile Include="ChatHandlers\HandlePos.cs" />
     <Compile Include="ChatHandlers\HandleTimeleft.cs" />
     <Compile Include="ChatHandlers\HandleInfo.cs" />
@@ -78,9 +80,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="UtilityClasses\MTObservableCollection.cs" />
+    <Compile Include="UtilityClasses\UIEditors.cs" />
     <Compile Include="Utility\Communication.cs" />
     <Compile Include="Utility\CubeGrid.cs" />
     <Compile Include="Utility\MathUtility.cs" />
+    <Compile Include="Utility\Player.cs" />
     <Compile Include="Utility\Utility.cs" />
     <Compile Include="Utility\Wrapper.cs" />
   </ItemGroup>

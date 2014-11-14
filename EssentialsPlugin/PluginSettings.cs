@@ -13,6 +13,7 @@ using System.Windows.Forms.Design;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms;
+using System.ComponentModel.Design;
 
 namespace EssentialsPlugin
 {
@@ -389,18 +390,20 @@ namespace EssentialsPlugin
 	public class InformationItem
 	{
 		internal DateTime lastUpdate = DateTime.Now;
+		internal int position = 0;
 
-		private String subCommand;
-		public String SubCommand { get { return subCommand; } set { subCommand = value; } }
+		private bool enabled;
+		public bool Enabled { get { return enabled; } set { enabled = value; } }
 
-		private String subText;
-		public String SubText { get { return subText; } set { subText = value; } }
+		private string subCommand;
+		public string SubCommand { get { return subCommand; } set { subCommand = value; } }
 
-		private Int32 intervalSeconds;
-		public Int32 IntervalSeconds { get { return intervalSeconds; } set { intervalSeconds = value; } }
+		private string subText;
+		[Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
+		public string SubText { get { return subText; } set { subText = value; } }
 
-		private Boolean enabled;
-		public Boolean Enabled { get { return enabled; } set { enabled = value; } }
+		private int intervalSeconds;
+		public int IntervalSeconds { get { return intervalSeconds; } set { intervalSeconds = value; } }
 	}
 
 	[Serializable]
@@ -464,43 +467,6 @@ namespace EssentialsPlugin
 		public RestartNotificationItem()
 		{
 			completed = false;
-		}
-	}
-
-	internal class TimePickerEditor : UITypeEditor {
-		IWindowsFormsEditorService editorService;
-		string time;
-
-		public override object EditValue(System.ComponentModel.ITypeDescriptorContext context, IServiceProvider provider, object value) 
-		{
-			if (provider != null) 
-			{
-				this.editorService = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
-			}
-			if (this.editorService != null) 
-			{
-				if (value == null) {
-					time = DateTime.Now.ToString("HH:mm");
-				}
-
-				DateTimePicker picker = new DateTimePicker();
-				picker.Format = DateTimePickerFormat.Custom;
-				picker.CustomFormat = "HH:mm";
-				picker.ShowUpDown = true;
-
-				if(value != null)
-				{
-					picker.Value = DateTime.Parse((string)value);
-				}
-
-				this.editorService.DropDownControl(picker);
-				value = picker.Value.ToString("HH:mm");
-			}
-			return value;
-		}
-
-		public override UITypeEditorEditStyle GetEditStyle(System.ComponentModel.ITypeDescriptorContext context) {
-			return UITypeEditorEditStyle.DropDown;
 		}
 	}
 }

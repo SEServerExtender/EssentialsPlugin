@@ -11,7 +11,7 @@ namespace EssentialsPlugin.Utility
 			if (infoText == "")
 				return;
 
-			Int32 maxLineLength = 45;
+			Int32 maxLineLength = 32;
 			Int32 charCount = 0;
 			String[] lines = infoText.Split(new String[] { " " }, StringSplitOptions.RemoveEmptyEntries).GroupBy(w => (charCount += w.Length + 1) / maxLineLength).Select(g => string.Join(" ", g)).ToArray();
 
@@ -27,7 +27,7 @@ namespace EssentialsPlugin.Utility
 			if (infoText == "")
 				return;
 
-			Int32 maxLineLength = 45;
+			Int32 maxLineLength = 32;
 			Int32 charCount = 0;
 			String[] lines = infoText.Split(new String[] { " " }, StringSplitOptions.RemoveEmptyEntries).GroupBy(w => (charCount += w.Length + 1) / maxLineLength).Select(g => string.Join(" ", g)).ToArray();
 

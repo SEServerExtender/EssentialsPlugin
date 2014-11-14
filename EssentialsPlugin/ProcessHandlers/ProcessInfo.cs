@@ -39,12 +39,23 @@ namespace EssentialsPlugin.ProcessHandler
 							foreach(ulong userId in PlayerManager.Instance.ConnectedPlayers)
 							{
 								string userName = PlayerMap.Instance.GetPlayerNameFromSteamId(userId);
-								Communication.SendPrivateInformation(userId, item.SubText.Replace("%name%", userName));
+								string subText = item.SubText.Replace("%name%", userName).Split(new string[] { "\n" }, 2, StringSplitOptions.None)[item.position];
+
+								item.position++;
+								if (item.position >= item.SubText.Replace("%name%", userName).Split(new string[] { "\n" }, 2, StringSplitOptions.None).Count())
+									item.position = 0;
+
+								Communication.SendPrivateInformation(userId, subText);
 							}							
 						}
 						else
 						{
-							Communication.SendPublicInformation(item.SubText);
+							string subText = item.SubText.Split(new string[] { "\n" }, StringSplitOptions.None)[item.position];
+							item.position++;
+							if (item.position >= item.SubText.Split(new string[] { "\n" }, StringSplitOptions.None).Count())
+								item.position = 0;
+
+							Communication.SendPublicInformation(subText);
 						}
 					}
 				}

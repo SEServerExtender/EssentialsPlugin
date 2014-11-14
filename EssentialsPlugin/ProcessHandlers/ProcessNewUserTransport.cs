@@ -156,7 +156,6 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override void OnPlayerJoined(ulong remoteUserId)
 		{
-			Logging.WriteLineAndConsole(string.Format("Queuing New User Transport Queued: {0}", remoteUserId));
 			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Count() > 0)
 				return;
 
@@ -199,13 +198,7 @@ namespace EssentialsPlugin.ProcessHandler
 				{
 					Logging.WriteLineAndConsole(string.Format("Found asteroid with viable materials: {0} - {1}", voxelMap.Name, voxelMap.Materials.Count()));
 					asteroidPosition = (Vector3)voxelMap.Position;
-					Vector3 startPosition = voxelMap.Position;
-					Vector3 randomPoint = new Vector3(m_random.Next(-100000, 100000), m_random.Next(-100000, 100000), m_random.Next(-100000, 100000));
-					Vector3 directionNormal = randomPoint - startPosition;
-					directionNormal.Normalize();
-					directionNormal *= PluginSettings.Instance.NewUserTransportDistance;
-					directionNormal += startPosition;
-					validPosition = directionNormal;
+					validPosition = MathUtility.RandomPositionFromPoint(asteroidPosition, PluginSettings.Instance.NewUserTransportDistance);
 					break;
 				}
 			}

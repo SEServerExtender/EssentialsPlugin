@@ -312,9 +312,11 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleAdminScanAreaTowards());
 			m_chatHandlers.Add(new HandleAdminScanNoBeacon());
 
-			m_chatHandlers.Add(new HandleAdminMoveAreaTo());
+			m_chatHandlers.Add(new HandleAdminMoveAreaToPosition());
 			m_chatHandlers.Add(new HandleAdminMoveAreaTowards());
-			m_chatHandlers.Add(new HandleAdminMovePlayer());
+			m_chatHandlers.Add(new HandleAdminMovePlayerTo());
+			m_chatHandlers.Add(new HandleAdminMovePlayerPosition());
+			m_chatHandlers.Add(new HandleAdminMoveGridTo());
 
 			m_chatHandlers.Add(new HandleAdminDeleteGridsArea());
 			m_chatHandlers.Add(new HandleAdminDeleteShipsArea());

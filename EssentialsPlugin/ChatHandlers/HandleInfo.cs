@@ -42,6 +42,9 @@ namespace EssentialsPlugin.ChatHandlers
 						if (!item.Enabled)
 							continue;
 
+						if (item.SubCommand == "")
+							continue;
+
 						if (noticeList != "")
 							noticeList += ", ";
 
@@ -54,10 +57,14 @@ namespace EssentialsPlugin.ChatHandlers
 				{
 					foreach (InformationItem item in PluginSettings.Instance.InformationItems)
 					{
+						if (item.SubCommand == "")
+							continue;
+
 						if (item.SubCommand.ToLower() == words[0].ToLower() && item.Enabled)
 						{
 							string userName = PlayerMap.Instance.GetPlayerNameFromSteamId(userId);
-							Communication.SendPrivateInformation(userId, item.SubText.Replace("%name%", userName));
+							string subText = item.SubText.Replace("%name%", userName).Split(new string[] { "\n" }, 2, StringSplitOptions.None).First();
+							Communication.SendPrivateInformation(userId, subText);
 							break;
 						}
 					}
