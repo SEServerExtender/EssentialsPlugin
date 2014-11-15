@@ -30,8 +30,9 @@ Options:
 - BackupCleanup - This allows you to turn Cleaning up of the backups off or on
 - BackupCleanupTime - The amount of time, in days, for a cleanup to occur
 - BackupCreateSubdirectories - This option forces the backup to put a separate backup in a new directory each time it occurs
-- BackupItems - This is where you define when you want a backup to occur.  You specify the hour and minute of the day you wish the backup to happen.  If you set hour to -1, this will allow you to backup hourly.  So if you set hour -1 and minute 30, it will backup on 30 minute mark of every hour.  
 - BackupAsteroids - This includes asteroids in the backup file.  If off, the .vx2 files will not be saved.
+- BackupItems - This is where you define when you want a backup to occur.  You specify the hour and minute of the day you wish the backup to happen.  If you set hour to -1, this will allow you to backup hourly.  So if you set hour -1 and minute 30, it will backup on 30 minute mark of every hour.  Items are defined as follows:
+  - 
 
 Automated Restart with Notifications
 ------------------------------------
@@ -40,8 +41,11 @@ This option allows you to schedule automated restarts of your server.  Sadly the
 
 Options:
 - RestartEnabled - This allows you to turn Restart off or on
-- RestartItems - These items allow you to define notifications that occur before a restart happens. You set a message, you set the minutes before restart the message will be shown, and you can force a save or stop all ships.
-- RestartTime - The time, in minutes, when the restart will occur.  Default is 720 (12 hours)
+- RestartAddedProcesses - This is a multline field that allows you to run things in between restarts.  Each line is a seperate process in the restart batch file.
+- RestartItems - These items allow you to define notifications that occur before a restart happens. You set a message, you set the minutes before restart the message will be shown, and you can force a save or stop all ships.  They are defined as followed:
+  - 
+- RestartTimeItems - These items allow you to define a time of day of when you'd like a restart to take place.  They are defined as followed:
+  - 
 
 Chat Information Commands with interval based repeats
 -----------------------------------------------------
@@ -50,7 +54,11 @@ This option allows you to setup commands that users can access that allow admini
 
 Options:
 - InformationEnabled - This allows you to turn Information commands off or on
-- InformationItems - This lets you define information commands.  Defining them is pretty straightforward: SubCommand is the command that a user types after /info to show the information.  SubText is the text displayed when they run the command.  IntervalSeconds is how many seconds in rotation the message will be broadcasted to all players without having to use the /info command.  And enabled allows you to disable items individually. 
+- InformationItems - This lets you define information commands.  Defining an item is pretty simple. 
+  - Enabled - Enable / Disable this information item
+  - IntervalSeconds - The amount of time it takes for this item to be broadcasted publically.  Set to 0 to not have it broadcast
+  - SubCommand - The command a user types to view this information item
+  - SubText - The actual text that is displayed with this item is queried using the /info command or broadcasted.  You may use the %name% tag which gets replaced by the user's name.
 
 Automated Join Messages for new and old players
 -----------------------------------------------
