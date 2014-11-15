@@ -64,7 +64,7 @@ Options:
   - Enabled - Enable / Disable this information item
   - IntervalSeconds - The amount of time it takes for this item to be broadcasted publically.  Set to 0 to not have it broadcast
   - SubCommand - The command a user types to view this information item
-  - SubText - The actual text that is displayed with this item is queried using the /info command or broadcasted.  You may use the %name% tag which gets replaced by the user's name.
+  - SubText - The actual text that is displayed with this item is queried using the /info command or broadcasted.  You may use the %name% tag which gets replaced by the user's name.  This is a multiline text, and each line will be broadcasted individually per interval as well.  So this allows you to setup messages that get sent in order.
 
 Automated Join Messages for new and old players
 -----------------------------------------------
