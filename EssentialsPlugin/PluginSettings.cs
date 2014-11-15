@@ -409,7 +409,7 @@ namespace EssentialsPlugin
 	[Serializable]
 	public class RestartTimeItem
 	{
-		public DateTime Restart = DateTime.Now.AddDays(1);
+		public DateTime Restart;
 
 		private bool enabled;
 		public bool Enabled
@@ -428,6 +428,13 @@ namespace EssentialsPlugin
 				restartTime = value;
 				Restart = DateTime.Parse(restartTime);
 			}
+		}
+
+		public RestartTimeItem()
+		{
+			enabled = false;
+			restartTime = DateTime.Now.AddHours(1).ToString("HH:mm");
+			Restart = DateTime.Now.AddHours(1);
 		}
 	}
 

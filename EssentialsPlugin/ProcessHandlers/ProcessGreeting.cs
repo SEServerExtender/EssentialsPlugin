@@ -92,10 +92,12 @@ namespace EssentialsPlugin.ProcessHandler
 			item.Start = DateTime.Now;
 			item.IsNewUser = PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Count() == 0;
 
+			Logging.WriteLineAndConsole(string.Format("New User: {0}", remoteUserId));
+
 			lock (m_greetingList)
 			{
 				m_greetingList.Add(item);
-				Logging.WriteLineAndConsole(string.Format("Greeting Added => {0}", remoteUserId));
+				Logging.WriteLineAndConsole(string.Format("Greeting Added => {0} (New user: {1})", remoteUserId, item.IsNewUser));
 			}
 
 			base.OnPlayerJoined(remoteUserId);

@@ -486,7 +486,7 @@ namespace EssentialsPlugin
 
 					foreach (ChatHandlerBase handler in m_chatHandlers)
 					{
-						if (handler.GetCommandText().ToLower().StartsWith(helpTarget.ToLower()))
+						if (handler.GetCommandText().ToLower().StartsWith(helpTarget.ToLower()) && ((!handler.IsAdminCommand()) || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
 						{
 							helpTopics.Add(handler.GetCommandText().ToLower().Replace(helpTarget.ToLower(), ""));
 						}
