@@ -56,7 +56,7 @@ Options:
 Chat Information Commands with interval based repeats
 -----------------------------------------------------
 
-This option allows you to setup commands that users can access that allow administrators to display server information to the user.  The command /info is the base command, and the administrator then defines subcommands to display different types of information.  For example defining a subcommand 'motd' that gives a general message to users is easily setup.  You can then specify if you'd like that message to be displayed for everyone at intervals.  So for example you can set it up to send that message once every few hours, even if a player doesn't type the /info motd command.
+This option allows you to setup commands that users can access that allow administrators to display server information to the user.  The command /info is the base command, and the administrator then defines subcommands to display different types of information.  For example defining a subcommand 'motd' that gives a general message to users is setup with a subcommand of motd.  The user then types /info motd to see it.  You can then specify if you'd like that message to be displayed for everyone at intervals.  So for example you can set it up to send that message once every few hours, even if a player doesn't type the /info motd command.
 
 Options:
 - InformationEnabled - This allows you to turn Information commands off or on
