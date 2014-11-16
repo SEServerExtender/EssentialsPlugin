@@ -43,13 +43,16 @@ namespace EssentialsPlugin.ChatHandlers
 		// admin nobeacon scan
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-			HashSet<IMyEntity> entitiesToConfirm = new HashSet<IMyEntity>();
-			HashSet<IMyEntity> entitiesConnected = new HashSet<IMyEntity>();
-			HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>();
-			Wrapper.GameAction(() =>
+			try
 			{
-				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
+				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+				HashSet<IMyEntity> entitiesToConfirm = new HashSet<IMyEntity>();
+				HashSet<IMyEntity> entitiesConnected = new HashSet<IMyEntity>();
+				HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>();
+				Wrapper.GameAction(() =>
+				{
+					MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
+				});
 
 				foreach (IMyEntity entity in entities)
 				{
@@ -66,21 +69,21 @@ namespace EssentialsPlugin.ChatHandlers
 					entitiesToConfirm.Add(grid);
 				}
 
-				foreach(IMyEntity entity in entitiesToConfirm)
+				foreach (IMyEntity entity in entitiesToConfirm)
 				{
 					IMyCubeGrid grid = (IMyCubeGrid)entity;
 					List<IMySlimBlock> blocks = new List<IMySlimBlock>();
 					grid.GetBlocks(blocks, x => x.FatBlock != null);
 					foreach (IMySlimBlock block in blocks)
 					{
-						if(block.FatBlock != null)
+						if (block.FatBlock != null)
 						{
 							IMyCubeBlock cubeBlock = block.FatBlock;
 
 							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_ShipConnector))
 							{
 								MyObjectBuilder_ShipConnector connector = (MyObjectBuilder_ShipConnector)cubeBlock.GetObjectBuilderCubeBlock();
-								if(connector.Connected)
+								if (connector.Connected)
 								{
 									IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(connector.ConnectedEntityId);
 
@@ -93,8 +96,17 @@ namespace EssentialsPlugin.ChatHandlers
 
 							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_PistonBase))
 							{
+								entitiesConnected.Add(entity);
+								break;
+							}
+
+							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_ExtendedPistonBase))
+							{
+								entitiesConnected.Add(entity);
+								break;
+								/*
 								MyObjectBuilder_PistonBase pistonBase = (MyObjectBuilder_PistonBase)cubeBlock.GetObjectBuilderCubeBlock();
-								if(pistonBase.TopBlockId != 0)
+								if (pistonBase.TopBlockId != 0)
 								{
 									IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(pistonBase.TopBlockId);
 
@@ -103,12 +115,32 @@ namespace EssentialsPlugin.ChatHandlers
 
 									break;
 								}
+								 */
 							}
 
-							if(cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorAdvancedStator))
+							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_PistonTop))
+							{
+								entitiesConnected.Add(entity);
+								break;
+
+								/*
+								MyObjectBuilder_PistonTop pistonTop = (MyObjectBuilder_PistonTop)cubeBlock.GetObjectBuilderCubeBlock();
+								if (pistonTop.PistonBlockId != 0)
+								{
+									IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(pistonTop.PistonBlockId);
+
+									if (connectedEntity != null)
+										entitiesConnected.Add(entity);
+
+									break;
+								}
+									*/
+							}
+
+							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorAdvancedStator))
 							{
 								MyObjectBuilder_MotorAdvancedStator stator = (MyObjectBuilder_MotorAdvancedStator)cubeBlock.GetObjectBuilderCubeBlock();
-								if(stator.RotorEntityId != 0)
+								if (stator.RotorEntityId != 0)
 								{
 									IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(stator.RotorEntityId);
 
@@ -118,7 +150,35 @@ namespace EssentialsPlugin.ChatHandlers
 									break;
 								}
 							}
+
+							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorAdvancedRotor))
+							{
+								entitiesConnected.Add(entity);
+								break;
+							}
+
+							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorStator))
+							{
+								MyObjectBuilder_MotorStator stator = (MyObjectBuilder_MotorStator)cubeBlock.GetObjectBuilderCubeBlock();
+								if (stator.RotorEntityId != 0)
+								{
+									IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(stator.RotorEntityId);
+
+									if (connectedEntity != null)
+										entitiesConnected.Add(entity);
+
+									break;
+								}
+							}
+
+							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorRotor))
+							{
+								entitiesConnected.Add(entity);
+								break;
+							}
 						}
+
+
 					}
 
 					if (!entitiesConnected.Contains(entity))
@@ -127,21 +187,16 @@ namespace EssentialsPlugin.ChatHandlers
 
 				foreach (IMyEntity entity in entitiesFound)
 				{
-					Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' at {1} with no beacon.", entity.EntityId, General.Vector3DToString(entity.GetPosition())));
+					CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(entity.EntityId);
+					Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) at {2} with no beacon.", gridEntity.Name, gridEntity.EntityId, General.Vector3DToString(entity.GetPosition())));
 				}
 
-				/*
-				for(int r = entitiesToDelete.Count - 1; r >= 0; r--)
-				{
-					IMyEntity entity = entitiesToDelete[r];
-					MyAPIGateway.Entities.RemoveEntity(entity);
-				}
-				 */ 
-
-			});
-
-			Communication.SendPrivateInformation(userId, string.Format("Found {0} grids with no beacons", entitiesFound.Count));
-			//Communication.SendPrivateInformation(userId, string.Format("Removed {0} grids with no beacons", entitiesToDelete.Count));
+				Communication.SendPrivateInformation(userId, string.Format("Found {0} grids with no beacons", entitiesFound.Count));
+			}
+			catch (Exception ex)
+			{
+				Logging.WriteLineAndConsole(string.Format("Scan error: {0}", ex.ToString()));
+			}
 
 			return true;
 		}

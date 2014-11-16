@@ -42,9 +42,8 @@ namespace EssentialsPlugin.ProcessHandler
 
 	public class ProcessGreeting : ProcessHandlerBase
 	{
-		#region Private Fields
 		private List<GreetingItem> m_greetingList = new List<GreetingItem>();
-		#endregion
+		private DateTime m_start = DateTime.Now;
 
 		public override int GetUpdateResolution()
 		{
@@ -55,29 +54,65 @@ namespace EssentialsPlugin.ProcessHandler
 		{
 			if (PluginSettings.Instance.GreetingMessage != "")
 			{
+				if (MyAPIGateway.Players == null)
+					return;
 
-				List<IMyPlayer> players = new List<IMyPlayer>();
-				Wrapper.GameAction(() =>
+				int pos = 0;
+				try
 				{
-					MyAPIGateway.Players.GetPlayers(players, null);
-				});
-
-				lock (m_greetingList)
-				{
-					for (int r = m_greetingList.Count - 1; r >= 0; r--)
+					List<IMyPlayer> players = new List<IMyPlayer>();
+					pos = 1;
+					bool result = false;
+					Wrapper.GameAction(() =>
 					{
-						GreetingItem item = m_greetingList[r];
-						IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == item.SteamId && x.Controller != null && x.Controller.ControlledEntity != null);
-						if (player != null)
+						try
 						{
-							m_greetingList.RemoveAt(r);
-
-							if (item.IsNewUser)
-								Communication.SendPrivateInformation(item.SteamId, PluginSettings.Instance.GreetingNewUserMessage.Replace("%name%", player.DisplayName));
-							else
-								Communication.SendPrivateInformation(item.SteamId, PluginSettings.Instance.GreetingMessage.Replace("%name%", player.DisplayName));
+							MyAPIGateway.Players.GetPlayers(players, null);
+							result = true;
 						}
+						catch (Exception ex)
+						{
+							Logging.WriteLineAndConsole(string.Format("Failed to get player list: {0}", ex.ToString()));
+						}
+					});
+
+					if(!result)
+						return;
+
+					pos = 2;
+					lock (m_greetingList)
+					{
+						for (int r = m_greetingList.Count - 1; r >= 0; r--)
+						{
+							pos = 3;
+							GreetingItem item = m_greetingList[r];
+							if(DateTime.Now - item.Start > item.Timeout)
+							{
+								m_greetingList.RemoveAt(r);
+								continue;
+							}
+							pos = 4;
+							IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == item.SteamId && x.Controller != null && x.Controller.ControlledEntity != null);
+							pos = 5;
+							if (player != null)
+							{
+								pos = 6;
+								m_greetingList.RemoveAt(r);
+
+								if (item.IsNewUser)
+									Communication.SendPrivateInformation(item.SteamId, PluginSettings.Instance.GreetingNewUserMessage.Replace("%name%", player.DisplayName));
+								else
+									Communication.SendPrivateInformation(item.SteamId, PluginSettings.Instance.GreetingMessage.Replace("%name%", player.DisplayName));
+							}
+						}
+
+						pos = 7;
+
 					}
+				}
+				catch (Exception ex)
+				{
+					Logging.WriteLineAndConsole(string.Format("Handle(): Error at pos - {0}: {1}", pos, ex.ToString()));
 				}
 			}
 

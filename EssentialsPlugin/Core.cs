@@ -308,9 +308,9 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleTimeleft());
 			m_chatHandlers.Add(new HandlePos());
 
-			m_chatHandlers.Add(new HandleAdminScanAreaAt());
-			m_chatHandlers.Add(new HandleAdminScanAreaTowards());
-			m_chatHandlers.Add(new HandleAdminScanNoBeacon());
+			m_chatHandlers.Add(new HandleAdminScanAreaAt());          //
+			m_chatHandlers.Add(new HandleAdminScanAreaTowards());     //
+			m_chatHandlers.Add(new HandleAdminScanNoBeacon());        //
 
 			m_chatHandlers.Add(new HandleAdminMoveAreaToPosition());
 			m_chatHandlers.Add(new HandleAdminMoveAreaTowards());

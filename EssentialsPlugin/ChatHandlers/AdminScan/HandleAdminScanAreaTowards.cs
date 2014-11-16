@@ -42,10 +42,10 @@ namespace EssentialsPlugin.ChatHandlers
 		// admin scan x y z radius
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			if (words.Count() != 4 && words.Count() != 0)
+			if (words.Count() != 8 && words.Count() != 0)
 				return false;
 
-			if (words.Count() != 4)
+			if (words.Count() != 8)
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());
 				return true;
@@ -77,6 +77,7 @@ namespace EssentialsPlugin.ChatHandlers
 			List<IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
 			int count = 0;
 
+			Communication.SendPrivateInformation(userId, string.Format("Scanning around {0}m around {1}", radius, General.Vector3DToString(finalPosition)));
 			Wrapper.GameAction(() =>
 			{
 				foreach (IMyEntity entity in entities)

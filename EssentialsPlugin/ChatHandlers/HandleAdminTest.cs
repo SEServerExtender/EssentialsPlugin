@@ -42,26 +42,6 @@ namespace EssentialsPlugin.ChatHandlers
 		// admin deletearea x y z radius
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			string user = words[0];
-			List<IMyPlayer> players = new List<IMyPlayer>();
-
-			Wrapper.GameAction(() =>
-			{
-				MyAPIGateway.Players.GetPlayers(players, x => x.DisplayName.ToLower() == user.ToLower());
-				if (players.Count > 0)
-				{
-					IMyPlayer player = players.First();
-					player.Controller.ControlledEntity.Entity.SetPosition(new Vector3D(1000, 1000, 5000));
-					Communication.SendPrivateInformation(userId, "Moved Entity");
-
-					
-				}
-			});
-
-			//Communication.SendPrivateInformation(userId, string.Format("Total ships removed: {0}", count));
-
-			MyAPIGateway.Utilities.ConfigDedicated.Load();
-			Communication.SendPrivateInformation(userId, string.Format("Here: {0} - {1}", MyAPIGateway.Utilities.ConfigDedicated.Administrators.Count, MyAPIGateway.Utilities.ConfigDedicated.Administrators.First()));
 
 			return true;
 		}

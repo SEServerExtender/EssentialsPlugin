@@ -51,12 +51,15 @@ namespace EssentialsPlugin.Utility
 			{
 				Thread.Sleep(100);
 				count++;
-				if (count > 10)
+				if (count > 40)
 					break;
 			}
 
 			if (gridEntity.IsLoading)
+			{
+				Logging.WriteLineAndConsole(string.Format("Failed to load cockpit entity: {0}", gridEntity.EntityId));
 				return false;
+			}
 
 			foreach (CubeBlockEntity block in gridEntity.CubeBlocks)
 			{

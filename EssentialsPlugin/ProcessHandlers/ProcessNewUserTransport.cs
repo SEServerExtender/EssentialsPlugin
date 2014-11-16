@@ -73,11 +73,27 @@ namespace EssentialsPlugin.ProcessHandler
 			if (!PluginSettings.Instance.NewUserTransportEnabled)
 				return;
 
+			if (MyAPIGateway.Players == null)
+				return;
+
 			List<IMyPlayer> players = new List<IMyPlayer>();
+			bool result = false;
 			Wrapper.GameAction(() =>
 			{
-				MyAPIGateway.Players.GetPlayers(players, null);
+				try
+				{
+
+					MyAPIGateway.Players.GetPlayers(players, null);
+					result = true;
+				}
+				catch (Exception ex)
+				{
+					Logging.WriteLineAndConsole(string.Format("Transport(): Unable to get player list: {0}", ex.ToString()));
+				}
 			});
+
+			if (!result)
+				return;
 
 			lock (m_newUserList)
 			{
@@ -117,7 +133,7 @@ namespace EssentialsPlugin.ProcessHandler
 						{
 							Thread.Sleep(100);
 							count++;
-							if (count > 10)
+							if (count > 40)
 								break;
 						}
 
@@ -138,7 +154,7 @@ namespace EssentialsPlugin.ProcessHandler
 
 						Wrapper.GameAction(() =>
 						{
-							// This should boot them out of their ship
+							// This should boot them out of their ship: it does not, it kills them :(
 //							MyAPIGateway.Entities.RemoveEntity(entity);
 							MyAPIGateway.Entities.RemapObjectBuilder(cubeGrid);
 						});

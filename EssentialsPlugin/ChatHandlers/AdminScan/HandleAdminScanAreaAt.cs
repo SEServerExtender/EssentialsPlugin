@@ -76,8 +76,8 @@ namespace EssentialsPlugin.ChatHandlers
 				{
 					if (!(entity is IMyCubeGrid))
 						continue;
-					
-					Communication.SendPrivateInformation(userId, string.Format("Found ship {0} at {1}", entity.DisplayName, General.Vector3DToString(entity.GetPosition())));
+
+					Communication.SendPrivateInformation(userId, string.Format("Found ship '{0}' ({1}) at {2}", entity.DisplayName, entity.EntityId, General.Vector3DToString(entity.GetPosition())));
 					count++;
 				}
 			});

@@ -17,7 +17,7 @@ using SEModAPIInternal.API.Entity.Sector.SectorObject;
 
 namespace EssentialsPlugin.ChatHandlers
 {
-	public class HandleAdminDeleteNoBeacon : ChatHandlerBase
+	public class HandleAdminDeleteStationsArea : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{

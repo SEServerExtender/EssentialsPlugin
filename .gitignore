@@ -46,3 +46,6 @@ EssentialsPlugin/bin/Debug/Essentials.dll
 EssentialsPlugin/bin/Debug/Essentials.dll
 *.dll
 *.dll
+*.pdb
+*.cache
+*.dll
