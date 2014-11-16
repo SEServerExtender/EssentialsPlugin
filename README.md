@@ -106,7 +106,7 @@ Move commands
 Command| Options|Example
 -------|--------|-----------------------------------------------------------------------------------------------------
 /admin move player position | [username] [x] [y] [z] | /admin move player position tyrsis 0 0 0 - This moves a player 'tyrsis' to position 0 0 0.
-/admin move player to | [sourceUsername] [targetUsername/targetGridname] (distance) | /admin move player to tyrsis vicious 500 - This moves player 'tyrsis' near player 'vicious' within 500m.  Please note that player 'tyrsis' must be in a space suit for this to work (out of cockpit).
+/admin move player to | [sourceUsername] [targetUsername or targetGridname] (distance) | /admin move player to tyrsis vicious 500 - This moves player 'tyrsis' near player 'vicious' within 500m.  Please note that player 'tyrsis' must be in a space suit for this to work (out of cockpit).
 /admin move area to position | [sx] [sy] [sz] [tx] [ty] [tz] [radius] | /admin move area to 10000 10000 10000 20000 20000 20000 5000 - This would move all ships and stations that are within 5000m of 10000,10000,10000 and move them towards 20000,20000,20000 relative to where they were before they were moved (so it basically picks up all the ships and moves them relative to the new position)
 /admin move area towards | [sx] [sy] [sz] [tx] [ty] [tz] [radius] | /admin move area towards 20000 0 0 0 0 0 5000 1000 - This command would move all ships within 1000m of point 20000,0,0 towards 0,0,0 and move them 5000m.  So a ship at 20500,0,0 would be moved to 15500,0,0.
 
