@@ -12,7 +12,7 @@ There are many options in this plugin, and those options will expand as time goe
 
 Installation
 ------------
-If you're just using the archive provided, just unzip the archive into it's own subdirectory off the Mods directory of your world instance. 
+If you're just using the archive provided, just unzip the archive into it's own sub directory off the Mods directory of your world instance. 
 
 If you want to compile the source provided.  Compile and copy the .dll created after compiling of this project into it's own sub directory of your Mods directory of your instance.  Also move the .sbc files included the .zip archive of any of the releases into that directory as well.
 
@@ -26,9 +26,9 @@ Major Feature Overview
 - Chat Information commands with interval based repeating
 - Automated Join Messages for new and old players 
 - Automated new player spawn movement
-- Advanced Adminsitrator Commands
+- Advanced Administrator Commands
 
-Indepth Feature Anaylsis
+In depth Feature Analysis
 ------------------------
 
 Automated Backup
@@ -54,7 +54,7 @@ This option allows you to schedule automated restarts of your server.  Sadly the
 
 Options:
 - RestartEnabled - This allows you to turn Restart off or on
-- RestartAddedProcesses - This is a multline field that allows you to run things in between restarts.  Each line is a seperate process in the restart batch file.
+- RestartAddedProcesses - This is a multline field that allows you to run things in between restarts.  Each line is a separate process in the restart batch file.
 - RestartItems - These items allow you to define notifications that occur before a restart happens. You set a message, you set the minutes before restart the message will be shown, and you can force a save or stop all ships.  They are defined as followed:
   - Message - This is the message that will be broadcasted to all users
   - MinutesBeforeRestart - This is the amount of time before a restart that this message is sent
@@ -67,7 +67,7 @@ Options:
 Chat Information Commands with interval based repeats
 -----------------------------------------------------
 
-This option allows you to setup commands that users can access that allow administrators to display server information to the user.  The command /info is the base command, and the administrator then defines subcommands to display different types of information.  For example defining a subcommand 'motd' that gives a general message to users is setup with a subcommand of motd.  The user then types /info motd to see it.  You can then specify if you'd like that message to be displayed for everyone at intervals.  So for example you can set it up to send that message once every few hours, even if a player doesn't type the /info motd command.
+This option allows you to setup commands that users can access that allow administrators to display server information to the user.  The command /info is the base command, and the administrator then defines sub commands to display different types of information.  For example defining a sub command 'motd' that gives a general message to users is setup with a sub command of motd.  The user then types /info motd to see it.  You can then specify if you'd like that message to be displayed for everyone at intervals.  So for example you can set it up to send that message once every few hours, even if a player doesn't type the /info motd command.
 
 Options:
 - InformationEnabled - This allows you to turn Information commands off or on
