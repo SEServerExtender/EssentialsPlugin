@@ -4,6 +4,10 @@ Requirements
 ------------
 This plugin requires SEServerExtender v2.11.20 or above.  Please download and install that first from https://github.com/Tyrsis/SE-Community-Mod-API/releases. 
 
+This plugin is available at github at: https://github.com/Tyrsis/EssentialsPlugin/releases
+
+Please most issues you have with the plugin at: https://github.com/Tyrsis/EssentialsPlugin/issues
+
 Overview
 --------
 This plugin is aimed at being an essential plugin to run on dedicated servers running extender.  It will cover a lot of very basic requirements for server administration.  This plugin looks to really show off how valuable server extender can be, by providing a lot of built in cleaning and adminstrative options and commands.
