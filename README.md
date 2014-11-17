@@ -97,7 +97,7 @@ Scan Commands
 Command| Options|Example
 -------|--------|-----------------------------------------------------------------------------------------------------
 /admin scan area at | [x] [y] [z] [radius] | /admin scan area at 0 0 0 1000 - This will scan for all ships and stations at position 0 0 0 within 1000m of that point.
-/admin scan area towards | [sX] [sy] [sz] [tx] [ty] [tz] [distance] [radius] | /admin scan area towards 10000 0 0 0 0 0 5000 1000 - This will scan for all ships and stations at position 5000 0 0 within a 1000m radius.  It basically starts at position 1000,0,0 and moves towards 0,0,0 5000 meters (which is 5000,0,0).  This is useful when moving ships a certain distance in a direction, and this allows you to scan the area before moving them to ensure nothing is there.
+/admin scan area towards | [sX] [sy] [sz] [tx] [ty] [tz] [distance] [radius] | /admin scan area towards 10000 0 0 0 0 0 5000 1000 - This will scan for all ships and stations at position 5000 0 0 within a 1000m radius.  It basically starts at position (10000,0,0) and moves towards (0,0,0) by 5000 meters (which is (5000,0,0)).  This is useful when moving ships a certain distance in a direction, and this allows you to scan the area before moving them to ensure nothing is there.
 /admin scan nobeacon | (no options) | /admin scan nobeacon - This command scans for ships and stations that have no beacons.  This allows you to preview a list of ships before running the cleanup on it in case something is wrong.
 
 
@@ -107,8 +107,8 @@ Command| Options|Example
 -------|--------|-----------------------------------------------------------------------------------------------------
 /admin move player position | [username] [x] [y] [z] | /admin move player position tyrsis 0 0 0 - This moves a player 'tyrsis' to position 0 0 0.
 /admin move player to | [sourceUsername] [targetUsername or targetGridname] (distance) | /admin move player to tyrsis vicious 500 - This moves player 'tyrsis' near player 'vicious' within 500m.  Please note that player 'tyrsis' must be in a space suit for this to work (out of cockpit).
-/admin move area to position | [sx] [sy] [sz] [tx] [ty] [tz] [radius] | /admin move area to 10000 10000 10000 20000 20000 20000 5000 - This would move all ships and stations that are within 5000m of 10000,10000,10000 and move them towards 20000,20000,20000 relative to where they were before they were moved (so it basically picks up all the ships and moves them relative to the new position)
-/admin move area towards | [sx] [sy] [sz] [tx] [ty] [tz] [radius] | /admin move area towards 20000 0 0 0 0 0 5000 1000 - This command would move all ships within 1000m of point 20000,0,0 towards 0,0,0 and move them 5000m.  So a ship at 20500,0,0 would be moved to 15500,0,0.
+/admin move area to position | [sx] [sy] [sz] [tx] [ty] [tz] [radius] | /admin move area to 10000 10000 10000 20000 20000 20000 5000 - This would move all ships and stations that are within 5000m of (10000,10000,10000) and move them towards (20000,20000,20000) relative to where they were before they were moved in relation to the original point. So if a ship was 100m from (10000,10000,10000) they would be 100m from (20000,20000,20000) after the move.
+/admin move area towards | [sx] [sy] [sz] [tx] [ty] [tz] [radius] | /admin move area towards 20000 0 0 0 0 0 5000 1000 - This command would move all ships within 1000m of point (20000,0,0) towards (0,0,0) and move them 5000m.  So a ship at (20000,0,0) would be moved to (15000,0,0).
 
 Delete commands
 ---------------
