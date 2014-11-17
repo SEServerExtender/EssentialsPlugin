@@ -80,7 +80,7 @@ namespace EssentialsPlugin.ChatHandlers
 					gridsToMove.Add((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder());
 					MyAPIGateway.Entities.RemoveEntity(entity);
 
-					Logging.WriteLineAndConsole(string.Format("Moving '{0}' from {1} to {2}", entity.DisplayName, entity.GetPosition(), entity.GetPosition() + difference));
+					Logging.WriteLineAndConsole(string.Format("Moving '{0}' from {1} to {2}", entity.DisplayName, General.Vector3DToString(entity.GetPosition()), General.Vector3DToString(entity.GetPosition() + difference)));
 				}
 			});
 
