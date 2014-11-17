@@ -62,7 +62,8 @@ namespace EssentialsPlugin.ChatHandlers
 			}
 
 			Vector3D startPosition = new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2]));
-			Vector3D movePosition = new Vector3(float.Parse(words[3]), float.Parse(words[4]), float.Parse(words[5]));		
+			Vector3D movePosition = new Vector3(float.Parse(words[3]), float.Parse(words[4]), float.Parse(words[5]));
+			Vector3D difference = startPosition - movePosition;
 			float radius = float.Parse(words[6]);
 
 			List<MyObjectBuilder_CubeGrid> gridsToMove = new List<MyObjectBuilder_CubeGrid>();
@@ -79,7 +80,7 @@ namespace EssentialsPlugin.ChatHandlers
 					gridsToMove.Add((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder());
 					MyAPIGateway.Entities.RemoveEntity(entity);
 
-					Logging.WriteLineAndConsole(string.Format("Moving '{0}' from {1} to {2}", entity.DisplayName, entity.GetPosition(), entity.GetPosition() + movePosition));
+					Logging.WriteLineAndConsole(string.Format("Moving '{0}' from {1} to {2}", entity.DisplayName, entity.GetPosition(), entity.GetPosition() + difference));
 				}
 			});
 
@@ -103,7 +104,7 @@ namespace EssentialsPlugin.ChatHandlers
 			{
 				foreach(MyObjectBuilder_CubeGrid grid in gridsToMove)
 				{
-					grid.PositionAndOrientation = new MyPositionAndOrientation(grid.PositionAndOrientation.Value.Position + movePosition, grid.PositionAndOrientation.Value.Forward, grid.PositionAndOrientation.Value.Up);
+					grid.PositionAndOrientation = new MyPositionAndOrientation(grid.PositionAndOrientation.Value.Position + difference, grid.PositionAndOrientation.Value.Forward, grid.PositionAndOrientation.Value.Up);
 					Logging.WriteLineAndConsole(string.Format("Adding '{0}' for move", grid.DisplayName));
 					SectorObjectManager.Instance.AddEntity(new CubeGridEntity(grid));					
 				}

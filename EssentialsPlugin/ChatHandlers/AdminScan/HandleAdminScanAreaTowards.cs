@@ -77,7 +77,7 @@ namespace EssentialsPlugin.ChatHandlers
 			List<IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
 			int count = 0;
 
-			Communication.SendPrivateInformation(userId, string.Format("Scanning around {0}m around {1}", radius, General.Vector3DToString(finalPosition)));
+			Communication.SendPrivateInformation(userId, string.Format("Scanning {0} meters around {1}", radius, General.Vector3DToString(finalPosition)));
 			Wrapper.GameAction(() =>
 			{
 				foreach (IMyEntity entity in entities)
