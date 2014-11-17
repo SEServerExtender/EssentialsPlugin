@@ -61,30 +61,37 @@ namespace EssentialsPlugin.ChatHandlers
 				}
 			}
 
+
 			Vector3D startPosition = new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2]));
 			Vector3D movePosition = new Vector3(float.Parse(words[3]), float.Parse(words[4]), float.Parse(words[5]));
 			Vector3D difference = startPosition - movePosition;
 			float radius = float.Parse(words[6]);
 
+			Communication.SendPrivateInformation(userId, string.Format("Moving all grids in a radius of {0} near {1} to {2}", radius, General.Vector3DToString(startPosition), General.Vector3DToString(movePosition)));
+
 			List<MyObjectBuilder_CubeGrid> gridsToMove = new List<MyObjectBuilder_CubeGrid>();
 			BoundingSphere sphere = new BoundingSphere(startPosition, radius);
 			List<IMyEntity> entitiesToMove = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
 
-			Wrapper.GameAction(() =>
-			{
+//			Wrapper.GameAction(() =>
+//			{
 				foreach (IMyEntity entity in entitiesToMove)
 				{
 					if (!(entity is IMyCubeGrid))
 						continue;
 
+					Communication.SendPrivateInformation(userId, string.Format("Moving '{0}' from {1} to {2}", entity.DisplayName, General.Vector3DToString(entity.GetPosition()), General.Vector3DToString(entity.GetPosition() + difference)));
+
 					gridsToMove.Add((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder());
-					MyAPIGateway.Entities.RemoveEntity(entity);
-
-					Logging.WriteLineAndConsole(string.Format("Moving '{0}' from {1} to {2}", entity.DisplayName, General.Vector3DToString(entity.GetPosition()), General.Vector3DToString(entity.GetPosition() + difference)));
+					//MyAPIGateway.Entities.RemoveEntity(entity);
+					CubeGridEntity gridEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
+					gridEntity.Dispose();
 				}
-			});
+//			});
 
+			Logging.WriteLineAndConsole("Entities Removed ... pausing");
 			Thread.Sleep(5000);
+			Logging.WriteLineAndConsole("Removing entities from closed entities");
 
 			Wrapper.GameAction(() =>
 			{
@@ -93,8 +100,8 @@ namespace EssentialsPlugin.ChatHandlers
 					if (!(entity is IMyCubeGrid))
 						continue;
 
-					MyAPIGateway.Entities.RemoveFromClosedEntities(entity);
 					Logging.WriteLineAndConsole(string.Format("Removing '{0}' for move", entity.DisplayName));
+					MyAPIGateway.Entities.RemoveFromClosedEntities(entity);
 				}
 			});
 
@@ -105,10 +112,14 @@ namespace EssentialsPlugin.ChatHandlers
 				foreach(MyObjectBuilder_CubeGrid grid in gridsToMove)
 				{
 					grid.PositionAndOrientation = new MyPositionAndOrientation(grid.PositionAndOrientation.Value.Position + difference, grid.PositionAndOrientation.Value.Forward, grid.PositionAndOrientation.Value.Up);
-					Logging.WriteLineAndConsole(string.Format("Adding '{0}' for move", grid.DisplayName));
-					SectorObjectManager.Instance.AddEntity(new CubeGridEntity(grid));					
+					//Logging.WriteLineAndConsole(string.Format("Adding '{0}' for move", grid.DisplayName));
+					Communication.SendPrivateInformation(userId, string.Format("Adding grid '{0}' back to world.", grid.DisplayName));
+					SectorObjectManager.Instance.AddEntity(new CubeGridEntity(grid));
+					Thread.Sleep(1000);
 				}
 			});
+
+			Communication.SendPrivateInformation(userId, string.Format("Moved {0} grids", gridsToMove.Count));
 
 			return true;
 		}

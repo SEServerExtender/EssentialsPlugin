@@ -75,6 +75,8 @@ namespace EssentialsPlugin.ChatHandlers
 			BoundingSphere sphere = new BoundingSphere(startPosition, radius);
 			List<IMyEntity> entitiesToMove = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
 
+			Communication.SendPrivateInformation(userId, string.Format("Moving all grids in a radius of {0} near {1} towards {2} by {3} meters", radius, General.Vector3DToString(startPosition), General.Vector3DToString(targetPosition), distance));
+
 			Wrapper.GameAction(() =>
 			{
 				foreach (IMyEntity entity in entitiesToMove)
@@ -82,10 +84,11 @@ namespace EssentialsPlugin.ChatHandlers
 					if (!(entity is IMyCubeGrid))
 						continue;
 
+					Communication.SendPrivateInformation(userId, string.Format("Moving '{0}' from {1} to {2}", entity.DisplayName, General.Vector3DToString(entity.GetPosition()), General.Vector3DToString(entity.GetPosition() + finalPosition)));
+
 					gridsToMove.Add((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder());
 					MyAPIGateway.Entities.RemoveEntity(entity);
 
-					Logging.WriteLineAndConsole(string.Format("Moving '{0}' from {1} to {2}", entity.DisplayName, General.Vector3DToString(entity.GetPosition()), General.Vector3DToString(entity.GetPosition() + finalPosition)));
 				}
 			});
 
@@ -98,8 +101,8 @@ namespace EssentialsPlugin.ChatHandlers
 					if (!(entity is IMyCubeGrid))
 						continue;
 
-					MyAPIGateway.Entities.RemoveFromClosedEntities(entity);
 					Logging.WriteLineAndConsole(string.Format("Removing '{0}' for move", entity.DisplayName));
+					MyAPIGateway.Entities.RemoveFromClosedEntities(entity);
 				}
 			});
 
@@ -110,10 +113,12 @@ namespace EssentialsPlugin.ChatHandlers
 				foreach(MyObjectBuilder_CubeGrid grid in gridsToMove)
 				{
 					grid.PositionAndOrientation = new MyPositionAndOrientation(grid.PositionAndOrientation.Value.Position + finalPosition, grid.PositionAndOrientation.Value.Forward, grid.PositionAndOrientation.Value.Up);
-					Logging.WriteLineAndConsole(string.Format("Adding '{0}' for move", grid.DisplayName));
+					Communication.SendPrivateInformation(userId, string.Format("Adding '{0}' for move", grid.DisplayName));
 					SectorObjectManager.Instance.AddEntity(new CubeGridEntity(grid));					
 				}
 			});
+
+			Communication.SendPrivateInformation(userId, string.Format("Finished moving {0} grids", gridsToMove.Count));
 
 			return true;
 		}

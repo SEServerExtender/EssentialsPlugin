@@ -312,16 +312,16 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleAdminScanAreaTowards());     //
 			m_chatHandlers.Add(new HandleAdminScanNoBeacon());        //
 
-			m_chatHandlers.Add(new HandleAdminMoveAreaToPosition());
-			m_chatHandlers.Add(new HandleAdminMoveAreaTowards());
-			m_chatHandlers.Add(new HandleAdminMovePlayerTo());
-			m_chatHandlers.Add(new HandleAdminMovePlayerPosition());
-			m_chatHandlers.Add(new HandleAdminMoveGridTo());
+			m_chatHandlers.Add(new HandleAdminMoveAreaToPosition());  //
+			m_chatHandlers.Add(new HandleAdminMoveAreaTowards());     //
+			m_chatHandlers.Add(new HandleAdminMovePlayerTo());        // 
+			m_chatHandlers.Add(new HandleAdminMovePlayerPosition());  //
+			m_chatHandlers.Add(new HandleAdminMoveGridTo());          //
 
-			m_chatHandlers.Add(new HandleAdminDeleteGridsArea());
-			m_chatHandlers.Add(new HandleAdminDeleteShipsArea());
-			m_chatHandlers.Add(new HandleAdminDeleteStationsArea());
-			m_chatHandlers.Add(new HandleAdminDeleteNoBeacon());
+			m_chatHandlers.Add(new HandleAdminDeleteGridsArea());     //
+			m_chatHandlers.Add(new HandleAdminDeleteShipsArea());     //
+			m_chatHandlers.Add(new HandleAdminDeleteStationsArea());  //
+			m_chatHandlers.Add(new HandleAdminDeleteNoBeacon());      //
 
 			m_chatHandlers.Add(new HandleAdminOwnershipChange());
 
@@ -332,7 +332,7 @@ namespace EssentialsPlugin
 			m_processThread = new Thread(new ThreadStart(PluginProcessing));
 			m_processThread.Start();
 
-			Logging.WriteLineAndConsole(string.Format("Plugin '{0}' initialzed. (Version: {1}  ID: {2})", Name, Version, Id));
+			Logging.WriteLineAndConsole(string.Format("Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id));
 		}
 
 		#endregion
