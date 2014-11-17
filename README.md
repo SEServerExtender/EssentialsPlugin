@@ -1,9 +1,12 @@
 Dedicated Server Essentials - Plugin
 ====================================
+Requirements
+------------
+This plugin requires SEServerExtender v2.11.20 or above.  Please download and install that first from https://github.com/Tyrsis/SE-Community-Mod-API/releases. 
 
 Overview
 --------
-This plugin is aimed at being an essential plugin to run on dedicated servers.  It will cover a lot of very basic requirements for a server administrator.  This plugin looks to really show off how valuable server extender can be, by providing a lot of built in cleaning and adminstrative options and commands.
+This plugin is aimed at being an essential plugin to run on dedicated servers running extender.  It will cover a lot of very basic requirements for server administration.  This plugin looks to really show off how valuable server extender can be, by providing a lot of built in cleaning and adminstrative options and commands.
 
 There are many options in this plugin, and those options will expand as time goes on.  Every section of the plugin can be disabled if desired, to tightly control what an administrator wants to do.
 
