@@ -38,7 +38,7 @@ Options:
 - BackupCleanup - This allows you to turn Cleaning up of the backups off or on
 - BackupCleanupTime - The amount of time, in days, that a backup will last before cleaned up
 - BackupCreateSubdirectories - This option forces the backup to put a separate backup in a new directory each time it occurs
-- BackupAsteroids - Enabling this option will make the backin process include asteroids in the backup file.  If disabled, the .vx2 files will not be saved.
+- BackupAsteroids - Enabling this option will make the backup process include asteroids in the backup file.  If disabled, the .vx2 files will not be saved.
 - BackupItems - This is where you define when you want a backup to occur.  You specify the hour and minute of the day you wish the backup to happen.  Items are defined as follows:
   - Enabled - Enable / Disable this backup item
   - Hour - The hour to run this item in the range between 0-23.  If you specify -1 for this option it will run every hour
