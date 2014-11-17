@@ -325,7 +325,7 @@ namespace EssentialsPlugin
 
 			m_chatHandlers.Add(new HandleAdminOwnershipChange());
 
-			m_chatHandlers.Add(new HandleAdminTest());
+//			m_chatHandlers.Add(new HandleAdminTest());
 //			m_chatHandlers.Add(new HandleAdmin());
 
 			m_lastProcessUpdate = DateTime.Now;
