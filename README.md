@@ -71,7 +71,7 @@ Options:
 - InformationItems - This lets you define information commands.  Defining an item is pretty simple. 
   - Enabled - Enable / Disable this information item
   - IntervalSeconds - The amount of time it takes for this item to be broadcasted publically.  Set to 0 to not have it broadcast
-  - SubCommand - The command a user types to view this information item
+  - SubCommand - The command a user types to view this information item.  If you leave this blank, users will not be able to view this command via /info, and will only see it if you use it in an interval.
   - SubText - The actual text that is displayed with this item is queried using the /info command or broadcasted.  You may use the %name% tag which gets replaced by the user's name.  This is a multiline text, and each line will be broadcasted individually per interval as well.  So this allows you to setup messages that get sent in order.
 
 Automated Join Messages for new and old players
