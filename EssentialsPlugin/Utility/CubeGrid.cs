@@ -68,5 +68,96 @@ namespace EssentialsPlugin.Utility
             Matrix rot = Matrix.CreateFromQuaternion(rotate);
             return new MyPositionAndOrientation(position, rot.Forward, rot.Up);
 		}
+
+		public static void GetBlocksUnconnected(HashSet<IMyEntity> connectedList, HashSet<IMyEntity> entitiesToConfirm)
+		{
+			foreach (IMyEntity entity in entitiesToConfirm)
+			{
+				IMyCubeGrid grid = (IMyCubeGrid)entity;
+				MyObjectBuilder_CubeGrid gridBuilder = (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder();
+
+				bool result = false;
+				foreach (MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
+				{
+					if (block.TypeId == typeof(MyObjectBuilder_ShipConnector))
+					{
+						MyObjectBuilder_ShipConnector connector = (MyObjectBuilder_ShipConnector)block;
+						if (connector.Connected)
+						{
+							IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(connector.ConnectedEntityId);
+
+							if (connectedEntity != null)
+							{
+								result = true;
+								break;
+							}
+						}
+					}
+
+					if (block.TypeId == typeof(MyObjectBuilder_PistonBase))
+					{
+						result = true;
+						break;
+					}
+
+					if (block.TypeId == typeof(MyObjectBuilder_ExtendedPistonBase))
+					{
+						result = true;
+						break;
+					}
+
+					if (block.TypeId == typeof(MyObjectBuilder_PistonTop))
+					{
+						result = true;
+						break;
+					}
+
+					if (block.TypeId == typeof(MyObjectBuilder_MotorAdvancedStator))
+					{
+						MyObjectBuilder_MotorAdvancedStator stator = (MyObjectBuilder_MotorAdvancedStator)block;
+						if (stator.RotorEntityId != 0)
+						{
+							IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(stator.RotorEntityId);
+
+							if (connectedEntity != null)
+							{
+								result = true;
+								break;
+							}
+						}
+					}
+
+					if (block.TypeId == typeof(MyObjectBuilder_MotorAdvancedRotor))
+					{
+						result = true;
+						break;
+					}
+
+					if (block.TypeId == typeof(MyObjectBuilder_MotorStator))
+					{
+						MyObjectBuilder_MotorStator stator = (MyObjectBuilder_MotorStator)block;
+						if (stator.RotorEntityId != 0)
+						{
+							IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(stator.RotorEntityId);
+
+							if (connectedEntity != null)
+							{
+								result = true;
+								break;
+							}
+						}
+					}
+
+					if (block.TypeId == typeof(MyObjectBuilder_MotorRotor))
+					{
+						result = true;
+						break;
+					}
+				}
+
+				if (!result)
+					connectedList.Add(entity);
+			}
+		}
 	}
 }

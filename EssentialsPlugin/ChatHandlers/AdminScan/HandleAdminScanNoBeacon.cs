@@ -60,131 +60,24 @@ namespace EssentialsPlugin.ChatHandlers
 						continue;
 
 					IMyCubeGrid grid = (IMyCubeGrid)entity;
-					List<IMySlimBlock> blocks = new List<IMySlimBlock>();
-					grid.GetBlocks(blocks, x => x.FatBlock != null && x.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_Beacon));
+					MyObjectBuilder_CubeGrid gridBuilder = (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder();
 
-					if (blocks.Count > 0)
-						continue;
-
-					entitiesToConfirm.Add(grid);
-				}
-
-				foreach (IMyEntity entity in entitiesToConfirm)
-				{
-					IMyCubeGrid grid = (IMyCubeGrid)entity;
-					List<IMySlimBlock> blocks = new List<IMySlimBlock>();
-					grid.GetBlocks(blocks, x => x.FatBlock != null);
-					foreach (IMySlimBlock block in blocks)
+					bool found = false;
+					foreach (MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
 					{
-						if (block.FatBlock != null)
+						if(block.TypeId == typeof(MyObjectBuilder_Beacon))
 						{
-							IMyCubeBlock cubeBlock = block.FatBlock;
-
-							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_ShipConnector))
-							{
-								MyObjectBuilder_ShipConnector connector = (MyObjectBuilder_ShipConnector)cubeBlock.GetObjectBuilderCubeBlock();
-								if (connector.Connected)
-								{
-									IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(connector.ConnectedEntityId);
-
-									if (connectedEntity != null)
-										entitiesConnected.Add(entity);
-
-									break;
-								}
-							}
-
-							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_PistonBase))
-							{
-								entitiesConnected.Add(entity);
-								break;
-							}
-
-							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_ExtendedPistonBase))
-							{
-								entitiesConnected.Add(entity);
-								break;
-								/*
-								MyObjectBuilder_PistonBase pistonBase = (MyObjectBuilder_PistonBase)cubeBlock.GetObjectBuilderCubeBlock();
-								if (pistonBase.TopBlockId != 0)
-								{
-									IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(pistonBase.TopBlockId);
-
-									if (connectedEntity != null)
-										entitiesConnected.Add(entity);
-
-									break;
-								}
-								 */
-							}
-
-							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_PistonTop))
-							{
-								entitiesConnected.Add(entity);
-								break;
-
-								/*
-								MyObjectBuilder_PistonTop pistonTop = (MyObjectBuilder_PistonTop)cubeBlock.GetObjectBuilderCubeBlock();
-								if (pistonTop.PistonBlockId != 0)
-								{
-									IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(pistonTop.PistonBlockId);
-
-									if (connectedEntity != null)
-										entitiesConnected.Add(entity);
-
-									break;
-								}
-									*/
-							}
-
-							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorAdvancedStator))
-							{
-								MyObjectBuilder_MotorAdvancedStator stator = (MyObjectBuilder_MotorAdvancedStator)cubeBlock.GetObjectBuilderCubeBlock();
-								if (stator.RotorEntityId != 0)
-								{
-									IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(stator.RotorEntityId);
-
-									if (connectedEntity != null)
-										entitiesConnected.Add(entity);
-
-									break;
-								}
-							}
-
-							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorAdvancedRotor))
-							{
-								entitiesConnected.Add(entity);
-								break;
-							}
-
-							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorStator))
-							{
-								MyObjectBuilder_MotorStator stator = (MyObjectBuilder_MotorStator)cubeBlock.GetObjectBuilderCubeBlock();
-								if (stator.RotorEntityId != 0)
-								{
-									IMyEntity connectedEntity = (IMyEntity)MyAPIGateway.Entities.GetEntityById(stator.RotorEntityId);
-
-									if (connectedEntity != null)
-										entitiesConnected.Add(entity);
-
-									break;
-								}
-							}
-
-							if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorRotor))
-							{
-								entitiesConnected.Add(entity);
-								break;
-							}
+							found = true;
+							break;
 						}
-
-
 					}
 
-					if (!entitiesConnected.Contains(entity))
-						entitiesFound.Add(entity);
+					if(!found)
+						entitiesToConfirm.Add(grid);
 				}
 
+				CubeGrids.GetBlocksUnconnected(entitiesFound, entitiesToConfirm);
+				
 				foreach (IMyEntity entity in entitiesFound)
 				{
 					CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(entity.EntityId);
