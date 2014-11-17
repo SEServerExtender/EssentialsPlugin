@@ -7,6 +7,14 @@ This plugin is aimed at being an essential plugin to run on dedicated servers.  
 
 There are many options in this plugin, and those options will expand as time goes on.  Every section of the plugin can be disabled if desired, to tightly control what an administrator wants to do.
 
+Installation
+------------
+If you're just using the archive provided, just unzip the archive into it's own subdirectory off the Mods directory of your world instance. 
+
+If you want to compile the source provided.  Compile and copy the .dll created after compiling of this project into it's own sub directory of your Mods directory of your instance.  Also move the .sbc files included the .zip archive of any of the releases into that directory as well.
+
+It's that easy!
+
 Major Feature Overview
 ----------------------
 
@@ -17,8 +25,8 @@ Major Feature Overview
 - Automated new player spawn movement
 - Advanced Adminsitrator Commands
 
-Indepth Features Anaylsis
--------------------------
+Indepth Feature Anaylsis
+------------------------
 
 Automated Backup
 ----------------
