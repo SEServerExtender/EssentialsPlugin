@@ -31,6 +31,8 @@ Major Feature Overview
 In depth Feature Analysis
 ------------------------
 
+Please note the following commands are all set via the plugin interface.  
+
 Automated Backup
 ----------------
 
