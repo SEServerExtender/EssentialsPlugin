@@ -281,6 +281,36 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.NewUserTransportDistance = value; }
 		}
 
+		[Category("Player Login Tracking")]
+		[Description("Enable / Disable Player Login Tracking.  This option tracks users login/logouts.  It also reads old logs to get player history.  It's recommended to enable this.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool LoginEnabled
+		{
+			get { return PluginSettings.Instance.LoginEnabled; }
+			set { PluginSettings.Instance.LoginEnabled = value; }
+		}
+
+		[Category("Player Login Tracking")]
+		[Description("This is an entity whitelist for player logins.  Any entity in this list will never be considered 'inactive'.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public string[] LoginEntityWhitelist
+		{
+			get { return PluginSettings.Instance.LoginEntityWhitelist; }
+			set { PluginSettings.Instance.LoginEntityWhitelist = value; }
+		}
+
+		[Category("Player Login Tracking")]
+		[Description("This is a player whitelist for player logins.  Any object owned by a player in this list will never be considered 'inactive'")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public string[] LoginPlayerIdWhitelist
+		{
+			get { return PluginSettings.Instance.LoginPlayerIdWhitelist; }
+			set { PluginSettings.Instance.LoginPlayerIdWhitelist = value; }
+		}
+
 		#endregion
 
 		#region Constructors and Initializers
@@ -301,6 +331,7 @@ namespace EssentialsPlugin
 			m_processHandlers.Add(new ProcessInfo());
 			m_processHandlers.Add(new ProcessCommunication());
 			m_processHandlers.Add(new ProcessBackup());
+			m_processHandlers.Add(new ProcessLoginTracking());
 			
 			// Setup chat handlers
 			m_chatHandlers = new List<ChatHandlerBase>();
@@ -311,6 +342,8 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleAdminScanAreaAt());          //
 			m_chatHandlers.Add(new HandleAdminScanAreaTowards());     //
 			m_chatHandlers.Add(new HandleAdminScanNoBeacon());        //
+			m_chatHandlers.Add(new HandleAdminScanInactive());        //
+			m_chatHandlers.Add(new HandleAdminScanEntityId());        //
 
 			m_chatHandlers.Add(new HandleAdminMoveAreaToPosition());  //
 			m_chatHandlers.Add(new HandleAdminMoveAreaTowards());     //
@@ -322,8 +355,14 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleAdminDeleteShipsArea());     //
 			m_chatHandlers.Add(new HandleAdminDeleteStationsArea());  //
 			m_chatHandlers.Add(new HandleAdminDeleteNoBeacon());      //
+			m_chatHandlers.Add(new HandleAdminDeleteInactive());      //
 
 			m_chatHandlers.Add(new HandleAdminOwnershipChange());
+
+			m_chatHandlers.Add(new HandleAdminPlayerListActive());
+			m_chatHandlers.Add(new HandleAdminPlayerListInactive());
+
+//			m_chatHandlers.Add(new HandleAdminPlayer());
 
 //			m_chatHandlers.Add(new HandleAdminTest());
 //			m_chatHandlers.Add(new HandleAdmin());
@@ -433,7 +472,15 @@ namespace EssentialsPlugin
 
 				if (chatHandler.CanHandle(remoteUserId, commandParts.ToArray(), ref commandCount))
 				{
-					chatHandler.HandleCommand(remoteUserId, commandParts.Skip(commandCount).ToArray());
+					try
+					{
+						chatHandler.HandleCommand(remoteUserId, commandParts.Skip(commandCount).ToArray());
+					}
+					catch(Exception ex)
+					{
+						Logging.WriteLineAndConsole(string.Format("ChatHandler Error: {0}", ex.ToString()));
+					}
+
 					handled = true;
 				}
 			}

@@ -16,7 +16,6 @@ using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
 
 namespace EssentialsPlugin.ProcessHandler
 {
-
 	public class ProcessNewUserTransport : ProcessHandlerBase
 	{
 		private List<ulong> m_newUserList;
@@ -171,6 +170,9 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override void OnPlayerJoined(ulong remoteUserId)
 		{
+			if (!PluginSettings.Instance.NewUserTransportEnabled)
+				return;
+
 			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Count() > 0)
 				return;
 
@@ -185,12 +187,14 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override void OnPlayerLeft(ulong remoteUserId)
 		{
-			Logging.WriteLineAndConsole(string.Format("Removing New User Transport Queued: {0}", remoteUserId));
+			if (!PluginSettings.Instance.NewUserTransportEnabled)
+				return;
+
 			lock (m_newUserList)
 			{
 				if (m_newUserList.Exists(x => x == remoteUserId))
 				{
-					Logging.WriteLineAndConsole(string.Format("New User Transport Removed: {0}", remoteUserId));
+					Logging.WriteLineAndConsole(string.Format("Queued Transport Removed: {0}", remoteUserId));
 					m_newUserList.RemoveAll(x => x == remoteUserId);
 				}
 			}

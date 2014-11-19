@@ -48,6 +48,10 @@ namespace EssentialsPlugin
 		private bool m_newUserTransportEnabled;
 		private int m_newUserTransportDistance;
 
+		private bool m_loginEnabled;
+		private string[] m_loginEntityWhitelist = new string[] { };
+		private string[] m_loginPlayerIdWhitelist = new string[] { };
+
 		#endregion
 
 		#region Static Properties
@@ -220,6 +224,17 @@ namespace EssentialsPlugin
 				Save();
 			}		
 		}
+
+		public bool BackupAsteroids
+		{
+			get { return m_backupAsteroids; }
+			set
+			{
+				m_backupAsteroids = value;
+				Save();
+			}
+		}
+
 		public bool NewUserTransportEnabled
 		{
 			get { return m_newUserTransportEnabled; }
@@ -240,12 +255,37 @@ namespace EssentialsPlugin
 			}
 		}
 
-		public bool BackupAsteroids
+		public bool LoginEnabled
 		{
-			get { return m_backupAsteroids; }
+			get { return m_loginEnabled; }
 			set 
 			{ 
-				m_backupAsteroids = value;
+				m_loginEnabled = value;
+				if (value && !m_loading)
+				{
+					if (Players.Instance.PlayerLogins.Count() == 0)
+						Players.ProcessServerLogsForLogins();
+				}
+				Save();
+			}
+		}
+
+		public string[] LoginEntityWhitelist
+		{
+			get { return m_loginEntityWhitelist; }
+			set
+			{
+				m_loginEntityWhitelist = value; 
+				Save();
+			}
+		}
+
+		public string[] LoginPlayerIdWhitelist
+		{
+			get { return m_loginPlayerIdWhitelist; }
+			set
+			{
+				m_loginPlayerIdWhitelist = value; 
 				Save();
 			}
 		}

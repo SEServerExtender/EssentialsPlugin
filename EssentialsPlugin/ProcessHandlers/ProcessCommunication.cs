@@ -48,6 +48,7 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override void OnPlayerJoined(ulong remoteUserId)
 		{
+			/*
 			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Count() < 1)
 				return;
 
@@ -64,7 +65,6 @@ namespace EssentialsPlugin.ProcessHandler
 			m_commGrids.Add(remoteUserId, entity.EntityId);
 			SectorObjectManager.Instance.AddEntity(entity);
 
-			/*
 			Wrapper.GameAction(() =>
 			{
 				MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(entity.Export());
@@ -82,6 +82,7 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override void OnPlayerLeft(ulong remoteUserId)
 		{
+			/*
 			if (!m_commGrids.ContainsKey(remoteUserId))
 				return;
 
@@ -96,7 +97,7 @@ namespace EssentialsPlugin.ProcessHandler
 			});
 
 			m_commGrids.Remove(remoteUserId);
-
+			*/
 			base.OnPlayerLeft(remoteUserId);
 		}
 

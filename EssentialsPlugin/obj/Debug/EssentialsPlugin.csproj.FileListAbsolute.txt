@@ -48,4 +48,3 @@ E:\Coding\C# Projects\Space Engineers\EssentialsPlugin\EssentialsPlugin\obj\Debu
 E:\Coding\C# Projects\Space Engineers\EssentialsPlugin\EssentialsPlugin\obj\Debug\EssentialsPlugin.csproj.GenerateResource.Cache
 E:\Coding\C# Projects\Space Engineers\EssentialsPlugin\EssentialsPlugin\obj\Debug\EssentialsPlugin.Properties.Resources.resources
 E:\Coding\C# Projects\Space Engineers\EssentialsPlugin\EssentialsPlugin\obj\Debug\EssentialsPlugin.ControlForm.resources
-E:\Coding\C# Projects\Space Engineers\EssentialsPlugin\EssentialsPlugin\obj\Debug\EssentialsPlugin.csprojResolveAssemblyReference.cache
