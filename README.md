@@ -153,7 +153,7 @@ Ownership commands
 ------------------
 Command| Options|Example
 -------|--------|-----------------------------------------------------------------------------------------------------
-/admin ownership change | <username> <entityId> | /admin ownership change tyrsis 4949392 - This will change grid #494392 and make the owner 'tyrsis'
+/admin ownership change | [username] [entityId] | /admin ownership change tyrsis 4949392 - This will change grid #494392 and make the owner 'tyrsis'
 
 To come:
 - Block delete commands (over limit of drills, prohibited blocks, etc)
