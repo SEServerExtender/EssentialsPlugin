@@ -31,6 +31,7 @@ Major Feature Overview
 - Automated Join Messages for new and old players 
 - Automated new player spawn movement
 - Advanced Administrator Commands
+- Player Login Tracking
 
 In depth Feature Analysis
 ------------------------
@@ -102,6 +103,15 @@ Options:
 - NewUserTransportEnabled - This allows you to turn automated transport off or on.
 - NewUserTransportDistance - Distance from a viable asteroid that they will be moved.
 
+Player Login Tracking
+---------------------
+This option allows administrators to track user logins.  This allows administrators to delete grids by owners who no longer login.  The first time this is run, it will scan your server logs, and extract older login information so that your login list is up to date.  
+
+Options:
+- LoginEnabled - Enable / Disable player login tracking.  It is recommended to enable this as it adds a lot of functionality.
+- LoginEntityIdWhitelist - This is a list of entities that will never be considered "inactive".  This allows administrators to protect grids from inactivity scans / deletions
+- LoginPlayerIdWhitelist - This is a list of player ids that will never be considered "inactive".  This allows administrators to protect player grids from inactivity scans / deletions. Please note this is IDs and not player names.  
+
 Advanced Administrator Chat Commands
 ------------------------------------
 
@@ -116,6 +126,8 @@ Command| Options|Example
 /admin scan area at | [x] [y] [z] [radius] | /admin scan area at 0 0 0 1000 - This will scan for all ships and stations at position 0 0 0 within 1000m of that point.
 /admin scan area towards | [sX] [sy] [sz] [tx] [ty] [tz] [distance] [radius] | /admin scan area towards 10000 0 0 0 0 0 5000 1000 - This will scan for all ships and stations at position 5000 0 0 within a 1000m radius.  It basically starts at position (10000,0,0) and moves towards (0,0,0) by 5000 meters (which is (5000,0,0)).  This is useful when moving ships a certain distance in a direction, and this allows you to scan the area before moving them to ensure nothing is there.
 /admin scan nobeacon | (no options) | /admin scan nobeacon - This command scans for ships and stations that have no beacons.  This allows you to preview a list of ships before running the cleanup on it in case something is wrong.
+/admin scan inactive | [days] (ignoreownerless) (ignorenologin) | /admin scan inactive 20 - This command scans for ships with owners who haven't logged in in 20 days.  If you specify the ignoreownerless option it ignores grids without owners.  If you specify the ignorenologin option it ignores grids owned by players with no login information.  The /admin delete inactive command works exactly as this command, so you can view what will be deleted with the scan command before commiting to a delete.
+/admin scan entityid | [entityid] | /admin scan entityid 4384938458 - This scans for grid with the entityid of 4384938458
 
 
 Move commands
@@ -135,6 +147,7 @@ Command| Options|Example
 /admin delete ships area | [x] [y] [z] [radius] | - Deletes all ships in the sphere of radius at position x, y, z
 /admin delete stations area | [x] [y] [z] [radius] | - Deletes all stations in the sphere of radius at position x, y, z
 /admin delete nobeacon | (no options) | /admin delete nobeacon - Deletes all ships that have no beacons.  This checks to see if ships are connected via - connector, piston or rotor.
+/admin delete inactive | [days] (ignoreownerless) (ignorenologin) | /admin delete inactive 20 - This deletes all grids owned by users who have no logged in in 20 days.  If you specify the "ignoreownerless" option it will not include ownerless grids.  If you specify the "ignorenologin" option it will not include grids of users with no login information (for example if you don't have logs old enough for them to have logged in)
 
 Ownership commands
 ------------------
