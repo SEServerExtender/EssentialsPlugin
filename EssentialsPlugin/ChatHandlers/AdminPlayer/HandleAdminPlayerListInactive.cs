@@ -71,7 +71,7 @@ namespace EssentialsPlugin.ChatHandlers
 					if (playerId > 0)
 					{
 						MyObjectBuilder_Checkpoint.PlayerItem item = PlayerMap.Instance.GetPlayerItemFromPlayerId(playerId);
-						Communication.SendPrivateInformation(userId, string.Format("{0} ({1}) last logged in {2}", item.Name, item.PlayerId, player.LastLogin.ToString("g")), false);
+						Communication.SendPrivateInformation(userId, string.Format("{0} ({1}) last logged in {2}", item.Name, item.PlayerId, player.LastLogin.ToString("g")));
 					}
 				}
 			}
@@ -80,7 +80,7 @@ namespace EssentialsPlugin.ChatHandlers
 				Console.WriteLine(string.Format("Error: {0}", ex.ToString()));
 			}
 
-			Communication.SendPrivateInformation(userId, string.Format("Found {0} players that have not logged in within the last {1} days", players.Count, days), false);
+			Communication.SendPrivateInformation(userId, string.Format("Found {0} players that have not logged in within the last {1} days", players.Count, days));
 			return true;
 		}
 	}

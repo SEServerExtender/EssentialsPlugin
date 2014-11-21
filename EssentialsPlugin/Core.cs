@@ -29,6 +29,7 @@ namespace EssentialsPlugin
 	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler
 	{
 		#region Private Fields
+		internal static Essentials m_instance;
 		private static string m_pluginPath;
 		//private static ControlForm controlForm;
 		private DateTime m_lastProcessUpdate;
@@ -42,6 +43,24 @@ namespace EssentialsPlugin
 		{
 			get { return m_pluginPath; }
 			set { m_pluginPath = value; }
+		}
+
+		internal static Essentials Instance
+		{
+			get { return m_instance;  }
+		}
+
+		internal static List<ChatHandlerBase> ChatHandlers
+		{
+			get
+			{
+				if (m_instance != null)
+				{
+					return m_instance.m_chatHandlers;
+				}
+
+				return null;
+			}
 		}
 
 		/*
@@ -316,7 +335,8 @@ namespace EssentialsPlugin
 		#region Constructors and Initializers
 
 		private void DoInit(string path)
-		{			
+		{
+			m_instance = this;
 			//controlForm.Text = "Testing";
 			m_pluginPath = path;
 
@@ -338,6 +358,8 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleInfo());
 			m_chatHandlers.Add(new HandleTimeleft());
 			m_chatHandlers.Add(new HandlePos());
+			m_chatHandlers.Add(new HandleMsg());
+			m_chatHandlers.Add(new HandleFaction());
 
 			m_chatHandlers.Add(new HandleAdminScanAreaAt());          //
 			m_chatHandlers.Add(new HandleAdminScanAreaTowards());     //
@@ -450,9 +472,14 @@ namespace EssentialsPlugin
 			if (obj.message[0] != '/')
 				return;
 
+			HandleChatMessage(obj.sourceUserId, obj.message);
+		}
+
+		public void HandleChatMessage(ulong steamId, string message)
+		{
 			// Parse chat message
-			ulong remoteUserId = obj.sourceUserId;
-			string[] commandParts = obj.message.Split(' ');
+			ulong remoteUserId = steamId;
+			string[] commandParts = message.Split(' ');
 			int paramCount = commandParts.Length - 1;
 
 			// User wants some help
@@ -476,7 +503,7 @@ namespace EssentialsPlugin
 					{
 						chatHandler.HandleCommand(remoteUserId, commandParts.Skip(commandCount).ToArray());
 					}
-					catch(Exception ex)
+					catch (Exception ex)
 					{
 						Logging.WriteLineAndConsole(string.Format("ChatHandler Error: {0}", ex.ToString()));
 					}
@@ -487,7 +514,7 @@ namespace EssentialsPlugin
 
 			if (!handled)
 			{
-				DisplayAvailableCommands(obj, remoteUserId);
+				DisplayAvailableCommands(remoteUserId, message);
 			}
 		}
 
@@ -504,7 +531,7 @@ namespace EssentialsPlugin
 				foreach (ChatHandlerBase handler in m_chatHandlers)
 				{
 					string commandBase = handler.GetCommandText().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
-					if (!commands.Contains(commandBase) && (!handler.IsAdminCommand() || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
+					if (!commands.Contains(commandBase) && (!handler.IsClientOnly()) && (!handler.IsAdminCommand() || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
 					{
 						commands.Add(commandBase);
 					}
@@ -556,9 +583,9 @@ namespace EssentialsPlugin
 		/// </summary>
 		/// <param name="obj"></param>
 		/// <param name="remoteUserId"></param>
-		private void DisplayAvailableCommands(ChatManager.ChatEvent obj, ulong remoteUserId)
+		private void DisplayAvailableCommands(ulong remoteUserId, string recvMessage)
 		{
-			string message = obj.message.ToLower().Trim();
+			string message = recvMessage.ToLower().Trim();
 			List<string> availableCommands = new List<string>();
 			foreach (ChatHandlerBase chatHandler in m_chatHandlers)
 			{

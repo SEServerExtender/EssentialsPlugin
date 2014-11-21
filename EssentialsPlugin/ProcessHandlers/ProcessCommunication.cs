@@ -11,6 +11,7 @@ using SEModAPIInternal.API.Entity;
 using SEModAPIInternal.API.Entity.Sector.SectorObject;
 using System.IO;
 using SEModAPIInternal.API.Common;
+using EssentialsPlugin.ChatHandlers;
 
 namespace EssentialsPlugin.ProcessHandler
 {
@@ -30,7 +31,7 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override int GetUpdateResolution()
 		{
-			return 250;
+			return 100;
 		}
 
 		public override void Handle()
@@ -39,65 +40,71 @@ namespace EssentialsPlugin.ProcessHandler
 			{
 				m_init = true;
 				CleanupRelays();
+				AddGlobalRelay();
 			}
 
+			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+			Wrapper.GameAction(() =>
+			{
+				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid && x.DisplayName.StartsWith("CommRelay") && !x.DisplayName.StartsWith("CommRelayGlobal") && !x.DisplayName.StartsWith("CommRelay0") && !x.DisplayName.StartsWith("CommRelayOutput"));
+			});
+
+			foreach(IMyEntity entity in entities)
+			{
+				try
+				{
+					ExtractCommandFromEntity(entity);
+				}
+				catch(Exception ex)
+				{
+					Logging.WriteLineAndConsole(string.Format("ExtractCommandFromEntity Error: {0}", ex.ToString()));
+				}
+			}
+
+			foreach (IMyEntity entity in entities)
+			{
+				CubeGridEntity cubeEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
+				cubeEntity.Dispose();
+			}
+
+			// Cleanup processing
+			Cleanup.Instance.Process();
+
 			base.Handle();
+		}
+
+		private void ExtractCommandFromEntity(IMyEntity entity)
+		{
+			IMyCubeGrid grid = (IMyCubeGrid)entity;
+			MyObjectBuilder_CubeGrid gridBuilder = (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder();
+			string command = "";
+			foreach(MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
+			{
+				if(block is MyObjectBuilder_Beacon)
+				{
+					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)block;
+					command = beacon.CustomName;
+					break;
+				}
+			}
+
+			string player = entity.DisplayName.Replace("CommRelay", "");
+			long playerId = long.Parse(player);
+			ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerId(playerId);
+			Logging.WriteLineAndConsole(string.Format("COMMAND {1}: {0}", command, playerId));
+
+			Essentials.Instance.HandleChatMessage(steamId, command);
 		}
 
 		// Events and Overrides
 
 		public override void OnPlayerJoined(ulong remoteUserId)
 		{
-			/*
-			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Count() < 1)
-				return;
-
-			CubeGridEntity entity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "CommRelay.sbc"));
-			entity.EntityId = BaseEntity.GenerateEntityId();			
-			entity.DisplayName = string.Format("CommRelay{0}", PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).First());
-
-			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent();
-			if(halfExtent == 0f)
-				halfExtent = 900000f;
-
-			entity.PositionAndOrientation = new MyPositionAndOrientation(new Vector3(GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent)), Vector3.Forward, Vector3.Up);
-			//entity.PositionAndOrientation = new MyPositionAndOrientation(new Vector3(100, 100, 100), Vector3.Forward, Vector3.Up);
-			m_commGrids.Add(remoteUserId, entity.EntityId);
-			SectorObjectManager.Instance.AddEntity(entity);
-
-			Wrapper.GameAction(() =>
-			{
-				MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(entity.Export());
-			});
-			*/
-
 			base.OnPlayerJoined(remoteUserId);
-		}
-
-		private float GenerateRandomCoord(float halfExtent)
-		{
-			float result = (m_random.Next(200) + halfExtent) * (m_random.Next(2) == 0 ? -1 : 1);
-			return result;
 		}
 
 		public override void OnPlayerLeft(ulong remoteUserId)
 		{
-			/*
-			if (!m_commGrids.ContainsKey(remoteUserId))
-				return;
-
-			Wrapper.GameAction(() =>
-			{
-				IMyEntity entity;
-
-				if (MyAPIGateway.Entities.TryGetEntityById(m_commGrids[remoteUserId], out entity))				
-				{
-					MyAPIGateway.Entities.RemoveEntity(entity);
-				}
-			});
-
-			m_commGrids.Remove(remoteUserId);
-			*/
 			base.OnPlayerLeft(remoteUserId);
 		}
 
@@ -124,6 +131,49 @@ namespace EssentialsPlugin.ProcessHandler
 					MyAPIGateway.Entities.RemoveEntity(entity);
 				}
 			});
+		}
+
+		private void AddGlobalRelay()
+		{
+			CubeGridEntity entity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "CommRelay.sbc"));
+			entity.EntityId = BaseEntity.GenerateEntityId();
+			entity.DisplayName = "CommRelayGlobal";
+
+			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent();
+			if (halfExtent == 0f)
+				halfExtent = 900000f;
+
+			entity.PositionAndOrientation = new MyPositionAndOrientation(MathUtility.GenerateRandomEdgeVector(), Vector3.Forward, Vector3.Up);
+
+			List<string> commands = new List<string>();
+			// Give a list of commands
+			foreach(ChatHandlerBase chatBase in Essentials.ChatHandlers)
+			{
+				string[] command = chatBase.GetCommandText().Split(new char[] {' '}, 2);
+				if (!commands.Contains(command[0]))
+					commands.Add(command[0]);
+			}
+
+			string finalText = "";
+			foreach(string command in commands)
+			{
+				if (finalText != "")
+					finalText += "\n";
+
+				finalText += command;
+			}
+
+
+			foreach(MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks)
+			{
+				if (block is MyObjectBuilder_Beacon)
+				{
+					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)block;
+					beacon.CustomName = finalText;
+				}
+			}
+
+			SectorObjectManager.Instance.AddEntity(entity);
 		}
 	}
 }

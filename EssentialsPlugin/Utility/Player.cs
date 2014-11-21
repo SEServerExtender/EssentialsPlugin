@@ -7,9 +7,11 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Reflection;
 
 using Sandbox.ModAPI;
 using Sandbox.Common.ObjectBuilders;
+using Sandbox.Common.ObjectBuilders.Definitions;
 
 using VRageMath;
 using VRage.Common.Utils;
@@ -20,6 +22,7 @@ using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
 using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
 
 using SEModAPIInternal.API.Common;
+using SEModAPIInternal.Support;
 
 using EssentialsPlugin.UtilityClasses;
 
@@ -79,6 +82,152 @@ namespace EssentialsPlugin.Utility
 
 			gridEntity.Dispose();
 			return true;
+		}
+
+		public static Boolean CheckPlayerSameFaction(long playerId, long compareId)
+		{
+			if (compareId == playerId)
+				return true;
+
+			MyObjectBuilder_FactionCollection m_factionCollection = (MyObjectBuilder_FactionCollection)InvokeEntityMethod(FactionsManager.Instance.BackingObject, FactionsManager.FactionManagerGetFactionCollectionMethod);
+
+			if (m_factionCollection == null)
+			{
+				Console.WriteLine("No faction collection");
+				return false;
+			}
+
+			if (m_factionCollection.Factions == null)
+			{
+				Console.WriteLine("No factions");
+				return false;
+			}
+
+			MyObjectBuilder_Faction faction = m_factionCollection.Factions.FirstOrDefault(f => f.Members.FirstOrDefault(m => m.PlayerId == playerId).PlayerId != 0);
+			if (faction != null)
+			{
+				if (faction.Members.FirstOrDefault(m => m.PlayerId == compareId).PlayerId != 0)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public static Boolean CheckPlayerSameFaction(ulong steamId, ulong steamCompareId)
+		{
+			long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(steamId).FirstOrDefault();
+			long compareId = PlayerMap.Instance.GetPlayerIdsFromSteamId(steamCompareId).FirstOrDefault();
+			return CheckPlayerSameFaction(playerId, compareId);
+		}
+
+		internal static Object InvokeEntityMethod(Object gameEntity, string methodName)
+		{
+			return InvokeEntityMethod(gameEntity, methodName, new object[] { });
+		}
+
+		internal static Object InvokeEntityMethod(Object gameEntity, string methodName, Object[] parameters)
+		{
+			return InvokeEntityMethod(gameEntity, methodName, parameters, null);
+		}
+
+		internal static Object InvokeEntityMethod(Object gameEntity, string methodName, Object[] parameters, Type[] argTypes)
+		{
+			try
+			{
+				MethodInfo method = GetEntityMethod(gameEntity, methodName, argTypes);
+				if (method == null)
+					throw new Exception("Method is empty");
+				Object result = method.Invoke(gameEntity, parameters);
+
+				return result;
+			}
+			catch (Exception ex)
+			{
+				LogManager.APILog.WriteLine("Failed to invoke entity method '" + methodName + "' on type '" + gameEntity.GetType().FullName + "': " + ex.Message);
+
+				if (SandboxGameAssemblyWrapper.IsDebugging)
+					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
+
+				LogManager.ErrorLog.WriteLine(ex);
+				return null;
+			}
+		}
+
+		internal static MethodInfo GetEntityMethod(Object gameEntity, string methodName)
+		{
+			try
+			{
+				if (gameEntity == null)
+					throw new Exception("Game entity was null");
+				if (methodName == null || methodName.Length == 0)
+					throw new Exception("Method name was empty");
+				MethodInfo method = gameEntity.GetType().GetMethod(methodName);
+				if (method == null)
+				{
+					//Recurse up through the class heirarchy to try to find the method
+					Type type = gameEntity.GetType();
+					while (type != typeof(Object))
+					{
+						method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+						if (method != null)
+							break;
+
+						type = type.BaseType;
+					}
+				}
+				if (method == null)
+					throw new Exception("Method not found");
+				return method;
+			}
+			catch (Exception ex)
+			{
+				LogManager.APILog.WriteLine("Failed to get entity method '" + methodName + "': " + ex.Message);
+				if (SandboxGameAssemblyWrapper.IsDebugging)
+					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
+				LogManager.ErrorLog.WriteLine(ex);
+				return null;
+			}
+		}
+
+		internal static MethodInfo GetEntityMethod(Object gameEntity, string methodName, Type[] argTypes)
+		{
+			try
+			{
+				if (argTypes == null || argTypes.Length == 0)
+					return GetEntityMethod(gameEntity, methodName);
+
+				if (gameEntity == null)
+					throw new Exception("Game entity was null");
+				if (methodName == null || methodName.Length == 0)
+					throw new Exception("Method name was empty");
+				MethodInfo method = gameEntity.GetType().GetMethod(methodName, argTypes);
+				if (method == null)
+				{
+					//Recurse up through the class heirarchy to try to find the method
+					Type type = gameEntity.GetType();
+					while (type != typeof(Object))
+					{
+						method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy, Type.DefaultBinder, argTypes, null);
+						if (method != null)
+							break;
+
+						type = type.BaseType;
+					}
+				}
+				if (method == null)
+					throw new Exception("Method not found");
+				return method;
+			}
+			catch (Exception ex)
+			{
+				LogManager.APILog.WriteLine("Failed to get entity method '" + methodName + "': " + ex.Message);
+				if (SandboxGameAssemblyWrapper.IsDebugging)
+					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
+				LogManager.ErrorLog.WriteLine(ex);
+				return null;
+			}
 		}
 	}
 

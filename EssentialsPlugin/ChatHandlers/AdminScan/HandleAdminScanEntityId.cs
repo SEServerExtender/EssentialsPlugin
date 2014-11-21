@@ -60,7 +60,7 @@ namespace EssentialsPlugin.ChatHandlers
 			}
 
 			CubeGridEntity entity = (CubeGridEntity)GameEntityManager.GetEntity(entityId);
-			Communication.SendPrivateInformation(userId, string.Format("Entity {0} DisplayName: {1} FullName: {2}", entityId, entity.DisplayName, entity.Name), false);
+			Communication.SendPrivateInformation(userId, string.Format("Entity {0} DisplayName: {1} FullName: {2}", entityId, entity.DisplayName, entity.Name));
 
 			return true;
 		}

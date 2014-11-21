@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VRageMath;
+using Sandbox.ModAPI;
 
 namespace EssentialsPlugin.Utility
 {
@@ -40,6 +41,21 @@ namespace EssentialsPlugin.Utility
 			directionNormal.Normalize();
 			directionNormal = (directionNormal * (long)distance) + start;
 			return directionNormal;
+		}
+
+		public static Vector3 GenerateRandomEdgeVector()
+		{
+			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent();
+			if (halfExtent == 0f)
+				halfExtent = 900000f;
+
+			return new Vector3(MathUtility.GenerateRandomCoord(halfExtent), MathUtility.GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent));
+		}
+
+		public static float GenerateRandomCoord(float halfExtent)
+		{
+			float result = (m_random.Next(200) + halfExtent) * (m_random.Next(2) == 0 ? -1 : 1);
+			return result;
 		}
 	}
 }

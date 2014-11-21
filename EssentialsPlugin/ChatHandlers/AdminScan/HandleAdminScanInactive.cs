@@ -76,7 +76,7 @@ namespace EssentialsPlugin.ChatHandlers
 				}
 			}
 
-			Communication.SendPrivateInformation(userId, string.Format("Scanning for grids with owners that haven't logged in {0} days.  (Must Have Login Info={1})", days, removeNoLoginInformation), false);
+			Communication.SendPrivateInformation(userId, string.Format("Scanning for grids with owners that haven't logged in {0} days.  (Must Have Login Info={1})", days, removeNoLoginInformation));
 
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 			Wrapper.GameAction(() =>
@@ -99,7 +99,7 @@ namespace EssentialsPlugin.ChatHandlers
 
 				if (grid.BigOwners.Count < 1 && removeOwnerless)
 				{
-					Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) not owned by anyone.", gridEntity.Name, entity.EntityId), false);
+					Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) not owned by anyone.", gridEntity.Name, entity.EntityId));
 					entitiesFound.Add(entity);
 					continue;					
 				}
@@ -113,7 +113,7 @@ namespace EssentialsPlugin.ChatHandlers
 					MyObjectBuilder_Checkpoint.PlayerItem checkItem = PlayerMap.Instance.GetPlayerItemFromPlayerId(player);
 					if(checkItem.IsDead || checkItem.Name == "")
 					{
-						Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) owned by dead player - ID: {2}", gridEntity.Name, entity.EntityId, player), false);
+						Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) owned by dead player - ID: {2}", gridEntity.Name, entity.EntityId, player));
 						entitiesFound.Add(entity);
 						continue;
 					}
@@ -123,19 +123,19 @@ namespace EssentialsPlugin.ChatHandlers
 					{
 						if (removeNoLoginInformation)
 						{
-							Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) owned by a player with no login info: {2}", gridEntity.Name, entity.EntityId, checkItem.Name), false);
+							Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) owned by a player with no login info: {2}", gridEntity.Name, entity.EntityId, checkItem.Name));
 							entitiesFound.Add(entity);
 						}
 					}
 					else if (item.LastLogin < DateTime.Now.AddDays(days * -1))
 					{
-						Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) owned by inactive player: {2}", gridEntity.Name, entity.EntityId, PlayerMap.Instance.GetPlayerItemFromPlayerId(player).Name), false);
+						Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) owned by inactive player: {2}", gridEntity.Name, entity.EntityId, PlayerMap.Instance.GetPlayerItemFromPlayerId(player).Name));
 						entitiesFound.Add(entity);
 					}
 				}
 			}
 
-			Communication.SendPrivateInformation(userId, string.Format("Found {0} grids owned by inactive users", entitiesFound.Count), false);
+			Communication.SendPrivateInformation(userId, string.Format("Found {0} grids owned by inactive users", entitiesFound.Count));
 			return true;
 		}
 	}

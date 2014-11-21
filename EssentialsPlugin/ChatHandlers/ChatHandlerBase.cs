@@ -44,6 +44,11 @@ namespace EssentialsPlugin.ChatHandlers
 			return false;
 		}
 
+		public virtual bool IsClientOnly()
+		{
+			return false;
+		}
+
 		public virtual bool HandleCommand(ulong userId, String[] words)
 		{
 			return false;

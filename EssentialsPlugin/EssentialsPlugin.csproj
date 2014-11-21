@@ -60,7 +60,9 @@
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanNoBeacon.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanAreaAt.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveAreaToPosition.cs" />
+    <Compile Include="ChatHandlers\HandleFaction.cs" />
     <Compile Include="ChatHandlers\HandlePos.cs" />
+    <Compile Include="ChatHandlers\HandleMsg.cs" />
     <Compile Include="ChatHandlers\HandleTimeleft.cs" />
     <Compile Include="ChatHandlers\HandleInfo.cs" />
     <Compile Include="ControlForm.cs">
@@ -88,8 +90,10 @@
     <Compile Include="UtilityClasses\MTObservableCollection.cs" />
     <Compile Include="UtilityClasses\SerializeableDictionary.cs" />
     <Compile Include="UtilityClasses\UIEditors.cs" />
+    <Compile Include="Utility\Cleanup.cs" />
     <Compile Include="Utility\Communication.cs" />
     <Compile Include="Utility\CubeGrid.cs" />
+    <Compile Include="Utility\Faction.cs" />
     <Compile Include="Utility\MathUtility.cs" />
     <Compile Include="Utility\Player.cs" />
     <Compile Include="Utility\Utility.cs" />
