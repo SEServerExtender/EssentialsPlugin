@@ -4,6 +4,8 @@ Requirements
 ------------
 This plugin requires SEServerExtender v2.11.20 or above.  Please download and install that first from https://github.com/Tyrsis/SE-Community-Mod-API/releases. 
 
+This plugin requires a workshop mod.  This mod acts as a gateway between the client and server and is required for some functionality to work (private messaging, faction messaging, command hiding): http://steamcommunity.com/sharedfiles/filedetails/?id=340095691
+
 This plugin is available at github at: https://github.com/Tyrsis/EssentialsPlugin/releases
 
 Please most issues you have with the plugin at: https://github.com/Tyrsis/EssentialsPlugin/issues
@@ -20,6 +22,8 @@ If you're just using the archive provided, just unzip the archive into it's own 
 
 If you want to compile the source provided.  Compile and copy the .dll created after compiling of this project into it's own sub directory of your Mods directory of your instance.  Also move the .sbc files included the .zip archive of any of the releases into that directory as well.
 
+Please make sure to add the associated workshop mod as well.  It is ID: 340095691.  Just add this mod in extender Mods section of the configuration and it will install automatically on restart!
+
 It's that easy!
 
 Major Feature Overview
@@ -32,6 +36,7 @@ Major Feature Overview
 - Automated new player spawn movement
 - Advanced Administrator Commands
 - Player Login Tracking
+- Private and Faction Messaging
 
 In depth Feature Analysis
 ------------------------
@@ -154,6 +159,15 @@ Ownership commands
 Command| Options|Example
 -------|--------|-----------------------------------------------------------------------------------------------------
 /admin ownership change | [username] [entityId] | /admin ownership change tyrsis 4949392 - This will change grid #494392 and make the owner 'tyrsis'
+
+Utility commands
+------------------
+Command| Options|Example
+-------|--------|-----------------------------------------------------------------------------------------------------
+/pos | (no options) | /pos - This gives the user his current X, Y, Z position in the world
+/timeleft | (no options) | /timeleft - this gives the user the amount of time remaining before the next scheduled restart
+/msg | [username] [message] | /msg tyrsis testing a private message - This will send a private message to the user 'tyrsis' with the message 'testing a private message'.  This command requires the workshop mod to function properly.
+/faction | [message] | /faction hello everyone in my faction - This will send a private faction only message to all users in the same faction as the user sending it.  
 
 To come:
 - Block delete commands (over limit of drills, prohibited blocks, etc)
