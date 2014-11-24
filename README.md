@@ -37,6 +37,7 @@ Major Feature Overview
 - Advanced Administrator Commands
 - Player Login Tracking
 - Private and Faction Messaging
+- Chat based settings
 
 In depth Feature Analysis
 ------------------------
@@ -117,6 +118,32 @@ Options:
 - LoginEntityIdWhitelist - This is a list of entities that will never be considered "inactive".  This allows administrators to protect grids from inactivity scans / deletions
 - LoginPlayerIdWhitelist - This is a list of player ids that will never be considered "inactive".  This allows administrators to protect player grids from inactivity scans / deletions. Please note this is IDs and not player names.  
 
+Chat Based Settings
+-------------------
+All settings are set through the UI, but settings can also be done via chat.  Please use the command '/admin settings' to set settings.  You can set settings using the set subcommand.  You can modify arrays by using the add or remove command.  You set sub settings items using the set command as well, examples:
+
+List Examples
+-------------
+/admin settings - this list all the available settings
+/admin settings BackupItems - This lists all the backupitems defined on the server
+/admin settings BackupEnabled - This lists if backups are enabled. 
+/admin settings <settingItem> - This lists the value for <settingItem> replace <settingItem> with any available setting
+
+Set Examples
+------------
+/admin settings BackupCleanupTime set 5 - This sets the option BackupCleanupTime to 5
+/admin settings BackupItems.1.Enabled set true - This enables backupitem #1 to enabled.  (Backupitems can have multiple items defined for them, each item is an item in the list of BackupItems)
+
+Add Examples
+------------
+/admin settings BackupItems add - This adds a new default item to backup items
+/admin settings InformationItems add - This adds a new default information item to the information item list
+
+Remove Example
+--------------
+/admin settings BackupItems remove 0 - This removes the item at position 0 from the BackupItems list
+/admin settings InformationItems remove 1 - This removes the item at position 1 from the InformationItems list
+
 Advanced Administrator Chat Commands
 ------------------------------------
 
@@ -168,6 +195,8 @@ Command| Options|Example
 /timeleft | (no options) | /timeleft - this gives the user the amount of time remaining before the next scheduled restart
 /msg | [username] [message] | /msg tyrsis testing a private message - This will send a private message to the user 'tyrsis' with the message 'testing a private message'.  This command requires the workshop mod to function properly.
 /faction | [message] | /faction hello everyone in my faction - This will send a private faction only message to all users in the same faction as the user sending it.  
+/utility grids list | (page number) | /utility grids list 1 - This lists all your grids by name and id.  If you have more than 7 ships, the ships are separated into pages.  Use a number after /utility grids list to list that specific page.
+/utility export server | [ship name] | /utility export server My Ship - This exports the ship "My Ship" to the server.  The ships are exported to an "Exports" directory in the mods directory of the server under the username of the user who exported it.
 
 To come:
 - Block delete commands (over limit of drills, prohibited blocks, etc)
