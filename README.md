@@ -122,25 +122,21 @@ Chat Based Settings
 -------------------
 All settings are set through the UI, but settings can also be done via chat.  Please use the command '/admin settings' to set settings.  You can set settings using the set subcommand.  You can modify arrays by using the add or remove command.  You set sub settings items using the set command as well, examples:
 
-List Examples
--------------
+### List Examples
 /admin settings - this list all the available settings
 /admin settings BackupItems - This lists all the backupitems defined on the server
 /admin settings BackupEnabled - This lists if backups are enabled. 
 /admin settings <settingItem> - This lists the value for <settingItem> replace <settingItem> with any available setting
 
-Set Examples
-------------
+### Set Examples
 /admin settings BackupCleanupTime set 5 - This sets the option BackupCleanupTime to 5
 /admin settings BackupItems.1.Enabled set true - This enables backupitem #1 to enabled.  (Backupitems can have multiple items defined for them, each item is an item in the list of BackupItems)
 
-Add Examples
-------------
+### Add Examples
 /admin settings BackupItems add - This adds a new default item to backup items
 /admin settings InformationItems add - This adds a new default information item to the information item list
 
-Remove Example
---------------
+### Remove Example
 /admin settings BackupItems remove 0 - This removes the item at position 0 from the BackupItems list
 /admin settings InformationItems remove 1 - This removes the item at position 1 from the InformationItems list
 
