@@ -54,7 +54,7 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override int GetUpdateResolution()
 		{
-			return 250;
+			return 500;
 		}
 
 		public override void Handle()
@@ -80,7 +80,6 @@ namespace EssentialsPlugin.ProcessHandler
 			{
 				try
 				{
-
 					MyAPIGateway.Players.GetPlayers(players, null);
 					result = true;
 				}
@@ -102,6 +101,7 @@ namespace EssentialsPlugin.ProcessHandler
 					IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == steamId && x.Controller != null && x.Controller.ControlledEntity != null);
 					if (player != null)
 					{
+						Logging.WriteLineAndConsole(string.Format("Player entered game, starting movement."));
 						m_newUserList.RemoveAt(r);
 
 						// In Game

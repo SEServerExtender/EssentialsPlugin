@@ -379,10 +379,15 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleAdminDeleteNoBeacon());      //
 			m_chatHandlers.Add(new HandleAdminDeleteInactive());      //
 
-			m_chatHandlers.Add(new HandleAdminOwnershipChange());
+			m_chatHandlers.Add(new HandleAdminSettings());
 
-			m_chatHandlers.Add(new HandleAdminPlayerListActive());
-			m_chatHandlers.Add(new HandleAdminPlayerListInactive());
+			m_chatHandlers.Add(new HandleAdminOwnershipChange());     //
+
+			m_chatHandlers.Add(new HandleAdminPlayerListActive());    //
+			m_chatHandlers.Add(new HandleAdminPlayerListInactive());  //
+
+			m_chatHandlers.Add(new HandleUtilityExportServer());
+			m_chatHandlers.Add(new HandleUtilityGridsList());
 
 //			m_chatHandlers.Add(new HandleAdminPlayer());
 

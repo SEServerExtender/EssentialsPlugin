@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms;
 using System.ComponentModel.Design;
+using System.Reflection;
 
 namespace EssentialsPlugin
 {
@@ -393,7 +395,317 @@ namespace EssentialsPlugin
 		}
 
 		#endregion
+
+		#region External Settings Modification
+
+		public enum SettingsOperators
+		{
+			List,
+			Set,
+			Add,
+			Remove
+		}
+
+		public bool UpdateSettings(string name, string value)
+		{
+			try
+			{
+
+				return false;
+			}
+			catch(Exception ex)
+			{
+				return false;
+			}
+		}
+
+		public string GetOrSetSettings(string line)
+		{
+			string result = "";
+
+			try
+			{
+				string[] words = line.Split(new char[] { ' ' });
+				SettingsOperators so = SettingsOperators.List;
+				string newValue = "";
+				string name = "";
+
+				if (words.Length > 0)
+					name = words[0];
+
+				if (words.Length == 2)
+				{
+					if (words[1].ToLower() == "add")
+						so = SettingsOperators.Add;
+					else
+						so = SettingsOperators.Remove;
+				}
+				else if (words.Length > 2)
+				{
+					if (words[1].ToLower() == "set")
+					{
+						so = SettingsOperators.Set;
+						newValue = string.Join(" ", words.Skip(2));
+					}
+					else if(words[1].ToLower() == "remove")
+					{
+						so = SettingsOperators.Remove;
+						newValue = string.Join(" ", words.Skip(2));
+					}
+				}
+				else
+				{
+					result += string.Format("Getting Value(s) For Setting: {0}\r\n", name == "" ? "root" : name);
+				}
+
+				result += ReflectObject(m_instance, name, null, so, newValue);
+			}
+			catch (Exception ex)
+			{
+				Logging.WriteLineAndConsole(string.Format("GetSettings() Error: {0}", ex.ToString()));
+			}
+		
+			return result;
+		}
+
+		private string ReflectObject(object obj, string name = "", PropertyInfo propertyInfo=null, SettingsOperators so = SettingsOperators.List, string newValue = "")
+		{
+			string result = "";
+			bool found = false;
+
+			try
+			{
+				Type checkType = obj.GetType();
+				if (propertyInfo != null)
+					checkType = propertyInfo.PropertyType;
+				
+				string[] names = name.Split(new char[] { '.' }, 2);
+				if (checkType.IsArray)
+				{
+					ReflectArray(obj, propertyInfo, so, newValue, ref result, names);
+				}
+				else if(checkType.IsGenericType && checkType.InheritsOrImplements(typeof(IList<>)))
+				{
+					ReflectGenericList(obj, propertyInfo, so, newValue, ref result, names);
+				}
+				else if(checkType.IsValueType || checkType == typeof(string))
+				{
+					if(so == SettingsOperators.Set && propertyInfo != null && newValue != "")
+					{
+						Logging.WriteLineAndConsole(string.Format("Setting Value of {0} to '{1}'", checkType.Name, newValue));
+						propertyInfo.SetValue(obj, Convert.ChangeType(newValue, propertyInfo.PropertyType));
+						Save();
+					}
+
+					result += propertyInfo.GetValue(obj);
+				}
+				else
+				{
+					PropertyInfo[] properties = checkType.GetProperties();
+					foreach (PropertyInfo info in properties)
+					{
+						bool display = false;
+						bool recurse = false;
+						string recurseName = "";
+
+						if (info.Name.ToLower() == names[0].ToLower())
+						{
+							display = true;
+							recurse = true;
+							if(names.Length > 1)
+								recurseName = names[1];	
+						}
+
+						if (name == "")
+							display = true;
+
+						if (display)
+						{
+							found = true;
+							string value = "";
+							if (info.PropertyType.IsValueType || info.PropertyType == typeof(string))
+							{
+								value += string.Format("{0}: {1}", info.Name, ReflectObject(obj, recurseName, info, so, newValue));
+							}
+							else if (info.PropertyType.IsArray)
+							{								
+								if(!recurse)
+									value += string.Format("{0}: (array)", info.Name);
+								else
+									value += ReflectObject(obj, recurseName, info, so, newValue);
+							}
+							else if(info.GetValue(obj) != null && info.GetValue(obj).GetType().InheritsOrImplements(typeof(IList<>)))
+							{							
+								if (!recurse)
+									value += string.Format("{0}: (list)", info.Name);
+								else
+									value += ReflectObject(obj, recurseName, info, so, newValue);
+
+								found = true;
+							}
+
+							if (result != "" && value != "")
+									result += "\r\n";
+
+							if (value != "")
+								result += value;
+						}
+					}
+
+					if(!found)
+					{
+						result += string.Format("Unabled to find setting: {0}", name);
+					}
+				}
+			}
+			catch(Exception ex)
+			{
+				Logging.WriteLineAndConsole(string.Format("ReflectObject(): {0}", ex.ToString()));
+			}
+
+			return result;
+		}
+
+		private void ReflectArray(object obj, PropertyInfo info, SettingsOperators so, string newValue, ref string result, string[] names)
+		{
+			int item = 0;
+			bool list = true;
+			string recurseName = "";
+			if (names[0] != "")
+			{
+				item = int.Parse(names[0]);
+				list = false;
+
+				if (names.Length > 1)
+					recurseName = names[1];
+			}
+
+			Array arrayToReflect = (Array)info.GetValue(obj);
+			if(so == SettingsOperators.Add)
+			{
+				Type elementType = arrayToReflect.GetType().GetElementType();
+				Array newArray = Array.CreateInstance(elementType, arrayToReflect.Length + 1);
+				Array.Copy(arrayToReflect, newArray, Math.Min(arrayToReflect.Length, newArray.Length));
+				info.SetValue(obj, newArray);
+				result += string.Format("{{ Added New Array Element - New size: {0} }}", arrayToReflect.Length + 1);
+				Save();
+				return;
+			}
+			else if (so == SettingsOperators.Remove)
+			{
+				item = int.Parse(newValue);
+				Type elementType = arrayToReflect.GetType().GetElementType();
+				Array newArray = Array.CreateInstance(elementType, arrayToReflect.Length - 1);
+
+				if (item > 0)
+					Array.Copy(arrayToReflect, 0, newArray, 0, item);
+
+				if (item < arrayToReflect.Length - 1)
+					Array.Copy(arrayToReflect, item + 1, newArray, item, arrayToReflect.Length - item - 1);
+
+				info.SetValue(obj, newArray);
+				result += string.Format("{{ Removed Array Element At: {0} }}", item);
+				Save();
+				return;
+			}
+
+			bool added = false;
+			for (int r = 0; r < arrayToReflect.Length; r++)
+			{
+				if (list || (!list && r == item))
+				{
+					if (added)
+						result += "\r\n";
+
+					if (so == SettingsOperators.Set && newValue != "")
+					{
+						result += (string.Format("Setting Value of {0} item #{1} to '{2}'", info.Name, r, newValue));
+						arrayToReflect.SetValue(Convert.ChangeType(newValue, arrayToReflect.GetType().GetElementType()), r);
+						Save();
+					}
+					else
+					{
+						object itemToReflect = arrayToReflect.GetValue(r);
+						result += "{" + string.Format("{0}: {1}", r, itemToReflect) + "}";
+					}
+
+					added = true;
+				}
+			}
+
+			if(arrayToReflect.Length == 0)
+			{
+				result += "{ No Items In Array }";
+			}
+			else if(!added)
+			{
+				result += "{ Unable to find element requrested }";
+			}
+		}
+
+		private void ReflectGenericList(object obj, PropertyInfo info, SettingsOperators so, string newValue, ref string result, string[] names)
+		{
+			int item = 0;
+			bool list = true;
+			string recurseName = "";
+			if (names[0] != "")
+			{
+				item = int.Parse(names[0]);
+				list = false;
+
+				if (names.Length > 1)
+					recurseName = names[1];
+			}
+
+			IList listToReflect = (IList)info.GetValue(obj);
+			if (so == SettingsOperators.Add)
+			{
+				Type elementType = listToReflect.GetType().GetGenericArguments()[0];
+				listToReflect.Add(Activator.CreateInstance(elementType));
+				result += string.Format("{{ Added New List Element - New size: {0} }}", listToReflect.Count);
+				Save();
+				return;
+			}
+			else if (so == SettingsOperators.Remove)
+			{
+				item = int.Parse(newValue);
+				listToReflect.RemoveAt(item);
+				result += string.Format("{{ Removed List Element At: {0} - New Size: {1} }}", item, listToReflect.Count);
+				Save();
+				return;
+			}
+
+			int count = (int)listToReflect.GetType().GetProperty("Count").GetValue(listToReflect);
+			bool added = false;
+			for(int r = 0; r < count; r++)
+			{
+				if (list || (!list && r == item))
+				{
+					if (added)
+						result += "\r\n";
+
+					object itemToReflect = listToReflect.GetType().GetProperty("Item").GetValue(listToReflect, new object[] { r });
+					String value = string.Format("{0} : {1}", r, ReflectObject(itemToReflect, recurseName, listToReflect.GetType().GetProperty("Item"), so, newValue));
+					value = "{" + value.Replace("\r\n", ", ") + "}";
+					result += value;					
+					added = true;
+				}
+			}
+
+			if(count == 0)
+			{
+				result += "{ No Items In List }";
+			}
+			else if (!added)
+			{
+				result += "{ Unable to find element requested }";
+			}
+		}
+
+		#endregion
 	}
+
+
 
 	[Serializable]
 	public class BackupItem

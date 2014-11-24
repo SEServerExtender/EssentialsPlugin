@@ -32,5 +32,65 @@ namespace EssentialsPlugin.Utility
 		{
 			return string.Format("({0:F2}, {1:F2}, {2:F2})", vector.X, vector.Y, vector.Z);
 		}
+
+		public static bool InheritsOrImplements(this Type child, Type parent)
+		{
+			parent = ResolveGenericTypeDefinition(parent);
+
+			var currentChild = child.IsGenericType
+								   ? child.GetGenericTypeDefinition()
+								   : child;
+
+			while (currentChild != typeof(object))
+			{
+				if (parent == currentChild || HasAnyInterfaces(parent, currentChild))
+					return true;
+
+				currentChild = currentChild.BaseType != null
+							   && currentChild.BaseType.IsGenericType
+								   ? currentChild.BaseType.GetGenericTypeDefinition()
+								   : currentChild.BaseType;
+
+				if (currentChild == null)
+					return false;
+			}
+			return false;
+		}
+
+		private static bool HasAnyInterfaces(Type parent, Type child)
+		{
+			return child.GetInterfaces()
+				.Any(childInterface =>
+				{
+					var currentInterface = childInterface.IsGenericType
+						? childInterface.GetGenericTypeDefinition()
+						: childInterface;
+
+					return currentInterface == parent;
+				});
+		}
+
+		private static Type ResolveGenericTypeDefinition(Type parent)
+		{
+			var shouldUseGenericType = true;
+			if (parent.IsGenericType && parent.GetGenericTypeDefinition() != parent)
+				shouldUseGenericType = false;
+
+			if (parent.IsGenericType && shouldUseGenericType)
+				parent = parent.GetGenericTypeDefinition();
+			return parent;
+		}
+
+		public static T[] RemoveAt<T>(this T[] source, int index)
+		{
+			T[] dest = new T[source.Length - 1];
+			if (index > 0)
+				Array.Copy(source, 0, dest, 0, index);
+
+			if (index < source.Length - 1)
+				Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
+
+			return dest;
+		}
 	}
 }

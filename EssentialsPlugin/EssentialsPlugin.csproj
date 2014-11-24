@@ -45,6 +45,7 @@
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayerListInactive.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayerListActive.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanEntityId.cs" />
+    <Compile Include="ChatHandlers\AdminSettings\HandleAdminSettings.cs" />
     <Compile Include="ChatHandlers\ChatHandlerBase.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteNoBeacon.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteStationsArea.cs" />
@@ -65,6 +66,8 @@
     <Compile Include="ChatHandlers\HandleMsg.cs" />
     <Compile Include="ChatHandlers\HandleTimeleft.cs" />
     <Compile Include="ChatHandlers\HandleInfo.cs" />
+    <Compile Include="ChatHandlers\Utility\HandleUtilityGridsList.cs" />
+    <Compile Include="ChatHandlers\Utility\HandleUtilityExportServer.cs" />
     <Compile Include="ControlForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -76,6 +76,12 @@ namespace EssentialsPlugin.Utility
 
 		public static void SendClientMessage(ulong steamId, string message)
 		{
+			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(steamId).Count < 1)
+			{
+				Logging.WriteLineAndConsole(string.Format("Unable to locate playerId for user with steamId: {0}", steamId));
+				return;
+			}
+
 			CubeGridEntity entity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "CommRelay.sbc"));
 			long entityId = BaseEntity.GenerateEntityId();
 			entity.EntityId = entityId;
