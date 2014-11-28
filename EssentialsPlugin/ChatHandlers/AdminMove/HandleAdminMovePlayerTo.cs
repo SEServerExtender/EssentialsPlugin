@@ -68,27 +68,26 @@ namespace EssentialsPlugin.ChatHandlers
 			else
 				targetName = string.Join(" ", words.Skip(1).ToArray());
 
-			Communication.SendPrivateInformation(userId, string.Format("Moving {0} to within {1}m of {2}.  This may take about 20 seconds.", sourceName, distance, targetName));
-
 			Vector3D position;
-			CharacterEntity charEntity = SectorObjectManager.Instance.GetTypedInternalData<CharacterEntity>().FirstOrDefault(x => x.DisplayName.ToLower() == targetName.ToLower() && x.Health > 0);
-			if(charEntity == null)
+			IMyEntity entity = Player.FindControlledEntity(targetName);
+			if (entity == null)
 			{
-				CubeGridEntity gridEntity = SectorObjectManager.Instance.GetTypedInternalData<CubeGridEntity>().FirstOrDefault(x => (x.DisplayName.ToLower().Contains(targetName.ToLower()) || x.Name.ToLower().Contains(targetName.ToLower())) && !x.IsDisposed);
-				if (gridEntity == null)
+				entity = CubeGrids.Find(targetName);
+				if(entity == null)
 				{
 					Communication.SendPrivateInformation(userId, string.Format("Can not find user or grid with the name: {0}", targetName));
 					return true;
 				}
-				position = (Vector3)gridEntity.Position;
 			}
-			else
-				position = (Vector3)charEntity.Position;
 
+			position = entity.GetPosition();
+
+			Communication.SendPrivateInformation(userId, string.Format("Trying to move {0} to within {1}m of {2}.  This may take about 20 seconds.", sourceName, distance, targetName));
 			Vector3D startPosition = MathUtility.RandomPositionFromPoint((Vector3)position, distance);
 			if(!Player.Move(sourceName, startPosition))
 			{
-				Communication.SendPrivateInformation(userId, string.Format("Can not move user: {0}", sourceName));
+				Communication.SendPrivateInformation(userId, string.Format("Can not move user: {0} (Is user in a cockpit or not in game?)", sourceName));
+				return true;
 			}
 
 			Communication.SendPrivateInformation(userId, string.Format("Moved {0} to within {1}m of {2}", sourceName, (int)Math.Round(Vector3D.Distance(startPosition, position)), targetName));

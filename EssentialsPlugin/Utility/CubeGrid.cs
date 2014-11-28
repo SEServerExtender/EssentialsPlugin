@@ -159,5 +159,25 @@ namespace EssentialsPlugin.Utility
 					connectedList.Add(entity);
 			}
 		}
+
+		public static IMyEntity Find(string displayName)
+		{
+			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+
+			Wrapper.GameAction(() =>
+			{
+				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
+			});
+
+			foreach (IMyEntity entity in entities)
+			{
+				if (entity.DisplayName.ToLower().Contains(displayName.ToLower()))
+				{
+					return entity;
+				}
+			}
+
+			return null;
+		}
 	}
 }

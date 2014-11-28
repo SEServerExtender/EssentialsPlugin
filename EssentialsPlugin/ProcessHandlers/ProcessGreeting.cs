@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using EssentialsPlugin.Utility;
 using Sandbox.ModAPI;
 using SEModAPIInternal.API.Common;
+
+using EssentialsPlugin.Utility;
+using EssentialsPlugin.Settings;
 
 namespace EssentialsPlugin.ProcessHandler
 {
@@ -99,10 +101,33 @@ namespace EssentialsPlugin.ProcessHandler
 								pos = 6;
 								m_greetingList.RemoveAt(r);
 
+								string message = "";
+
 								if (item.IsNewUser)
-									Communication.SendPrivateInformation(item.SteamId, PluginSettings.Instance.GreetingNewUserMessage.Replace("%name%", player.DisplayName));
+									message = PluginSettings.Instance.GreetingNewUserMessage.Replace("%name%", player.DisplayName);
 								else
-									Communication.SendPrivateInformation(item.SteamId, PluginSettings.Instance.GreetingMessage.Replace("%name%", player.DisplayName));
+									message = PluginSettings.Instance.GreetingMessage.Replace("%name%", player.DisplayName);
+
+								string finalMessage = message;
+								Communication.SendPrivateInformation(item.SteamId, finalMessage);
+
+								if (item.IsNewUser)
+								{
+									if (PluginSettings.Instance.GreetingNewUserItem.Enabled)
+									{
+										SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingNewUserItem;
+										Communication.SendClientMessage(item.SteamId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), " ", gItem.Contents.Replace("%name%", player.DisplayName), gItem.ButtonText));
+									}
+								}
+								else
+								{
+									if (PluginSettings.Instance.GreetingItem.Enabled)
+									{
+										SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingItem;
+										Communication.SendClientMessage(item.SteamId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), " ", gItem.Contents.Replace("%name%", player.DisplayName), gItem.ButtonText));
+									}
+								}
+
 							}
 						}
 

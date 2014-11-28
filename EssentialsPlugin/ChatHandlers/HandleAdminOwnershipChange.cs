@@ -41,11 +41,11 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		// admin nobeacon scan
+		// /admin ownership change name gridId
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
 			string name = words[0].ToLower();
-			long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(PlayerMap.Instance.GetSteamIdFromPlayerName(name)).First();
+			long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(PlayerMap.Instance.GetSteamIdFromPlayerName(name, true)).First();
 			string gridId = words[1].ToLower();
 
 			long gridEntityId = 0;

@@ -8,6 +8,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.Design;
 using System.Drawing.Design;
+using System.ComponentModel.Design;
 
 using SEModAPIExtensions.API;
 using SEModAPIExtensions.API.Plugin;
@@ -23,6 +24,7 @@ using EssentialsPlugin.Utility;
 using EssentialsPlugin.ProcessHandler;
 using EssentialsPlugin.ChatHandlers;
 using EssentialsPlugin.UtilityClasses;
+using EssentialsPlugin.Settings;
 
 namespace EssentialsPlugin
 {
@@ -75,6 +77,16 @@ namespace EssentialsPlugin
 			}
 		}
 		*/
+
+		[Category("General")]
+		[Description("Name of the server used throughout this plugin")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public string ServerName
+		{
+			get { return PluginSettings.Instance.ServerName; }
+			set { PluginSettings.Instance.ServerName = value; }
+		}
 
 		[Category("Information")]
 		[Description("Enabled / Disable Information Commands")]
@@ -174,6 +186,17 @@ namespace EssentialsPlugin
 		}
 
 		[Category("Join Greeting")]
+		[Description("Greeting Dialog Displayed To User On Join")]
+		[Browsable(true)]		
+		[ReadOnly(false)]
+		[TypeConverter(typeof(ExpandableObjectConverter))]
+		public SettingsGreetingDialogItem GreetingItem
+		{
+			get { return PluginSettings.Instance.GreetingItem; }
+			set { PluginSettings.Instance.GreetingItem = value; }
+		}
+
+		[Category("Join Greeting")]
 		[Description("Greeting Sent To User On Join")]
 		[Browsable(true)]
 		[ReadOnly(false)]
@@ -189,6 +212,18 @@ namespace EssentialsPlugin
 				PluginSettings.Instance.GreetingMessage = value;
 			}
 		}
+
+		[Category("Join Greeting")]
+		[Description("Greeting Dialog Displayed To User On Join")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		[TypeConverter(typeof(ExpandableObjectConverter))]
+		public SettingsGreetingDialogItem GreetingNewUserItem
+		{
+			get { return PluginSettings.Instance.GreetingNewUserItem; }
+			set { PluginSettings.Instance.GreetingNewUserItem = value; }
+		}
+
 
 		[Category("Join Greeting")]
 		[Description("Greeting Sent To New Users On Join")]
@@ -330,6 +365,26 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.LoginPlayerIdWhitelist = value; }
 		}
 
+		[Category("Protected Entities")]
+		[Description("Enable / Disable Protected Entities.  Protected entities have increased integrity, and also heal repair / fix deformation instantly when damaged.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool ProtectedEnabled
+		{
+			get { return PluginSettings.Instance.ProtectedEnabled; }
+			set { PluginSettings.Instance.ProtectedEnabled = value; }
+		}
+
+		[Category("Protected Entities")]
+		[Description("This is the list of entities that are protected by the server")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public MTObservableCollection<ProtectedItem> ProtectedItems
+		{
+			get { return PluginSettings.Instance.ProtectedItems; }
+		}
+
+
 		#endregion
 
 		#region Constructors and Initializers
@@ -352,6 +407,7 @@ namespace EssentialsPlugin
 			m_processHandlers.Add(new ProcessCommunication());
 			m_processHandlers.Add(new ProcessBackup());
 			m_processHandlers.Add(new ProcessLoginTracking());
+			m_processHandlers.Add(new ProcessProtection());
 			
 			// Setup chat handlers
 			m_chatHandlers = new List<ChatHandlerBase>();
@@ -360,12 +416,15 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandlePos());
 			m_chatHandlers.Add(new HandleMsg());
 			m_chatHandlers.Add(new HandleFaction());
+			m_chatHandlers.Add(new HandleFactionF());
 
 			m_chatHandlers.Add(new HandleAdminScanAreaAt());          //
 			m_chatHandlers.Add(new HandleAdminScanAreaTowards());     //
 			m_chatHandlers.Add(new HandleAdminScanNoBeacon());        //
 			m_chatHandlers.Add(new HandleAdminScanInactive());        //
 			m_chatHandlers.Add(new HandleAdminScanEntityId());        //
+			m_chatHandlers.Add(new HandleAdminScanTrash());
+			m_chatHandlers.Add(new HandleAdminScanOverlimit());
 
 			m_chatHandlers.Add(new HandleAdminMoveAreaToPosition());  //
 			m_chatHandlers.Add(new HandleAdminMoveAreaTowards());     //
@@ -378,20 +437,23 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleAdminDeleteStationsArea());  //
 			m_chatHandlers.Add(new HandleAdminDeleteNoBeacon());      //
 			m_chatHandlers.Add(new HandleAdminDeleteInactive());      //
+			m_chatHandlers.Add(new HandleAdminDeleteTrash());
 
 			m_chatHandlers.Add(new HandleAdminSettings());
+			m_chatHandlers.Add(new HandleAdminNotify());
 
 			m_chatHandlers.Add(new HandleAdminOwnershipChange());     //
 
 			m_chatHandlers.Add(new HandleAdminPlayerListActive());    //
 			m_chatHandlers.Add(new HandleAdminPlayerListInactive());  //
 
+
 			m_chatHandlers.Add(new HandleUtilityExportServer());
 			m_chatHandlers.Add(new HandleUtilityGridsList());
 
 //			m_chatHandlers.Add(new HandleAdminPlayer());
 
-//			m_chatHandlers.Add(new HandleAdminTest());
+			m_chatHandlers.Add(new HandleAdminTest());
 //			m_chatHandlers.Add(new HandleAdmin());
 
 			m_lastProcessUpdate = DateTime.Now;
@@ -432,6 +494,7 @@ namespace EssentialsPlugin
 
 						m_lastProcessUpdate = DateTime.Now;
 					}
+					Thread.Sleep(25);
 				}
 			}
 			catch (Exception ex)

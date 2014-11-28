@@ -7,8 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using EssentialsPlugin.Utility;
-using EssentialsPlugin.UtilityClasses;
 using VRage.Common.Utils;
 using System.Windows.Forms.Design;
 using System.ComponentModel;
@@ -16,6 +14,10 @@ using System.Drawing.Design;
 using System.Windows.Forms;
 using System.ComponentModel.Design;
 using System.Reflection;
+
+using EssentialsPlugin.Utility;
+using EssentialsPlugin.UtilityClasses;
+using EssentialsPlugin.Settings;
 
 namespace EssentialsPlugin
 {
@@ -27,12 +29,17 @@ namespace EssentialsPlugin
 		private static bool m_loading = false;
 		private static DateTime m_start;
 
+		private string m_serverName;
+
 		private bool m_informationEnabled;
 		private MTObservableCollection<InformationItem> m_informationItems;
 
 		private bool m_greetingEnabled;
 		private string m_greetingMessage;
+		private SettingsGreetingDialogItem m_greetingItem;
+
 		private string m_greetingNewUserMessage;
+		private SettingsGreetingDialogItem m_greetingNewUserItem;
 
 		private bool m_restartEnabled;
 		private MTObservableCollection<RestartNotificationItem> m_restartNotificationItems;
@@ -54,6 +61,8 @@ namespace EssentialsPlugin
 		private string[] m_loginEntityWhitelist = new string[] { };
 		private string[] m_loginPlayerIdWhitelist = new string[] { };
 
+		private bool m_protectedEnabled;
+		private MTObservableCollection<ProtectedItem> m_protectedItems;
 		#endregion
 
 		#region Static Properties
@@ -78,6 +87,17 @@ namespace EssentialsPlugin
 		#endregion
 
 		#region Properties
+
+		// General
+		public string ServerName
+		{
+			get { return m_serverName; }
+			set
+			{
+				m_serverName = value;
+				Save();
+			}
+		}
 
 		// Information
 		public bool InformationEnabled
@@ -154,12 +174,32 @@ namespace EssentialsPlugin
 			}
 		}
 
+		public SettingsGreetingDialogItem GreetingItem
+		{
+			get { return m_greetingItem; }
+			set
+			{
+				m_greetingItem = value;
+				Save();
+			}
+		}
+
 		public string GreetingNewUserMessage
 		{
 			get { return m_greetingNewUserMessage; }
 			set
 			{
 				m_greetingNewUserMessage = value;
+				Save();
+			}
+		}
+
+		public SettingsGreetingDialogItem GreetingNewUserItem
+		{
+			get { return m_greetingNewUserItem; }
+			set
+			{
+				m_greetingNewUserItem = value;
 				Save();
 			}
 		}
@@ -292,6 +332,22 @@ namespace EssentialsPlugin
 			}
 		}
 
+		public bool ProtectedEnabled
+		{
+			get { return m_protectedEnabled; }
+			set
+			{
+				m_protectedEnabled = value;
+				Save();
+			}
+		}
+
+		public MTObservableCollection<ProtectedItem> ProtectedItems
+		{
+			get { return m_protectedItems; }
+			set { m_protectedItems = value; }
+		}
+
 		#endregion
 
 		#region Constructor
@@ -302,14 +358,19 @@ namespace EssentialsPlugin
 			m_newUserTransportDistance = 500;
 			m_backupAsteroids = true;
 
+			m_greetingItem = new SettingsGreetingDialogItem();
+			m_greetingNewUserItem = new SettingsGreetingDialogItem();
+
 			m_informationItems = new MTObservableCollection<InformationItem>();
 			m_restartNotificationItems = new MTObservableCollection<RestartNotificationItem>();
 			m_restartTimeItems = new MTObservableCollection<RestartTimeItem>();
 			m_backupItems = new MTObservableCollection<BackupItem>();
+			m_protectedItems = new MTObservableCollection<ProtectedItem>();
 			m_informationItems.CollectionChanged += ItemsCollectionChanged;
 			m_restartNotificationItems.CollectionChanged += ItemsCollectionChanged;
 			m_restartTimeItems.CollectionChanged += ItemsCollectionChanged;
 			m_backupItems.CollectionChanged += ItemsCollectionChanged;
+			m_protectedItems.CollectionChanged += ItemsCollectionChanged;
 
 			m_greetingMessage = "";
 		}
@@ -404,19 +465,6 @@ namespace EssentialsPlugin
 			Set,
 			Add,
 			Remove
-		}
-
-		public bool UpdateSettings(string name, string value)
-		{
-			try
-			{
-
-				return false;
-			}
-			catch(Exception ex)
-			{
-				return false;
-			}
 		}
 
 		public string GetOrSetSettings(string line)
@@ -703,129 +751,5 @@ namespace EssentialsPlugin
 		}
 
 		#endregion
-	}
-
-
-
-	[Serializable]
-	public class BackupItem
-	{
-		private int hour;
-		public int Hour
-		{
-			get { return hour; }
-			set 
-			{
-				hour = Math.Min(Math.Max(-1, value), 23);
-			}
-		}
-
-		private int minute;
-		public int Minute
-		{
-			get { return minute; }
-			set 
-			{
-				minute = Math.Min(Math.Max(0, value), 59);
-			}
-		}
-
-		private bool enabled;
-		public bool Enabled
-		{
-			get { return enabled; }
-			set { enabled = value; }
-		}
-	}
-
-	[Serializable]
-	public class InformationItem
-	{
-		internal DateTime lastUpdate = DateTime.Now;
-		internal int position = 0;
-
-		private bool enabled;
-		public bool Enabled { get { return enabled; } set { enabled = value; } }
-
-		private string subCommand;
-		public string SubCommand { get { return subCommand; } set { subCommand = value; } }
-
-		private string subText;
-		[Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
-		public string SubText { get { return subText; } set { subText = value; } }
-
-		private int intervalSeconds;
-		public int IntervalSeconds { get { return intervalSeconds; } set { intervalSeconds = value; } }
-	}
-
-	[Serializable]
-	public class RestartTimeItem
-	{
-		public DateTime Restart;
-
-		private bool enabled;
-		public bool Enabled
-		{
-			get { return enabled; }
-			set { enabled = value; }
-		}
-
-		private string restartTime;
-		[Editor(typeof(TimePickerEditor), typeof(UITypeEditor))]
-		public string RestartTime
-		{
-			get { return restartTime; }
-			set 
-			{ 
-				restartTime = value;
-				Restart = DateTime.Parse(restartTime);
-			}
-		}
-
-		public RestartTimeItem()
-		{
-			enabled = false;
-			restartTime = DateTime.Now.AddHours(1).ToString("HH:mm");
-			Restart = DateTime.Now.AddHours(1);
-		}
-	}
-
-	[Serializable]
-	public class RestartNotificationItem
-	{
-		internal bool completed;
-
-		private string message;
-		public string Message
-		{
-			get { return message; }
-			set { message = value; }
-		}
-
-		private int minutesBeforeRestart;
-		public int MinutesBeforeRestart
-		{
-			get { return minutesBeforeRestart; }
-			set { minutesBeforeRestart = value; }
-		}
-
-		private bool save;
-		public bool Save
-		{
-			get { return save; }
-			set { save = value; }
-		}
-
-		private bool stopAllShips;
-		public bool StopAllShips
-		{
-			get { return stopAllShips; }
-			set { stopAllShips = value; }
-		}
-
-		public RestartNotificationItem()
-		{
-			completed = false;
-		}
 	}
 }

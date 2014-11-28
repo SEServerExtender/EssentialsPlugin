@@ -33,7 +33,7 @@ namespace EssentialsPlugin.ProcessHandler
 		private void Init()
 		{
 			// Cache asteroids
-			ThreadPool.QueueUserWorkItem(new WaitCallback((object state) =>
+			Thread thread = new Thread((Object state) =>
 			{
 				List<VoxelMap> voxels = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>();
 				Thread.Sleep(10000);
@@ -49,7 +49,31 @@ namespace EssentialsPlugin.ProcessHandler
 				Logging.WriteLineAndConsole("Completed Voxel Caching");
 
 				m_ready = true;
+
+			});
+			thread.Priority = ThreadPriority.BelowNormal;
+			thread.IsBackground = true;
+			thread.Start();
+
+			/*
+			ThreadPool.QueueUserWorkItem(new WaitCallback((object state) =>
+			{				
+				List<VoxelMap> voxels = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>();
+				Thread.Sleep(10000);
+				voxels = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>();
+
+				Logging.WriteLineAndConsole("Starting Voxel Caching .. This might take awhile");
+				foreach (VoxelMap voxel in voxels)
+				{
+					DateTime start = DateTime.Now;
+					int voxelMaterialCount = voxel.Materials.Count;
+					Logging.WriteLineAndConsole(string.Format("Caching Voxel: {0} - {1} (Took: {2}s)", voxel.Name, voxelMaterialCount, (DateTime.Now - start).TotalSeconds));
+				}
+				Logging.WriteLineAndConsole("Completed Voxel Caching");
+
+				m_ready = true;
 			}));
+			 */ 
 		}
 
 		public override int GetUpdateResolution()

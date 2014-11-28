@@ -30,9 +30,86 @@ namespace EssentialsPlugin.Utility
 {
 	public static class Player
 	{
+		public static MyObjectBuilder_Character FindCharacter(string userName)
+		{
+			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+			Wrapper.GameAction(() =>
+			{
+				MyAPIGateway.Entities.GetEntities(entities);
+			});
+
+			foreach(IMyEntity entity in entities)
+			{
+				MyObjectBuilder_Character character = null;
+				try
+				{
+					if (entity.GetObjectBuilder() is MyObjectBuilder_Character)
+						character = (MyObjectBuilder_Character)entity.GetObjectBuilder();
+					else
+						continue;
+				}
+				catch
+				{
+					continue;
+				}
+
+				CharacterEntity charEntity = new CharacterEntity(character, entity);
+				if (character.DisplayName.ToLower().Equals(userName.ToLower()) && charEntity.Health > 0f)
+				{
+					return character;
+				}
+			}
+
+			/*
+			 * This works, but it doesn't do what I wanted (they don't get removed from their current cockpit)
+			IMyEntity entityCheck = FindControlledEntity(userName);
+			if (entityCheck != null && entityCheck.GetObjectBuilder() is MyObjectBuilder_CubeGrid)
+			{
+				MyObjectBuilder_CubeGrid grid = (MyObjectBuilder_CubeGrid)entityCheck.GetObjectBuilder();
+				foreach (MyObjectBuilder_CubeBlock block in grid.CubeBlocks)
+				{
+					if(block is MyObjectBuilder_Cockpit)
+					{
+						MyObjectBuilder_Cockpit cockpit = (MyObjectBuilder_Cockpit)block;
+						if (cockpit.Pilot != null && cockpit.Pilot.DisplayName.ToLower().Contains(userName.ToLower()))
+							return cockpit.Pilot;							
+					}
+				}
+			}
+			*/
+
+			return null;
+		}
+
+		public static IMyEntity FindControlledEntity(string userName)
+		{
+			List<IMyPlayer> players = new List<IMyPlayer>();
+			Wrapper.GameAction(() =>
+			{
+				MyAPIGateway.Players.GetPlayers(players);
+			});
+
+			foreach (IMyPlayer player in players)
+			{
+				if(player.DisplayName.ToLower().Contains(userName) && player.Controller != null && player.Controller.ControlledEntity != null && player.Controller.ControlledEntity.Entity != null)
+				{
+					return player.Controller.ControlledEntity.Entity.GetTopMostParent();
+				}
+			}
+
+			return null;
+		}
+
 		public static bool Move(string userName, Vector3D position)
 		{
-			CharacterEntity charEntity = SectorObjectManager.Instance.GetTypedInternalData<CharacterEntity>().Where(x => x.DisplayName.ToLower() == userName.ToLower() && x.Health > 0).First();
+			//CharacterEntity charEntity = SectorObjectManager.Instance.GetTypedInternalData<CharacterEntity>().FirstOrDefault(x => x.DisplayName.ToLower() == userName.ToLower() && x.Health > 0);
+			MyObjectBuilder_Character charEntity = FindCharacter(userName);
+			if(charEntity == null)
+			{
+				Logging.WriteLineAndConsole(string.Format("Unable to find CharacterEntity of '{0}'", userName));
+				return false;
+			}
+
 			CubeGridEntity gridEntity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "MovePlayer.sbc"));
 			gridEntity.EntityId = BaseEntity.GenerateEntityId();
 			foreach (MyObjectBuilder_CubeBlock block in gridEntity.BaseCubeBlocks)
@@ -41,7 +118,7 @@ namespace EssentialsPlugin.Utility
 				if (block is MyObjectBuilder_Cockpit)
 				{
 					MyObjectBuilder_Cockpit cockpit = (MyObjectBuilder_Cockpit)block;
-					cockpit.Pilot = (MyObjectBuilder_Character)charEntity.Export();
+					cockpit.Pilot = charEntity;
 				}
 			}
 

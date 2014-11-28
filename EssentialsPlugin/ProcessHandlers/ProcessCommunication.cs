@@ -18,14 +18,14 @@ namespace EssentialsPlugin.ProcessHandler
 	public class ProcessCommunication : ProcessHandlerBase
 	{
 		#region Private Fields
-		private Dictionary<ulong, long> m_commGrids;
+		private HashSet<long> m_processedRelays;
 		private Random m_random;
 		private bool m_init;
 		#endregion
 
 		public ProcessCommunication()
 		{
-			m_commGrids = new Dictionary<ulong, long>();
+			m_processedRelays = new HashSet<long>();
 			m_random = new Random();
 		}
 
@@ -61,12 +61,13 @@ namespace EssentialsPlugin.ProcessHandler
 				}
 			}
 
+			/*
 			foreach (IMyEntity entity in entities)
 			{
 				CubeGridEntity cubeEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
 				cubeEntity.Dispose();
 			}
-
+			*/
 			// Cleanup processing
 			Cleanup.Instance.Process();
 
@@ -84,6 +85,9 @@ namespace EssentialsPlugin.ProcessHandler
 				{
 					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)block;
 					command = beacon.CustomName;
+					CubeGridEntity cubeEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
+					cubeEntity.Dispose();
+
 					break;
 				}
 			}
@@ -91,9 +95,17 @@ namespace EssentialsPlugin.ProcessHandler
 			string player = entity.DisplayName.Replace("CommRelay", "");
 			long playerId = long.Parse(player);
 			ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerId(playerId);
-			Logging.WriteLineAndConsole(string.Format("COMMAND {1}: {0}", command, playerId));
+			Logging.WriteLineAndConsole(string.Format("COMMAND {1} - {2}: {0}", command, playerId, entity.EntityId));
 
-			Essentials.Instance.HandleChatMessage(steamId, command);
+			if (!m_processedRelays.Contains(entity.EntityId))
+			{
+				m_processedRelays.Add(entity.EntityId);
+				Essentials.Instance.HandleChatMessage(steamId, command);
+			}
+			else
+			{
+				Logging.WriteLineAndConsole(string.Format("Ignoring repeat beacon: {0}", entity.EntityId));
+			}
 		}
 
 		// Events and Overrides
@@ -163,6 +175,10 @@ namespace EssentialsPlugin.ProcessHandler
 				finalText += command;
 			}
 
+			finalText += "\n/help";
+
+			if (PluginSettings.Instance.ServerName != "")
+				finalText += "\n" + "servername:" + PluginSettings.Instance.ServerName;
 
 			foreach(MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks)
 			{

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using EssentialsPlugin.Utility;
 using SEModAPIInternal.API.Common;
+using EssentialsPlugin.Utility;
+using EssentialsPlugin.Settings;
 
 namespace EssentialsPlugin.ProcessHandler
 {

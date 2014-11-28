@@ -40,11 +40,14 @@
       <DependentUpon>AssemblyFileVersion.tt</DependentUpon>
     </Compile>
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteInactive.cs" />
+    <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteTrash.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveGridTo.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayer.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayerListInactive.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayerListActive.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanEntityId.cs" />
+    <Compile Include="ChatHandlers\AdminScan\HandleAdminScanOverlimit.cs" />
+    <Compile Include="ChatHandlers\AdminScan\HandleAdminScanTrash.cs" />
     <Compile Include="ChatHandlers\AdminSettings\HandleAdminSettings.cs" />
     <Compile Include="ChatHandlers\ChatHandlerBase.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteNoBeacon.cs" />
@@ -57,10 +60,12 @@
     <Compile Include="ChatHandlers\HandleAdminOwnershipChange.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanInactive.cs" />
     <Compile Include="ChatHandlers\HandleAdminTest.cs" />
+    <Compile Include="ChatHandlers\HandleAdminNotify.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteGridsArea.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanNoBeacon.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanAreaAt.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveAreaToPosition.cs" />
+    <Compile Include="ChatHandlers\HandleFactionF.cs" />
     <Compile Include="ChatHandlers\HandleFaction.cs" />
     <Compile Include="ChatHandlers\HandlePos.cs" />
     <Compile Include="ChatHandlers\HandleMsg.cs" />
@@ -75,7 +80,8 @@
       <DependentUpon>ControlForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core.cs" />
-    <Compile Include="PluginSettings.cs" />
+    <Compile Include="ProcessHandlers\ProcessProtection.cs" />
+    <Compile Include="Settings\PluginSettings.cs" />
     <Compile Include="ProcessHandlers\ProcessCommunication.cs" />
     <Compile Include="ProcessHandlers\ProcessLoginTracking.cs" />
     <Compile Include="ProcessHandlers\ProcessNewUserTransport.cs" />
@@ -90,6 +96,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Settings\SettingsGreetingDialogItem.cs" />
+    <Compile Include="Settings\SettingsBackupItem.cs" />
+    <Compile Include="Settings\SettingsInformationItem.cs" />
+    <Compile Include="Settings\SettingsProtectedItem.cs" />
+    <Compile Include="Settings\SettingsRestartItem.cs" />
+    <Compile Include="Settings\SettingsRestartNotificationItem.cs" />
     <Compile Include="UtilityClasses\MTObservableCollection.cs" />
     <Compile Include="UtilityClasses\SerializeableDictionary.cs" />
     <Compile Include="UtilityClasses\UIEditors.cs" />

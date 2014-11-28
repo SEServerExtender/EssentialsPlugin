@@ -20,17 +20,17 @@ using SEModAPIInternal.API.Common;
 
 namespace EssentialsPlugin.ChatHandlers
 {
-	public class HandleAdminTest : ChatHandlerBase
+	public class HandleAdminNotify : ChatHandlerBase
 	{
 		private Random m_random = new Random();
 		public override string GetHelp()
 		{
-			return "For testing.";
+			return "This will broadcast a notification to all users.  Usage: /admin notify <message>";
 		}
 
 		public override string GetCommandText()
 		{
-			return "/admin test";
+			return "/admin notify";
 		}
 
 		public override bool IsAdminCommand()
@@ -46,29 +46,13 @@ namespace EssentialsPlugin.ChatHandlers
 		// admin deletearea x y z radius
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-			Wrapper.GameAction(() =>
+			string message = string.Join(" ", words);
+			foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
 			{
-				MyAPIGateway.Entities.GetEntities(entities);
-			});
-
-			foreach(IMyEntity entity in entities)
-			{
-				//entity.PersistentFlags &= ~MyPersistentEntityFlags2.InScene;
-				entity.InScene = true;
-				entity.CastShadows = true;
-				entity.Visible = false;
-				Logging.WriteLineAndConsole(string.Format("Setting {0}", entity.EntityId));
+				Communication.SendFactionClientMessage(steamId, string.Format("/notification {0}", message));
 			}
 
 			return true;
 		}
-
-		private float GenerateRandomCoord(float halfExtent)
-		{
-			float result = (m_random.Next(200) + halfExtent) * (m_random.Next(2) == 0 ? -1 : 1);
-			return result;
-		}
-
 	}
 }

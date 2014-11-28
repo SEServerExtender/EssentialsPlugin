@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EssentialsPlugin.Utility;
 using SEModAPIInternal.API.Common;
+using EssentialsPlugin.Settings;
 
 namespace EssentialsPlugin.ChatHandlers
 {

@@ -11,6 +11,8 @@ using SEModAPIExtensions.API;
 using Sandbox.ModAPI;
 using VRageMath;
 
+using EssentialsPlugin.Settings;
+
 namespace EssentialsPlugin.ProcessHandler
 {
 	class ProcessRestart : ProcessHandlerBase

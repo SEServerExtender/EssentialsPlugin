@@ -3,6 +3,7 @@ using System.IO;
 using EssentialsPlugin.Utility;
 using SEModAPIExtensions.API;
 using System.IO.Compression;
+using EssentialsPlugin.Settings;
 
 namespace EssentialsPlugin.ProcessHandler
 {
