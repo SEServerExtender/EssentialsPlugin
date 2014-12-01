@@ -55,8 +55,8 @@ namespace EssentialsPlugin.ChatHandlers
 			foreach(IMyEntity entity in entities)
 			{
 				//entity.PersistentFlags &= ~MyPersistentEntityFlags2.InScene;
-				entity.InScene = true;
-				entity.CastShadows = true;
+				entity.InScene = false;
+				entity.CastShadows = false;
 				entity.Visible = false;
 				Logging.WriteLineAndConsole(string.Format("Setting {0}", entity.EntityId));
 			}

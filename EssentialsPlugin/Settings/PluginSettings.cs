@@ -63,6 +63,9 @@ namespace EssentialsPlugin
 
 		private bool m_protectedEnabled;
 		private MTObservableCollection<ProtectedItem> m_protectedItems;
+
+		private bool m_dockingEnabled;
+
 		#endregion
 
 		#region Static Properties
@@ -348,6 +351,16 @@ namespace EssentialsPlugin
 			set { m_protectedItems = value; }
 		}
 
+
+		public bool DockingEnabled
+		{
+			get { return m_dockingEnabled; }
+			set 
+			{ 
+				m_dockingEnabled = value;
+				Save();
+			}
+		}
 		#endregion
 
 		#region Constructor

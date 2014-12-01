@@ -70,7 +70,9 @@ namespace EssentialsPlugin.ProcessHandler
 		private void ProtectedEntity(IMyEntity entity, ProtectedItem item)
 		{
 			//Logging.WriteLineAndConsole(string.Format("Protecting: {0}", entity.EntityId));
-			CubeGridEntity gridEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
+			//CubeGridEntity gridEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
+			CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(entity.EntityId);
+			MyObjectBuilder_CubeGrid grid = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder();
 
 			int count = 0;
 			while (gridEntity.IsLoading)
@@ -83,6 +85,7 @@ namespace EssentialsPlugin.ProcessHandler
 			}
 
 			bool found = false;
+			/*
 			foreach(CubeBlockEntity block in gridEntity.CubeBlocks)
 			{
 				if (block.IntegrityPercent != item.IntegrityIncrease || block.BuildPercent != item.IntegrityIncrease || block.BoneDamage > 0f)
@@ -93,7 +96,7 @@ namespace EssentialsPlugin.ProcessHandler
 					block.BuildPercent = item.IntegrityIncrease;
 				}
 			}
-
+			*/
 			if(found)
      			Logging.WriteLineAndConsole(string.Format("Repaired Grid: {0}", gridEntity.EntityId));
 		}

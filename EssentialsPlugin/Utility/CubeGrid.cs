@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+
 using VRageMath;
 using Sandbox.ModAPI;
 using Sandbox.Common.ObjectBuilders;
@@ -178,6 +180,20 @@ namespace EssentialsPlugin.Utility
 			}
 
 			return null;
+		}
+
+		public static bool WaitForLoadingEntity(CubeGridEntity grid)
+		{
+			int count = 0;
+			while (grid.IsLoading)
+			{
+				Thread.Sleep(100);
+				count++;
+				if (count > 10)
+					return false;
+			}
+
+			return true;
 		}
 	}
 }

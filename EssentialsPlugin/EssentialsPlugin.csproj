@@ -57,6 +57,10 @@
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMovePlayerPosition.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveAreaTowards.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanAreaTowards.cs" />
+    <Compile Include="ChatHandlers\Dock\HandleDockUndock.cs" />
+    <Compile Include="ChatHandlers\Dock\HandleDockDock.cs" />
+    <Compile Include="ChatHandlers\Dock\HandleDockList.cs" />
+    <Compile Include="ChatHandlers\Dock\HandleDockValidate.cs" />
     <Compile Include="ChatHandlers\HandleAdminOwnershipChange.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanInactive.cs" />
     <Compile Include="ChatHandlers\HandleAdminTest.cs" />
@@ -80,6 +84,7 @@
       <DependentUpon>ControlForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core.cs" />
+    <Compile Include="ProcessHandlers\ProcessDockingZone.cs" />
     <Compile Include="ProcessHandlers\ProcessProtection.cs" />
     <Compile Include="Settings\PluginSettings.cs" />
     <Compile Include="ProcessHandlers\ProcessCommunication.cs" />
@@ -103,11 +108,14 @@
     <Compile Include="Settings\SettingsRestartItem.cs" />
     <Compile Include="Settings\SettingsRestartNotificationItem.cs" />
     <Compile Include="UtilityClasses\MTObservableCollection.cs" />
+    <Compile Include="UtilityClasses\OrientedBoundingBox.cs" />
     <Compile Include="UtilityClasses\SerializeableDictionary.cs" />
     <Compile Include="UtilityClasses\UIEditors.cs" />
     <Compile Include="Utility\Cleanup.cs" />
     <Compile Include="Utility\Communication.cs" />
     <Compile Include="Utility\CubeGrid.cs" />
+    <Compile Include="Utility\DockingZone.cs" />
+    <Compile Include="Utility\Entity.cs" />
     <Compile Include="Utility\Faction.cs" />
     <Compile Include="Utility\MathUtility.cs" />
     <Compile Include="Utility\Player.cs" />

@@ -7,6 +7,7 @@ using System.IO;
 
 using Sandbox.ModAPI;
 using Sandbox.Common.ObjectBuilders;
+using Sandbox.Common;
 using VRageMath;
 
 using SEModAPIInternal.API.Entity;
@@ -26,24 +27,6 @@ namespace EssentialsPlugin.Utility
 			if (infoText == "")
 				return;
 
-			/*
-			String[] lines;
-			if (wrap)
-			{
-				Int32 maxLineLength = 32;
-				Int32 charCount = 0;
-				lines = infoText.Split(new String[] { " " }, StringSplitOptions.RemoveEmptyEntries).GroupBy(w => (charCount += w.Length + 1) / maxLineLength).Select(g => string.Join(" ", g)).ToArray();
-			}
-			else
-				lines = new string[] { infoText };
-
-			foreach (String line in lines)
-			{
-				if (infoText != "")
-					ChatManager.Instance.SendPublicChatMessage(line);
-			}
-			 */
-
 			ChatManager.Instance.SendPublicChatMessage(infoText);
 		}
 
@@ -51,25 +34,6 @@ namespace EssentialsPlugin.Utility
 		{
 			if (infoText == "")
 				return;
-
-			/*
-			String[] lines;
-
-			if (wrap)
-			{
-				Int32 maxLineLength = 32;
-				Int32 charCount = 0;
-				lines = infoText.Split(new String[] { " " }, StringSplitOptions.RemoveEmptyEntries).GroupBy(w => (charCount += w.Length + 1) / maxLineLength).Select(g => string.Join(" ", g)).ToArray();
-			}
-			else
-				lines = new string[] { infoText };
-
-			foreach (String line in lines)
-			{
-				if (infoText != "")
-					ChatManager.Instance.SendPrivateChatMessage(playerId, line);
-			}
-			 */
 
 			ChatManager.Instance.SendPrivateChatMessage(playerId, infoText);
 		}
@@ -110,6 +74,11 @@ namespace EssentialsPlugin.Utility
 					Communication.SendClientMessage(steamId, message);
 				}
 			}
+		}
+
+		public static void Notification(ulong steamId, MyFontEnum color, int timeInSeconds, string message)
+		{
+			SendClientMessage(steamId, string.Format("/notification {0} {1} {2}", color, timeInSeconds, message));
 		}
 	}
 }

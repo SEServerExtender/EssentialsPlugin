@@ -384,6 +384,15 @@ namespace EssentialsPlugin
 			get { return PluginSettings.Instance.ProtectedItems; }
 		}
 
+		[Category("Docking Zones")]
+		[Description("Enable / Disable docking zones.  This allows players to safely dock in zones created by 4 beacons with the same name.  This removes the entity from the world when docked, and adds it back when undocked.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DockingEnabled
+		{
+			get { return PluginSettings.Instance.DockingEnabled;  }
+			set { PluginSettings.Instance.DockingEnabled = value; }
+		}
 
 		#endregion
 
@@ -408,6 +417,7 @@ namespace EssentialsPlugin
 			m_processHandlers.Add(new ProcessBackup());
 			m_processHandlers.Add(new ProcessLoginTracking());
 			m_processHandlers.Add(new ProcessProtection());
+			m_processHandlers.Add(new ProcessDockingZone());
 			
 			// Setup chat handlers
 			m_chatHandlers = new List<ChatHandlerBase>();
@@ -447,6 +457,10 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleAdminPlayerListActive());    //
 			m_chatHandlers.Add(new HandleAdminPlayerListInactive());  //
 
+			m_chatHandlers.Add(new HandleDockValidate());
+			m_chatHandlers.Add(new HandleDockDock());
+			m_chatHandlers.Add(new HandleDockUndock());
+			m_chatHandlers.Add(new HandleDockList());
 
 			m_chatHandlers.Add(new HandleUtilityExportServer());
 			m_chatHandlers.Add(new HandleUtilityGridsList());
