@@ -38,6 +38,8 @@ Major Feature Overview
 - Player Login Tracking
 - Private and Faction Messaging
 - Chat based settings
+- Safe Docking
+- Advanced Grid Scan and Cleanup
 
 In depth Feature Analysis
 ------------------------
@@ -99,9 +101,15 @@ Options:
 - GreetingEnabled - Enable / Disable Greetings
 - GreetingMessage - Message to normal users.  You may use %name% which gets replaced with the user's name, for personalized greetings.
 - NewUserGreetingMessage - Different message to new users.  You can use %name% as well.
+- GreetingItem | GreetingNewUserItem - This allows you to launch a dialog with a Message of the day style greeting for the user to see when he logs in.  One is for a returning user, and the other is for a new user.  Each item has the same settings:
+  - Enabled - This enables / disables this item
+  - Title - This is the text that appears at the top of the dialog
+  - Header - This is the text that appears below the title
+  - Content - This is the text that appears in the dialog area.  This is the part that can be as long as you desire.
+  - ButtonText - This is the text that appears on the button at the bottom of the dialog.
 
-Automated New Player Spawn Change
----------------------------------
+Automated New Player Spawn Movement
+-----------------------------------
 
 This option allows you to move players closer to viable asteroids.  A viable asteroid is one that has more than 3 different base materials.  It will then move them closer to that asteroid.  This is useful for servers with asteroids that are very spread out.  Right now the asteroid selected will be random.  More options are coming for this
 
@@ -140,12 +148,50 @@ All settings are set through the UI, but settings can also be done via chat.  Pl
 - /admin settings BackupItems remove 0 - This removes the item at position 0 from the BackupItems list
 - /admin settings InformationItems remove 1 - This removes the item at position 1 from the InformationItems list
 
+Safe Docking
+------------
+This function allows user to define a "safe docking" zone on a station or ship.  When a ship goes into the safe docking zone, it will be allowed to "dock" which removes the ship from the world, allowing the "carrier" ship to move around as fast as it wants without risking exposions due to faulty landing gears / connectors.  Once the carrier has stopped, the user is free to undock the ship which places the ship back exactly where they docked it in the ship.
+
+### Setting Up A Zone
+Setting up a docking zone is simple.  The user just creates a zone by place 4 beacon is a square on the same plane.  The 4 beacons define the area in which a ship must fly in order to be considered inside a safe docking zone.  The zone projects on the Z axis by the shortest distance between the two other axis.  For example, if you make a zone that is 10x8, then the full cube dimension will be 10x8x8. A zone is defined by naming all 4 beacons with the same name.  The beacons may be disabled as well, but must be 100% built.
+
+### Docking command
+- /dock dock <dockingZoneName> - This docks the ship in a docking zone
+- /dock undock <dockingZoneName> - This undocks a ship from a docking zone
+- /dock validate <dockingZoneName> - This validates if a docking zone is valid.  You do not need to have the bacons at 100% in order to use this command.
+- /dock list <dockingZoneName> - This list if a ship is in a particular docking zone.
+
+Advanced Grid Scan And Cleanup
+------------------------------
+We have added an advanced scanning and deletion function that allows precise control over what is removed from the game.  We decided to algamate all the separate functionality into one command, so it's easier to maintain.  These commands are as follows:
+
+- /admin scan cleanup 
+- /admin delete cleanup
+
+The delete does the exact same thing as the scan, except it will actually perform a grid deletion once the ships are scanned.  So it's useful to use the scan to get the desired result before using the actual delete.  Without any options, the cleanup scan looks for unowned grids that do not contain functional blocks, terminal blocks, or power generating blocks.  The scan and delete are controlled further with the following options:
+
+- debug - Specify this option to get a full display of what and why every grid is included in a cleanup scan.  It will show why a grid isn't being cleaned up.  It is a good idea to always specify this if you want to know exactly what the scan is doing.
+- isowned - If this option is specified, then a grid must be owned.  If this option is not specified, then it will only scan unowned grids
+- ignoreownership - If this option is specified, then the scan will ignore ownership of a grid.  All grids will be included in the scan
+- ignorefunctional - If this option is specified, then it does not matter if a ship contains a functional block or not
+- ignoreterminal - If this option is specified, then it does not matter if a ship contains a terminal block or not
+- ignorepower - If this option is specified, then it does not matter if a ship contains a block that generates power (solar, battery or reactor with fuel)
+- hasdisplayname:<name to search for> - If this option is specified, then a ship must partially contain the name specified here (spaces are not allowed currently)
+- hasblocksubtype:(subtype to search for):(count) - If this option is specified, then a ship must contain a block with the subtype you specify, and contain at least (count) of those blocks.  If (count) is not specified, then the default amount is 1
+- limitblocksubtype:(subtype to search for):(limit) - If this option is specified, then a ship that contains a (limit) amount of (subtype) blocks or more, will be considered as part of the cleanup.  This will be useful for when we add block removal.  Only use this for scanning for now, otherwise ships that are over (limit) will be deleted outright.
+
+### Examples
+- /admin scan cleanup ignoreterminal ignorefunctional ignorepower - This will scan for all grids / stations that are not owned that may or may not have terminal blocks or functional blocks or are powered.
+
+(more examples to come)
+
 Advanced Administrator Chat Commands
 ------------------------------------
 
 We've added new administrator commands that we will expand upon slowly.  They will aid in moving grids and stations around, along with trying to keep things clean.
 
 For options, do not include braces.  [] stand for required, while () stand for optional.
+
 
 Scan Commands
 -------------
@@ -156,7 +202,6 @@ Command| Options|Example
 /admin scan nobeacon | (no options) | /admin scan nobeacon - This command scans for ships and stations that have no beacons.  This allows you to preview a list of ships before running the cleanup on it in case something is wrong.
 /admin scan inactive | [days] optional: [ignoreownerless] [ignorenologin] | /admin scan inactive 20 - This command scans for ships with owners who haven't logged in in 20 days.  If you specify the ignoreownerless option it ignores grids without owners.  If you specify the ignorenologin option it ignores grids owned by players with no login information.  The /admin delete inactive command works exactly as this command, so you can view what will be deleted with the scan command before commiting to a delete.
 /admin scan entityid | [entityid] | /admin scan entityid 4384938458 - This scans for grid with the entityid of 4384938458
-
 
 Move commands
 -------------
