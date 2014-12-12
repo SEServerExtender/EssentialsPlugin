@@ -388,14 +388,12 @@ namespace EssentialsPlugin.Utility
 						reader.Close();
 					}
 				}
+				else
+					m_instance = new Players();
 			}
 			catch (Exception ex)
 			{
 				Logging.WriteLineAndConsole(string.Format("LoginTracking Load Error: {0}", ex.ToString()));
-			}
-			finally
-			{
-				m_instance = new Players();
 			}
 		}
 

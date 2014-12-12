@@ -70,7 +70,7 @@ namespace EssentialsPlugin.ChatHandlers
 			Communication.SendPrivateInformation(userId, string.Format("Moving all grids in a radius of {0} near {1} to {2}", radius, General.Vector3DToString(startPosition), General.Vector3DToString(movePosition)));
 
 			List<MyObjectBuilder_CubeGrid> gridsToMove = new List<MyObjectBuilder_CubeGrid>();
-			BoundingSphere sphere = new BoundingSphere(startPosition, radius);
+			BoundingSphereD sphere = new BoundingSphereD(startPosition, radius);
 			List<IMyEntity> entitiesToMove = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
 
 //			Wrapper.GameAction(() =>

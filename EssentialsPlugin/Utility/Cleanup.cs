@@ -42,19 +42,6 @@ namespace EssentialsPlugin.Utility
 			m_items = new List<CleanupItem>();
 		}
 
-		/*
-		public void Add(CubeGridEntity entity)		
-		{
-			CleanupItem item = new CleanupItem();
-			item.entityToCleanup = entity;
-			item.addedTime = DateTime.Now;
-			item.secondsAfterAdding = 5;
-
-			lock (m_items)
-				m_items.Add(item);
-		}
-		 */ 
-
 		public void Add(long entityId)
 		{
 			CleanupItem item = new CleanupItem();
@@ -84,11 +71,21 @@ namespace EssentialsPlugin.Utility
 							IMyEntity entity = null;
 							Wrapper.GameAction(() =>
 							{
-								entity = MyAPIGateway.Entities.GetEntityById(item.entityId);
+								MyAPIGateway.Entities.TryGetEntityById(item.entityId, out entity);
 							});
 
 							if(entity != null)
 							{
+								MyObjectBuilder_CubeGrid gridBuilder = null;
+								try
+								{
+									gridBuilder = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder();
+								}
+								catch
+								{
+									continue;
+								}
+
 								CubeGridEntity entityToDispose = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
 								entityToDispose.Dispose();
 							}

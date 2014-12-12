@@ -46,13 +46,13 @@ namespace EssentialsPlugin.ChatHandlers
 		{
 			if(words.Count() < 2)
 			{
-				Communication.SendClientMessage(userId, GetHelp());
+				Communication.SendClientMessage(userId, "/message Server " + GetHelp());
 			}
 
 			ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerName(words[0], true);
 			if(steamId < 1)
 			{
-				Communication.SendClientMessage(userId, string.Format("Can not find user: {0}", words[0]));
+				Communication.SendClientMessage(userId, string.Format("/message Server an not find user: {0}", words[0]));
 				return true;
 			}
 

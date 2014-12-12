@@ -72,7 +72,7 @@ namespace EssentialsPlugin.ChatHandlers
 			//finalPosition += startPosition;
 
 			List<MyObjectBuilder_CubeGrid> gridsToMove = new List<MyObjectBuilder_CubeGrid>();
-			BoundingSphere sphere = new BoundingSphere(startPosition, radius);
+			BoundingSphereD sphere = new BoundingSphereD(startPosition, radius);
 			List<IMyEntity> entitiesToMove = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
 
 			Communication.SendPrivateInformation(userId, string.Format("Moving all grids in a radius of {0} near {1} towards {2} by {3} meters", radius, General.Vector3DToString(startPosition), General.Vector3DToString(targetPosition), distance));

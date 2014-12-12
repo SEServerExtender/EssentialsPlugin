@@ -15,16 +15,16 @@ using SEModAPIInternal.API.Common;
 
 namespace EssentialsPlugin.ChatHandlers
 {
-	public class HandleFactionF : ChatHandlerBase
+	public class HandleWaypointList : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{
-			return "Sends a private message to all faction members that are online.  Usage: /faction <msg>";
+			return "Lists all personal waypoints.  Usage: /waypoint list";
 		}
 
 		public override string GetCommandText()
 		{
-			return "/f";
+			return "/waypoint list";
 		}
 
 		public override bool IsAdminCommand()
@@ -34,7 +34,7 @@ namespace EssentialsPlugin.ChatHandlers
 
 		public override bool AllowedInConsole()
 		{
-			return true;
+			return false;
 		}
 
 		public override bool IsClientOnly()
@@ -44,13 +44,19 @@ namespace EssentialsPlugin.ChatHandlers
 
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			if(words.Count() < 1)
+			if (!PluginSettings.Instance.WaypointsEnabled)
+				return false;
+
+			Communication.SendPrivateInformation(userId, "Personal Waypoints:");
+
+			List<WaypointItem> items = Waypoints.Instance.Get(userId);
+			foreach (WaypointItem item in items)
 			{
-				Communication.SendClientMessage(userId, "/message Server " + GetHelp());
+				Communication.SendPrivateInformation(userId, string.Format("Waypoint {0}: \"{1}\"  Location: {2}", item.Name, item.Text, General.Vector3DToString(item.Position)));
 			}
 
-			string userName = PlayerMap.Instance.GetPlayerNameFromSteamId(userId);
-			Communication.SendFactionClientMessage(userId, string.Format("/message F:{0} {1}", userName, string.Join(" ", words)));
+			Communication.SendPrivateInformation(userId, string.Format("Total waypoints: {0}", items.Count));
+
 			return true;
 		}
 	}

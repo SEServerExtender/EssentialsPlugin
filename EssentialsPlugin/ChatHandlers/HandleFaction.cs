@@ -46,7 +46,7 @@ namespace EssentialsPlugin.ChatHandlers
 		{
 			if(words.Count() < 1)
 			{
-				Communication.SendClientMessage(userId, GetHelp());
+				Communication.SendClientMessage(userId, "/message Server " + GetHelp());
 			}
 
 			string userName = PlayerMap.Instance.GetPlayerNameFromSteamId(userId);

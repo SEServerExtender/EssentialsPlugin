@@ -82,11 +82,15 @@ namespace EssentialsPlugin.ChatHandlers
 
 				long[] beaconListIds = beaconList.Select(p => p.EntityId).ToArray();
 				long ownerId = beaconList.First().OwnerId;
-				DockingItem dockingItem = Docking.Instance.Find(d => d.PlayerId == ownerId && d.TargetEntityId == parent.EntityId && d.DockingBeaconIds.Intersect(beaconListIds).Count() == 4);
-
-				if (dockingItem != null)
+				List<DockingItem> dockingItems = Docking.Instance.Find(d => d.PlayerId == ownerId && d.TargetEntityId == parent.EntityId && d.DockingBeaconIds.Intersect(beaconListIds).Count() == 4);
+				if (dockingItems.Count > 0)
 				{
-					Communication.SendPrivateInformation(userId, string.Format("You have a ship docked in docking zone '{0}'.", pylonName));
+					Communication.SendPrivateInformation(userId, string.Format("You have {1} ship(s) docked in docking zone '{0}':", pylonName, dockingItems.Count));
+					foreach (DockingItem item in dockingItems)
+					{
+						Communication.SendPrivateInformation(userId, string.Format("Docked ship: {0} ({1})", item.DockedName, item.DockedEntityId));
+					}
+
 					return true;
 				}
 				else

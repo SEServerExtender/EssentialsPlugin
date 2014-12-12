@@ -104,7 +104,7 @@ namespace EssentialsPlugin.ChatHandlers
 				}
 
 				// TODO proper checking for coowned ships
-				bool coowned = false;
+				//bool coowned = false;
 				if(grid.BigOwners.Count > 1)
 				{
 					continue;

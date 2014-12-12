@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Threading;
 using EssentialsPlugin.Utility;
 using System.Windows.Forms;
 using SEModAPIInternal.API.Common;
@@ -33,6 +34,9 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override void Handle()
 		{
+			if (PluginSettings.Instance.RestartWhenUnresponsive)
+				CheckResponse();
+
 			if(!PluginSettings.Instance.RestartEnabled)
 				return;
 
@@ -52,7 +56,7 @@ namespace EssentialsPlugin.ProcessHandler
 			{
 				if (item.completed)
 					continue;
-
+				
 				if(DateTime.Now - m_start > TimeSpan.FromMinutes(m_done - item.MinutesBeforeRestart))
 				{
 					item.completed = true;					
@@ -153,6 +157,30 @@ namespace EssentialsPlugin.ProcessHandler
 			}
 
 			return result;
+		}
+
+		private void CheckResponse()	
+		{
+			ThreadPool.QueueUserWorkItem((object state) =>
+			{
+				DateTime start = DateTime.Now;
+				AutoResetEvent are = new AutoResetEvent(false);
+				SandboxGameAssemblyWrapper.Instance.EnqueueMainGameAction(() =>
+				{
+					are.Set();
+				});
+
+				if (!are.WaitOne(60000))
+				{
+					Logging.WriteLineAndConsole("Server unresponsive for 60 seconds, restarting in 5 seconds.");
+					Thread.Sleep(5000);
+					DoRestart();
+					return;
+				}
+
+				if((DateTime.Now - start).TotalMilliseconds > 10000)
+					Logging.WriteLineAndConsole(string.Format("Warning: Server Response Time: {0}ms", (DateTime.Now - start).TotalMilliseconds));
+			});
 		}
 	}
 }

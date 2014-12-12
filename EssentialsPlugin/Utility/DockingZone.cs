@@ -280,16 +280,16 @@ namespace EssentialsPlugin.Utility
 			Save();
 		}
 
-		public DockingItem Find(Func<DockingItem, bool> search)
+		public List<DockingItem> Find(Func<DockingItem, bool> search)
 		{
 			lock (m_instance)
-				return m_dockingItems.FirstOrDefault(search);
+				return m_dockingItems.Where(search).ToList();
 		}
 
 		public void Remove(DockingItem item)
 		{
 			lock (m_instance)
-				m_dockingItems.RemoveAll(x => x == item);
+				m_dockingItems.Remove(item);
 
 			Save();
 		}

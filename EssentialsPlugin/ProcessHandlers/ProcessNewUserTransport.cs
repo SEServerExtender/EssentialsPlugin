@@ -100,8 +100,8 @@ namespace EssentialsPlugin.ProcessHandler
 
 			List<IMyPlayer> players = new List<IMyPlayer>();
 			bool result = false;
-			Wrapper.GameAction(() =>
-			{
+//			Wrapper.GameAction(() =>
+//			{
 				try
 				{
 					MyAPIGateway.Players.GetPlayers(players, null);
@@ -111,7 +111,7 @@ namespace EssentialsPlugin.ProcessHandler
 				{
 					Logging.WriteLineAndConsole(string.Format("Transport(): Unable to get player list: {0}", ex.ToString()));
 				}
-			});
+//			});
 
 			if (!result)
 				return;
@@ -149,19 +149,9 @@ namespace EssentialsPlugin.ProcessHandler
 						Communication.SendPrivateInformation(steamId, string.Format("Welcome {0}.  We are moving you closer to an asteroid ... please stand by ...", PlayerMap.Instance.GetPlayerNameFromSteamId(steamId)));
 
 						CubeGridEntity grid = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
-
-						int count = 0;
-						while (grid.IsLoading)
-						{
-							Thread.Sleep(100);
-							count++;
-							if (count > 40)
-								break;
-						}
-
-						if (grid.IsLoading)
+						if (!CubeGrids.WaitForLoadingEntity(grid))
 							continue;
- 
+
 						foreach(CubeBlockEntity block in grid.CubeBlocks)
 						{
 							if(block is CockpitEntity)
@@ -174,12 +164,12 @@ namespace EssentialsPlugin.ProcessHandler
 						Thread.Sleep(500);
 						grid.Dispose();
 
-						Wrapper.GameAction(() =>
-						{
+//						Wrapper.GameAction(() =>
+//						{
 							// This should boot them out of their ship: it does not, it kills them :(
 //							MyAPIGateway.Entities.RemoveEntity(entity);
 							MyAPIGateway.Entities.RemapObjectBuilder(cubeGrid);
-						});
+//						});
 
 						CubeGridEntity gridEntity = new CubeGridEntity(cubeGrid);
 						gridEntity.PositionAndOrientation = CubeGrids.CreatePositionAndOrientation(validPosition, asteroidPosition);
@@ -240,7 +230,7 @@ namespace EssentialsPlugin.ProcessHandler
 				if (voxelMap.Materials.Count > 3)
 				{
 					Logging.WriteLineAndConsole(string.Format("Found asteroid with viable materials: {0} - {1}", voxelMap.Name, voxelMap.Materials.Count()));
-					asteroidPosition = (Vector3)voxelMap.Position;
+					asteroidPosition = voxelMap.Position;
 					validPosition = MathUtility.RandomPositionFromPoint(asteroidPosition, PluginSettings.Instance.NewUserTransportDistance);
 					break;
 				}

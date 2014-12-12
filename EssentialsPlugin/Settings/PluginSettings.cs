@@ -45,6 +45,7 @@ namespace EssentialsPlugin
 		private MTObservableCollection<RestartNotificationItem> m_restartNotificationItems;
 		private MTObservableCollection<RestartTimeItem> m_restartTimeItems;
 		private string m_restartAddedProcesses;
+		private bool m_restartWhenUnresponsive;
 
 		private bool m_backupEnabled;
 		private MTObservableCollection<BackupItem> m_backupItems;
@@ -56,6 +57,7 @@ namespace EssentialsPlugin
 
 		private bool m_newUserTransportEnabled;
 		private int m_newUserTransportDistance;
+		private bool m_newUserTransportMoveAllSpawnShips;
 
 		private bool m_loginEnabled;
 		private string[] m_loginEntityWhitelist = new string[] { };
@@ -65,6 +67,17 @@ namespace EssentialsPlugin
 		private MTObservableCollection<ProtectedItem> m_protectedItems;
 
 		private bool m_dockingEnabled;
+		private int m_dockingShipsPerZone;
+
+		private bool m_dynamicConcealEnabled;
+		private float m_dynamicConcealDistance;
+		private bool m_dynamicConcealIncludeLargeGrids;
+		private string[] m_dynamicConcealIgnoreSubTypeList = new string[] { };
+		private bool m_dynamicConcealIncludeMedBays;
+		private bool m_dynamicShowMessages;
+
+		private bool m_waypointsEnabled;
+		private int m_waypointsMaxPerPlayer;
 
 		#endregion
 
@@ -156,6 +169,16 @@ namespace EssentialsPlugin
 			}
 		}
 
+		public bool RestartWhenUnresponsive
+		{
+			get { return m_restartWhenUnresponsive; }
+			set 
+			{ 
+				m_restartWhenUnresponsive = value;
+				Save();
+			}
+		}
+
 		// Greetings
 		public bool GreetingEnabled
 		{
@@ -183,6 +206,7 @@ namespace EssentialsPlugin
 			set
 			{
 				m_greetingItem = value;
+				m_greetingItem.PropertyChanged += OnPropertyChanged;
 				Save();
 			}
 		}
@@ -203,6 +227,7 @@ namespace EssentialsPlugin
 			set
 			{
 				m_greetingNewUserItem = value;
+				m_greetingNewUserItem.PropertyChanged += OnPropertyChanged; 
 				Save();
 			}
 		}
@@ -300,6 +325,16 @@ namespace EssentialsPlugin
 			}
 		}
 
+		public bool NewUserTransportMoveAllSpawnShips
+		{
+			get { return m_newUserTransportMoveAllSpawnShips; }
+			set 
+			{
+				m_newUserTransportMoveAllSpawnShips = value;
+				Save();
+			}
+		}
+
 		public bool LoginEnabled
 		{
 			get { return m_loginEnabled; }
@@ -361,6 +396,96 @@ namespace EssentialsPlugin
 				Save();
 			}
 		}
+
+		public int DockingShipsPerZone
+		{
+			get { return m_dockingShipsPerZone; }
+			set 
+			{ 
+				m_dockingShipsPerZone = value;
+				Save();
+			}
+		}
+
+		public bool DynamicConcealEnabled
+		{
+			get { return m_dynamicConcealEnabled; }
+			set
+			{
+				m_dynamicConcealEnabled = value;
+				Save();
+			}
+		}
+
+		public float DynamicConcealDistance
+		{
+			get { return m_dynamicConcealDistance; }
+			set
+			{
+				m_dynamicConcealDistance = value;
+				Save();
+			}
+		}
+
+		public bool ConcealIncludeLargeGrids
+		{
+			get { return m_dynamicConcealIncludeLargeGrids; }
+			set 
+			{ 
+				m_dynamicConcealIncludeLargeGrids = value;
+				Save();
+			}
+		}
+
+		public string[] DynamicConcealIgnoreSubTypeList
+		{
+			get { return m_dynamicConcealIgnoreSubTypeList; }
+			set 
+			{ 
+				m_dynamicConcealIgnoreSubTypeList = value;
+				Save();
+			}
+		}
+
+		public bool DynamicConcealIncludeMedBays
+		{
+			get { return m_dynamicConcealIncludeMedBays; }
+			set 
+			{ 
+				m_dynamicConcealIncludeMedBays = value;
+				Save();
+			}
+		}
+
+		public bool DynamicShowMessages
+		{
+			get { return m_dynamicShowMessages; }
+			set 
+			{ 
+				m_dynamicShowMessages = value;
+				Save();
+			}
+		}
+
+		public bool WaypointsEnabled
+		{
+			get { return m_waypointsEnabled; }
+			set
+			{
+				m_waypointsEnabled = value;
+				Save();
+			}
+		}
+
+		public int WaypointsMaxPerPlayer
+		{
+			get { return m_waypointsMaxPerPlayer; }
+			set
+			{
+				m_waypointsMaxPerPlayer = value;
+				Save();
+			}
+		}
 		#endregion
 
 		#region Constructor
@@ -372,7 +497,9 @@ namespace EssentialsPlugin
 			m_backupAsteroids = true;
 
 			m_greetingItem = new SettingsGreetingDialogItem();
+			m_greetingItem.PropertyChanged += OnPropertyChanged;
 			m_greetingNewUserItem = new SettingsGreetingDialogItem();
+			m_greetingNewUserItem.PropertyChanged += OnPropertyChanged;
 
 			m_informationItems = new MTObservableCollection<InformationItem>();
 			m_restartNotificationItems = new MTObservableCollection<RestartNotificationItem>();
@@ -386,6 +513,11 @@ namespace EssentialsPlugin
 			m_protectedItems.CollectionChanged += ItemsCollectionChanged;
 
 			m_greetingMessage = "";
+
+			m_dynamicConcealDistance = 8000;
+			m_dynamicShowMessages = false;
+
+			m_dockingShipsPerZone = 1;
 		}
 
 		#endregion
@@ -465,6 +597,12 @@ namespace EssentialsPlugin
 		/// <param name="e"></param>
 		private void ItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
+			Save();
+		}
+
+		private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			Console.WriteLine("PropertyChanged()");
 			Save();
 		}
 

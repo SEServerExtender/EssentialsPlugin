@@ -69,12 +69,7 @@ namespace EssentialsPlugin.ChatHandlers
 			}
 
 			string message = string.Join(" ", words.Skip(2).ToArray());
-
-			foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
-			{
-				Communication.SendClientMessage(steamId, string.Format("/notification {0} {1} {2}", font, timeInSeconds, message));
-			}
-
+			Communication.SendBroadcastMessage(string.Format("/notification {0} {1} {2}", font, timeInSeconds, message));
 			return true;
 		}
 

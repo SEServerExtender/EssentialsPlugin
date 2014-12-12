@@ -4,17 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System.Drawing.Design;
+using System.ComponentModel.Design;
+using System.Runtime.CompilerServices;
+using VRage;
 
 namespace EssentialsPlugin.Settings
 {
-	public class SettingsGreetingDialogItem
-	{
+	public class SettingsGreetingDialogItem : INotifyPropertyChanged
+	{		
 		private bool enabled;
 		[Description("Should we display a dialog to a user who logs in?")]
 		public bool Enabled
 		{
 			get { return enabled; }
-			set { enabled = value; }
+			set 
+			{
+				enabled = value;
+				NotifyPropertyChanged();
+			}
 		}
 
 		private string title;
@@ -22,7 +30,11 @@ namespace EssentialsPlugin.Settings
 		public string Title
 		{
 			get { return title; }
-			set { title = value; }
+			set 
+			{
+				title = value;
+				NotifyPropertyChanged();
+			}
 		}
 
 		private string header;
@@ -30,15 +42,24 @@ namespace EssentialsPlugin.Settings
 		public string Header
 		{
 			get { return header; }
-			set { header = value; }
+			set 
+			{
+				header = value;
+				NotifyPropertyChanged();
+			}
 		}
 
 		private string contents;
-		[Description("The contents of the dialog.  This area has a scroll bar and can be long.  Use the '|' character as a carriage return.")]
+		[Description("The contents of the dialog.  This area has a scroll bar and can be long and use carriage returns.")]
+		[Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
 		public string Contents
 		{
 			get { return contents; }
-			set { contents = value; }
+			set 
+			{
+				contents = value;
+				NotifyPropertyChanged();
+			}
 		}
 
 		private string buttonText;
@@ -46,12 +67,26 @@ namespace EssentialsPlugin.Settings
 		public string ButtonText
 		{
 			get { return buttonText; }
-			set { buttonText = value; }
+			set
+			{
+				buttonText = value;
+				NotifyPropertyChanged();
+			}
 		}
 
 		public override string ToString()
 		{
 			return "<-- click to expand and set values";
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		private void NotifyPropertyChanged(String propertyName = "")
+		{			
+			if (PropertyChanged != null)
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 }

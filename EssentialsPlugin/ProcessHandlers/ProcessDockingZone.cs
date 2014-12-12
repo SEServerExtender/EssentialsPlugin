@@ -42,7 +42,7 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override int GetUpdateResolution()
 		{
-			return 500;
+			return 1000;
 		}
 
 		public override void Handle()
@@ -57,10 +57,10 @@ namespace EssentialsPlugin.ProcessHandler
 			}
 
 			List<IMyPlayer> players = new List<IMyPlayer>();
-			Wrapper.GameAction(() =>
-			{
+			//Wrapper.GameAction(() =>
+			//{
 				MyAPIGateway.Players.GetPlayers(players);
-			});
+			//});
 
 			foreach (IMyPlayer player in players)
 			{
@@ -87,7 +87,7 @@ namespace EssentialsPlugin.ProcessHandler
 			}
 
 			// Get All ships with 500m
-			BoundingSphere sphere = new BoundingSphere(parent.GetPosition(), 500);
+			BoundingSphereD sphere = new BoundingSphereD(parent.GetPosition(), 500);
 			List<IMyEntity> nearByEntities = null;
 
 			// Live dangerously (no wrapper for speed!)

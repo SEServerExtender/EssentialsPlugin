@@ -65,8 +65,8 @@ namespace EssentialsPlugin.ProcessHandler
 					List<IMyPlayer> players = new List<IMyPlayer>();
 					pos = 1;
 					bool result = false;
-					Wrapper.GameAction(() =>
-					{
+//					Wrapper.GameAction(() =>
+//					{
 						try
 						{
 							MyAPIGateway.Players.GetPlayers(players, null);
@@ -76,7 +76,7 @@ namespace EssentialsPlugin.ProcessHandler
 						{
 							Logging.WriteLineAndConsole(string.Format("Failed to get player list: {0}", ex.ToString()));
 						}
-					});
+//					});
 
 					if(!result)
 						return;
@@ -116,7 +116,7 @@ namespace EssentialsPlugin.ProcessHandler
 									if (PluginSettings.Instance.GreetingNewUserItem.Enabled)
 									{
 										SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingNewUserItem;
-										Communication.SendClientMessage(item.SteamId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), " ", gItem.Contents.Replace("%name%", player.DisplayName), gItem.ButtonText));
+										Communication.SendClientMessage(item.SteamId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), " ", gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText));
 									}
 								}
 								else
@@ -124,7 +124,7 @@ namespace EssentialsPlugin.ProcessHandler
 									if (PluginSettings.Instance.GreetingItem.Enabled)
 									{
 										SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingItem;
-										Communication.SendClientMessage(item.SteamId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), " ", gItem.Contents.Replace("%name%", player.DisplayName), gItem.ButtonText));
+										Communication.SendClientMessage(item.SteamId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), " ", gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText));
 									}
 								}
 

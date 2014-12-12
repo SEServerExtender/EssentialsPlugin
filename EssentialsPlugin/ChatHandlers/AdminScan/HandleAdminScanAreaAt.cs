@@ -66,7 +66,7 @@ namespace EssentialsPlugin.ChatHandlers
 			float radius = float.Parse(words[3]);
 
 			List<MyObjectBuilder_CubeGrid> gridsToMove = new List<MyObjectBuilder_CubeGrid>();
-			BoundingSphere sphere = new BoundingSphere(startPosition, radius);
+			BoundingSphereD sphere = new BoundingSphereD(startPosition, radius);
 			List<IMyEntity> entitiesToMove = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
 			int count = 0;
 

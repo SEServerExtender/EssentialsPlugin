@@ -97,7 +97,7 @@ namespace EssentialsPlugin.ChatHandlers
 				if (PluginSettings.Instance.LoginEntityWhitelist.Length > 0 && PluginSettings.Instance.LoginEntityWhitelist.Contains(grid.EntityId.ToString()))
 					continue;
 
-				if (grid.BigOwners.Count < 1 && removeOwnerless)
+				if (grid.BigOwners.Count < 1 && grid.SmallOwners.Count < 1 && removeOwnerless)
 				{
 					Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) not owned by anyone.", gridEntity.Name, entity.EntityId));
 					entitiesFound.Add(entity);

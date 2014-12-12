@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.Design;
@@ -36,6 +37,7 @@ namespace EssentialsPlugin
 		//private static ControlForm controlForm;
 		private DateTime m_lastProcessUpdate;
 		private Thread m_processThread;
+		private List<Thread> m_processThreads;
 		private List<ProcessHandlerBase> m_processHandlers;
 		private List<ChatHandlerBase> m_chatHandlers;
 		#endregion
@@ -173,6 +175,16 @@ namespace EssentialsPlugin
 			{
 				PluginSettings.Instance.RestartAddedProcesses = value;
 			}
+		}
+
+		[Category("Automated Restart")]
+		[Description("Enable / Disable A trigger which automatically restarts the server if it becomes unresponsive for 1 full minute.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool RestartWhenUnresponsive
+		{
+			get { return PluginSettings.Instance.RestartWhenUnresponsive; }
+			set { PluginSettings.Instance.RestartWhenUnresponsive = value; }
 		}
 
 		[Category("Join Greeting")]
@@ -334,7 +346,17 @@ namespace EssentialsPlugin
 			get { return PluginSettings.Instance.NewUserTransportDistance; }
 			set { PluginSettings.Instance.NewUserTransportDistance = value; }
 		}
-
+		/*
+		[Category("Automated New User Transport")]
+		[Description("Move all spawn ships no matter if the user is new or not")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool NewUserTransportMoveAllSpawnShips
+		{
+			get { return PluginSettings.Instance.NewUserTransportMoveAllSpawnShips;  }
+			set { PluginSettings.Instance.NewUserTransportMoveAllSpawnShips = value; }
+		}
+		*/
 		[Category("Player Login Tracking")]
 		[Description("Enable / Disable Player Login Tracking.  This option tracks users login/logouts.  It also reads old logs to get player history.  It's recommended to enable this.")]
 		[Browsable(true)]
@@ -394,6 +416,105 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.DockingEnabled = value; }
 		}
 
+		[Category("Docking Zones")]
+		[Description("Sets the number of ships that can dock in a zone.  Default is 1")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public int DockingShipsPerZone
+		{
+			get { return PluginSettings.Instance.DockingShipsPerZone; }
+			set { PluginSettings.Instance.DockingShipsPerZone = value; }
+		}
+
+		[Category("Dynamic Entity Concealment")]
+		[Description("Enable / Disable dynamic entity concealment.  This option will automatically 'hide' ships that players are not close to, meaning they won't be processed by the physics engine.  This should improve performance.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DynamicConcealEnabled
+		{
+			get { return PluginSettings.Instance.DynamicConcealEnabled; }
+			set { PluginSettings.Instance.DynamicConcealEnabled = value; }
+		}
+
+		[Category("Dynamic Entity Concealment")]
+		[Description("The distance a player must be from a grid for it to be revealed due to distance.  The smaller this value is, the longer a grid will be hidden from sight.  Default is 8000m (max view distance)")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public float DynamicConcealDistance
+		{
+			get { return PluginSettings.Instance.DynamicConcealDistance; }
+			set { PluginSettings.Instance.DynamicConcealDistance = value; }
+		}
+
+		[Category("Dynamic Entity Concealment")]
+		[Description("Enable / Disable management of large block grids.  Large block grids require a different set of scans due to them having medical bays.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DynamicConcealIncludeLargeGrids
+		{
+			get { return PluginSettings.Instance.ConcealIncludeLargeGrids; }
+			set { PluginSettings.Instance.ConcealIncludeLargeGrids = value; }
+		}
+
+		[Category("Dynamic Entity Concealment")]
+		[Description("The list of subtype blocks that will make the entity manager ignore a grid.  If a grid contains any of these block subtypes, it will automatically not include it when deciding whether to conceal the grid or not")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public string[] DynamicConcealIgnoreSubTypeList
+		{
+			get { return PluginSettings.Instance.DynamicConcealIgnoreSubTypeList; }
+			set { PluginSettings.Instance.DynamicConcealIgnoreSubTypeList = value; }
+		}
+
+		[Category("Dynamic Entity Concealment")]
+		[Description("The list of subtype blocks that will make the entity manager ignore a grid.  If a grid contains any of these block subtypes, it will automatically not include it when deciding whether to conceal the grid or not")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DynamicConcealIncludeMedBays
+		{
+			get { return PluginSettings.Instance.DynamicConcealIncludeMedBays; }
+			set { PluginSettings.Instance.DynamicConcealIncludeMedBays = value; }
+		}
+
+		[Category("Dynamic Entity Concealment")]
+		[Description("Enable / Disable console messages that display whether an entity is concealed or revealed.  Should be off if you don't care about seeing how many entities get revealed/concealed.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DynamicShowMessages
+		{
+			get { return PluginSettings.Instance.DynamicShowMessages; }
+			set
+			{
+				PluginSettings.Instance.DynamicShowMessages = value;
+			}
+		}
+
+		[Category("Waypoint System")]
+		[Description("Enable / Disable personal waypoints.  These are hud displayed waypoints that only a user can see.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool WaypointsEnabled
+		{
+			get { return PluginSettings.Instance.WaypointsEnabled; }
+			set
+			{
+				PluginSettings.Instance.WaypointsEnabled = value;
+			}
+		}
+
+		[Category("Waypoint System")]
+		[Description("Maximum personal waypoints a player can have.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public int WaypointsMaxPerPlayer
+		{
+			get { return PluginSettings.Instance.WaypointsMaxPerPlayer; }
+			set
+			{
+				PluginSettings.Instance.WaypointsMaxPerPlayer = value;
+			}
+		}
+
 		#endregion
 
 		#region Constructors and Initializers
@@ -418,6 +539,8 @@ namespace EssentialsPlugin
 			m_processHandlers.Add(new ProcessLoginTracking());
 			m_processHandlers.Add(new ProcessProtection());
 			m_processHandlers.Add(new ProcessDockingZone());
+			m_processHandlers.Add(new ProcessConceal());
+			m_processHandlers.Add(new ProcessWaypoints());
 			
 			// Setup chat handlers
 			m_chatHandlers = new List<ChatHandlerBase>();
@@ -433,8 +556,9 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleAdminScanNoBeacon());        //
 			m_chatHandlers.Add(new HandleAdminScanInactive());        //
 			m_chatHandlers.Add(new HandleAdminScanEntityId());        //
-			m_chatHandlers.Add(new HandleAdminScanTrash());
+			m_chatHandlers.Add(new HandleAdminScanCleanup());
 			m_chatHandlers.Add(new HandleAdminScanOverlimit());
+			m_chatHandlers.Add(new HandleAdminScanGrids());
 
 			m_chatHandlers.Add(new HandleAdminMoveAreaToPosition());  //
 			m_chatHandlers.Add(new HandleAdminMoveAreaTowards());     //
@@ -447,7 +571,7 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleAdminDeleteStationsArea());  //
 			m_chatHandlers.Add(new HandleAdminDeleteNoBeacon());      //
 			m_chatHandlers.Add(new HandleAdminDeleteInactive());      //
-			m_chatHandlers.Add(new HandleAdminDeleteTrash());
+			m_chatHandlers.Add(new HandleAdminDeleteCleanup());
 
 			m_chatHandlers.Add(new HandleAdminSettings());
 			m_chatHandlers.Add(new HandleAdminNotify());
@@ -457,10 +581,17 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleAdminPlayerListActive());    //
 			m_chatHandlers.Add(new HandleAdminPlayerListInactive());  //
 
+			m_chatHandlers.Add(new HandleAdminConceal());
+			m_chatHandlers.Add(new HandleAdminReveal());
+
 			m_chatHandlers.Add(new HandleDockValidate());
 			m_chatHandlers.Add(new HandleDockDock());
 			m_chatHandlers.Add(new HandleDockUndock());
 			m_chatHandlers.Add(new HandleDockList());
+
+			m_chatHandlers.Add(new HandleWaypointAdd());
+			m_chatHandlers.Add(new HandleWaypointRemove());
+			m_chatHandlers.Add(new HandleWaypointList());
 
 			m_chatHandlers.Add(new HandleUtilityExportServer());
 			m_chatHandlers.Add(new HandleUtilityGridsList());
@@ -471,6 +602,7 @@ namespace EssentialsPlugin
 //			m_chatHandlers.Add(new HandleAdmin());
 
 			m_lastProcessUpdate = DateTime.Now;
+			m_processThreads = new List<Thread>();
 			m_processThread = new Thread(new ThreadStart(PluginProcessing));
 			m_processThread.Start();
 
@@ -484,11 +616,11 @@ namespace EssentialsPlugin
 		{
 			try
 			{
-				while (true)
+				foreach (ProcessHandlerBase handler in m_processHandlers)
 				{
-					if (DateTime.Now - m_lastProcessUpdate > TimeSpan.FromMilliseconds(100))
+					Thread thread = new Thread(() =>
 					{
-						foreach (ProcessHandlerBase handler in m_processHandlers)
+						while (true)
 						{
 							if (handler.CanProcess())
 							{
@@ -504,12 +636,50 @@ namespace EssentialsPlugin
 								// Let's make sure LastUpdate is set to now otherwise we may start processing too quickly
 								handler.LastUpdate = DateTime.Now;
 							}
-						}
 
+							Thread.Sleep(100);
+						}
+					});
+
+					m_processThreads.Add(thread);
+					thread.Start();
+				}
+
+				foreach (Thread thread in m_processThreads)
+					thread.Join();
+
+				/*
+				while (true)
+				{
+					if (DateTime.Now - m_lastProcessUpdate > TimeSpan.FromMilliseconds(100))
+					{
+						Parallel.ForEach(m_processHandlers, handler => 
+						{
+							if (handler.CanProcess())
+							{
+								try
+								{
+									handler.Handle();
+								}
+								catch (Exception ex)
+								{
+									Logging.WriteLineAndConsole(String.Format("Handler Problems: {0} - {1}", handler.GetUpdateResolution(), ex.ToString()));
+								}
+
+								// Let's make sure LastUpdate is set to now otherwise we may start processing too quickly
+								handler.LastUpdate = DateTime.Now;
+							}
+						});
+
+						//foreach (ProcessHandlerBase handler in m_processHandlers)
+						//{
+						//}
 						m_lastProcessUpdate = DateTime.Now;
 					}
 					Thread.Sleep(25);
 				}
+				*/
+
 			}
 			catch (Exception ex)
 			{
@@ -532,6 +702,10 @@ namespace EssentialsPlugin
 		public void Shutdown()
 		{
 			Logging.WriteLineAndConsole(string.Format("Shutting down plugin: {0} - {1}", Name, Version));
+
+			foreach (Thread thread in m_processThreads)
+				thread.Abort();
+
 			m_processThread.Abort();
 		}
 

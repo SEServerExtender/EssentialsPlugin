@@ -9,7 +9,7 @@ namespace EssentialsPlugin.ChatHandlers
 	{
 		public ChatHandlerBase()
 		{
-			Logging.WriteLineAndConsole(string.Format("Added chat handler: {0}", GetCommandText()));
+			//Logging.WriteLineAndConsole(string.Format("Added chat handler: {0}", GetCommandText()));
 		}
 
 		public virtual Boolean CanHandle(ulong steamId, String[] words, ref int commandCount)

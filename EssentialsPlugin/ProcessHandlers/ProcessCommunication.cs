@@ -31,7 +31,7 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override int GetUpdateResolution()
 		{
-			return 100;
+			return 300;
 		}
 
 		public override void Handle()
@@ -44,10 +44,23 @@ namespace EssentialsPlugin.ProcessHandler
 			}
 
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-			Wrapper.GameAction(() =>
+
+			bool result = false;
+			try
 			{
-				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid && x.DisplayName.StartsWith("CommRelay") && !x.DisplayName.StartsWith("CommRelayGlobal") && !x.DisplayName.StartsWith("CommRelay0") && !x.DisplayName.StartsWith("CommRelayOutput"));
-			});
+				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid && x.DisplayName.StartsWith("CommRelay") && !x.DisplayName.StartsWith("CommRelayGlobal") && !x.DisplayName.StartsWith("CommRelay0") && !x.DisplayName.StartsWith("CommRelayOutput") && !x.DisplayName.StartsWith("CommRelayBroadcast"));
+				result = true;
+			}
+			catch
+			{
+				Logging.WriteLineAndConsole(string.Format("ProcessCommunication: Problem getting entities, skipping update"));
+			}
+
+			if (!result)
+			{
+				base.Handle();
+				return;
+			}
 
 			foreach(IMyEntity entity in entities)
 			{

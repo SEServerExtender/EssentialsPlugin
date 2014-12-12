@@ -73,7 +73,7 @@ namespace EssentialsPlugin.ChatHandlers
 			finalPosition += startPosition;
 
 			List<MyObjectBuilder_CubeGrid> gridsToMove = new List<MyObjectBuilder_CubeGrid>();
-			BoundingSphere sphere = new BoundingSphere(finalPosition, radius);
+			BoundingSphereD sphere = new BoundingSphereD(finalPosition, radius);
 			List<IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
 			int count = 0;
 

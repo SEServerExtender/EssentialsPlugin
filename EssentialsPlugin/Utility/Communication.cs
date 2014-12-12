@@ -22,6 +22,8 @@ namespace EssentialsPlugin.Utility
 {
 	public class Communication
 	{
+		private static Random m_random = new Random();
+
 		public static void SendPublicInformation(String infoText)
 		{
 			if (infoText == "")
@@ -50,6 +52,27 @@ namespace EssentialsPlugin.Utility
 			long entityId = BaseEntity.GenerateEntityId();
 			entity.EntityId = entityId;
 			entity.DisplayName = string.Format("CommRelayOutput{0}", PlayerMap.Instance.GetPlayerIdsFromSteamId(steamId).First());
+			entity.PositionAndOrientation = new MyPositionAndOrientation(MathUtility.GenerateRandomEdgeVector(), Vector3.Forward, Vector3.Up);
+
+			foreach (MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks)
+			{
+				if (block is MyObjectBuilder_Beacon)
+				{
+					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)block;
+					beacon.CustomName = message;
+				}
+			}
+
+			SectorObjectManager.Instance.AddEntity(entity);
+			Cleanup.Instance.Add(entityId);
+		}
+
+		public static void SendBroadcastMessage(string message)
+		{
+			CubeGridEntity entity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "CommRelay.sbc"));
+			long entityId = BaseEntity.GenerateEntityId();
+			entity.EntityId = entityId;
+			entity.DisplayName = string.Format("CommRelayBroadcast{0}", m_random.Next(1, 10000));
 			entity.PositionAndOrientation = new MyPositionAndOrientation(MathUtility.GenerateRandomEdgeVector(), Vector3.Forward, Vector3.Up);
 
 			foreach (MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks)

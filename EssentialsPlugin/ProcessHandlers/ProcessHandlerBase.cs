@@ -28,7 +28,7 @@ namespace EssentialsPlugin.ProcessHandler
 		{
 			m_lastUpdate = DateTime.Now;
 
-			Logging.WriteLineAndConsole(string.Format("Added process handler: Raised every {0}ms", GetUpdateResolution()));
+			//Logging.WriteLineAndConsole(string.Format("Added process handler: Raised every {0}ms", GetUpdateResolution()));
 		}
 
 		/// <summary>

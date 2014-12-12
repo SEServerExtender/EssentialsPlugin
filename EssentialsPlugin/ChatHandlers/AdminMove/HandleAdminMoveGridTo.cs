@@ -80,10 +80,10 @@ namespace EssentialsPlugin.ChatHandlers
 					Communication.SendPrivateInformation(userId, string.Format("Can not find user or grid with the name: {0}", targetName));
 					return true;
 				}
-				position = (Vector3)gridEntity.Position;
+				position = gridEntity.Position;
 			}
 			else
-				position = (Vector3)charEntity.Position;
+				position = charEntity.Position;
 
 			Vector3D startPosition = MathUtility.RandomPositionFromPoint((Vector3)position, distance);
 			CubeGridEntity gridToMove = SectorObjectManager.Instance.GetTypedInternalData<CubeGridEntity>().FirstOrDefault(x => (x.DisplayName.ToLower().Contains(sourceName.ToLower()) || x.Name.ToLower().Contains(sourceName.ToLower())) && !x.IsDisposed);

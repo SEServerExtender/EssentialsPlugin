@@ -2,17 +2,74 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 using SEModAPIInternal.Support;
 using VRageMath;
+using VRage.Common.Utils;
 
 namespace EssentialsPlugin.Utility
 {
 	public static class Logging
 	{
+		private static object m_lockObj = new object();
+		private static StringBuilder m_sb = new StringBuilder();
 		public static void WriteLineAndConsole(string text)
 		{
 			LogManager.APILog.WriteLineAndConsole(text);
+		}
+
+		public static void WriteLineAndConsole(string name, string text)
+		{
+			lock(m_lockObj)
+			{
+				m_sb.Clear();
+				AppendDateAndTime(m_sb);
+				m_sb.Append(" - ");
+				m_sb.Append(text);
+
+				string logPath = MyFileSystem.UserDataPath + "\\Logs\\";
+				if (!Directory.Exists(logPath))
+					Directory.CreateDirectory(logPath);
+
+				File.AppendAllText(logPath + name + ".log", m_sb.ToString() + "\r\n");
+
+				if (!PluginSettings.Instance.DynamicShowMessages)
+					return;
+
+				Console.WriteLine(m_sb.ToString());
+				m_sb.Clear();
+			}			
+		}
+
+		private static int GetThreadId()
+		{
+			return Thread.CurrentThread.ManagedThreadId;
+		}
+
+		private static void AppendDateAndTime(StringBuilder sb)
+		{
+			try
+			{
+				DateTimeOffset now = DateTimeOffset.Now;
+				StringBuilderExtensions.Concat(sb, now.Year, 4U, '0', 10U, false).Append('-');
+				StringBuilderExtensions.Concat(sb, now.Month, 2U).Append('-');
+				StringBuilderExtensions.Concat(sb, now.Day, 2U).Append(' ');
+				StringBuilderExtensions.Concat(sb, now.Hour, 2U).Append(':');
+				StringBuilderExtensions.Concat(sb, now.Minute, 2U).Append(':');
+				StringBuilderExtensions.Concat(sb, now.Second, 2U).Append('.');
+				StringBuilderExtensions.Concat(sb, now.Millisecond, 3U);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+			}
+		}
+
+		private static void AppendThreadInfo(StringBuilder sb)
+		{
+			sb.Append("Thread: " + GetThreadId().ToString());
 		}
 	}
 
@@ -91,6 +148,15 @@ namespace EssentialsPlugin.Utility
 				Array.Copy(source, index + 1, dest, index, source.Length - index - 1);
 
 			return dest;
+		}
+		public static string[] SplitString(string data)
+		{
+			var result = data.Split('"').Select((element, index) => index % 2 == 0  // If even index
+												 ? element.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)  // Split the item
+												 : new string[] { element })  // Keep the entire item					
+												 .SelectMany(element => element).ToList();
+
+			return result.ToArray();
 		}
 	}
 }

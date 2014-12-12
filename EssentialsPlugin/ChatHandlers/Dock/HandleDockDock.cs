@@ -102,16 +102,13 @@ namespace EssentialsPlugin.ChatHandlers
                 IMyCubeBlock e = beaconList[0];
                 IMyCubeGrid parent = (IMyCubeGrid)e.Parent;
                 long[] beaconListIds = beaconList.Select(b => b.EntityId).ToArray();
-
-				/*
-				 * Do a check for docked ship
-                DockingItem checkItem = PluginDocking.Settings.DockingItems.FirstOrDefault(d => d.playerId == e.OwnerId && d.targetEntityId == parent.EntityId && d.dockingBeaconIds.Intersect(beaconListIds).Count() == 4);
-                if (checkItem != null)
+				long ownerId = beaconList.First().OwnerId;
+				List<DockingItem> checkItems = Docking.Instance.Find(d => d.PlayerId == ownerId && d.TargetEntityId == parent.EntityId && d.DockingBeaconIds.Intersect(beaconListIds).Count() == 4);
+				if (checkItems.Count >= PluginSettings.Instance.DockingShipsPerZone)
                 {
-                    Communication.Message(String.Format("Ship already docked in docking zone '{0}'.", pylonName));
-                    return;
+                    Communication.SendPrivateInformation(userId, string.Format("Docking zone already '{0}' already contains the maximum capacity of ships.", pylonName));
+                    return true;
                 }
-				*/
 
                 // Figure out center of docking area, and other distance information
                 float maxDistance = 99;
@@ -198,7 +195,6 @@ namespace EssentialsPlugin.ChatHandlers
                     // Get local rotation of dock ship, and save it for when we undock
                     saveQuat = Quaternion.Inverse(saveQuat) * Quaternion.CreateFromRotationMatrix(dockingEntity.WorldMatrix.GetOrientation());
 
-					long ownerId = beaconList.First().OwnerId;
 					// Serialize and save ship to file, then remove it
 					// Save item
 					DockingItem dockItem = new DockingItem();
