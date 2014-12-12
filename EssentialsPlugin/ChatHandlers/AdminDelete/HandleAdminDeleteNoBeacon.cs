@@ -59,7 +59,9 @@ namespace EssentialsPlugin.ChatHandlers
 					continue;
 
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder();
+				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
+				if (gridBuilder == null)
+					continue;
 
 				bool found = false;
 				foreach (MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)

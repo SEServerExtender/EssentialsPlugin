@@ -92,6 +92,9 @@ namespace EssentialsPlugin.ChatHandlers
 						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
 					}
 
+					grid.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
+					grid.InScene = true;
+					grid.CastShadows = true;
 					builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
 					MyAPIGateway.Entities.RemapObjectBuilder(builder);
 					Logging.WriteLineAndConsole("Conceal", string.Format("Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
@@ -102,6 +105,9 @@ namespace EssentialsPlugin.ChatHandlers
 					entity.Visible = true;
 					*/
 				
+					//CubeGridEntity newEntity = new CubeGridEntity(builder);
+					//SectorObjectManager.Instance.AddEntity(newEntity);
+
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
 					MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(builder);
 					addList.Add(builder);

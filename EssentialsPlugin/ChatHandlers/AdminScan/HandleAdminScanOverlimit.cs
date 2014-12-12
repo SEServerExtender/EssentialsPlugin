@@ -78,7 +78,9 @@ namespace EssentialsPlugin.ChatHandlers
 					continue;
 
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(grid.EntityId);
+				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
+				if (gridBuilder == null)
+					continue;
 
 				if (PluginSettings.Instance.LoginEntityWhitelist.Contains(entity.EntityId.ToString()))
 					continue;

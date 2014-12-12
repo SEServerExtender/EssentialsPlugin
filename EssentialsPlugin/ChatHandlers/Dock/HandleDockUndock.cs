@@ -139,8 +139,8 @@ namespace EssentialsPlugin.ChatHandlers
 				cubeGrid.PositionAndOrientation = new MyPositionAndOrientation(Matrix.CreateFromQuaternion(Quaternion.CreateFromRotationMatrix(parent.Physics.GetWorldMatrix().GetOrientation()) * dockingItem.SaveQuat).GetOrientation());
 				// Move our ship relative to the new carrier position and orientation
 				Quaternion newQuat = Quaternion.CreateFromRotationMatrix(parent.Physics.GetWorldMatrix().GetOrientation());
-				Vector3 rotatedPos = Vector3.Transform(dockingItem.SavePos, newQuat);
-				cubeGrid.Position = rotatedPos + (Vector3)parent.GetPosition();
+				Vector3D rotatedPos = Vector3D.Transform(dockingItem.SavePos, newQuat);
+				cubeGrid.Position = rotatedPos + parent.GetPosition();
 
 				// Add object to world
 				cubeGrid.EntityId = BaseEntity.GenerateEntityId();

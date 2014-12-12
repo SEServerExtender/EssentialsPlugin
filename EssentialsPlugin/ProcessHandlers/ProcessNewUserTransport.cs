@@ -83,6 +83,9 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override void Handle()
 		{
+			if (!PluginSettings.Instance.NewUserTransportEnabled)
+				return;
+
 			if (!m_init)
 			{ 
 				m_init = true;
@@ -90,9 +93,6 @@ namespace EssentialsPlugin.ProcessHandler
 			}
 
 			if (!m_ready)
-				return;
-
-			if (!PluginSettings.Instance.NewUserTransportEnabled)
 				return;
 
 			if (MyAPIGateway.Players == null)
