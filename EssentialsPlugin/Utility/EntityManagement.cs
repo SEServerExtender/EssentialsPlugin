@@ -23,6 +23,7 @@ namespace EssentialsPlugin.Utility
 	public class EntityManagement
 	{
 		private static HashSet<IMyEntity> m_processedGrids = new HashSet<IMyEntity>();
+		private static List<long> m_removedGrids = new List<long>();
 		public static void CheckAndConcealEntities()
 		{
 			try
@@ -421,10 +422,21 @@ namespace EssentialsPlugin.Utility
 				builder.PersistentFlags = MyPersistentEntityFlags2.None;
 				MyAPIGateway.Entities.RemapObjectBuilder(builder);
 
-				Logging.WriteLineAndConsole("Conceal", string.Format("Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
+				if (m_removedGrids.Contains(entity.EntityId))
+				{
+					Logging.WriteLineAndConsole("Conceal", string.Format("Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
+					BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
+				}
+				else
+				{
+					Logging.WriteLineAndConsole("Conceal", string.Format("Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
+					BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
+					IMyEntity result = null;
+					result = MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(builder);
+					if (result != null)
+						m_removedGrids.Add(entity.EntityId);
+				}
 
-				BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
-				MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(builder);
 			});
 		}
 
@@ -761,22 +773,34 @@ namespace EssentialsPlugin.Utility
 					//ownerId = grid.BigOwners.First();
 					ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
 				}
-
-				builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
-				MyAPIGateway.Entities.RemapObjectBuilder(builder);
-				Logging.WriteLineAndConsole("Conceal", string.Format("Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
-
 				/*
 				entity.InScene = true;
 				entity.CastShadows = true;
 				entity.Visible = true;
 				*/
 
-				BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
-				MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(builder);
-				List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>();
-				addList.Add(builder);
-				MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
+				builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
+				MyAPIGateway.Entities.RemapObjectBuilder(builder);
+
+				if(m_removedGrids.Contains(entity.EntityId))
+				{
+					Logging.WriteLineAndConsole("Conceal", string.Format("Revealing - Id: {0} DUPE FOUND Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
+					BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
+				}
+				else
+				{
+					Logging.WriteLineAndConsole("Conceal", string.Format("Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
+					BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
+
+					IMyEntity result = null;
+					result = MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(builder);
+					if(result != null)
+						m_removedGrids.Add(entity.EntityId);
+
+					List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>();
+					addList.Add(builder);
+					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);				
+				}
 			});
 		}
 	}
