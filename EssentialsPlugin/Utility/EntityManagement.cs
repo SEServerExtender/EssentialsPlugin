@@ -457,7 +457,7 @@ namespace EssentialsPlugin.Utility
 
 					m_removedGrids.Add(entity.EntityId);
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
-					MyAPIGateway.Entities.AddEntity(newEntity, true);
+					MyAPIGateway.Entities.AddEntity(newEntity, false);
 					Logging.WriteLineAndConsole("Conceal", string.Format("End Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
 				}
 
@@ -520,7 +520,9 @@ namespace EssentialsPlugin.Utility
 					MyAPIGateway.Entities.GetEntities(entities);
 				//});
 
-				HashSet<IMyEntity> entitiesToReveal = new HashSet<IMyEntity>();
+				Dictionary<IMyEntity, string> entitiesToReveal = new Dictionary<IMyEntity, string>();
+				string currentReason = "";
+				//HashSet<IMyEntity> entitiesToReveal = new HashSet<IMyEntity>();
 				foreach (IMyEntity entity in entities)
 				{
 					if (!(entity is IMyCubeGrid))
@@ -531,6 +533,7 @@ namespace EssentialsPlugin.Utility
 
 					IMyCubeGrid grid = (IMyCubeGrid)entity;
 					bool found = false;
+					currentReason = "";
 					foreach (IMyPlayer player in players)
 					{
 						double distance = 0f;
@@ -539,13 +542,14 @@ namespace EssentialsPlugin.Utility
 							if (distance < PluginSettings.Instance.DynamicConcealDistance)
 							{
 								found = true;
+								currentReason = string.Format("{0} distance to grid: {1}", player.DisplayName, distance);
 							}
 						}
 					}
 
 					if (!found)
 					{
-						if(CheckRevealBlockRules(grid, players))
+						if(CheckRevealBlockRules(grid, players, out currentReason))
 						{
 							found = true;
 						}
@@ -553,7 +557,7 @@ namespace EssentialsPlugin.Utility
 
 					if (found)
 					{
-						entitiesToReveal.Add(entity);
+						entitiesToReveal.Add(entity, currentReason);
 					}
 				}
 
@@ -570,8 +574,9 @@ namespace EssentialsPlugin.Utility
 			}
 		}
 
-		private static bool CheckRevealBlockRules(IMyCubeGrid grid, List<IMyPlayer> players)
+		private static bool CheckRevealBlockRules(IMyCubeGrid grid, List<IMyPlayer> players, out string reason)
 		{
+			reason = "";
 			/*
 			MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
 			
@@ -688,6 +693,7 @@ namespace EssentialsPlugin.Utility
 							{
 								//found = true;
 								//break;
+								reason = string.Format("{0} distance to beacon broadcast: {1}", player.DisplayName, distance);
 								return true;
 							}
 						}
@@ -714,6 +720,7 @@ namespace EssentialsPlugin.Utility
 							{
 								//found = true;
 								//break;
+								reason = string.Format("{0} distance to antenna broadcast: {1}", player.DisplayName, distance);
 								return true;
 							}
 						}
@@ -738,12 +745,14 @@ namespace EssentialsPlugin.Utility
 							if (medical.Owner == playerId || (medical.ShareMode == MyOwnershipShareModeEnum.Faction && Player.CheckPlayerSameFaction(medical.Owner, playerId)))
 							//if (functionalBlock.OwnerId == playerId || (functionalBlock.GetUserRelationToOwner(playerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.FactionShare))
 							{
+								reason = string.Format("Grid has medbay and player is logged in - playerid: {0}", playerId);
 								return true;
 							}
 						}
 					}
 					else
 					{
+						reason = string.Format("Grid has medbay and conceal can not include medbays");
 						return true;
 					}
 				}
@@ -754,20 +763,22 @@ namespace EssentialsPlugin.Utility
 					if (!production.Enabled)
 						continue;
 
-					Console.WriteLine("Here: {0} {1}", production.Enabled, production.Queue.Length);
 					Sandbox.ModAPI.Ingame.IMyProductionBlock productionBlock = (Sandbox.ModAPI.Ingame.IMyProductionBlock)cubeBlock;
 
 					if (production.Queue.Length > 0)
+					{
+						reason = string.Format("Grid has production facility that has a queue");
 						return true;
+					}
 				}
 			}
 
 			return false;
 		}
 
-		private static void RevealEntities(HashSet<IMyEntity> entitiesToReveal)
+		private static void RevealEntities(Dictionary<IMyEntity, string> entitiesToReveal)
 		{
-			foreach (IMyEntity entity in entitiesToReveal)
+			foreach (KeyValuePair<IMyEntity, string> entity in entitiesToReveal)
 			{
 				RevealEntity(entity);
 			}
@@ -775,8 +786,10 @@ namespace EssentialsPlugin.Utility
 			Logging.WriteLineAndConsole(string.Format("Revealed {0} entities.", entitiesToReveal.Count));
 		}
 
-		private static void RevealEntity(IMyEntity entity)
+		private static void RevealEntity(KeyValuePair<IMyEntity, string> item)
 		{
+			IMyEntity entity = item.Key;
+			string reason = item.Value;
 			Wrapper.GameAction(() =>
 			{
 				MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
@@ -802,12 +815,12 @@ namespace EssentialsPlugin.Utility
 
 				if(m_removedGrids.Contains(entity.EntityId))
 				{
-					Logging.WriteLineAndConsole("Conceal", string.Format("Revealing - Id: {0} DUPE FOUND Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
+					Logging.WriteLineAndConsole("Conceal", string.Format("Revealing - Id: {0} DUPE FOUND Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId, reason));
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
 				}
 				else
 				{
-					Logging.WriteLineAndConsole("Conceal", string.Format("Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
+					Logging.WriteLineAndConsole("Conceal", string.Format("Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId, reason));
 
 					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
 					if (newEntity == null)
@@ -822,7 +835,7 @@ namespace EssentialsPlugin.Utility
 					List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>();
 					addList.Add(builder);
 					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
-					Logging.WriteLineAndConsole("Conceal", string.Format("End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
+					Logging.WriteLineAndConsole("Conceal", string.Format("End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId, reason));
 				}
 			});
 		}
