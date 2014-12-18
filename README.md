@@ -40,6 +40,8 @@ Major Feature Overview
 - Chat based settings
 - Safe Docking
 - Advanced Grid Scan and Cleanup
+- Dynamic Entity Management
+- Waypoint System
 
 In depth Feature Analysis
 ------------------------
@@ -185,6 +187,28 @@ The delete does the exact same thing as the scan, except it will actually perfor
 
 (more examples to come)
 
+Dynamic Entity Management
+------------------------------
+This option, when turned on, automatically manages entities in the world.  The biggest issue with Space Engineers currently is when a dedicated server gets a lot of entities, it's UPS drops due to GameLogic.  This is almost always due to having too many entities in the world.  This system manages them by removing / disabling entities in the world that no one can see, or are generally doing nothing.  This helps improve UPS greatly as these entities no longer get processed.  The system is complex and updates to it are ongoing, but many servers now use it with great success.
+
+All conceals and reveals are logged in your C:/path/to/instance/Logs/ directory.
+
+Options:
+- DynamicConcealEnabled - This enables / disables entity concealment.  If you disable this after it being enabled, you must run the command /admin reveal force to forcefully show entities that have been concealed.
+- DynamicConcealDistance - This is the distance that a player must be from an entity before it reveals.  If they get any closer than this distance (in meters) then the entity reveals itself.  (default: 8000 meters)
+- DynamicConcealIgnoreSubTypeList - This is a list of block subtypes that.  This allows administrators to make it so that grids that contain these subtypes never get concealed.  Helpful for when blocks "warp" users around or require a "end point" like stargates.
+- DynamicConcealIncludeLargeGrids - When this is disabled, large grids and stations can not be concealed.  This is the safest mode, as then only small ships get concealed.  Once you enable this, large grids and stations without med bays can be concealed.  This requires more checks and is a bit more intensive, but results in the biggest increase in UPS.
+- DynamicConcealIncludeMedBays - When this is disabled, large grids with medbays are not disabled.  When enabled, large grids with med bays are concealed, but are revealed when a user logs in that can use that med bay.  Please note that there is a very tiny chance that a spawn point won't be shown when a user logs in and a grid is concealed.  All they need to do is hit "refresh" and it comes back.  The chance of this happening is VERY small.  (I've only ever seen it happen once)
+- DynamicShowMessages - When enabled, this shows when ships are concealed/revealed.  Some people consider it a bit spammy, so you can turn it off if you don't like the messages.  
+
+Waypoint System
+---------------
+Waypoints are ways of placing hud markers at locations that appear for you at all time.  They are personal and no one else can see them except the person who placed them.  (This will expand to faction waypoints soon).  Waypoints are not blocks, and you do not place them by hand, you place them via a command and use the coordinate system built into essentials (that displays at the top).
+
+Options:
+- WaypointsEnabled - Enable / Disables this option
+- WaypointsMaxPerPlayer - This limits a user so they don't create too many waypoints.  
+
 Advanced Administrator Chat Commands
 ------------------------------------
 
@@ -239,9 +263,10 @@ Command| Options|Example
 /utility grids list | (page number) | /utility grids list 1 - This lists all your grids by name and id.  If you have more than 7 ships, the ships are separated into pages.  Use a number after /utility grids list to list that specific page.
 /utility export server | [ship name] | /utility export server My Ship - This exports the ship "My Ship" to the server.  The ships are exported to an "Exports" directory in the mods directory of the server under the username of the user who exported it.
 
-To come:
-- Block delete commands (over limit of drills, prohibited blocks, etc)
-- Grid delete commands with more attributes (no power)
-- More cleanup commands
-- Commands that disable blocks, for example thrusters
-
+Waypoint commands
+------------------
+Command| Options|Example
+-------|--------|-----------------------------------------------------------------------------------------------------
+/waypoint add | "name" "text on marker" Neutral or Allied or Enemy X Y Z | /waypoint add MyWaypoint MyWaypoint neutral 0 0 0 - This adds a green hud marker that shows up at 0 0 0
+/waypoint remove | "name" | /waypoint remove test - This removes the waypoint test
+/waypoint list | | /waypoint list - This list all your waypoints
