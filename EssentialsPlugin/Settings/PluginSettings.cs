@@ -36,8 +36,8 @@ namespace EssentialsPlugin
 
 		private bool m_greetingEnabled;
 		private string m_greetingMessage;
+		private bool m_greetingPublic;
 		private SettingsGreetingDialogItem m_greetingItem;
-
 		private string m_greetingNewUserMessage;
 		private SettingsGreetingDialogItem m_greetingNewUserItem;
 
@@ -196,6 +196,16 @@ namespace EssentialsPlugin
 			set 
 			{ 
 				m_greetingMessage = value;
+				Save();
+			}
+		}
+
+		public bool GreetingPublic
+		{
+			get { return m_greetingPublic; }
+			set 
+			{ 
+				m_greetingPublic = value;
 				Save();
 			}
 		}

@@ -92,7 +92,10 @@ namespace EssentialsPlugin.ChatHandlers
 			foreach(IMyEntity entity in entitiesUnconnected)
 			{
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder();
+				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
+				if (gridBuilder == null)
+					continue;
+
 				int count = 0;
 				foreach(MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
 				{

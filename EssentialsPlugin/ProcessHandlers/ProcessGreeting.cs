@@ -65,8 +65,8 @@ namespace EssentialsPlugin.ProcessHandler
 					List<IMyPlayer> players = new List<IMyPlayer>();
 					pos = 1;
 					bool result = false;
-//					Wrapper.GameAction(() =>
-//					{
+					Wrapper.GameAction(() =>
+					{
 						try
 						{
 							MyAPIGateway.Players.GetPlayers(players, null);
@@ -76,7 +76,7 @@ namespace EssentialsPlugin.ProcessHandler
 						{
 							Logging.WriteLineAndConsole(string.Format("Failed to get player list: {0}", ex.ToString()));
 						}
-//					});
+					});
 
 					if(!result)
 						return;
@@ -109,7 +109,11 @@ namespace EssentialsPlugin.ProcessHandler
 									message = PluginSettings.Instance.GreetingMessage.Replace("%name%", player.DisplayName);
 
 								string finalMessage = message;
-								Communication.SendPrivateInformation(item.SteamId, finalMessage);
+
+								if(PluginSettings.Instance.GreetingPublic)
+									Communication.SendPublicInformation(finalMessage);
+								else
+									Communication.SendPrivateInformation(item.SteamId, finalMessage);
 
 								if (item.IsNewUser)
 								{

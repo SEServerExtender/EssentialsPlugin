@@ -84,15 +84,9 @@ namespace EssentialsPlugin.Utility
 					continue;
 
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = null;
-				try
-				{
-					 gridBuilder = (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder();
-				}
-				catch
-				{
+				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
+				if (gridBuilder == null)
 					continue;
-				}
 
 				bool result = false;
 				foreach (MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
@@ -228,6 +222,7 @@ namespace EssentialsPlugin.Utility
 			bool debug = false;
 			bool hasBlockSubType = false;
 			bool hasBlockSubTypeLimits = false;
+			bool hasDisplayNameExact = false;
 
 			options.Add("Requires Functional", "true");
 			options.Add("Requires Terminal", "true");
@@ -286,6 +281,9 @@ namespace EssentialsPlugin.Utility
 					hasDisplayName = true;
 					displayName = words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")).Split(new char[] { ':' })[1];
 					options["Matches Display Name Text"] = "true:" + displayName;
+
+					if (words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")).Split(new char[] { ':' }).Length > 2 && words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")).Split(new char[] { ':' })[2] == "exact")
+						hasDisplayNameExact = true;
 				}
 
 				if(words.FirstOrDefault(x => x.ToLower().StartsWith("hasblocksubtype:")) != null)
@@ -363,7 +361,10 @@ namespace EssentialsPlugin.Utility
 
 				if (hasDisplayName && displayName != "")
 				{
-					if (entity.DisplayName.Contains(displayName))
+					if (!hasDisplayNameExact && entity.DisplayName.Contains(displayName))
+						entitiesToConfirm.Add(entity);
+
+					if (hasDisplayNameExact && entity.DisplayName.Equals(displayName))
 						entitiesToConfirm.Add(entity);
 				}
 				else if (ignoreOwnership)
@@ -510,10 +511,13 @@ namespace EssentialsPlugin.Utility
 			bool hasBlockSubType = false;
 			bool hasBlockSubTypeLimits = false;
 			bool debug = false;
+			bool isOwnedBy = false;
 
 			string displayName = "";
 			Dictionary<string, int> blockSubTypes = new Dictionary<string, int>();
 			Dictionary<string, int> blockSubTypeLimits = new Dictionary<string, int>();
+			string ownedBy = "";
+			long ownedByPlayerId = 0;
 			if (words.Count() > 0)
 			{
 				if (words.FirstOrDefault(x => x.ToLower() == "debug") != null)
@@ -616,6 +620,18 @@ namespace EssentialsPlugin.Utility
 						options.Add("Sub Block Type Limit: " + parts[1], count.ToString());
 					}
 				}
+
+				if (words.FirstOrDefault(x => x.ToLower().StartsWith("ownedby:")) != null)
+				{
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("ownedby:")).Split(new char[] { ':' });
+					if (parts.Length > 1)
+					{
+						isOwnedBy = true;
+						ownedBy = parts[1];
+						if(PlayerMap.Instance.GetPlayerItemsFromPlayerName(ownedBy).Count > 0)
+							ownedByPlayerId = PlayerMap.Instance.GetPlayerItemsFromPlayerName(ownedBy).First().playerId;
+					}
+				}
 			}
 
 			Communication.SendPrivateInformation(userId, string.Format("Scanning for ships with options: {0}", GetOptionsText(options)));
@@ -645,8 +661,6 @@ namespace EssentialsPlugin.Utility
 					continue;
 				}
 
-				//CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(grid.EntityId);
-
 				if (PluginSettings.Instance.LoginEntityWhitelist.Contains(entity.EntityId.ToString()) || PluginSettings.Instance.LoginEntityWhitelist.Contains(entity.DisplayName))
 					continue;
 
@@ -655,15 +669,19 @@ namespace EssentialsPlugin.Utility
 					if (entity.DisplayName.Contains(displayName))
 						entitiesToConfirm.Add(entity);
 				}
-				else if (owner == 0)
+				else if (isOwnedBy && ownedByPlayerId > 0 && GetAllOwners(gridBuilder).Contains(ownedByPlayerId))
 				{
 					entitiesToConfirm.Add(entity);
 				}
-				else if (owner == 2 && HasOwner(gridBuilder))
+				else if (!isOwnedBy && owner == 0)
 				{
 					entitiesToConfirm.Add(entity);
 				}
-				else if (owner == 1 && !HasOwner(gridBuilder))
+				else if (!isOwnedBy && owner == 2 && HasOwner(gridBuilder))
+				{
+					entitiesToConfirm.Add(entity);
+				}
+				else if (!isOwnedBy && owner == 1 && !HasOwner(gridBuilder))
 				{
 					entitiesToConfirm.Add(entity);
 				}
@@ -835,6 +853,41 @@ namespace EssentialsPlugin.Utility
 			}
 
 			return false;
+		}
+
+		public static List<long> GetBigOwners(MyObjectBuilder_CubeGrid grid)
+		{
+			Dictionary<long, int> ownerList = new Dictionary<long, int>();
+			foreach (MyObjectBuilder_CubeBlock block in grid.CubeBlocks)
+			{
+				if (block.Owner == 0)
+					continue;
+
+				if (ownerList.ContainsKey(block.Owner))
+					ownerList[block.Owner] = ownerList[block.Owner] + 1;
+				else
+					ownerList.Add(block.Owner, 1);
+			}
+
+			int count = ownerList.OrderBy(x => x.Value).Select(x => x.Value).FirstOrDefault();
+			return ownerList.OrderBy(x => x.Value).Select(x => x.Key).Where(x => x == count).ToList();
+		}
+
+		public static List<long> GetAllOwners(MyObjectBuilder_CubeGrid grid)
+		{
+			Dictionary<long, int> ownerList = new Dictionary<long, int>();
+			foreach (MyObjectBuilder_CubeBlock block in grid.CubeBlocks)
+			{
+				if (block.Owner == 0)
+					continue;
+
+				if (ownerList.ContainsKey(block.Owner))
+					ownerList[block.Owner] = ownerList[block.Owner] + 1;
+				else
+					ownerList.Add(block.Owner, 1);
+			}
+
+			return ownerList.Select(x => x.Key).ToList();
 		}
 
 		public static bool HasOwner(MyObjectBuilder_CubeGrid grid)

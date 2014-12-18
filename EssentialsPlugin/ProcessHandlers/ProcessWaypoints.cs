@@ -43,8 +43,8 @@ namespace EssentialsPlugin.ProcessHandler
 
 			List<IMyPlayer> players = new List<IMyPlayer>();
 			bool result = false;
-//			Wrapper.GameAction(() =>
-//			{
+			Wrapper.GameAction(() =>
+			{
 				try
 				{
 					MyAPIGateway.Players.GetPlayers(players, null);
@@ -54,7 +54,7 @@ namespace EssentialsPlugin.ProcessHandler
 				{
 					Logging.WriteLineAndConsole(string.Format("Waypoints(): Unable to get player list: {0}", ex.ToString()));
 				}
-//			});
+			});
 
 			if (!result)
 				return;

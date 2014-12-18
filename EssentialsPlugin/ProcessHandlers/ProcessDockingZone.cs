@@ -30,14 +30,20 @@ namespace EssentialsPlugin.ProcessHandler
 	public class ProcessDockingZone : ProcessHandlerBase
 	{
 		private DateTime m_lastZoneUpdate;
-		private List<IMyCubeGrid> m_zoneCache;
+		private static HashSet<IMyCubeGrid> m_zoneCache;
 		private List<long> m_playersInside;
+
+		public static HashSet<IMyCubeGrid> ZoneCache
+		{
+			get { return ProcessDockingZone.m_zoneCache; }
+			set { ProcessDockingZone.m_zoneCache = value; }
+		}
 
 		public ProcessDockingZone()
 		{
 			m_lastZoneUpdate = DateTime.Now.AddMinutes(-1);
 			m_playersInside = new List<long>();
-			m_zoneCache = new List<IMyCubeGrid>();
+			m_zoneCache = new HashSet<IMyCubeGrid>();
 		}
 
 		public override int GetUpdateResolution()
@@ -47,20 +53,21 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override void Handle()
 		{
-			if (!PluginSettings.Instance.DockingEnabled)
-				return;
-
+			// ZoneCache can be used elsewhere.  I need to move this out of here.
 			if (DateTime.Now - m_lastZoneUpdate > TimeSpan.FromSeconds(30))
 			{
 				m_lastZoneUpdate = DateTime.Now;
 				PopulateZoneCache();
 			}
 
+			if (!PluginSettings.Instance.DockingEnabled)
+				return;
+
 			List<IMyPlayer> players = new List<IMyPlayer>();
-			//Wrapper.GameAction(() =>
-			//{
+			Wrapper.GameAction(() =>
+			{
 				MyAPIGateway.Players.GetPlayers(players);
-			//});
+			});
 
 			foreach (IMyPlayer player in players)
 			{
@@ -83,6 +90,13 @@ namespace EssentialsPlugin.ProcessHandler
 			// Not a ship?  let's not process
 			if (!(parent is IMyCubeGrid))
 			{
+				if (m_playersInside.Contains(playerId))
+				{
+					m_playersInside.Remove(playerId);
+					ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerId(playerId);
+					Communication.Notification(steamId, MyFontEnum.DarkBlue, 7, "You have exited a ship in a docking zone");
+				}
+
 				return;
 			}
 

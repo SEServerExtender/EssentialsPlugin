@@ -66,7 +66,7 @@ namespace EssentialsPlugin.ChatHandlers
 			// Find shared beacon area
 			Dictionary<String, List<IMyCubeBlock>> testList;
 			List<IMyCubeBlock> beaconList;
-			DockingZone.FindByName(pylonName, out testList, out beaconList);
+			DockingZone.FindByName(pylonName, out testList, out beaconList, playerId);
 			if (beaconList.Count == 4)
 			{
 				// Check ownership

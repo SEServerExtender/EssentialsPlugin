@@ -32,6 +32,7 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public ProcessConceal()
 		{
+			//EntityManagement.RevealAll();
 		}
 
 		public override int GetUpdateResolution()

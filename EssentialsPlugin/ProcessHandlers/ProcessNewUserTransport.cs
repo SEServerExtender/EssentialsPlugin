@@ -135,7 +135,10 @@ namespace EssentialsPlugin.ProcessHandler
 							continue;
 
 						IMyEntity entity = playerEntity.GetTopMostParent();
-						MyObjectBuilder_CubeGrid cubeGrid = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder();
+						MyObjectBuilder_CubeGrid cubeGrid = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
+						if (cubeGrid == null)
+							continue;
+
 						Vector3D validPosition = Vector3D.Zero;
 						Vector3D asteroidPosition = Vector3D.Zero;
 						FindViableAsteroid(out validPosition, out asteroidPosition);

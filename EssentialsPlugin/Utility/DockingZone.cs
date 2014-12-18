@@ -102,7 +102,7 @@ namespace EssentialsPlugin.Utility
 			return GetZonesInGrid(cubeGrid).Count > 0;
 		}
 
-		static public void FindByName(String pylonName, out Dictionary<String, List<IMyCubeBlock>> testList, out List<IMyCubeBlock> beaconList)
+		static public void FindByName(String pylonName, out Dictionary<String, List<IMyCubeBlock>> testList, out List<IMyCubeBlock> beaconList, long playerId)
 		{
 			IMyCubeGrid beaconParent = null;
 			testList = new Dictionary<string, List<IMyCubeBlock>>();
@@ -121,6 +121,9 @@ namespace EssentialsPlugin.Utility
 				IMyCubeGrid cubeGrid = (IMyCubeGrid)entity;
 
 				if (cubeGrid == null || cubeGrid.GridSizeEnum == MyCubeSize.Small)
+					continue;
+
+				if (!cubeGrid.BigOwners.Contains(playerId) && !cubeGrid.SmallOwners.Contains(playerId))
 					continue;
 
 				testList.Clear();

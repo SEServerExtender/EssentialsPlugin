@@ -67,15 +67,9 @@ namespace EssentialsPlugin.ChatHandlers
 					if (!(entity is IMyCubeGrid))
 						continue;
 
-					MyObjectBuilder_CubeGrid builder = null;
-					try
-					{
-						builder = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(true);
-					}
-					catch
-					{
+					MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
+					if (builder == null)
 						continue;
-					}
 
 					count++;
 					if (!force)

@@ -25,6 +25,7 @@ namespace EssentialsPlugin.ProcessHandler
 		{
 			m_start = DateTime.Now;
 			SetRestartTime();
+			StopAllShips();
 		}
 
 		public override int GetUpdateResolution()
@@ -82,7 +83,7 @@ namespace EssentialsPlugin.ProcessHandler
 			// If we're not a service, restart with a .bat otherwise just exit and let the service be restarted
 			if (Environment.UserInteractive)
 			{
-				String restartText = "timeout /t 20\r\n";
+				String restartText = "%windir%/system32/timeout /t 30\r\n";
 				restartText += String.Format("cd /d \"{0}\"\r\n", System.IO.Path.GetDirectoryName(Application.ExecutablePath));
 				restartText += PluginSettings.Instance.RestartAddedProcesses + "\r\n";
 				restartText += System.IO.Path.GetFileName(Application.ExecutablePath) + " " + Server.Instance.CommandLineArgs.args + "\r\n";
@@ -170,7 +171,7 @@ namespace EssentialsPlugin.ProcessHandler
 					are.Set();
 				});
 
-				if (!are.WaitOne(60000))
+				if (!are.WaitOne(120000))
 				{
 					Logging.WriteLineAndConsole("Server unresponsive for 60 seconds, restarting in 5 seconds.");
 					Thread.Sleep(5000);

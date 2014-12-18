@@ -36,12 +36,12 @@ namespace EssentialsPlugin.ProcessHandler
 						if (item.Hour == -1)
 						{
 							if (item.Minute == DateTime.Now.Minute)
-								CreateBackup();
+								Backup.Create(PluginSettings.Instance.BackupBaseDirectory, PluginSettings.Instance.BackupCreateSubDirectories, PluginSettings.Instance.BackupAsteroids);
 						}
 						else
 						{
 							if (item.Hour == DateTime.Now.Hour && item.Minute == DateTime.Now.Minute)
-								CreateBackup();
+								Backup.Create(PluginSettings.Instance.BackupBaseDirectory, PluginSettings.Instance.BackupCreateSubDirectories, PluginSettings.Instance.BackupAsteroids);
 						}
 					}
 
@@ -56,57 +56,6 @@ namespace EssentialsPlugin.ProcessHandler
 			} 
 			
 			base.Handle();
-		}
-
-		private void CreateBackup()
-		{
-			Logging.WriteLineAndConsole(string.Format("Creating backup ..."));
-			string baseDirectory = PluginSettings.Instance.BackupBaseDirectory;
-			if (!Directory.Exists(baseDirectory))
-			{
-				Directory.CreateDirectory(baseDirectory);
-			}
-
-			var savePath = Server.Instance.Config.LoadWorld;
-
-			string finalDirectory = baseDirectory;
-			if(PluginSettings.Instance.BackupCreateSubDirectories)
-			{
-				string subDirectory = string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-HH-mm"));
-				if (!Directory.Exists(baseDirectory + "\\" + subDirectory))
-					Directory.CreateDirectory(baseDirectory + "\\" + subDirectory);
-
-				finalDirectory = baseDirectory + "\\" + subDirectory;
-			}
-
-			string tempDirectory = baseDirectory + "\\" + "temp";
-			if(!Directory.Exists(tempDirectory))
-				Directory.CreateDirectory(tempDirectory);
-
-
-			File.Copy(savePath + "\\" + "SANDBOX_0_0_0_.sbs", tempDirectory + "\\" + "SANDBOX_0_0_0_.sbs", true);
-			File.Copy(savePath + "\\" + "Sandbox.sbc", tempDirectory + "\\" + "Sandbox.sbc", true);
-
-			if(PluginSettings.Instance.BackupAsteroids)
-			{
-				foreach (string file in Directory.GetFiles(savePath))
-				{
-					FileInfo info = new FileInfo(file);
-					if (!info.Extension.Equals(".vx2"))
-						continue;
-
-					File.Copy(file, tempDirectory + "\\" + info.Name, true);
-				}
-			}
-
-			ZipFile.CreateFromDirectory(tempDirectory, finalDirectory + "\\" + string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-HH-mm")) + ".zip");
-
-			foreach(string file in Directory.GetFiles(tempDirectory))
-			{
-				File.Delete(file);
-			}
-
-			Logging.WriteLineAndConsole(string.Format("Backup created: {0}", finalDirectory + "\\" + string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-hh-mm")) + ".zip"));
 		}
 
 		private void CleanupBackups()

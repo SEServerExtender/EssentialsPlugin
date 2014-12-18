@@ -226,6 +226,16 @@ namespace EssentialsPlugin
 		}
 
 		[Category("Join Greeting")]
+		[Description("Enable / Disable Sending this message to all users, and not just to the joining user privately")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool GreetingPublic
+		{
+			get { return PluginSettings.Instance.GreetingPublic; }
+			set { PluginSettings.Instance.GreetingPublic = value; }
+		}
+
+		[Category("Join Greeting")]
 		[Description("Greeting Dialog Displayed To User On Join")]
 		[Browsable(true)]
 		[ReadOnly(false)]
@@ -575,6 +585,7 @@ namespace EssentialsPlugin
 
 			m_chatHandlers.Add(new HandleAdminSettings());
 			m_chatHandlers.Add(new HandleAdminNotify());
+			m_chatHandlers.Add(new HandleAdminBackup());
 
 			m_chatHandlers.Add(new HandleAdminOwnershipChange());     //
 

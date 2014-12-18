@@ -64,6 +64,7 @@
     <Compile Include="ChatHandlers\Dock\HandleDockDock.cs" />
     <Compile Include="ChatHandlers\Dock\HandleDockList.cs" />
     <Compile Include="ChatHandlers\Dock\HandleDockValidate.cs" />
+    <Compile Include="ChatHandlers\HandleAdminBackup.cs" />
     <Compile Include="ChatHandlers\HandleAdminOwnershipChange.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanInactive.cs" />
     <Compile Include="ChatHandlers\HandleAdminTest.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="UtilityClasses\OrientedBoundingBox.cs" />
     <Compile Include="UtilityClasses\SerializeableDictionary.cs" />
     <Compile Include="UtilityClasses\UIEditors.cs" />
+    <Compile Include="Utility\Backup.cs" />
     <Compile Include="Utility\Cleanup.cs" />
     <Compile Include="Utility\Communication.cs" />
     <Compile Include="Utility\CubeGrid.cs" />
@@ -205,7 +207,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "C:\ProgramData\SpaceEngineersDedicated\Transcend\Mods\Essentials\"
+    <PostBuildEvent>copy "$(TargetPath)" "C:\ProgramData\SpaceEngineersDedicated\survival test\Mods\Essentials\"
 set textTemplatingPath="%25CommonProgramFiles(x86)%25\Microsoft Shared\TextTemplating\$(VisualStudioVersion)\texttransform.exe"
 if %25textTemplatingPath%25=="\Microsoft Shared\TextTemplating\$(VisualStudioVersion)\texttransform.exe" set textTemplatingPath="%25CommonProgramFiles%25\Microsoft Shared\TextTemplating\$(VisualStudioVersion)\texttransform.exe"
 %25textTemplatingPath%25 "$(ProjectDir)AssemblyFileVersion.tt"</PostBuildEvent>

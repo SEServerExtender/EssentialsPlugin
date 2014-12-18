@@ -76,15 +76,9 @@ namespace EssentialsPlugin.Utility
 
 							if(entity != null)
 							{
-								MyObjectBuilder_CubeGrid gridBuilder = null;
-								try
-								{
-									gridBuilder = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder();
-								}
-								catch
-								{
+								MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
+								if (gridBuilder == null)
 									continue;
-								}
 
 								CubeGridEntity entityToDispose = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
 								entityToDispose.Dispose();

@@ -90,7 +90,10 @@ namespace EssentialsPlugin.ProcessHandler
 		private void ExtractCommandFromEntity(IMyEntity entity)
 		{
 			IMyCubeGrid grid = (IMyCubeGrid)entity;
-			MyObjectBuilder_CubeGrid gridBuilder = (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder();
+			MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
+			if (gridBuilder == null)
+				return;
+			
 			string command = "";
 			foreach(MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
 			{

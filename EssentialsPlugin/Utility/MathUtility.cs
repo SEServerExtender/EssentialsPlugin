@@ -45,7 +45,7 @@ namespace EssentialsPlugin.Utility
 
 		public static Vector3 GenerateRandomEdgeVector()
 		{
-			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent();
+			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent() - 1000;
 			if (halfExtent == 0f)
 				halfExtent = 900000f;
 
