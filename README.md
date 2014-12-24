@@ -319,4 +319,4 @@ Command| Options|Example
 -------|--------|-----------------------------------------------------------------------------------------------------
 /waypoint add | "name" "text on marker" Neutral or Allied or Enemy X Y Z | /waypoint add MyWaypoint MyWaypoint neutral 0 0 0 - This adds a green hud marker that shows up at 0 0 0
 /waypoint remove | "name" | /waypoint remove test - This removes the waypoint test
-/waypoint list | | /waypoint list - This list all your waypoints
+/waypoint list | dialog | /waypoint list dialog - This list all your waypoints in a dialog
