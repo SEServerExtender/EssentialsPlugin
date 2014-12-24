@@ -310,7 +310,7 @@ Command| Options|Example
 /timeleft | (no options) | /timeleft - this gives the user the amount of time remaining before the next scheduled restart
 /msg | [username] [message] | /msg tyrsis testing a private message - This will send a private message to the user 'tyrsis' with the message 'testing a private message'.  This command requires the workshop mod to function properly.
 /faction | [message] | /faction hello everyone in my faction - This will send a private faction only message to all users in the same faction as the user sending it.  
-/utility grids list | (page number) | /utility grids list 1 - This lists all your grids by name and id.  If you have more than 7 ships, the ships are separated into pages.  Use a number after /utility grids list to list that specific page.
+/utility grids list | (page number) or dialog | /utility grids list 1 - This lists all your grids by name and id.  If you have more than 7 ships, the ships are separated into pages.  Use a number after /utility grids list to list that specific page.  If you do /utility grids list dialog you will get your entire grid list in a nice little dialog.
 /utility export server | [ship name] | /utility export server My Ship - This exports the ship "My Ship" to the server.  The ships are exported to an "Exports" directory in the mods directory of the server under the username of the user who exported it.
 
 Waypoint commands
