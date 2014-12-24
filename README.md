@@ -39,7 +39,8 @@ Major Feature Overview
 - Private and Faction Messaging
 - Chat based settings
 - Safe Docking
-- Advanced Grid Scan and Cleanup
+- Advanced Grid Scan
+- Timed Cleanup and Triggered Cleanup
 - Dynamic Entity Management
 - Waypoint System
 
@@ -163,29 +164,76 @@ Setting up a docking zone is simple.  The user just creates a zone by place 4 be
 - /dock validate <dockingZoneName> - This validates if a docking zone is valid.  You do not need to have the bacons at 100% in order to use this command.
 - /dock list <dockingZoneName> - This list if a ship is in a particular docking zone.
 
-Advanced Grid Scan And Cleanup
-------------------------------
-We have added an advanced scanning and deletion function that allows precise control over what is removed from the game.  We decided to algamate all the separate functionality into one command, so it's easier to maintain.  These commands are as follows:
+Advanced Grid Scan
+------------------
+We have added an advanced grid scanning function.  This obsoletes the /admin scan cleanup, and replaces it with a more sane version of that.  The commands are:
 
-- /admin scan cleanup 
-- /admin delete cleanup
+/admin scan grids
+/admin delete grids (uses the results from scan and just applies a delete)
 
-The delete does the exact same thing as the scan, except it will actually perform a grid deletion once the ships are scanned.  So it's useful to use the scan to get the desired result before using the actual delete.  Without any options, the cleanup scan looks for unowned grids that do not contain functional blocks, terminal blocks, or power generating blocks.  The scan and delete are controlled further with the following options:
+If you run the scan by itself, it returns _all_ ships.  You then apply filters to the scan to weed out ships until you get a list of ships you want.  
 
-- debug - Specify this option to get a full display of what and why every grid is included in a cleanup scan.  It will show why a grid isn't being cleaned up.  It is a good idea to always specify this if you want to know exactly what the scan is doing.
-- isowned - If this option is specified, then a grid must be owned.  If this option is not specified, then it will only scan unowned grids
-- ignoreownership - If this option is specified, then the scan will ignore ownership of a grid.  All grids will be included in the scan
-- ignorefunctional - If this option is specified, then it does not matter if a ship contains a functional block or not
-- ignoreterminal - If this option is specified, then it does not matter if a ship contains a terminal block or not
-- ignorepower - If this option is specified, then it does not matter if a ship contains a block that generates power (solar, battery or reactor with fuel)
-- hasdisplayname:<name to search for> - If this option is specified, then a ship must partially contain the name specified here (spaces are not allowed currently)
-- hasblocksubtype:(subtype to search for):(count) - If this option is specified, then a ship must contain a block with the subtype you specify, and contain at least (count) of those blocks.  If (count) is not specified, then the default amount is 1
-- limitblocksubtype:(subtype to search for):(limit) - If this option is specified, then a ship that contains a (limit) amount of (subtype) blocks or more, will be considered as part of the cleanup.  This will be useful for when we add block removal.  Only use this for scanning for now, otherwise ships that are over (limit) will be deleted outright.
+### Filters
+terminal - The grid must contain a terminal block.  These are blocks that can have ownership for example, cockpit.
+noterminal - The grid must contain NO terminal blocks.
+functional - The grid must contain a functional block.  These are blocks that can be enabled / disabled.  They are also terminal blocks.
+nofunctional - The grid must contain NO functional blocks.
+ownership - The grid must have at least one block owned by a player.  This implies terminal, but also requires that the terminal be owned.
+noownership - The grid must have NO blocks owned by a player.
+power - The grid must have a valid power source.  Valid power source is defined as an enabled reactor with uranium in it, a battery with a charge, or a solar panel.
+nopower - The grid must NOT have a valid power source.
+
+### Options
+These options can have fields with spaces in it, but if there are spaces, the entire option must be enclosed in quotes, for example: "hasdisplayname:Respawn Ship:exact"
+
+hasdisplayname:(name of ship):(exact) - This option allows you to filter by the name of a ship.  If you want to sort by a ship that has a space in it's name, please enclose the whole option in quotes.  Using the "exact" option also makes sure that it matches the name exactly.  Without the exact option a partial match can occur.
+
+ownedby:(name of player) - This option allows you to filter by owner of the ship. 
+
+includesblocksubtype:(block subtype name):(count) - This option allows you to filter ships by ensuring the ship has the block you specify here.  The count lets you filter even further by ensuring the ship has multiple of that block.  For example if you want to find ships that have more than 25 drills on it, you'd specify: includesblocksubtype:Drill:26 - This scans for all ships that has 26 or more drills on it.
+
+excludesblocksubtype:(block subtype name):(count) - This option is the reverse of the last and filters ships if they do not have the block specified here.  Count allows you to filter further by specifying that the ship must have less than count blocks.
 
 ### Examples
-- /admin scan cleanup ignoreterminal ignorefunctional ignorepower - This will scan for all grids / stations that are not owned that may or may not have terminal blocks or functional blocks or are powered.
+- /admin scan grids - Returns all grids
+- /admin scan grids noterminal - Returns all grids without terminal blocks
+- /admin scan grids noownership - Returns all grids without any owned blocks
+- /admin scan grids nopower - Returns all grids without any viable power
+- /admin scan grids "hasdisplayname:Respawnship:exact" - Returns all grids with the displayname 'Respawnship'
+- /admin scan grids ownedby:tyrsis - Returns all grids owned by the player 'tyrsis'
+- /admin scan grids includesblocksubtype:Drill:26 - Returns all grids that have more than 25 drills.
+- /admin scan grids excludesblocksubtype:Beacon:1 - Returns all grids that do not have at least 1 beacon.
 
-(more examples to come)
+Timed Cleanup and Triggered Cleanup
+-----------------------------------
+You can setup timed and triggered cleanups based on the advanced grid scanning above.  
+
+### Timed Cleanups
+Timed cleanups occur at a timed interval.  They are pretty straightforward, in that you specify a time of day, and it runs on that time.  
+
+Timed Cleanup Items Options:
+- Enabled - Enable / Disable this cleanup item
+- Reason - Text reason for this cleanup.  This replaces %cleanup_reason% in a notification item
+- RestartTime - Time of day this occurs using a 24 hour clock
+- ScanCommand - This is the command used to scan / delete when the cleanup occurs.  It is basically an /admin scan grids command like above, but you do not include the /admin scan grids part.  For example: nopower noownership would be the same as /admin scan nopower noownership
+
+### Triggered Cleanups
+These are cleanups that occur when a certian capacity is met.  So if the ScanCommand returns a certain number of grids that's greater than the capacity set, the cleanup is triggered. 
+ 
+Triggered Cleanup Items Options:
+- Enabled - Enable / Disable this cleanup item
+- MaxCapacity - This is the amount of grids required to trigger this cleanup
+- MinutesAfterCapacity - This is the amount of minutes after the capacity is reach to run the cleanup
+- Reason - This is a text reason of why this cleanup is occuring.  It replaces %cleanup_reason% in a notification item.
+- ScanCommand - This is the command used to scan / delete when the cleanup occurs.  It is basically an /admin scan grids command like above, but you do not include the /admin scan grids part.  For example: nopower noownership would be the same as /admin scan nopower noownership
+
+### Notification Items
+These are items that let you give text notifications to users about pending cleanups.  These occur a set time before a cleanup takes place.  They will not run if the TimeBeforeCleanup is higher than the actual MinutesAfterCapacity for a triggered cleanup item.
+
+Cleanup Notification Item Options:
+- Enabled - Enable / Diable the notification item
+- Message - Message to send to all users about the pending cleanup.  Use the tag %cleanup_reason% which is replaced by the reason you specify in the cleanup items.
+- MinutesBeforeCleanup - The amount of time before a cleanup occurs for this message to occur.
 
 Dynamic Entity Management
 ------------------------------
@@ -200,6 +248,8 @@ Options:
 - DynamicConcealIncludeLargeGrids - When this is disabled, large grids and stations can not be concealed.  This is the safest mode, as then only small ships get concealed.  Once you enable this, large grids and stations without med bays can be concealed.  This requires more checks and is a bit more intensive, but results in the biggest increase in UPS.
 - DynamicConcealIncludeMedBays - When this is disabled, large grids with medbays are not disabled.  When enabled, large grids with med bays are concealed, but are revealed when a user logs in that can use that med bay.  Please note that there is a very tiny chance that a spawn point won't be shown when a user logs in and a grid is concealed.  All they need to do is hit "refresh" and it comes back.  The chance of this happening is VERY small.  (I've only ever seen it happen once)
 - DynamicShowMessages - When enabled, this shows when ships are concealed/revealed.  Some people consider it a bit spammy, so you can turn it off if you don't like the messages.  
+
+
 
 Waypoint System
 ---------------
