@@ -174,25 +174,25 @@ We have added an advanced grid scanning function.  This obsoletes the /admin sca
 If you run the scan by itself, it returns _all_ ships.  You then apply filters to the scan to weed out ships until you get a list of ships you want.  
 
 ### Filters
-terminal - The grid must contain a terminal block.  These are blocks that can have ownership for example, cockpit.
-noterminal - The grid must contain NO terminal blocks.
-functional - The grid must contain a functional block.  These are blocks that can be enabled / disabled.  They are also terminal blocks.
-nofunctional - The grid must contain NO functional blocks.
-ownership - The grid must have at least one block owned by a player.  This implies terminal, but also requires that the terminal be owned.
-noownership - The grid must have NO blocks owned by a player.
-power - The grid must have a valid power source.  Valid power source is defined as an enabled reactor with uranium in it, a battery with a charge, or a solar panel.
-nopower - The grid must NOT have a valid power source.
+- terminal - The grid must contain a terminal block.  These are blocks that can have ownership for example, cockpit.
+- noterminal - The grid must contain NO terminal blocks.
+- functional - The grid must contain a functional block.  These are blocks that can be enabled / disabled.  They are also terminal blocks.
+- nofunctional - The grid must contain NO functional blocks.
+- ownership - The grid must have at least one block owned by a player.  This implies terminal, but also requires that the terminal be owned.
+- noownership - The grid must have NO blocks owned by a player.
+- power - The grid must have a valid power source.  Valid power source is defined as an enabled reactor with uranium in it, a battery with a charge, or a solar panel.
+- nopower - The grid must NOT have a valid power source.
 
 ### Options
 These options can have fields with spaces in it, but if there are spaces, the entire option must be enclosed in quotes, for example: "hasdisplayname:Respawn Ship:exact"
 
-hasdisplayname:(name of ship):(exact) - This option allows you to filter by the name of a ship.  If you want to sort by a ship that has a space in it's name, please enclose the whole option in quotes.  Using the "exact" option also makes sure that it matches the name exactly.  Without the exact option a partial match can occur.
+- hasdisplayname:(name of ship):(exact) - This option allows you to filter by the name of a ship.  If you want to sort by a ship that has a space in it's name, please enclose the whole option in quotes.  Using the "exact" option also makes sure that it matches the name exactly.  Without the exact option a partial match can occur.
 
-ownedby:(name of player) - This option allows you to filter by owner of the ship. 
+- ownedby:(name of player) - This option allows you to filter by owner of the ship. 
 
-includesblocksubtype:(block subtype name):(count) - This option allows you to filter ships by ensuring the ship has the block you specify here.  The count lets you filter even further by ensuring the ship has multiple of that block.  For example if you want to find ships that have more than 25 drills on it, you'd specify: includesblocksubtype:Drill:26 - This scans for all ships that has 26 or more drills on it.
+- includesblocksubtype:(block subtype name):(count) - This option allows you to filter ships by ensuring the ship has the block you specify here.  The count lets you filter even further by ensuring the ship has multiple of that block.  For example if you want to find ships that have more than 25 drills on it, you'd specify: includesblocksubtype:Drill:26 - This scans for all ships that has 26 or more drills on it.
 
-excludesblocksubtype:(block subtype name):(count) - This option is the reverse of the last and filters ships if they do not have the block specified here.  Count allows you to filter further by specifying that the ship must have less than count blocks.
+- excludesblocksubtype:(block subtype name):(count) - This option is the reverse of the last and filters ships if they do not have the block specified here.  Count allows you to filter further by specifying that the ship must have less than count blocks.
 
 ### Examples
 - /admin scan grids - Returns all grids
