@@ -47,15 +47,33 @@ namespace EssentialsPlugin.ChatHandlers
 			if (!PluginSettings.Instance.WaypointsEnabled)
 				return false;
 
-			Communication.SendPrivateInformation(userId, "Personal Waypoints:");
+			bool dialog = false;
+			if(words.FirstOrDefault(x => x.ToLower() == "dialog") != null)
+				dialog = true;
+
+			if(!dialog)
+				Communication.SendPrivateInformation(userId, "Personal Waypoints:");
 
 			List<WaypointItem> items = Waypoints.Instance.Get(userId);
+			string waypoints = "";
 			foreach (WaypointItem item in items)
 			{
-				Communication.SendPrivateInformation(userId, string.Format("Waypoint {0}: \"{1}\"  Location: {2}", item.Name, item.Text, General.Vector3DToString(item.Position)));
+				if(waypoints != "")
+					waypoints += "\r\n";
+
+				waypoints += string.Format("Waypoint {0}: '{1}'  Location: {2}", item.Name, item.Text, General.Vector3DToString(item.Position));
 			}
 
-			Communication.SendPrivateInformation(userId, string.Format("Total waypoints: {0}", items.Count));
+			if(waypoints != "")
+				waypoints += "\r\n";
+
+			if(!dialog)
+				waypoints += string.Format("Total waypoints: {0}", items.Count);
+
+			if (!dialog)
+				Communication.SendPrivateInformation(userId, waypoints);
+			else
+				Communication.DisplayDialog(userId, "Waypoints", string.Format("Your defined waypoints: {0} waypoints", items.Count), waypoints);
 
 			return true;
 		}

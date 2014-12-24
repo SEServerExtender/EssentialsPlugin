@@ -13,38 +13,38 @@ using Sandbox.Common.ObjectBuilders;
 
 namespace EssentialsPlugin.Utility
 {
-	public class CleanupItem
+	public class TimedEntityCleanupItem
 	{
 		public long entityId;
 		public DateTime addedTime;
 		public Int32 secondsAfterAdding;
 	}
 
-	public class Cleanup
+	public class TimedEntityCleanup
 	{
-		private static Cleanup m_instance;
-		private List<CleanupItem> m_items;
+		private static TimedEntityCleanup m_instance;
+		private List<TimedEntityCleanupItem> m_items;
 
-		public static Cleanup Instance
+		public static TimedEntityCleanup Instance
 		{
 			get 			
 			{
 				if (m_instance == null)
-					m_instance = new Cleanup();
+					m_instance = new TimedEntityCleanup();
 
 				return m_instance; 
 			}
 		}
 
-		public Cleanup()
+		public TimedEntityCleanup()
 		{
 			m_instance = this;
-			m_items = new List<CleanupItem>();
+			m_items = new List<TimedEntityCleanupItem>();
 		}
 
 		public void Add(long entityId)
 		{
-			CleanupItem item = new CleanupItem();
+			TimedEntityCleanupItem item = new TimedEntityCleanupItem();
 			item.addedTime = DateTime.Now;
 			item.secondsAfterAdding = 5;
 			item.entityId = entityId;
@@ -62,7 +62,7 @@ namespace EssentialsPlugin.Utility
 
 				for (int r = m_items.Count() - 1; r >= 0; r--)
 				{
-					CleanupItem item = m_items[r];
+					TimedEntityCleanupItem item = m_items[r];
 
 					if (DateTime.Now - item.addedTime > TimeSpan.FromSeconds(item.secondsAfterAdding))
 					{

@@ -87,7 +87,7 @@ namespace EssentialsPlugin.Utility
 
 		public static string Vector3DToString(Vector3D vector)
 		{
-			return string.Format("({0:F2}, {1:F2}, {2:F2})", vector.X, vector.Y, vector.Z);
+			return string.Format("({0:F0}, {1:F0}, {2:F0})", vector.X, vector.Y, vector.Z);
 		}
 
 		public static bool InheritsOrImplements(this Type child, Type parent)

@@ -90,6 +90,16 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.ServerName = value; }
 		}
 
+		[Category("General")]
+		[Description("Should we allow users to see coordinates when they type /utility grids list if they own 100% of the ship?")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool ServerUtilityGridsShowCoords
+		{
+			get { return PluginSettings.Instance.ServerUtilityGridsShowCoords; }
+			set { PluginSettings.Instance.ServerUtilityGridsShowCoords = value; }
+		}
+
 		[Category("Information")]
 		[Description("Enabled / Disable Information Commands")]
 		[Browsable(true)]
@@ -356,9 +366,9 @@ namespace EssentialsPlugin
 			get { return PluginSettings.Instance.NewUserTransportDistance; }
 			set { PluginSettings.Instance.NewUserTransportDistance = value; }
 		}
-		/*
+
 		[Category("Automated New User Transport")]
-		[Description("Move all spawn ships no matter if the user is new or not")]
+		[Description("Move all spawn ships no matter if the user is new or not (Only works on login for now)")]
 		[Browsable(true)]
 		[ReadOnly(false)]
 		public bool NewUserTransportMoveAllSpawnShips
@@ -366,7 +376,17 @@ namespace EssentialsPlugin
 			get { return PluginSettings.Instance.NewUserTransportMoveAllSpawnShips;  }
 			set { PluginSettings.Instance.NewUserTransportMoveAllSpawnShips = value; }
 		}
-		*/
+
+		[Category("Automated New User Transport")]
+		[Description("Spawn only at asteroids that are this distance or less from center (0,0,0) - 0 means asteroids can be anywhere")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public int NewUserTransportAsteroidDistance
+		{
+			get { return PluginSettings.Instance.NewUserTransportAsteroidDistance; }
+			set { PluginSettings.Instance.NewUserTransportAsteroidDistance = value; }
+		}
+
 		[Category("Player Login Tracking")]
 		[Description("Enable / Disable Player Login Tracking.  This option tracks users login/logouts.  It also reads old logs to get player history.  It's recommended to enable this.")]
 		[Browsable(true)]
@@ -525,6 +545,61 @@ namespace EssentialsPlugin
 			}
 		}
 
+		[Category("Waypoint System")]
+		[Description("Server waypoints that every user will see and can not removed")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public MTObservableCollection<ServerWaypointItem> WaypointServerItems
+		{
+			get { return PluginSettings.Instance.WaypointServerItems; }
+		}
+
+		[Category("Waypoint System")]
+		[Description("Default waypoints added for a user if they have none or are new")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public MTObservableCollection<ServerWaypointItem> WaypointDefaultItems
+		{
+			get { return PluginSettings.Instance.WaypointDefaultItems; }
+		}
+
+		[Category("Automated Cleanup System")]
+		[Description("Enable / Disable automated cleanup")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool CleanupEnabled
+		{
+			get { return PluginSettings.Instance.CleanupEnabled; }
+			set { PluginSettings.Instance.CleanupEnabled = value; }				
+		}
+
+		[Category("Automated Cleanup System")]
+		[Description("Items that are triggered by a reached capacity.  These cleanup items will execute when a certain limit has been reached.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public MTObservableCollection<SettingsCleanupTriggerItem> CleanupTriggerItems
+		{
+			get { return PluginSettings.Instance.CleanupTriggerItems; }
+		}
+
+		[Category("Automated Cleanup System")]
+		[Description("Items that are triggered by time.  These items will execute when a certain time of the day is reached.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public MTObservableCollection<SettingsCleanupTimedItem> CleanupTimedItems
+		{
+			get { return PluginSettings.Instance.CleanupTimedItems; }
+		}
+
+		[Category("Automated Cleanup System")]
+		[Description("Notifications to users that a cleanup is about to occur.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public MTObservableCollection<SettingsCleanupNotificationItem> CleanupNotificationItems
+		{
+			get { return PluginSettings.Instance.CleanupNotificationItems; }
+		}
+
 		#endregion
 
 		#region Constructors and Initializers
@@ -551,6 +626,7 @@ namespace EssentialsPlugin
 			m_processHandlers.Add(new ProcessDockingZone());
 			m_processHandlers.Add(new ProcessConceal());
 			m_processHandlers.Add(new ProcessWaypoints());
+			m_processHandlers.Add(new ProcessCleanup());
 			
 			// Setup chat handlers
 			m_chatHandlers = new List<ChatHandlerBase>();
@@ -560,6 +636,7 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleMsg());
 			m_chatHandlers.Add(new HandleFaction());
 			m_chatHandlers.Add(new HandleFactionF());
+			m_chatHandlers.Add(new HandleMotd());
 
 			m_chatHandlers.Add(new HandleAdminScanAreaAt());          //
 			m_chatHandlers.Add(new HandleAdminScanAreaTowards());     //
@@ -582,10 +659,13 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleAdminDeleteNoBeacon());      //
 			m_chatHandlers.Add(new HandleAdminDeleteInactive());      //
 			m_chatHandlers.Add(new HandleAdminDeleteCleanup());
+			m_chatHandlers.Add(new HandleAdminDeleteGrids());
 
 			m_chatHandlers.Add(new HandleAdminSettings());
 			m_chatHandlers.Add(new HandleAdminNotify());
 			m_chatHandlers.Add(new HandleAdminBackup());
+			m_chatHandlers.Add(new HandleAdminRestart());
+			m_chatHandlers.Add(new HandleAdminMemory());
 
 			m_chatHandlers.Add(new HandleAdminOwnershipChange());     //
 

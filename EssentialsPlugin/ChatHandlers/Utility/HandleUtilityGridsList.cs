@@ -48,8 +48,12 @@ namespace EssentialsPlugin.ChatHandlers
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
 			int page = 1;
+			bool dialog = false;
 			if(words.Length > 0)
 			{
+				if (words[0] == "dialog")
+					dialog = true;
+
 				int.TryParse(words[0], out page);
 				if (page < 1)
 					page = 1;
@@ -77,25 +81,41 @@ namespace EssentialsPlugin.ChatHandlers
 			{
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
 
-				if (grid.BigOwners.Contains(playerId) || userId == 0)
+				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
+				if (grid == null)
+					continue;
+
+				if (CubeGrids.GetAllOwners(gridBuilder).Contains(playerId))
 				{
 					if(result != "")
 						result += "\r\n";
 
-					result += string.Format("Ship '{0}' ({1})", grid.DisplayName, grid.EntityId);
+					if(CubeGrids.IsFullOwner(gridBuilder, playerId) && !dialog)
+						result += string.Format("Grid '{0}' at {2}", grid.DisplayName, grid.EntityId, ShowCoordinates(grid.GetPosition()));
+					else if (CubeGrids.IsFullOwner(gridBuilder, playerId) && dialog)
+						result += string.Format("{0} - {1} - {2}bl - {3}", grid.DisplayName, ShowCoordinates(grid.GetPosition()), gridBuilder.CubeBlocks.Count, gridBuilder.GridSizeEnum);
+					else
+						result += string.Format("Grid '{0}'", grid.DisplayName, grid.EntityId);
+
 					count++;
 				}
 			}
-				
+
+			if (dialog)
+			{
+				Communication.SendClientMessage(userId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", "User Grid List", "Ships / Stations you ", "own:", result.Replace("\r\n", "|"), "OK"));
+				return true;
+			}
+
 			string[] resultLines = result.Split(new string[] {"\r\n"}, StringSplitOptions.None);
 
-			int pages = ((resultLines.Length - 1) / 7) + 1;
+			int pages = ((resultLines.Length - 1) / 6) + 1;
 
 			if (page > pages)
 				page = pages;
 
 			string output = "";
-			for (int r = ((page - 1) * 7); r < resultLines.Length && r < ((page) * 7); r++ )
+			for (int r = ((page - 1) * 6); r < resultLines.Length && r < ((page) * 6); r++ )
 			{
 				string line = resultLines[r];
 				if (output != "")
@@ -107,6 +127,14 @@ namespace EssentialsPlugin.ChatHandlers
 
 			Communication.SendPrivateInformation(userId, string.Format("Displaying page {0} of {1} - {2} grids", page, pages, count));
 			return true;
+		}
+
+		private string ShowCoordinates(Vector3D pos)
+		{
+			if (PluginSettings.Instance.ServerUtilityGridsShowCoords)
+				return General.Vector3DToString(pos);
+			else
+				return "(Unknown Postion)";
 		}
 	}
 }

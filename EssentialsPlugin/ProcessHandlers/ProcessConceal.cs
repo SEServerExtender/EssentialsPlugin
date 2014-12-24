@@ -45,7 +45,7 @@ namespace EssentialsPlugin.ProcessHandler
 			if (!PluginSettings.Instance.DynamicConcealEnabled)
 				return;
 
-			if (DateTime.Now - m_lastRevealCheck > TimeSpan.FromSeconds(5))
+			if (DateTime.Now - m_lastRevealCheck > TimeSpan.FromSeconds(4))
 			{
 				//Logging.WriteLineAndConsole("CheckAndRevealEntities");
 				EntityManagement.CheckAndRevealEntities();

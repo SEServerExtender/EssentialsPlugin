@@ -82,7 +82,7 @@ namespace EssentialsPlugin.ProcessHandler
 			}
 			*/
 			// Cleanup processing
-			Cleanup.Instance.Process();
+			TimedEntityCleanup.Instance.Process();
 
 			base.Handle();
 		}
@@ -101,9 +101,6 @@ namespace EssentialsPlugin.ProcessHandler
 				{
 					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)block;
 					command = beacon.CustomName;
-					CubeGridEntity cubeEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
-					cubeEntity.Dispose();
-
 					break;
 				}
 			}
@@ -111,8 +108,14 @@ namespace EssentialsPlugin.ProcessHandler
 			string player = entity.DisplayName.Replace("CommRelay", "");
 			long playerId = long.Parse(player);
 			ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerId(playerId);
-			Logging.WriteLineAndConsole(string.Format("COMMAND {1} - {2}: {0}", command, playerId, entity.EntityId));
 
+			Wrapper.GameAction(() =>
+			{
+				entity.DisplayName = "";
+				BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
+			});
+
+			Logging.WriteLineAndConsole(string.Format("COMMAND {1} - {2}: {0}", command, playerId, entity.EntityId));
 			if (!m_processedRelays.Contains(entity.EntityId))
 			{
 				m_processedRelays.Add(entity.EntityId);
@@ -166,12 +169,7 @@ namespace EssentialsPlugin.ProcessHandler
 			CubeGridEntity entity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "CommRelay.sbc"));
 			entity.EntityId = BaseEntity.GenerateEntityId();
 			entity.DisplayName = "CommRelayGlobal";
-
-			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent();
-			if (halfExtent == 0f)
-				halfExtent = 900000f;
-
-			entity.PositionAndOrientation = new MyPositionAndOrientation(MathUtility.GenerateRandomEdgeVector(), Vector3.Forward, Vector3.Up);
+			entity.PositionAndOrientation = new MyPositionAndOrientation(new Vector3D(MathUtility.GenerateRandomCoord(50000), MathUtility.GenerateRandomCoord(50000), MathUtility.GenerateRandomCoord(50000)), Vector3.Forward, Vector3.Up);
 
 			List<string> commands = new List<string>();
 			// Give a list of commands

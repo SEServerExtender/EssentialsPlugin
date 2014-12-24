@@ -3,16 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using EssentialsPlugin.Utility;
+using System.Threading;
+
 using Sandbox.ModAPI;
-using SEModAPIInternal.API.Common;
 using Sandbox.Common.ObjectBuilders;
 using VRageMath;
-using System.Threading;
+
+using SEModAPIInternal.API.Common;
 using SEModAPIInternal.API.Entity;
 using SEModAPIInternal.API.Entity.Sector.SectorObject;
 using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
 using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+
+using EssentialsPlugin.Utility;
+using EssentialsPlugin.Settings;
 
 namespace EssentialsPlugin.ProcessHandler
 {
@@ -71,11 +75,45 @@ namespace EssentialsPlugin.ProcessHandler
 						Logging.WriteLineAndConsole("Player in game, creating waypoints");
 						m_waypointAdd.Remove(steamId);
 
+						// Add defaults
+						if (Waypoints.Instance.Get(steamId).Count < 1)
+						{
+							foreach (ServerWaypointItem item in PluginSettings.Instance.WaypointDefaultItems)
+							{
+								WaypointItem newItem = new WaypointItem();
+								newItem.Name = item.Name;
+								newItem.Text = item.Name;
+								newItem.WaypointType = WaypointTypes.Neutral;
+								newItem.Position = new Vector3D(item.X, item.Y, item.Z);
+								newItem.SteamId = steamId;
+								Waypoints.Instance.Add(newItem);
+							}
+						}
+
 						List<WaypointItem> waypointItems = Waypoints.Instance.Get(steamId);
+						string waypoints = "";
 						foreach (WaypointItem item in waypointItems)
 						{
-							Communication.SendClientMessage(steamId, string.Format("/waypoint add \"{0}\" \"{1}\" {2} {3} {4} {5}", item.Name.ToLower(), item.Text, item.WaypointType.ToString(), item.Position.X, item.Position.Y, item.Position.Z));
+							if(waypoints != "")
+								waypoints += "\r\n";
+
+							waypoints += string.Format("/waypoint add \"{0}\" \"{1}\" {2} {3} {4} {5}", item.Name.ToLower(), item.Text, item.WaypointType.ToString(), item.Position.X, item.Position.Y, item.Position.Z);
 						}
+
+						// Add server waypoints
+						foreach (ServerWaypointItem item in PluginSettings.Instance.WaypointServerItems)
+						{
+							if (!item.Enabled)
+								continue;
+
+							if (waypoints != "")
+								waypoints += "\r\n";
+
+							waypoints += string.Format("/waypoint add \"{0}\" \"{0}\" Neutral {1} {2} {3}", item.Name, item.X, item.Y, item.Z);
+						}
+
+						if(waypoints != "")
+							Communication.SendClientMessage(steamId, waypoints);
 					}
 				}
 			}
@@ -90,8 +128,8 @@ namespace EssentialsPlugin.ProcessHandler
 
 			lock(m_waypointAdd)
 			{
-				if (Waypoints.Instance.Get(remoteUserId).Count < 1)
-					return;
+				//if (Waypoints.Instance.Get(remoteUserId).Count < 1)
+					//return;
 
 				m_waypointAdd.Add(remoteUserId);
 			}

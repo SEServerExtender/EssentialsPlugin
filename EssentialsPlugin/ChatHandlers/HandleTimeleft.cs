@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EssentialsPlugin.Utility;
 using EssentialsPlugin.Settings;
+using EssentialsPlugin.ProcessHandler;
 
 namespace EssentialsPlugin.ChatHandlers
 {
@@ -53,6 +54,9 @@ namespace EssentialsPlugin.ChatHandlers
 		private DateTime? GetNextRestartTime()
 		{
 			DateTime? result = null;
+
+			if (ProcessRestart.ForcedRestart != null)
+				return ProcessRestart.ForcedRestart;
 
 			foreach (RestartTimeItem item in PluginSettings.Instance.RestartTimeItems)
 			{

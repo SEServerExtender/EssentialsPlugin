@@ -111,6 +111,7 @@ namespace EssentialsPlugin.Utility
 		Enemy
 	}
 
+	[Serializable]
 	public class WaypointItem
 	{
 		private ulong steamId;

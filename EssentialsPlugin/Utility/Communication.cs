@@ -64,7 +64,7 @@ namespace EssentialsPlugin.Utility
 			}
 
 			SectorObjectManager.Instance.AddEntity(entity);
-			Cleanup.Instance.Add(entityId);
+			TimedEntityCleanup.Instance.Add(entityId);
 		}
 
 		public static void SendBroadcastMessage(string message)
@@ -73,7 +73,7 @@ namespace EssentialsPlugin.Utility
 			long entityId = BaseEntity.GenerateEntityId();
 			entity.EntityId = entityId;
 			entity.DisplayName = string.Format("CommRelayBroadcast{0}", m_random.Next(1, 10000));
-			entity.PositionAndOrientation = new MyPositionAndOrientation(MathUtility.GenerateRandomEdgeVector(), Vector3.Forward, Vector3.Up);
+			entity.PositionAndOrientation = new MyPositionAndOrientation(Vector3D.Zero, Vector3.Forward, Vector3.Up);
 
 			foreach (MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks)
 			{
@@ -85,7 +85,7 @@ namespace EssentialsPlugin.Utility
 			}
 
 			SectorObjectManager.Instance.AddEntity(entity);
-			Cleanup.Instance.Add(entityId);
+			TimedEntityCleanup.Instance.Add(entityId);
 		}
 
 		public static void SendFactionClientMessage(ulong playerSteamId, String message)
@@ -102,6 +102,13 @@ namespace EssentialsPlugin.Utility
 		public static void Notification(ulong steamId, MyFontEnum color, int timeInSeconds, string message)
 		{
 			SendClientMessage(steamId, string.Format("/notification {0} {1} {2}", color, timeInSeconds, message));
+		}
+
+		// 
+
+		public static void DisplayDialog(ulong steamId, string header, string subheader, string content, string buttonText="OK")
+		{
+			SendClientMessage(steamId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", header, subheader, " ", content.Replace("\r\n", "|"), buttonText));
 		}
 	}
 }

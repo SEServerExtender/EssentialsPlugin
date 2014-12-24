@@ -393,6 +393,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
+				m_instance = new Players();
 				Logging.WriteLineAndConsole(string.Format("LoginTracking Load Error: {0}", ex.ToString()));
 			}
 		}

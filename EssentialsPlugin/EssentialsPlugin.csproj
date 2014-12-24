@@ -43,6 +43,7 @@
     <Compile Include="ChatHandlers\AdminConceal\HandleAdminConceal.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteInactive.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteCleanup.cs" />
+    <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteGrids.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveGridTo.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayer.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayerListInactive.cs" />
@@ -67,12 +68,15 @@
     <Compile Include="ChatHandlers\HandleAdminBackup.cs" />
     <Compile Include="ChatHandlers\HandleAdminOwnershipChange.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanInactive.cs" />
+    <Compile Include="ChatHandlers\HandleAdminRestart.cs" />
+    <Compile Include="ChatHandlers\HandleAdminMemory.cs" />
     <Compile Include="ChatHandlers\HandleAdminTest.cs" />
     <Compile Include="ChatHandlers\HandleAdminNotify.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteGridsArea.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanNoBeacon.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanAreaAt.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveAreaToPosition.cs" />
+    <Compile Include="ChatHandlers\HandleMotd.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointList.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointRemove.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointAdd.cs" />
@@ -91,6 +95,7 @@
       <DependentUpon>ControlForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core.cs" />
+    <Compile Include="ProcessHandlers\ProcessCleanup.cs" />
     <Compile Include="ProcessHandlers\ProcessDockingZone.cs" />
     <Compile Include="ProcessHandlers\ProcessConceal.cs" />
     <Compile Include="ProcessHandlers\ProcessWaypoints.cs" />
@@ -110,18 +115,22 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Settings\SettingsCleanupNotificationItem.cs" />
+    <Compile Include="Settings\SettingsCleanupTriggerItem.cs" />
+    <Compile Include="Settings\SettingsCleanupTimedItem.cs" />
     <Compile Include="Settings\SettingsGreetingDialogItem.cs" />
     <Compile Include="Settings\SettingsBackupItem.cs" />
     <Compile Include="Settings\SettingsInformationItem.cs" />
     <Compile Include="Settings\SettingsProtectedItem.cs" />
     <Compile Include="Settings\SettingsRestartItem.cs" />
     <Compile Include="Settings\SettingsRestartNotificationItem.cs" />
+    <Compile Include="Settings\SettingsServerWaypointItem.cs" />
     <Compile Include="UtilityClasses\MTObservableCollection.cs" />
     <Compile Include="UtilityClasses\OrientedBoundingBox.cs" />
     <Compile Include="UtilityClasses\SerializeableDictionary.cs" />
     <Compile Include="UtilityClasses\UIEditors.cs" />
     <Compile Include="Utility\Backup.cs" />
-    <Compile Include="Utility\Cleanup.cs" />
+    <Compile Include="Utility\TimedEntityCleanup.cs" />
     <Compile Include="Utility\Communication.cs" />
     <Compile Include="Utility\CubeGrid.cs" />
     <Compile Include="Utility\DockingZone.cs" />

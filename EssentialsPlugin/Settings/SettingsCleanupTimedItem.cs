@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Drawing.Design;
 
@@ -6,10 +10,11 @@ using EssentialsPlugin.UtilityClasses;
 
 namespace EssentialsPlugin.Settings
 {
-	[Serializable]
-	public class RestartTimeItem
+	public class SettingsCleanupTimedItem
 	{
 		public DateTime Restart;
+		public List<SettingsCleanupNotificationItem> NotificationItemsRan = new List<SettingsCleanupNotificationItem>();
+		public DateTime LastRan = DateTime.Now.AddDays(-1);
 
 		private bool enabled;
 		public bool Enabled
@@ -30,11 +35,18 @@ namespace EssentialsPlugin.Settings
 			}
 		}
 
-		public RestartTimeItem()
+		private string scanCommand;
+		public string ScanCommand
 		{
-			enabled = false;
-			restartTime = DateTime.Now.AddHours(1).ToString("HH:mm");
-			Restart = DateTime.Now.AddHours(1);
+			get { return scanCommand; }
+			set { scanCommand = value; }
+		}
+
+		private string reason;
+		public string Reason
+		{
+			get { return reason; }
+			set { reason = value; }
 		}
 	}
 }

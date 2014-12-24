@@ -18,8 +18,16 @@ namespace EssentialsPlugin.ProcessHandler
 {
 	class ProcessRestart : ProcessHandlerBase
 	{
+		static private DateTime? m_forcedRestart = null;
+
 		private DateTime m_start;
 		private int m_done = -1;
+
+		static public DateTime? ForcedRestart
+		{
+			get { return m_forcedRestart; }
+			set { m_forcedRestart = value; }
+		}
 
 		public ProcessRestart()
 		{
@@ -136,6 +144,9 @@ namespace EssentialsPlugin.ProcessHandler
 		private DateTime? GetNextRestartTime()
 		{
 			DateTime? result = null;
+
+			if (m_forcedRestart != null)
+				return m_forcedRestart;
 
 			foreach (RestartTimeItem item in PluginSettings.Instance.RestartTimeItems)
 			{

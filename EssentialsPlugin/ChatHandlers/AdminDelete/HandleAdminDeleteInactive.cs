@@ -91,32 +91,26 @@ namespace EssentialsPlugin.ChatHandlers
 
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(grid.EntityId);
+				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
+				if (gridBuilder == null)
+					continue;
 
 				// This entity is protected by whitelist
 				if (PluginSettings.Instance.LoginEntityWhitelist.Length > 0 && PluginSettings.Instance.LoginEntityWhitelist.Contains(grid.EntityId.ToString()))
 					continue;
 
-				if (grid.BigOwners.Count < 1 && removeOwnerless)
+				if (CubeGrids.GetAllOwners(gridBuilder).Count < 1 && removeOwnerless)
 				{
 					Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) not owned by anyone.", gridEntity.Name, entity.EntityId));
 					entitiesFound.Add(entity);
 					continue;
 				}
 
-				// TODO proper checking for coowned ships
-				//bool coowned = false;
-				if(grid.BigOwners.Count > 1)
-				{
-					continue;
-				}
-
-				foreach (long player in grid.BigOwners)
+				foreach (long player in CubeGrids.GetBigOwners(gridBuilder))
 				{
 					// This playerId is protected by whitelist
 					if (PluginSettings.Instance.LoginPlayerIdWhitelist.Length > 0 && PluginSettings.Instance.LoginPlayerIdWhitelist.Contains(player.ToString()))
-					{
-						break;
-					}
+						continue;
 
 					MyObjectBuilder_Checkpoint.PlayerItem checkItem = PlayerMap.Instance.GetPlayerItemFromPlayerId(player);
 					if (checkItem.IsDead || checkItem.Name == "")
@@ -133,14 +127,12 @@ namespace EssentialsPlugin.ChatHandlers
 						{
 							Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) owned by a player with no login info: {2}", gridEntity.Name, entity.EntityId, checkItem.Name));
 							entitiesFound.Add(entity);
-							continue;
 						}
 					}
 					else if (item.LastLogin < DateTime.Now.AddDays(days * -1))
 					{
 						Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) owned by inactive player: {2}", gridEntity.Name, entity.EntityId, PlayerMap.Instance.GetPlayerItemFromPlayerId(player).Name));
 						entitiesFound.Add(entity);
-						continue;
 					}
 				}
 			}

@@ -30,6 +30,7 @@ namespace EssentialsPlugin
 		private static DateTime m_start;
 
 		private string m_serverName;
+		private bool m_serverUtilityGridsShowCoords;
 
 		private bool m_informationEnabled;
 		private MTObservableCollection<InformationItem> m_informationItems;
@@ -58,6 +59,8 @@ namespace EssentialsPlugin
 		private bool m_newUserTransportEnabled;
 		private int m_newUserTransportDistance;
 		private bool m_newUserTransportMoveAllSpawnShips;
+		private int m_newUserTransportAsteroidDistance;
+		private string[] m_NewUserTransportSpawnShipNames = new string[] { };
 
 		private bool m_loginEnabled;
 		private string[] m_loginEntityWhitelist = new string[] { };
@@ -78,6 +81,13 @@ namespace EssentialsPlugin
 
 		private bool m_waypointsEnabled;
 		private int m_waypointsMaxPerPlayer;
+		private MTObservableCollection<ServerWaypointItem> m_waypointServerItems;
+		private MTObservableCollection<ServerWaypointItem> m_waypointDefaultItems;
+
+		private bool m_cleanupEnabled;
+		private MTObservableCollection<SettingsCleanupTriggerItem> m_cleanupTriggerItems;
+		private MTObservableCollection<SettingsCleanupTimedItem> m_cleanupTimedItems;
+		private MTObservableCollection<SettingsCleanupNotificationItem> m_cleanupNotificationItems;
 
 		#endregion
 
@@ -111,6 +121,16 @@ namespace EssentialsPlugin
 			set
 			{
 				m_serverName = value;
+				Save();
+			}
+		}
+
+		public bool ServerUtilityGridsShowCoords
+		{
+			get { return m_serverUtilityGridsShowCoords; }
+			set 
+			{ 
+				m_serverUtilityGridsShowCoords = value;
 				Save();
 			}
 		}
@@ -335,6 +355,16 @@ namespace EssentialsPlugin
 			}
 		}
 
+		public int NewUserTransportAsteroidDistance
+		{
+			get { return m_newUserTransportAsteroidDistance; }
+			set 
+			{
+				m_newUserTransportAsteroidDistance = value;
+				Save();
+			}
+		}
+
 		public bool NewUserTransportMoveAllSpawnShips
 		{
 			get { return m_newUserTransportMoveAllSpawnShips; }
@@ -496,6 +526,58 @@ namespace EssentialsPlugin
 				Save();
 			}
 		}
+
+		public MTObservableCollection<ServerWaypointItem> WaypointServerItems
+		{
+			get { return m_waypointServerItems; }
+			set { m_waypointServerItems = value; }
+		}
+
+		public MTObservableCollection<ServerWaypointItem> WaypointDefaultItems
+		{
+			get { return m_waypointDefaultItems; }
+			set { m_waypointDefaultItems = value; }
+		}
+
+		public bool CleanupEnabled
+		{
+			get { return m_cleanupEnabled; }
+			set 
+			{ 
+				m_cleanupEnabled = value;
+				Save();
+			}
+		}
+
+		public MTObservableCollection<SettingsCleanupTriggerItem> CleanupTriggerItems
+		{
+			get { return m_cleanupTriggerItems; }
+			set 
+			{
+				m_cleanupTriggerItems = value;
+				Save();
+			}
+		}
+
+		public MTObservableCollection<SettingsCleanupTimedItem> CleanupTimedItems
+		{
+			get { return m_cleanupTimedItems; }
+			set 
+			{ 
+				m_cleanupTimedItems = value;
+				Save();
+			}
+		}
+
+		public MTObservableCollection<SettingsCleanupNotificationItem> CleanupNotificationItems
+		{
+			get { return m_cleanupNotificationItems; }
+			set 
+			{ 
+				m_cleanupNotificationItems = value;
+				Save();
+			}
+		}
 		#endregion
 
 		#region Constructor
@@ -528,7 +610,22 @@ namespace EssentialsPlugin
 			m_dynamicShowMessages = false;
 
 			m_dockingShipsPerZone = 1;
+
+			m_newUserTransportAsteroidDistance = 0;
+
+			m_waypointServerItems = new MTObservableCollection<ServerWaypointItem>();
+			m_waypointServerItems.CollectionChanged += ItemsCollectionChanged;
+			m_waypointDefaultItems = new MTObservableCollection<ServerWaypointItem>();
+			m_waypointDefaultItems.CollectionChanged += ItemsCollectionChanged;
+
+			m_cleanupTriggerItems = new MTObservableCollection<SettingsCleanupTriggerItem>();
+			m_cleanupTriggerItems.CollectionChanged += ItemsCollectionChanged;
+			m_cleanupTimedItems = new MTObservableCollection<SettingsCleanupTimedItem>();
+			m_cleanupTimedItems.CollectionChanged += ItemsCollectionChanged;
+			m_cleanupNotificationItems = new MTObservableCollection<SettingsCleanupNotificationItem>();
+			m_cleanupNotificationItems.CollectionChanged += ItemsCollectionChanged;
 		}
+
 
 		#endregion
 

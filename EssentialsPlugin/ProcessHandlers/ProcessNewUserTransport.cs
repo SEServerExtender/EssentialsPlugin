@@ -177,7 +177,7 @@ namespace EssentialsPlugin.ProcessHandler
 						CubeGridEntity gridEntity = new CubeGridEntity(cubeGrid);
 						gridEntity.PositionAndOrientation = CubeGrids.CreatePositionAndOrientation(validPosition, asteroidPosition);
 						SectorObjectManager.Instance.AddEntity(gridEntity);
-						Communication.SendPrivateInformation(steamId, string.Format("You have been moved!  You should be within {0} meters of an asteroid.  Good luck.", PluginSettings.Instance.NewUserTransportDistance));
+						Communication.SendPrivateInformation(steamId, string.Format("You have been moved!  You should be within {0} meters of an asteroid.", PluginSettings.Instance.NewUserTransportDistance));
 					}
 				}
 			}
@@ -190,7 +190,7 @@ namespace EssentialsPlugin.ProcessHandler
 			if (!PluginSettings.Instance.NewUserTransportEnabled)
 				return;
 
-			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Count() > 0)
+			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Count() > 0 && !PluginSettings.Instance.NewUserTransportMoveAllSpawnShips)
 				return;
 
 			lock (m_newUserList)
@@ -230,6 +230,10 @@ namespace EssentialsPlugin.ProcessHandler
 				int choice = m_random.Next(0, voxelMaps.Count - r);
 				VoxelMap voxelMap = voxelMaps[choice];
 				voxelMaps.RemoveAt(choice);
+
+				if (PluginSettings.Instance.NewUserTransportAsteroidDistance > 0 && Vector3D.Distance(voxelMap.Position, Vector3D.Zero) > PluginSettings.Instance.NewUserTransportAsteroidDistance)
+					continue;
+
 				if (voxelMap.Materials.Count > 3)
 				{
 					Logging.WriteLineAndConsole(string.Format("Found asteroid with viable materials: {0} - {1}", voxelMap.Name, voxelMap.Materials.Count()));

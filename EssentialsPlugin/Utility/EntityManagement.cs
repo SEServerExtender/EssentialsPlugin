@@ -39,13 +39,29 @@ namespace EssentialsPlugin.Utility
 
 				Wrapper.GameAction(() =>
 				{
-					MyAPIGateway.Players.GetPlayers(players);
+					try
+					{
+						MyAPIGateway.Players.GetPlayers(players);
+					}
+					catch(Exception ex)
+					{
+						Logging.WriteLineAndConsole(string.Format("Error getting players list.  Check and Conceal failed: {0}", ex.ToString()));
+						return;
+					}
 
 					//CubeGrids.GetConnectedGrids(entities);
 				});
 
-				MyAPIGateway.Entities.GetEntities(entities);
-
+				try
+				{
+					MyAPIGateway.Entities.GetEntities(entities);
+				}
+				catch
+				{
+					Logging.WriteLineAndConsole("CheckAndConcealEntities(): Error getting entity list, skipping check");
+					return;
+				}
+				
 				CubeGrids.GetBlocksUnconnected(entitiesFound, entities);
 
 				HashSet<IMyEntity> entitiesToConceal = new HashSet<IMyEntity>();
@@ -129,119 +145,6 @@ namespace EssentialsPlugin.Utility
 
 		private static bool CheckConcealBlockRules(IMyCubeGrid grid, List<IMyPlayer> players)
 		{
-			/*
-			MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
-
-			if (gridBuilder == null)
-				return false;
-
-			if (!CubeGrids.DoesGridHavePowerSupply(gridBuilder) && !CubeGrids.DoesGridHaveFourBeacons(gridBuilder))
-				return false;
-
-			int beaconCount = 0;
-			foreach (MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
-			{
-				if (block is MyObjectBuilder_Beacon)
-				{
-					beaconCount++;
-					// Keep this return here, as 4 beacons always means true
-					if (beaconCount >= 4)
-					{
-						return true;
-					}
-
-					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)block;
-					if (!beacon.Enabled)
-						continue;
-
-					foreach (IMyPlayer player in players)
-					{
-						double distance = 0d;
-						if (GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
-						{
-							if (distance < beacon.BroadcastRadius)
-							{
-								return true;
-							}
-						}
-					}
-				}
-
-				if (block is MyObjectBuilder_RadioAntenna)
-				{
-					MyObjectBuilder_RadioAntenna antenna = (MyObjectBuilder_RadioAntenna)block;
-
-					if (!antenna.Enabled)
-						continue;
-
-					foreach (IMyPlayer player in players)
-					{
-						double distance = 0d;
-						if (GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
-						{
-							if (distance < antenna.BroadcastRadius)
-							{
-								return true;
-							}
-						}
-					}
-				}
-
-				if (block is MyObjectBuilder_MedicalRoom)
-				{
-					MyObjectBuilder_MedicalRoom medical = (MyObjectBuilder_MedicalRoom)block;
-
-					if (!medical.Enabled)
-						continue;
-
-					if (PluginSettings.Instance.ConcealIncludeMedBays)
-					{
-						foreach (ulong connectedPlayer in PlayerManager.Instance.ConnectedPlayers)
-						{
-							if (PlayerMap.Instance.GetPlayerIdsFromSteamId(connectedPlayer).Count < 1)
-								continue;
-
-							long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(connectedPlayer).First();
-							if (medical.Owner == playerId || (medical.ShareMode == MyOwnershipShareModeEnum.Faction && Player.CheckPlayerSameFaction(medical.Owner, playerId)))
-							{
-								return true;
-							}
-						}
-					}
-					else
-					{
-						return true;
-					}
-				}
-
-				if (block is MyObjectBuilder_ProductionBlock)
-				{
-					MyObjectBuilder_ProductionBlock production = (MyObjectBuilder_ProductionBlock)block;
-					if (!production.Enabled)
-						continue;
-
-					IMyEntity cubeBlock = null;
-					if (!MyAPIGateway.Entities.TryGetEntityById(block.EntityId, out cubeBlock))
-						continue;
-
-					Sandbox.ModAPI.Ingame.IMyProductionBlock productionBlock = (Sandbox.ModAPI.Ingame.IMyProductionBlock)cubeBlock;
-					if (productionBlock.IsProducing)
-					{
-						//found = true;
-						return true;
-					}
-				}
-
-			}
-			MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
-			if (gridBuilder == null)
-				return false;
-
-			if(!CubeGrids.DoesGridHavePowerSupply(gridBuilder) && !CubeGrids.DoesGridHaveFourBeacons(gridBuilder))
-				return false;
-
-			 */
- 
 			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
 
 			// Live dangerously
@@ -370,30 +273,8 @@ namespace EssentialsPlugin.Utility
 						return true;
 					}
 				}
-
-				/*
-				MyObjectBuilder_CubeBlock blockBuilder = null;
-				try
-				{
-					blockBuilder = cubeBlock.GetObjectBuilderCubeBlock();
-				}
-				catch
-				{
-					continue;
-				}
-				 * 
-				if (block.FatBlock.EntityId == 0)
-					continue;
-
-				if(CubeGrids.DoesBlockSupplyPower(gridBuilder.CubeBlocks.FirstOrDefault(x => x.EntityId == cubeBlock.EntityId)))
-				{
-					powered = true;
-				}
-				 * */
 			}
 
-			//if (found && powered)
-			//	return true;
 			return false;
 		}
 
@@ -576,87 +457,7 @@ namespace EssentialsPlugin.Utility
 
 		private static bool CheckRevealBlockRules(IMyCubeGrid grid, List<IMyPlayer> players, out string reason)
 		{
-			reason = "";
-			/*
-			MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
-			
-			if (gridBuilder == null)
-				return false;
-
-			if (!CubeGrids.DoesGridHavePowerSupply(gridBuilder) && !CubeGrids.DoesGridHaveFourBeacons(gridBuilder))
-				return false;
-
-			foreach (MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
-			{
-				if (block is MyObjectBuilder_Beacon)
-				{
-					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)block;
-					if (!beacon.Enabled)
-						continue;
-
-					foreach (IMyPlayer player in players)
-					{
-						double distance = 0d;
-						if (GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
-						{
-							if (distance < beacon.BroadcastRadius)
-							{
-								return true;
-							}
-						}
-					}
-				}
-
-				if (block is MyObjectBuilder_RadioAntenna)
-				{
-					MyObjectBuilder_RadioAntenna antenna = (MyObjectBuilder_RadioAntenna)block;
-
-					if (!antenna.Enabled)
-						continue;
-
-					foreach (IMyPlayer player in players)
-					{
-						double distance = 0d;
-						if (GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
-						{
-							if (distance < antenna.BroadcastRadius)
-							{
-								return true;
-							}
-						}
-					}
-				}
-
-				if (block is MyObjectBuilder_MedicalRoom)
-				{
-					MyObjectBuilder_MedicalRoom medical = (MyObjectBuilder_MedicalRoom)block;
-
-					if (!medical.Enabled)
-						continue;
-
-					if (PluginSettings.Instance.ConcealIncludeMedBays)
-					{
-						foreach (ulong connectedPlayer in PlayerManager.Instance.ConnectedPlayers)
-						{
-							//if (PlayerMap.Instance.GetPlayerIdsFromSteamId(connectedPlayer).Count < 1)
-								//continue;
-
-							//long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(connectedPlayer).First();
-							long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(connectedPlayer);
-							if (medical.Owner == playerId || (medical.ShareMode == MyOwnershipShareModeEnum.Faction && Player.CheckPlayerSameFaction(medical.Owner, playerId)))
-							{
-								return true;
-							}
-						}
-					}
-					else
-					{
-						return true;
-					}
-				}
-			}
-		    */
-			
+			reason = "";			
 			// This is actually faster, but doesn't include power checks
 			
 			// Live dangerously
@@ -799,9 +600,9 @@ namespace EssentialsPlugin.Utility
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				long ownerId = 0;
 				string ownerName = "";
-				if (CubeGrids.GetOwner(builder, out ownerId))
+				if (CubeGrids.GetBigOwners(builder).Count > 0)
 				{
-					//ownerId = grid.BigOwners.First();
+					ownerId = CubeGrids.GetBigOwners(builder).First();
 					ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
 				}
 				/*
@@ -815,12 +616,12 @@ namespace EssentialsPlugin.Utility
 
 				if(m_removedGrids.Contains(entity.EntityId))
 				{
-					Logging.WriteLineAndConsole("Conceal", string.Format("Revealing - Id: {0} DUPE FOUND Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId, reason));
+					Logging.WriteLineAndConsole("Conceal", string.Format("Revealing - Id: {0} DUPE FOUND Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
 				}
 				else
 				{
-					Logging.WriteLineAndConsole("Conceal", string.Format("Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId, reason));
+					Logging.WriteLineAndConsole("Conceal", string.Format("Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
 
 					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
 					if (newEntity == null)
@@ -835,7 +636,7 @@ namespace EssentialsPlugin.Utility
 					List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>();
 					addList.Add(builder);
 					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
-					Logging.WriteLineAndConsole("Conceal", string.Format("End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId, reason));
+					Logging.WriteLineAndConsole("Conceal", string.Format("End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
 				}
 			});
 		}
@@ -868,9 +669,9 @@ namespace EssentialsPlugin.Utility
 					IMyCubeGrid grid = (IMyCubeGrid)entity;
 					long ownerId = 0;
 					string ownerName = "";
-					if (grid.BigOwners.Count > 0)
+					if (CubeGrids.GetBigOwners(builder).Count > 0)
 					{
-						ownerId = grid.BigOwners.First();
+						ownerId = CubeGrids.GetBigOwners(builder).First();
 						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
 					}
 
