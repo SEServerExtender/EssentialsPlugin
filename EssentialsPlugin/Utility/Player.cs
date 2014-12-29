@@ -522,7 +522,7 @@ namespace EssentialsPlugin.Utility
 			return null;
 		}
 
-		public static void ProcessServerLogsForLogins()
+		public static void ProcessServerLogsForLogins(bool restart = false)
 		{
 			if (m_checking)
 				return;
@@ -540,6 +540,9 @@ namespace EssentialsPlugin.Utility
 					DateTime start = DateTime.Now;
 					Parallel.ForEach(files, currentFile =>
 					{
+						if (DateTime.Now - File.GetCreationTime(currentFile) > TimeSpan.FromDays(20))
+							return;
+
 						string fileText;
 						try
 						{

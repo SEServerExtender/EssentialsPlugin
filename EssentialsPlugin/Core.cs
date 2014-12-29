@@ -387,6 +387,16 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.NewUserTransportAsteroidDistance = value; }
 		}
 
+		[Category("Automated New User Transport")]
+		[Description("Type of spawn point we use.  Asteroids = we spawn near asteroids.  Origin = we spawn near origin.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public NewUserTransportSpawnPoint NewUserTransportSpawnType
+		{
+			get { return PluginSettings.Instance.NewUserTransportSpawnType; }
+			set { PluginSettings.Instance.NewUserTransportSpawnType = value; }
+		}
+
 		[Category("Player Login Tracking")]
 		[Description("Enable / Disable Player Login Tracking.  This option tracks users login/logouts.  It also reads old logs to get player history.  It's recommended to enable this.")]
 		[Browsable(true)]

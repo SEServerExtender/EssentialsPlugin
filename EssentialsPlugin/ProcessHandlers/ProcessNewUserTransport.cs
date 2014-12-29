@@ -33,27 +33,36 @@ namespace EssentialsPlugin.ProcessHandler
 		private void Init()
 		{
 			// Cache asteroids
-			Thread thread = new Thread((Object state) =>
+			if (PluginSettings.Instance.NewUserTransportSpawnType == NewUserTransportSpawnPoint.Asteroids)
 			{
-				List<VoxelMap> voxels = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>();
-				Thread.Sleep(10000);
-				voxels = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>();
-
-				Logging.WriteLineAndConsole("Starting Voxel Caching .. This might take awhile");
-				foreach (VoxelMap voxel in voxels)
+				Logging.WriteLineAndConsole(string.Format("Voxel Caching Initializing"));
+				Thread thread = new Thread((Object state) =>
 				{
-					DateTime start = DateTime.Now;
-					int voxelMaterialCount = voxel.Materials.Count;
-					Logging.WriteLineAndConsole(string.Format("Caching Voxel: {0} - {1} (Took: {2}s)", voxel.Name, voxelMaterialCount, (DateTime.Now - start).TotalSeconds));
-				}
-				Logging.WriteLineAndConsole("Completed Voxel Caching");
+					List<VoxelMap> voxels = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>();
+					Thread.Sleep(10000);
+					voxels = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>();
 
-				m_ready = true;
+					Logging.WriteLineAndConsole(string.Format("Starting Voxel Caching .. This might take awhile: {0} voxels", voxels.Count));
+					int count = 0;
+					foreach (VoxelMap voxel in voxels)
+					{
+						DateTime start = DateTime.Now;
+						Logging.WriteLineAndConsole(string.Format("Caching Voxel: {0}", voxel.Name));
+						int voxelMaterialCount = voxel.Materials.Count;
+						Logging.WriteLineAndConsole(string.Format("Caching Voxel: {0} - {1} (Took: {2}s)", voxel.Name, voxelMaterialCount, (DateTime.Now - start).TotalSeconds));
+						count++;
+					}
+					Logging.WriteLineAndConsole(string.Format("Completed Voxel Caching: {0}", count));
 
-			});
-			thread.Priority = ThreadPriority.BelowNormal;
-			thread.IsBackground = true;
-			thread.Start();
+					m_ready = true;
+
+				});
+				thread.Priority = ThreadPriority.BelowNormal;
+				thread.IsBackground = true;
+				thread.Start();
+			}
+
+			m_ready = true;
 
 			/*
 			ThreadPool.QueueUserWorkItem(new WaitCallback((object state) =>
@@ -141,7 +150,11 @@ namespace EssentialsPlugin.ProcessHandler
 
 						Vector3D validPosition = Vector3D.Zero;
 						Vector3D asteroidPosition = Vector3D.Zero;
-						FindViableAsteroid(out validPosition, out asteroidPosition);
+
+						if(PluginSettings.Instance.NewUserTransportSpawnType == NewUserTransportSpawnPoint.Asteroids)
+							FindViableAsteroid(out validPosition, out asteroidPosition);
+						else if(PluginSettings.Instance.NewUserTransportSpawnType == NewUserTransportSpawnPoint.Origin)
+							validPosition = MathUtility.RandomPositionFromPoint(Vector3D.Zero, PluginSettings.Instance.NewUserTransportDistance);
 
 						if(validPosition == Vector3D.Zero)
 						{
@@ -149,12 +162,42 @@ namespace EssentialsPlugin.ProcessHandler
 							continue;
 						}
 
-						Communication.SendPrivateInformation(steamId, string.Format("Welcome {0}.  We are moving you closer to an asteroid ... please stand by ...", PlayerMap.Instance.GetPlayerNameFromSteamId(steamId)));
+						Logging.WriteLineAndConsole(string.Format("Attempting to move user to: {0}", General.Vector3DToString(validPosition)));
+						player.Controller.ControlledEntity.Use();
+						Thread.Sleep(100);
+						BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
+						MyAPIGateway.Entities.RemapObjectBuilder(cubeGrid);
+						cubeGrid.PositionAndOrientation = new MyPositionAndOrientation(validPosition, Vector3.Forward, Vector3.Up);
 
-						CubeGridEntity grid = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
-						if (!CubeGrids.WaitForLoadingEntity(grid))
-							continue;
+						IMyEntity newEntity = null;
+						Wrapper.GameAction(() =>
+						{
+							newEntity = MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(cubeGrid);
+							List<MyObjectBuilder_EntityBase> list = new List<MyObjectBuilder_EntityBase>();
+							list.Add(cubeGrid);
+							MyAPIGateway.Multiplayer.SendEntitiesCreated(list);
+						});
 
+
+							/*
+						CubeGridEntity gridEntity = new CubeGridEntity(cubeGrid);
+						gridEntity.PositionAndOrientation = CubeGrids.CreatePositionAndOrientation(validPosition, asteroidPosition);
+						SectorObjectManager.Instance.AddEntity(gridEntity);
+													    */
+
+						/*
+						Wrapper.GameAction(() =>
+						{
+							MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(cubeGrid);
+						});
+						*/
+
+						//Communication.SendPrivateInformation(steamId, string.Format("Welcome {0}.  We are moving you closer to an asteroid ... please stand by ...", PlayerMap.Instance.GetPlayerNameFromSteamId(steamId)));
+
+						//CubeGridEntity grid = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
+						//if (!CubeGrids.WaitForLoadingEntity(grid))
+						//	continue;
+						/*
 						foreach(CubeBlockEntity block in grid.CubeBlocks)
 						{
 							if(block is CockpitEntity)
@@ -163,9 +206,9 @@ namespace EssentialsPlugin.ProcessHandler
 								Logging.WriteLineAndConsole(string.Format("Removing User From Cockpit: {0}", steamId));
 							}
 						}
-						
-						Thread.Sleep(500);
-						grid.Dispose();
+						*/
+
+						/*
 
 //						Wrapper.GameAction(() =>
 //						{
@@ -177,7 +220,8 @@ namespace EssentialsPlugin.ProcessHandler
 						CubeGridEntity gridEntity = new CubeGridEntity(cubeGrid);
 						gridEntity.PositionAndOrientation = CubeGrids.CreatePositionAndOrientation(validPosition, asteroidPosition);
 						SectorObjectManager.Instance.AddEntity(gridEntity);
-						Communication.SendPrivateInformation(steamId, string.Format("You have been moved!  You should be within {0} meters of an asteroid.", PluginSettings.Instance.NewUserTransportDistance));
+						//Communication.SendPrivateInformation(steamId, string.Format("You have been moved!  You should be within {0} meters of an asteroid.", PluginSettings.Instance.NewUserTransportDistance));
+						 */ 
 					}
 				}
 			}

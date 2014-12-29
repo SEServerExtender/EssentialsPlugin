@@ -513,15 +513,28 @@ namespace EssentialsPlugin.Utility
 			bool hasDisplayNameExact = false;
 			bool hasBlockSubType = false;
 			bool hasBlockSubTypeLimits = false;
+			bool includesBlockType = false;
+			bool excludesBlockType = false;
 			bool debug = false;
 			bool isOwnedBy = false;
 			bool quiet = false;
+			bool requireBlockCount = false;
+			bool requireBlockCountLess = false;
+			bool isBlockSize = false;
+			bool hasCustomName = false;
+			bool hasCustomNameExact = false;
 
 			string displayName = "";
+			string customName = "";
 			Dictionary<string, int> blockSubTypes = new Dictionary<string, int>();
 			Dictionary<string, int> blockSubTypeLimits = new Dictionary<string, int>();
+			Dictionary<string, int> blockTypes = new Dictionary<string, int>();
+			Dictionary<string, int> blockTypesExcluded = new Dictionary<string, int>();
 			string ownedBy = "";
 			long ownedByPlayerId = 0;
+			int blockCount = 0;
+			int blockCountLess = 0;
+			int blockSize = 0;
 			if (words.Count() > 0)
 			{
 				if (words.FirstOrDefault(x => x.ToLower() == "debug") != null)
@@ -601,6 +614,23 @@ namespace EssentialsPlugin.Utility
 					}
 				}
 
+				if (words.FirstOrDefault(x => x.ToLower().StartsWith("hascustomname:")) != null)
+				{
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("hascustomname:")).Split(new char[] { ':' });
+					if (parts.Length > 1)
+					{
+						hasCustomName = true;
+						customName = parts[1];
+						options.Add("Matches Custom Name Text", "true:" + displayName);
+						//Console.WriteLine("Here: {0}", parts[2]);
+						if (parts.Length > 2 && parts[2].ToLower() == "exact")
+						{
+							hasCustomNameExact = true;
+							options.Add("Matches Custom Name Exactly", "true");
+						}
+					}
+				}
+
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("includesblocksubtype:")) != null)
 				{
 					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("includesblocksubtype:")).Split(new char[] { ':' });
@@ -654,6 +684,117 @@ namespace EssentialsPlugin.Utility
 						options.Add("Owned By", ownedBy);
 					}
 				}
+
+				if (words.FirstOrDefault(x => x.ToLower().StartsWith("includesblocktype:")) != null)
+				{
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("includesblocktype:")).Split(new char[] { ':' });
+					includesBlockType = true;
+					options.Add("Includes Block Type", "true");
+
+					if (parts.Length < 3)
+					{
+						blockTypes.Add(parts[1], 1);
+						options.Add("Includes Block Type Count: " + parts[1], "1");
+					}
+					else
+					{
+						int count = 1;
+						int.TryParse(parts[2], out count);
+						blockTypes.Add(parts[1], count);
+						options.Add("Includes Block Type Count: " + parts[1], count.ToString());
+					}
+				}
+
+				if (words.FirstOrDefault(x => x.ToLower().StartsWith("excludesblocktype:")) != null)
+				{
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("excludesblocktype:")).Split(new char[] { ':' });
+					excludesBlockType = true;
+					options.Add("Excludes Block Type", "true");
+
+					if (parts.Length < 3)
+					{
+						blockTypesExcluded.Add(parts[1], 1);
+						options.Add("Excludes Block Type Count: " + parts[1], "1");
+					}
+					else
+					{
+						int count = 1;
+						int.TryParse(parts[2], out count);
+						blockTypesExcluded.Add(parts[1], count);
+						options.Add("Excludes Block Type Count: " + parts[1], count.ToString());
+					}
+				}
+
+				if (words.FirstOrDefault(x => x.ToLower().StartsWith("blockcount:")) != null)
+				{
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("blockcount:")).Split(new char[] { ':' });
+					requireBlockCount = true;
+					options.Add("Requires Block Count", "true");
+
+					if (parts.Length < 2)
+					{
+						blockCount = 1;
+						options.Add("Block Count:", "1");
+					}
+					else
+					{
+						int count = 1;
+						int.TryParse(parts[1], out count);
+						blockCount = count;
+						options.Add("Block Count:", blockCount.ToString());
+					}
+				}
+
+				if (words.FirstOrDefault(x => x.ToLower().StartsWith("blockcountlessthan:")) != null)
+				{
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("blockcountlessthan:")).Split(new char[] { ':' });
+					requireBlockCountLess = true;
+					options.Add("Requires Block Count Less Than", "true");
+
+					if (parts.Length < 2)
+					{
+						blockCountLess = 1;
+						options.Add("Block Count:", "1");
+					}
+					else
+					{
+						int count = 1;
+						int.TryParse(parts[1], out count);
+						blockCountLess = count;
+						options.Add("Block Count:", blockCount.ToString());
+					}
+				}
+
+				if (words.FirstOrDefault(x => x.ToLower().StartsWith("blocksize:")) != null)
+				{
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("blocksize:")).Split(new char[] { ':' });
+
+					if(parts[1].ToLower() == "small")
+					{
+						options.Add("Is Block Size", "small");
+						isBlockSize = true;
+						blockSize = 0;
+					}
+					else if(parts[1].ToLower() == "large")
+					{
+						options.Add("Is Block Size", "large");
+						isBlockSize = true;
+						blockSize = 1;
+					}
+					else if (parts[1].ToLower() == "station")
+					{
+						options.Add("Is Block Size", "station");
+						isBlockSize = true;
+						blockSize = 2;
+					}
+					else if (parts[1].ToLower() == "largeship")
+					{
+						options.Add("Is Block Size", "largeship");
+						isBlockSize = true;
+						blockSize = 3;
+					}
+				}
+
 			}
 
 			if (options.Count < 1 && quiet)
@@ -701,6 +842,14 @@ namespace EssentialsPlugin.Utility
 					if (hasDisplayNameExact && entity.DisplayName.Equals(displayName))
 						entitiesToConfirm.Add(entity);
 				}
+				else if(hasCustomName && HasCustomName(gridBuilder, customName, hasCustomNameExact))
+				{
+					entitiesToConfirm.Add(entity);
+				}
+				else if(hasCustomName)
+				{
+					continue;
+				}
 				else if (isOwnedBy && ownedByPlayerId > 0 && GetAllOwners(gridBuilder).Contains(ownedByPlayerId))
 				{
 					entitiesToConfirm.Add(entity);
@@ -720,11 +869,14 @@ namespace EssentialsPlugin.Utility
 			}
 
 			Dictionary<string, int> subTypeDict = new Dictionary<string, int>();
+			Dictionary<string, int> typeDict = new Dictionary<string, int>();
 			List<string> checkList = new List<string>();
 			CubeGrids.GetBlocksUnconnected(entitiesUnconnected, entitiesToConfirm);
+			int blocks = 0;
 			foreach (IMyEntity entity in entitiesUnconnected)
 			{
 				subTypeDict.Clear();
+				typeDict.Clear();
 				checkList.Clear();
 				MyObjectBuilder_CubeGrid grid = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder();
 				bool found = true;
@@ -754,7 +906,6 @@ namespace EssentialsPlugin.Utility
 						}
 					}
 
-
 					if (power != 0)
 					{
 						if (DoesBlockSupplyPower(block))
@@ -774,6 +925,15 @@ namespace EssentialsPlugin.Utility
 							subTypeDict[subTypeName] = subTypeDict[subTypeName] + 1;
 						else
 							subTypeDict.Add(subTypeName, 1);
+					}
+
+					if (includesBlockType || excludesBlockType)
+					{
+						string typeName = block.GetId().TypeId.ToString();
+						if (typeDict.ContainsKey(typeName))
+							typeDict[typeName] = typeDict[typeName] + 1;
+						else
+							typeDict.Add(typeName, 1);
 					}
 				}
 
@@ -834,6 +994,36 @@ namespace EssentialsPlugin.Utility
 					}
 				}
 
+				if (includesBlockType)
+				{
+					bool hasType = false;
+					foreach (KeyValuePair<string, int> pairBlockTypesInGrid in typeDict)
+					{
+						foreach (KeyValuePair<string, int> pairBlockTypesFilter in blockTypes)
+						{
+							if (pairBlockTypesInGrid.Key.ToLower().Contains(pairBlockTypesFilter.Key.ToLower()))
+							{
+								if (pairBlockTypesInGrid.Value >= pairBlockTypesFilter.Value)
+								{
+									if (debug && !quiet)
+										Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which contains at least {4} of block type {3} ({5}).  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count, pairBlockTypesInGrid.Key, pairBlockTypesFilter.Value, pairBlockTypesInGrid.Value));
+
+									hasType = true;
+									break;
+								}
+							}
+						}
+					}
+
+					if (!hasType)
+					{
+						if (debug && !quiet)
+							Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which does not contain block type.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count));
+
+						found = false;
+					}
+				}
+
 				if (hasBlockSubTypeLimits && found)
 				{
 					foreach (KeyValuePair<string, int> pairBlockTypesInGrid in subTypeDict)
@@ -842,18 +1032,72 @@ namespace EssentialsPlugin.Utility
 						{
 							if (pairBlockTypesInGrid.Key.ToLower().Contains(pairBlockTypesFilter.Key.ToLower()))
 							{
-								if (pairBlockTypesInGrid.Value > pairBlockTypesFilter.Value)
+								if (pairBlockTypesInGrid.Value >= pairBlockTypesFilter.Value)
 								{
-									if (found)
+									if(found)
 										found = false;
 
-									if(!quiet)
-										Communication.SendPrivateInformation(userId, string.Format("Excluding grid '{0}' ({1}) which has block type of {3} at {4}.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count, pairBlockTypesFilter.Key, pairBlockTypesInGrid.Value));
+									if(!quiet && debug)
+										Communication.SendPrivateInformation(userId, string.Format("Exclusion: Found grid '{0}' ({1}) which excludes block type of {3} at {4}.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count, pairBlockTypesFilter.Key, pairBlockTypesInGrid.Value));
+
 									break;
 								}
 							}
 						}
 					}
+				}
+
+				if (excludesBlockType && found)
+				{
+					foreach (KeyValuePair<string, int> pairBlockTypesInGrid in typeDict)
+					{
+						foreach (KeyValuePair<string, int> pairBlockTypesFilter in blockTypes)
+						{
+							if (pairBlockTypesInGrid.Key.ToLower().Contains(pairBlockTypesFilter.Key.ToLower()))
+							{
+								if (pairBlockTypesInGrid.Value >= pairBlockTypesFilter.Value)
+								{
+									if (found)
+										found = false;
+
+									if (!quiet && debug)
+										Communication.SendPrivateInformation(userId, string.Format("Exclusion: Found grid '{0}' ({1}) which excludes block type of {3} at {4}.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count, pairBlockTypesFilter.Key, pairBlockTypesInGrid.Value));
+
+									break;
+								}
+							}
+						}
+					}
+				}
+
+				if(requireBlockCount && found && grid.CubeBlocks.Count < blockCount)
+				{
+					found = false;
+				}
+
+				if (requireBlockCountLess && found && grid.CubeBlocks.Count >= blockCountLess)
+				{
+					found = false;
+				}
+
+				if(isBlockSize && found && blockSize == 0 && grid.GridSizeEnum != MyCubeSize.Small)
+				{
+					found = false;
+				}
+
+				if (isBlockSize && found && blockSize == 1 && grid.GridSizeEnum != MyCubeSize.Large)
+				{
+					found = false;
+				}
+
+				if (isBlockSize && found && blockSize == 2 && (grid.GridSizeEnum != MyCubeSize.Large || grid.GridSizeEnum == MyCubeSize.Large && !grid.IsStatic))
+				{
+					found = false;
+				}
+
+				if (isBlockSize && found && blockSize == 2 && (grid.GridSizeEnum != MyCubeSize.Large || grid.GridSizeEnum == MyCubeSize.Large && grid.IsStatic))
+				{
+					found = false;
 				}
 
 				if (found)
@@ -975,6 +1219,33 @@ namespace EssentialsPlugin.Utility
 			}
 
 			return ownerList.Select(x => x.Key).ToList();
+		}
+
+		public static bool HasCustomName(MyObjectBuilder_CubeGrid grid, string name, bool exact)
+		{
+			foreach (MyObjectBuilder_CubeBlock block in grid.CubeBlocks)
+			{
+				if (block is MyObjectBuilder_TerminalBlock)
+				{
+					MyObjectBuilder_TerminalBlock termBlock = (MyObjectBuilder_TerminalBlock)block;
+					if (exact)
+					{
+						if (termBlock.CustomName != null && termBlock.CustomName == name)
+						{
+							return true;
+						}
+					}
+					else
+					{
+						if (termBlock.CustomName != null && termBlock.CustomName.Contains(name))
+						{
+							return true;
+						}
+					}
+				}
+			}
+
+			return false;
 		}
 
 		public static bool HasOwner(MyObjectBuilder_CubeGrid grid)

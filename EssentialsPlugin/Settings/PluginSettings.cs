@@ -60,6 +60,7 @@ namespace EssentialsPlugin
 		private int m_newUserTransportDistance;
 		private bool m_newUserTransportMoveAllSpawnShips;
 		private int m_newUserTransportAsteroidDistance;
+		private NewUserTransportSpawnPoint m_newUserTransportSpawnType;
 		private string[] m_NewUserTransportSpawnShipNames = new string[] { };
 
 		private bool m_loginEnabled;
@@ -375,6 +376,16 @@ namespace EssentialsPlugin
 			}
 		}
 
+		public NewUserTransportSpawnPoint NewUserTransportSpawnType
+		{
+			get { return m_newUserTransportSpawnType; }
+			set
+			{
+				m_newUserTransportSpawnType = value;
+				Save();
+			}
+		}
+
 		public bool LoginEnabled
 		{
 			get { return m_loginEnabled; }
@@ -384,7 +395,7 @@ namespace EssentialsPlugin
 				if (value && !m_loading)
 				{
 					if (Players.Instance.PlayerLogins.Count() == 0)
-						Players.ProcessServerLogsForLogins();
+						Players.ProcessServerLogsForLogins(true);
 				}
 				Save();
 			}
@@ -1009,5 +1020,11 @@ namespace EssentialsPlugin
 		}
 
 		#endregion
+	}
+
+	public enum NewUserTransportSpawnPoint
+	{
+		Asteroids,
+		Origin
 	}
 }

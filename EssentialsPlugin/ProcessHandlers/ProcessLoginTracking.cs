@@ -19,7 +19,12 @@ namespace EssentialsPlugin.ProcessHandler
 		public ProcessLoginTracking()
 		{
 			if (PluginSettings.Instance.LoginEnabled)
-				Players.ProcessServerLogsForLogins();
+			{
+				if(Players.Instance.PlayerLogins.Count == 0)
+					Players.ProcessServerLogsForLogins(true);
+				else
+					Players.ProcessServerLogsForLogins();
+			}
 		}
 
 		public override int GetUpdateResolution()

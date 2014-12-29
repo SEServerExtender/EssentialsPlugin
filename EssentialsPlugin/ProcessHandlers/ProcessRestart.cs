@@ -53,6 +53,7 @@ namespace EssentialsPlugin.ProcessHandler
 			if(m_done < 0)
 				return;
 
+
 			//Logging.WriteLineAndConsole(string.Format("Restart in {0} minutes", m_done));
 
 			if (DateTime.Now - m_start > TimeSpan.FromMinutes(m_done))
@@ -64,6 +65,9 @@ namespace EssentialsPlugin.ProcessHandler
 			foreach (RestartNotificationItem item in PluginSettings.Instance.RestartNotificationItems)
 			{
 				if (item.completed)
+					continue;
+
+				if (m_done - item.MinutesBeforeRestart < -2)
 					continue;
 				
 				if(DateTime.Now - m_start > TimeSpan.FromMinutes(m_done - item.MinutesBeforeRestart))
