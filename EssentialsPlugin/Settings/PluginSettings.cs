@@ -90,6 +90,9 @@ namespace EssentialsPlugin
 		private MTObservableCollection<SettingsCleanupTimedItem> m_cleanupTimedItems;
 		private MTObservableCollection<SettingsCleanupNotificationItem> m_cleanupNotificationItems;
 
+		private bool m_blockEnforcementEnabled;
+		private MTObservableCollection<SettingsBlockEnforcementItem> m_blockEnforcementItems;
+
 		#endregion
 
 		#region Static Properties
@@ -589,6 +592,23 @@ namespace EssentialsPlugin
 				Save();
 			}
 		}
+
+		public bool BlockEnforcementEnabled
+		{
+			get { return m_blockEnforcementEnabled; }
+			set 
+			{ 
+				m_blockEnforcementEnabled = value;
+				Save();
+			}
+		}
+
+		public MTObservableCollection<SettingsBlockEnforcementItem> BlockEnforcementItems
+		{
+			get { return m_blockEnforcementItems; }
+		}
+
+
 		#endregion
 
 		#region Constructor
@@ -635,6 +655,9 @@ namespace EssentialsPlugin
 			m_cleanupTimedItems.CollectionChanged += ItemsCollectionChanged;
 			m_cleanupNotificationItems = new MTObservableCollection<SettingsCleanupNotificationItem>();
 			m_cleanupNotificationItems.CollectionChanged += ItemsCollectionChanged;
+
+			m_blockEnforcementItems = new MTObservableCollection<SettingsBlockEnforcementItem>();
+			m_blockEnforcementItems.CollectionChanged += ItemsCollectionChanged;
 		}
 
 

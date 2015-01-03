@@ -163,18 +163,24 @@ namespace EssentialsPlugin.ProcessHandler
 						}
 
 						Logging.WriteLineAndConsole(string.Format("Attempting to move user to: {0}", General.Vector3DToString(validPosition)));
-						player.Controller.ControlledEntity.Use();
+
+						Wrapper.GameAction(() =>
+						{
+							if(player.Controller != null && player.Controller.ControlledEntity != null)
+								player.Controller.ControlledEntity.Use();
+						});
+
 						Thread.Sleep(100);
-						BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
-						MyAPIGateway.Entities.RemapObjectBuilder(cubeGrid);
 						cubeGrid.PositionAndOrientation = new MyPositionAndOrientation(validPosition, Vector3.Forward, Vector3.Up);
+						List<MyObjectBuilder_EntityBase> list = new List<MyObjectBuilder_EntityBase>();
+						list.Add(cubeGrid);
 
 						IMyEntity newEntity = null;
 						Wrapper.GameAction(() =>
 						{
+							BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
+							MyAPIGateway.Entities.RemapObjectBuilder(cubeGrid);
 							newEntity = MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(cubeGrid);
-							List<MyObjectBuilder_EntityBase> list = new List<MyObjectBuilder_EntityBase>();
-							list.Add(cubeGrid);
 							MyAPIGateway.Multiplayer.SendEntitiesCreated(list);
 						});
 

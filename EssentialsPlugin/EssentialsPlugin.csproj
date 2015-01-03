@@ -115,6 +115,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Settings\SettingsBlockEnforcementItem.cs" />
     <Compile Include="Settings\SettingsCleanupNotificationItem.cs" />
     <Compile Include="Settings\SettingsCleanupTriggerItem.cs" />
     <Compile Include="Settings\SettingsCleanupTimedItem.cs" />

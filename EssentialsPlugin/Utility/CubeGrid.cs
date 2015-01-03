@@ -1170,6 +1170,7 @@ namespace EssentialsPlugin.Utility
 
 		public static bool IsFullOwner(MyObjectBuilder_CubeGrid grid, long ownerId)
 		{
+			bool found = false;
 			foreach (MyObjectBuilder_CubeBlock block in grid.CubeBlocks)
 			{
 				if (!(block is MyObjectBuilder_TerminalBlock))
@@ -1180,9 +1181,13 @@ namespace EssentialsPlugin.Utility
 				{
 					return false;
 				}
+				else if (functional.Owner != 0)
+				{
+					found = true;
+				}
 			}
 
-			return true;
+			return found;
 		}
 
 		// might not work? -- updated, needs testing

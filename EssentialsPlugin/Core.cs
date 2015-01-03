@@ -609,7 +609,26 @@ namespace EssentialsPlugin
 		{
 			get { return PluginSettings.Instance.CleanupNotificationItems; }
 		}
+		/*
+		[Category("Block Enforcement System")]
+		[Description("Enable / Disable block type max count enforcement.  This removes blocks that exceed a certain count.  They are removed forcefully from a grid.  When max is reached, a warning is given.  When max is exceeded another warning.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool BlockEnforcementEnabled
+		{
+			get { return PluginSettings.Instance.BlockEnforcementEnabled; }
+			set { PluginSettings.Instance.BlockEnforcementEnabled = value; }
+		}
 
+		[Category("Block Enforcement System")]
+		[Description("Enforcement Items.  These are how block enforcements are defined.  Each item is a block that is scanned for.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public MTObservableCollection<SettingsBlockEnforcementItem> BlockEnforcementItems
+		{
+			get { return PluginSettings.Instance.BlockEnforcementItems; }
+		}
+		*/
 		#endregion
 
 		#region Constructors and Initializers

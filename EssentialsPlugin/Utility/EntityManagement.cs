@@ -292,56 +292,69 @@ namespace EssentialsPlugin.Utility
 		{
 			Wrapper.GameAction(() =>
 			{
-				if (!entity.InScene)
-					return;
-
-				MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
-				if (builder == null)
-					return;
-
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				long ownerId = 0;
-				string ownerName = "";
-				if (CubeGrids.GetOwner(builder, out ownerId))
+				int pos = 0;
+				try
 				{
-					//ownerId = grid.BigOwners.First();
-					ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
-				}
-
-				entity.Physics.LinearVelocity = Vector3.Zero;
-				entity.Physics.AngularVelocity = Vector3.Zero;
-
-				/*
-				entity.InScene = false;
-				entity.CastShadows = false;
-				entity.Visible = false;
-				*/
-
-				builder.PersistentFlags = MyPersistentEntityFlags2.None;
-				MyAPIGateway.Entities.RemapObjectBuilder(builder);
-
-				if (m_removedGrids.Contains(entity.EntityId))
-				{
-					Logging.WriteLineAndConsole("Conceal", string.Format("Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
-					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
-				}
-				else
-				{
-					Logging.WriteLineAndConsole("Conceal", string.Format("Start Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
-
-					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
-					if (newEntity == null)
-					{
-						Logging.WriteLineAndConsole("Conceal", string.Format("Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId));
+					if (!entity.InScene)
 						return;
+
+					MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
+					if (builder == null)
+						return;
+
+					pos = 1;
+					IMyCubeGrid grid = (IMyCubeGrid)entity;
+					long ownerId = 0;
+					string ownerName = "";
+					if (CubeGrids.GetOwner(builder, out ownerId))
+					{
+						//ownerId = grid.BigOwners.First();
+						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
 					}
 
-					m_removedGrids.Add(entity.EntityId);
-					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
-					MyAPIGateway.Entities.AddEntity(newEntity, false);
-					Logging.WriteLineAndConsole("Conceal", string.Format("End Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
-				}
+					pos = 2;
+					entity.Physics.LinearVelocity = Vector3.Zero;
+					entity.Physics.AngularVelocity = Vector3.Zero;
 
+					/*
+					entity.InScene = false;
+					entity.CastShadows = false;
+					entity.Visible = false;
+					*/
+
+					builder.PersistentFlags = MyPersistentEntityFlags2.None;
+					MyAPIGateway.Entities.RemapObjectBuilder(builder);
+
+					pos = 3;
+					if (m_removedGrids.Contains(entity.EntityId))
+					{
+						Logging.WriteLineAndConsole("Conceal", string.Format("Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
+						BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
+					}
+					else
+					{
+						pos = 4;
+						Logging.WriteLineAndConsole("Conceal", string.Format("Start Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
+
+						IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
+						if (newEntity == null)
+						{
+							Logging.WriteLineAndConsole("Conceal", string.Format("Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId));
+							return;
+						}
+
+						pos = 5;
+						m_removedGrids.Add(entity.EntityId);
+						BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
+						MyAPIGateway.Entities.AddEntity(newEntity, false);
+						Logging.WriteLineAndConsole("Conceal", string.Format("End Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
+						pos = 6;
+					}
+				}
+				catch (Exception ex)
+				{
+					Logging.WriteLineAndConsole(string.Format("ConcealEntity({1}): {0}", ex.ToString(), pos));
+				}
 			});
 		}
 

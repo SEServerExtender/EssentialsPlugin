@@ -127,6 +127,7 @@ namespace EssentialsPlugin.Utility
 			Wrapper.GameAction(() =>
 			{
 				MyObjectBuilder_EntityBase baseEntity = gridEntity.Export();
+				MyAPIGateway.Entities.RemapObjectBuilder(baseEntity);
 				IMyEntity entity = MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(baseEntity);
 				Type someManager = SandboxGameAssemblyWrapper.Instance.GetAssemblyType(SectorObjectManager.EntityBaseNetManagerNamespace, SectorObjectManager.EntityBaseNetManagerClass);
 				Wrapper.InvokeStaticMethod(someManager, SectorObjectManager.EntityBaseNetManagerSendEntity, new object[] { entity.GetObjectBuilder() });
