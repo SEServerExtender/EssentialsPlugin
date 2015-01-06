@@ -82,6 +82,10 @@ Options:
   - Enabled - Enable / Disable this restart time item
   - RestartTime - 24 hour time of day when this restart should occur
 
+Note that this feature restarts SESE only.  For your server to restart completely, SESE should be launched with the autostart parameter, as follows:
+
+c:\PathToSpaceEngineers\SEServerExtender.exe autostart instance="instance name"
+
 Chat Information Commands with interval based repeats
 -----------------------------------------------------
 
