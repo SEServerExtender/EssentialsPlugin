@@ -64,7 +64,7 @@ namespace EssentialsPlugin.ProcessHandler
 			if (time - DateTime.Now < TimeSpan.Zero)
 				return;
 
-			if (DateTime.Now - item.LastRan > TimeSpan.FromMinutes(1))
+			if (DateTime.Now - item.LastRan < TimeSpan.FromMinutes(1))
 				return;
 
 			if (time - DateTime.Now < TimeSpan.FromSeconds(1) && DateTime.Now - item.LastRan > TimeSpan.FromMinutes(1))
@@ -86,8 +86,14 @@ namespace EssentialsPlugin.ProcessHandler
 				if (time - DateTime.Now < TimeSpan.FromMinutes(notifyItem.MinutesBeforeCleanup))
 				{
 					item.NotificationItemsRan.Add(notifyItem);
-					string notification = notifyItem.Message.Replace("%cleanup_reason%", item.Reason);
-					Communication.SendPublicInformation(notification);						
+
+					if (DateTime.Now - notifyItem.lastRan > TimeSpan.FromMinutes(1))
+					{
+						notifyItem.lastRan = DateTime.Now;
+						string notification = notifyItem.Message.Replace("%cleanup_reason%", item.Reason);
+						Communication.SendPublicInformation(notification);						
+					}
+
 				}
 			}
 		}

@@ -80,9 +80,10 @@ namespace EssentialsPlugin
 		private string[] m_dynamicConcealIgnoreSubTypeList = new string[] { };
 		private bool m_dynamicConcealIncludeMedBays;
 		private bool m_dynamicShowMessages;
-		private bool m_dynamicTurretManagment;
+		private bool m_dynamicTurretManagementEnabled;
 		private int m_dynamicTurretTargetDistance;
 		private bool m_dynamicTurretAllowExemption;
+		private DynamicTurretManagementTypes m_dynamicTurretManagementType;
 
 		private bool m_waypointsEnabled;
 		private int m_waypointsMaxPerPlayer;
@@ -556,12 +557,12 @@ namespace EssentialsPlugin
 			}
 		}
 
-		public bool DynamicTurretManagment
+		public bool DynamicTurretManagmentEnabled
 		{
-			get { return m_dynamicTurretManagment; }
+			get { return m_dynamicTurretManagementEnabled; }
 			set 
-			{ 
-				m_dynamicTurretManagment = value;
+			{
+				m_dynamicTurretManagementEnabled = value;
 				Save();
 			}
 		}
@@ -572,6 +573,17 @@ namespace EssentialsPlugin
 			set 
 			{ 
 				m_dynamicTurretAllowExemption = value;
+				Save();
+			}
+		}
+
+		public DynamicTurretManagementTypes DynamicTurretManagementType
+		{
+			get { return m_dynamicTurretManagementType; }
+			set 
+			{ 
+				//m_dynamicTurretManagementType = value;
+				m_dynamicTurretManagementType = DynamicTurretManagementTypes.All;
 				Save();
 			}
 		}
@@ -706,7 +718,7 @@ namespace EssentialsPlugin
 			m_dynamicConcealDistance = 8000;
 			m_dynamicShowMessages = false;
 			m_dynamicTurretTargetDistance = 2000;
-			m_dynamicTurretManagment = false;
+			m_dynamicTurretManagementEnabled = false;
 
 			m_dockingShipsPerZone = 1;
 
@@ -1117,5 +1129,12 @@ namespace EssentialsPlugin
 	{
 		Asteroids,
 		Origin
+	}
+
+	public enum DynamicTurretManagementTypes
+	{
+		All,
+		AllButOwner,
+		NeutralAndEnemy
 	}
 }

@@ -553,12 +553,12 @@ namespace EssentialsPlugin
 		[Description("Enable / Disable dynamic management of turrets.  Turrets that do not have a valid target within their target range will be disabled.  This will improve sim speed.")]
 		[Browsable(true)]
 		[ReadOnly(false)]
-		public bool DynamicTurretManagment
+		public bool DynamicTurretManagmentEnabled
 		{
-			get { return PluginSettings.Instance.DynamicTurretManagment; }
+			get { return PluginSettings.Instance.DynamicTurretManagmentEnabled; }
 			set
 			{
-				PluginSettings.Instance.DynamicTurretManagment = value;
+				PluginSettings.Instance.DynamicTurretManagmentEnabled = value;
 			}
 		}
 
@@ -585,6 +585,19 @@ namespace EssentialsPlugin
 			set
 			{
 				PluginSettings.Instance.DynamicTurretAllowExemption = value;
+			}
+		}
+
+		[Category("Dynamic Entity Management")]
+		[Description("Set the type of management the server does.  All means anything will turn the turrets back on.  All but owner means everything except owner of turret turns them on.  EnemyAndNeutral mean enemy and neutral players/grids turn the turrets back on.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public DynamicTurretManagementTypes DynamicTurretManagementType
+		{
+			get { return PluginSettings.Instance.DynamicTurretManagementType; }
+			set
+			{
+				PluginSettings.Instance.DynamicTurretManagementType = value;
 			}
 		}
 

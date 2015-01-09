@@ -8,6 +8,8 @@ namespace EssentialsPlugin.Settings
 {
 	public class SettingsCleanupNotificationItem
 	{
+		public DateTime lastRan = DateTime.Now;
+
 		private bool enabled;
 		public bool Enabled
 		{

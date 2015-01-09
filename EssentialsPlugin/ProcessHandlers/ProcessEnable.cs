@@ -45,16 +45,19 @@ namespace EssentialsPlugin.ProcessHandler
 			if (!PluginSettings.Instance.DynamicConcealEnabled)
 				return;
 
-			if (DateTime.Now - m_lastEnableCheck > TimeSpan.FromSeconds(5))
+			if (PluginSettings.Instance.DynamicTurretManagmentEnabled)
 			{
-				EntityManagement.CheckAndEnableTurrets();
-				m_lastEnableCheck = DateTime.Now;
-			}
+				if (DateTime.Now - m_lastEnableCheck > TimeSpan.FromSeconds(5))
+				{
+					EntityManagement.CheckAndEnableTurrets();
+					m_lastEnableCheck = DateTime.Now;
+				}
 
-			if (DateTime.Now - m_lastDisableCheck > TimeSpan.FromSeconds(30))
-			{
-				EntityManagement.CheckAndDisableTurrets();
-				m_lastDisableCheck = DateTime.Now;
+				if (DateTime.Now - m_lastDisableCheck > TimeSpan.FromSeconds(30))
+				{
+					EntityManagement.CheckAndDisableTurrets();
+					m_lastDisableCheck = DateTime.Now;
+				}
 			}
 
 			base.Handle();

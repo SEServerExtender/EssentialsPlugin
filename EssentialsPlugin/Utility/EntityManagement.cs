@@ -811,7 +811,7 @@ namespace EssentialsPlugin.Utility
 					else
 						m_turretsDisabled++;
 
-					if (state && !ignore)
+					if (state)// && !ignore)
 					{
 						// No target, so we're not going to enable anything on this grid
 						//if (!disable && DoesGridHaveTarget(grid, block))
@@ -918,7 +918,7 @@ namespace EssentialsPlugin.Utility
 					else
 						m_turretsDisabled++;
 
-					if (!state && !ignore)
+					if (!state) // && !ignore)
 					{
 						// No target, so we're not going to disable anything on this grid
 						//if (!enable && !DoesGridHaveTarget(grid, block))
@@ -988,6 +988,9 @@ namespace EssentialsPlugin.Utility
 
 				if (testEntity is IMyCubeGrid)
 				{
+					if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.All)
+						return true;
+
 					IMyCubeGrid testGrid = (IMyCubeGrid)testEntity;
 					// Always enable if grid has no owner.  Seems suspect.  Might be a user trying to abuse a no ownership ship.
 					if (testGrid.BigOwners.Count < 1 && testGrid.SmallOwners.Count < 1)
@@ -995,15 +998,34 @@ namespace EssentialsPlugin.Utility
 
 					foreach (long owner in testGrid.BigOwners)
 					{
+						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner && block.FatBlock.GetUserRelationToOwner(owner) != Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Owner)
+							return true;
+
 						if (block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies ||
 						    block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Neutral)
 						{
 							return true;
 						}
 					}
+
+					foreach (long owner in testGrid.SmallOwners)
+					{
+						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner && block.FatBlock.GetUserRelationToOwner(owner) != Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Owner)
+							return true;
+
+						if (block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies ||
+							block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Neutral)
+						{
+							return true;
+						}
+					}
+
 				}
 				else
 				{
+					if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.All)
+						return true;
+
 					var builderBase = testEntity.GetObjectBuilder();
 					if (builderBase is MyObjectBuilder_Character)
 					{
@@ -1016,13 +1038,19 @@ namespace EssentialsPlugin.Utility
 						}
 						catch
 						{
-
+							return true;
 						}
 
 						if (player == null)
-							continue;
+						{
+							return true;
+							//continue;
+						}
 
 						long playerId = player.PlayerID;
+
+						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner && block.FatBlock.GetUserRelationToOwner(playerId) != Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Owner)
+							return true;
 
 						if (block.FatBlock.GetUserRelationToOwner(playerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies ||
 						    block.FatBlock.GetUserRelationToOwner(playerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Neutral)
