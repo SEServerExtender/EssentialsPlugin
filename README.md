@@ -43,6 +43,7 @@ Major Feature Overview
 - Timed Cleanup and Triggered Cleanup
 - Dynamic Entity Management
 - Waypoint System
+- Block Enforcement
 
 In depth Feature Analysis
 ------------------------
@@ -186,17 +187,31 @@ If you run the scan by itself, it returns _all_ ships.  You then apply filters t
 - noownership - The grid must have NO blocks owned by a player.
 - power - The grid must have a valid power source.  Valid power source is defined as an enabled reactor with uranium in it, a battery with a charge, or a solar panel.
 - nopower - The grid must NOT have a valid power source.
+- online - The owner of the grid must be online
+- notonline - The owner of the grid must not be online
 
 ### Options
 These options can have fields with spaces in it, but if there are spaces, the entire option must be enclosed in quotes, for example: "hasdisplayname:Respawn Ship:exact"
 
 - hasdisplayname:(name of ship):(exact) - This option allows you to filter by the name of a ship.  If you want to sort by a ship that has a space in it's name, please enclose the whole option in quotes.  Using the "exact" option also makes sure that it matches the name exactly.  Without the exact option a partial match can occur.
 
+- hascustomname:(custom name of block):(exact) - This option allows you to filter by the custom name set on a block (ie beacons).  If the custom name has spaces in it, please enclose the whole option in quotes.  Without the exact qualifier, partial matching occurs. 
+
 - ownedby:(name of player) - This option allows you to filter by owner of the ship. 
 
 - includesblocksubtype:(block subtype name):(count) - This option allows you to filter ships by ensuring the ship has the block you specify here.  The count lets you filter even further by ensuring the ship has multiple of that block.  For example if you want to find ships that have more than 25 drills on it, you'd specify: includesblocksubtype:Drill:26 - This scans for all ships that has 26 or more drills on it.
 
 - excludesblocksubtype:(block subtype name):(count) - This option is the reverse of the last and filters ships if they do not have the block specified here.  Count allows you to filter further by specifying that the ship must have less than count blocks.
+
+- includesblocktype:(block type name):(count) - This option allows you to filter ships by ensuring the ship has the blocktype you have here (different than subtype).  The counts lets you filter even further.
+
+- excludesblocktype:(block type name):(count) - This option is the reverse of the last option and filters ships if they do not have the block specified here.
+ 
+- blockcount:(number of blocks) - This option allows you to filter ships that contain at least blockcount of blocks.  For example blockcount:5 will return all ships with 5 or more blocks.
+ 
+- blockcountlessthan:(number of blocks) - This option is the reverse of the less, and filters ships that have less than the value specified for this option.  For example blockcountlessthan:5 returns all grids with 4 or less blocks.
+
+- blocksize:(large, small, station, largeship) - This option allows you to filter grids depending on size of the grid
 
 ### Examples
 - /admin scan grids - Returns all grids
@@ -243,6 +258,8 @@ Dynamic Entity Management
 ------------------------------
 This option, when turned on, automatically manages entities in the world.  The biggest issue with Space Engineers currently is when a dedicated server gets a lot of entities, it's UPS drops due to GameLogic.  This is almost always due to having too many entities in the world.  This system manages them by removing / disabling entities in the world that no one can see, or are generally doing nothing.  This helps improve UPS greatly as these entities no longer get processed.  The system is complex and updates to it are ongoing, but many servers now use it with great success.
 
+Dynamic turret management is another dynamic setting that lets the server control all the turrets in the world.  The server will turn off all turrets if no one is around, but if an enemy or neutral player comes close, it will turn them back on.  This effectively rids the server of lag created by having active turrets always running.  
+
 All conceals and reveals are logged in your C:/path/to/instance/Logs/ directory.
 
 Options:
@@ -252,8 +269,9 @@ Options:
 - DynamicConcealIncludeLargeGrids - When this is disabled, large grids and stations can not be concealed.  This is the safest mode, as then only small ships get concealed.  Once you enable this, large grids and stations without med bays can be concealed.  This requires more checks and is a bit more intensive, but results in the biggest increase in UPS.
 - DynamicConcealIncludeMedBays - When this is disabled, large grids with medbays are not disabled.  When enabled, large grids with med bays are concealed, but are revealed when a user logs in that can use that med bay.  Please note that there is a very tiny chance that a spawn point won't be shown when a user logs in and a grid is concealed.  All they need to do is hit "refresh" and it comes back.  The chance of this happening is VERY small.  (I've only ever seen it happen once)
 - DynamicShowMessages - When enabled, this shows when ships are concealed/revealed.  Some people consider it a bit spammy, so you can turn it off if you don't like the messages.  
-
-
+- DynamicTurretManagement - Enable / Disables turret management.  This will allow the server to control the enabled state of turrets dynamically.  
+- DynamicTurretTargetDistance - This is the distance turrets will scan in order to determine if there is an enemy.  Obviously as you increase this option, so does the CPU usage, though that shouldn't effect things too badly.  It's recommended to keep this value 2x the distance of the distance your turrets can shoot.  For example most default turrets can fire at 800m, so setting it 1600m+ is best.  (Default is 2000m)
+- DynamicTurretAllowExemption - Enable / Disable user exemptions.  This allows users to exempt out of server controlled turrets.  This isn't really recommended, but I added this option in case you want to allow users to opt out of server controlled turrets.  They must add [ManualControl] to their turret name in order for that turret to be exempted from control.
 
 Waypoint System
 ---------------
@@ -262,6 +280,25 @@ Waypoints are ways of placing hud markers at locations that appear for you at al
 Options:
 - WaypointsEnabled - Enable / Disables this option
 - WaypointsMaxPerPlayer - This limits a user so they don't create too many waypoints.  
+- WaypointsMaxPerFaction - This limits the amount of waypoints a faction can have.
+- WaypointDefaultItems - Default waypoints given to users without waypoints
+- WaypointServerItems - Default waypoints that can not be removed by users.  All users will see these
+ 
+
+Block Enforcement
+-----------------
+Block enforcement allows you to enforce block type counts on grids so that a user does not exceed a limit you set.  If they exceed that limit, the new blocks are removed forcefully.  This allow strict control of some lag inducing blocks so that users do not abuse them (for example drills, or turrets).  
+
+Options:
+- BlockEnforcementEnabled - Enable / Disable this option
+- BlockEnforcementItems - These are items that define the each block you wish to enforce
+
+### Block Enforcement Item
+- Enabled - Enable / Disable this item
+- BlockType - This is the block type that you're enforcing.  This can be a partial match against a block ID.  Block IDs are the object builders of a block and can be found in your save.  For example: LargeBlockBeacon is the subtype for beacons.  LargeBlockDrill is the type for large drills.
+- MaxPerGrid - This is the maximum of this type allowed per grid.
+- MaxExceedWarning - (option not currently used)
+- MaxReachWarning - (option not currently used)
 
 Advanced Administrator Chat Commands
 ------------------------------------
@@ -321,6 +358,12 @@ Waypoint commands
 ------------------
 Command| Options|Example
 -------|--------|-----------------------------------------------------------------------------------------------------
-/waypoint add | "name" "text on marker" Neutral or Allied or Enemy X Y Z | /waypoint add MyWaypoint MyWaypoint neutral 0 0 0 - This adds a green hud marker that shows up at 0 0 0
+/waypoint add | "name" "text on marker" Neutral or Allied or Enemy X Y Z "group"| /waypoint add MyWaypoint MyWaypoint neutral 0 0 0 - This adds a green hud marker that shows up at 0 0 0
 /waypoint remove | "name" | /waypoint remove test - This removes the waypoint test
 /waypoint list | dialog | /waypoint list dialog - This list all your waypoints in a dialog
+/waypoint factionadd | "name" "text on marker" Neutral or Allied or Enemy X Y Z "group" | /waypoint factionadd MyFactionPoint MyFactionPoint allied 0 0 0 - This adds an allied hud marker that shows up at 0 0 0
+/waypoint factionremove | "name" | Removes a faction waypoint.  Please note if a leader created the waypoint, only a leader can remove the faction waypoint
+/waypoint groupadd | "group name" "existing waypoint" | /waypoint groupadd "Asteroids" "Asteroid1" - This adds the waypoint Asteroid1 to the group Asteroids
+/waypoint groupremove | "existing waypoint" | /waypoint groupremove Asteroid1 - This removes the waypoint Asteroid1 from the group it's in
+/waypoint refresh | (no options) | This refreshes the waypoints in case they didn't load on login
+/waypoint toggle | "group" | /waypoint toggle Asteroids - This turns off all waypoints in the asteroids group.
