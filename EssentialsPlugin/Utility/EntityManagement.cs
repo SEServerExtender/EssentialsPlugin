@@ -792,7 +792,7 @@ namespace EssentialsPlugin.Utility
 			IMyCubeGrid grid = (IMyCubeGrid)entity;
 			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
 			grid.GetBlocks(blocks);
-			bool disable = false;
+			//bool disable = false;
 			bool ignore = false;
 			foreach (IMySlimBlock block in blocks)
 			{
@@ -899,7 +899,7 @@ namespace EssentialsPlugin.Utility
 			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
 			m_scanCache.Clear();
 			grid.GetBlocks(blocks);
-			bool enable = false;
+			//bool enable = false;
 			bool ignore = false;
 			foreach (IMySlimBlock block in blocks)
 			{
@@ -969,7 +969,7 @@ namespace EssentialsPlugin.Utility
 				return false;
 			}
 			*/
-			bool found = false;
+			//bool found = false;
 			foreach (IMyEntity testEntity in m_scanCache)
 			{
 				if ((IMyEntity)grid == testEntity)
@@ -1014,7 +1014,7 @@ namespace EssentialsPlugin.Utility
 							MyAPIGateway.Players.GetPlayers(players);
 							player = players.FirstOrDefault(x => x.DisplayName == testEntity.DisplayName);
 						}
-						catch (Exception ex)
+						catch
 						{
 
 						}

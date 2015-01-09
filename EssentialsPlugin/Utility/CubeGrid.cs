@@ -817,6 +817,12 @@ namespace EssentialsPlugin.Utility
 				return new HashSet<IMyEntity>();
 			}
 
+			if (words.Count() > options.Count())
+			{
+				Communication.SendPrivateInformation(userId, "Possible problem with your parameters (options provided is larger than options found).  Not returning any results in case of error");
+				return new HashSet<IMyEntity>();
+			}
+
 			if(!quiet)				
 				Communication.SendPrivateInformation(userId, string.Format("Scanning for ships with options: {0}", GetOptionsText(options)));
 
@@ -887,7 +893,7 @@ namespace EssentialsPlugin.Utility
 			Dictionary<string, int> typeDict = new Dictionary<string, int>();
 			List<string> checkList = new List<string>();
 			CubeGrids.GetBlocksUnconnected(entitiesUnconnected, entitiesToConfirm);
-			int blocks = 0;
+			//int blocks = 0;
 			foreach (IMyEntity entity in entitiesUnconnected)
 			{
 				subTypeDict.Clear();

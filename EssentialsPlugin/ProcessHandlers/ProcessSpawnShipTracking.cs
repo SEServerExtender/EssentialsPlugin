@@ -17,13 +17,8 @@ using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
 namespace EssentialsPlugin.ProcessHandler
 {
 	public class ProcessSpawnShipTracking : ProcessHandlerBase
-	{
-		private List<ulong> m_newUserList;
-		private volatile bool m_ready = false;
-		private Random m_random;
-		private bool m_init;
+	{		
 		private DateTime m_lastUpdate = DateTime.Now;
-
 
 		public override int GetUpdateResolution()
 		{

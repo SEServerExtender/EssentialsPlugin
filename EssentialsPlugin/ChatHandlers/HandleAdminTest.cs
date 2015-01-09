@@ -24,7 +24,7 @@ namespace EssentialsPlugin.ChatHandlers
 	public class HandleAdminTest : ChatHandlerBase
 	{
 		private Random m_random = new Random();
-		private bool m_working = false;
+		//private bool m_working = false;
 		public override string GetHelp()
 		{
 			return "For testing.";
