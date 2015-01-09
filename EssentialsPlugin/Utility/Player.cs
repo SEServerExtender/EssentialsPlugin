@@ -99,6 +99,26 @@ namespace EssentialsPlugin.Utility
 
 			return null;
 		}
+		public static IMyEntity FindControlledEntity(long playerId)
+		{
+			List<IMyPlayer> players = new List<IMyPlayer>();
+			Wrapper.GameAction(() =>
+			{
+				MyAPIGateway.Players.GetPlayers(players);
+			});
+
+			IMyPlayer player = players.FirstOrDefault(x => x.PlayerID == playerId);
+			if (player == null)
+				return null;
+
+			if (player.Controller != null && player.Controller.ControlledEntity != null && player.Controller.ControlledEntity.Entity != null)
+			{
+				return player.Controller.ControlledEntity.Entity.GetTopMostParent();
+			}
+
+			return null;
+		}
+
 
 		public static bool Move(string userName, Vector3D position)
 		{

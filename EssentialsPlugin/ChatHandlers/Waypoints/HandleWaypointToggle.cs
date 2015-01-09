@@ -12,24 +12,25 @@ using SEModAPIInternal.API.Entity.Sector.SectorObject;
 using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
 using SEModAPIInternal.API.Common;
 
+using EssentialsPlugin.Settings;
 
 namespace EssentialsPlugin.ChatHandlers
 {
-	public class HandleWaypointRemove : ChatHandlerBase
+	public class HandleWaypointToggle : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{
-			return "Removes a personal waypoint.  Usage: /waypoint remove \"waypoint name\"";
+			return "Toggles waypoints off or on.  Specifying a group name hides only that group.  Specifying a waypoint name only toggles that waypoint.  Usage: /waypoint toggle (optional: group name or waypoint name).  Example: /waypoint toggle Targets";
 		}
 
 		public override string GetCommandText()
 		{
-			return "/waypoint remove";
+			return "/waypoint add";
 		}
 
 		public override string[] GetMultipleCommandText()
 		{
-			return new string[] { "/waypoint remove", "/wp remove" };
+			return new string[] { "/waypoint toggle", "/wp toggle" };
 		}
 
 		public override bool IsAdminCommand()
@@ -51,35 +52,27 @@ namespace EssentialsPlugin.ChatHandlers
 		{
 			if (!PluginSettings.Instance.WaypointsEnabled)
 				return false;
-
+			
 			string[] splits = General.SplitString(string.Join(" ", words));
 
-			if (splits.Count() != 1)
+			if (splits.Length > 0 && !Waypoints.Instance.GroupExists(userId, splits[0]))
 			{
-				Communication.SendPrivateInformation(userId, GetHelp());
+				Communication.SendPrivateInformation(userId, string.Format("Group '{0}' does not exist.  You can only toggle a valid group", splits[0]));
 				return true;
 			}
 
-			List<WaypointItem> items = Waypoints.Instance.Get(userId);
-			if (items.FirstOrDefault(x => x.Name.ToLower() == splits[0].ToLower()) == null)
-			{
-				Communication.SendPrivateInformation(userId, string.Format("You do not have a waypoint with the name: {0}", splits[0]));
-				return true;
-			}
+			if (splits.Length < 1)
+				Waypoints.Instance.Toggle(userId);
+			else
+				Waypoints.Instance.Toggle(userId, splits[0]);
 
-			Waypoints.Instance.Remove(userId, splits[0]);
+			Waypoints.SendClientWaypoints(userId);
 
-			string remove = "";
-			foreach (string split in splits)
-			{
-				if (remove == "")
-					remove += split.ToLower();
-				else
-					remove += " " + split;
-			}
+			if (splits.Length < 1)
+				Communication.SendPrivateInformation(userId, string.Format("Toggled all waypoints"));
+			else
+				Communication.SendPrivateInformation(userId, string.Format("Toggled waypoint group '{0}'", splits[0]));
 
-			Communication.SendClientMessage(userId, string.Format("/waypoint remove {0}", remove));
-			Communication.SendPrivateInformation(userId, string.Format("Removed waypoint: {0}", splits[0]));
 			return true;
 		}
 	}

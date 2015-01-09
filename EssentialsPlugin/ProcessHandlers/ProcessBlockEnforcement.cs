@@ -1,0 +1,156 @@
+﻿using System;
+using System.IO;
+using System.IO.Compression;
+using System.Collections.Generic;
+
+using Sandbox.Common.ObjectBuilders;
+
+using Sandbox.ModAPI;
+
+using SEModAPIExtensions.API;
+
+using EssentialsPlugin.Settings;
+using EssentialsPlugin.Utility;
+
+using SEModAPIInternal.API.Entity;
+using SEModAPIInternal.API.Entity.Sector.SectorObject;
+using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
+using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+
+using SEModAPIInternal.API.Common;
+
+namespace EssentialsPlugin.ProcessHandler
+{
+	class ProcessBlockEnforcement : ProcessHandlerBase
+	{
+
+		public override int GetUpdateResolution()
+		{
+			return 30000;
+		}
+
+		public override void Handle()
+		{
+			try
+			{
+				if (!PluginSettings.Instance.BlockEnforcementEnabled)
+					return;
+
+				DateTime start = DateTime.Now;
+				if(PluginSettings.Instance.BlockEnforcementItems.Count > 0)
+				{
+					ScanForBlockItems();
+					if ((DateTime.Now - start).TotalMilliseconds > 2000)
+						Logging.WriteLineAndConsole(string.Format("Block Enforce Scan Time Elapsed: {0}ms", (DateTime.Now - start).TotalMilliseconds));
+				}
+			}
+			catch (Exception ex)
+			{
+				Logging.WriteLineAndConsole(string.Format("ProcessBlockEnforcement.Handle(): {0}", ex.ToString()));
+			}
+
+			base.Handle();
+		}
+
+		private void ScanForBlockItems()
+		{
+			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+
+			try
+			{
+				MyAPIGateway.Entities.GetEntities(entities);
+			}
+			catch
+			{
+				Logging.WriteLineAndConsole(string.Format("ScanForBlockItems(): Entity list busy, skipping scan."));
+			}
+
+			foreach (IMyEntity entity in entities)
+			{
+				if (!(entity is IMyCubeGrid))
+					continue;
+
+				if (!entity.InScene)
+					continue;
+
+				IMyCubeGrid grid = (IMyCubeGrid)entity;
+				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
+				if (gridBuilder == null)
+					continue;
+
+				Dictionary<string, int> blocks = new Dictionary<string, int>();
+				foreach (MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
+				{
+					foreach(SettingsBlockEnforcementItem item in PluginSettings.Instance.BlockEnforcementItems)
+					{
+						if (!item.Enabled)
+							continue;
+
+						if (block.GetId().ToString().Contains(item.BlockType))
+						{
+							if (blocks.ContainsKey(item.BlockType))
+								blocks[item.BlockType] += 1;
+							else
+								blocks.Add(item.BlockType, 1);
+						}
+					}
+				}
+
+				foreach(SettingsBlockEnforcementItem item in PluginSettings.Instance.BlockEnforcementItems)
+				{
+					if (!item.Enabled)
+						continue;
+
+					if (!blocks.ContainsKey(item.BlockType))
+						continue;
+
+					if (blocks[item.BlockType] > item.MaxPerGrid)
+					{
+						foreach(long playerId in CubeGrids.GetBigOwners(gridBuilder))
+						{
+							ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerId(playerId);
+							if (steamId > 0)
+							{
+								Communication.SendPrivateInformation(steamId, string.Format("You have exceeded the max block count of {0} on the ship '{1}'.  We are removing {2} blocks to enforce this block limit.", item.BlockType, gridBuilder.DisplayName, blocks[item.BlockType] - item.MaxPerGrid));
+							}
+						}
+
+						DeleteReverse(item.BlockType, blocks[item.BlockType] - item.MaxPerGrid, grid, gridBuilder);
+					}
+				}
+			}
+		}
+
+		private void DeleteReverse(string id, int remove, IMyCubeGrid grid, MyObjectBuilder_CubeGrid gridBuilder)
+		{
+			int count = 0;
+			List<MyObjectBuilder_CubeBlock> blocksToRemove = new List<MyObjectBuilder_CubeBlock>();
+			for (int r = gridBuilder.CubeBlocks.Count - 1; r >= 0; r--)
+			{
+				MyObjectBuilder_CubeBlock block = gridBuilder.CubeBlocks[r];
+				if (block.GetId().ToString().Contains(id))
+				{
+					blocksToRemove.Add(block);
+					count++;
+				}
+
+				if (count == remove)
+					break;
+			}
+
+			if (blocksToRemove.Count < 1)
+				return;
+
+			List<VRageMath.Vector3I> razeList = new List<VRageMath.Vector3I>();
+			foreach (MyObjectBuilder_CubeBlock block in blocksToRemove)
+			{
+				razeList.Add(block.Min);
+			}
+
+			Wrapper.GameAction(() =>
+			{
+				grid.RazeBlocks(razeList);
+			});			
+		}
+	}
+}

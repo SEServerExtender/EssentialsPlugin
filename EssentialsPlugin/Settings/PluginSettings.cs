@@ -62,6 +62,7 @@ namespace EssentialsPlugin
 		private int m_newUserTransportAsteroidDistance;
 		private NewUserTransportSpawnPoint m_newUserTransportSpawnType;
 		private string[] m_NewUserTransportSpawnShipNames = new string[] { };
+		private bool m_newUserTransportStopRunawaySpawnShips;
 
 		private bool m_loginEnabled;
 		private string[] m_loginEntityWhitelist = new string[] { };
@@ -79,11 +80,15 @@ namespace EssentialsPlugin
 		private string[] m_dynamicConcealIgnoreSubTypeList = new string[] { };
 		private bool m_dynamicConcealIncludeMedBays;
 		private bool m_dynamicShowMessages;
+		private bool m_dynamicTurretManagment;
+		private int m_dynamicTurretTargetDistance;
+		private bool m_dynamicTurretAllowExemption;
 
 		private bool m_waypointsEnabled;
 		private int m_waypointsMaxPerPlayer;
 		private MTObservableCollection<ServerWaypointItem> m_waypointServerItems;
 		private MTObservableCollection<ServerWaypointItem> m_waypointDefaultItems;
+		private int m_waypointsMaxPerFaction;
 
 		private bool m_cleanupEnabled;
 		private MTObservableCollection<SettingsCleanupTriggerItem> m_cleanupTriggerItems;
@@ -389,6 +394,26 @@ namespace EssentialsPlugin
 			}
 		}
 
+		public string[] NewUserTransportSpawnShipNames
+		{
+			get { return m_NewUserTransportSpawnShipNames; }
+			set 
+			{ 
+				m_NewUserTransportSpawnShipNames = value;
+				Save();
+			}
+		}
+
+		public bool NewUserTransportStopRunawaySpawnShips
+		{
+			get { return m_newUserTransportStopRunawaySpawnShips; }
+			set
+			{ 
+				m_newUserTransportStopRunawaySpawnShips = value;
+				Save();
+			}
+		}
+
 		public bool LoginEnabled
 		{
 			get { return m_loginEnabled; }
@@ -521,6 +546,36 @@ namespace EssentialsPlugin
 			}
 		}
 
+		public int DynamicTurretTargetDistance
+		{
+			get { return m_dynamicTurretTargetDistance; }
+			set 
+			{ 
+				m_dynamicTurretTargetDistance = value;
+				Save();
+			}
+		}
+
+		public bool DynamicTurretManagment
+		{
+			get { return m_dynamicTurretManagment; }
+			set 
+			{ 
+				m_dynamicTurretManagment = value;
+				Save();
+			}
+		}
+
+		public bool DynamicTurretAllowExemption
+		{
+			get { return m_dynamicTurretAllowExemption; }
+			set 
+			{ 
+				m_dynamicTurretAllowExemption = value;
+				Save();
+			}
+		}
+
 		public bool WaypointsEnabled
 		{
 			get { return m_waypointsEnabled; }
@@ -530,6 +585,7 @@ namespace EssentialsPlugin
 				Save();
 			}
 		}
+
 
 		public int WaypointsMaxPerPlayer
 		{
@@ -551,6 +607,16 @@ namespace EssentialsPlugin
 		{
 			get { return m_waypointDefaultItems; }
 			set { m_waypointDefaultItems = value; }
+		}
+
+		public int WaypointsMaxPerFaction
+		{
+			get { return m_waypointsMaxPerFaction; }
+			set 
+			{ 
+				m_waypointsMaxPerFaction = value;
+				Save();
+			}
 		}
 
 		public bool CleanupEnabled
@@ -639,6 +705,8 @@ namespace EssentialsPlugin
 
 			m_dynamicConcealDistance = 8000;
 			m_dynamicShowMessages = false;
+			m_dynamicTurretTargetDistance = 2000;
+			m_dynamicTurretManagment = false;
 
 			m_dockingShipsPerZone = 1;
 

@@ -22,6 +22,7 @@ namespace EssentialsPlugin.ProcessHandler
 		private volatile bool m_ready = false;
 		private Random m_random;
 		private bool m_init;
+		private DateTime m_lastUpdate = DateTime.Now;
 
 		public ProcessNewUserTransport()
 		{

@@ -90,30 +90,7 @@ namespace EssentialsPlugin.ProcessHandler
 							}
 						}
 
-						List<WaypointItem> waypointItems = Waypoints.Instance.Get(steamId);
-						string waypoints = "";
-						foreach (WaypointItem item in waypointItems)
-						{
-							if(waypoints != "")
-								waypoints += "\r\n";
-
-							waypoints += string.Format("/waypoint add \"{0}\" \"{1}\" {2} {3} {4} {5}", item.Name.ToLower(), item.Text, item.WaypointType.ToString(), item.Position.X, item.Position.Y, item.Position.Z);
-						}
-
-						// Add server waypoints
-						foreach (ServerWaypointItem item in PluginSettings.Instance.WaypointServerItems)
-						{
-							if (!item.Enabled)
-								continue;
-
-							if (waypoints != "")
-								waypoints += "\r\n";
-
-							waypoints += string.Format("/waypoint add \"{0}\" \"{0}\" Neutral {1} {2} {3}", item.Name, item.X, item.Y, item.Z);
-						}
-
-						if(waypoints != "")
-							Communication.SendClientMessage(steamId, waypoints);
+						Waypoints.SendClientWaypoints(steamId);
 					}
 				}
 			}

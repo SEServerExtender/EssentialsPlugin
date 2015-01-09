@@ -70,10 +70,14 @@ namespace EssentialsPlugin.ChatHandlers
 				playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(userId).First();
 
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+			List<IMyPlayer> players = new List<IMyPlayer>();
 			Wrapper.GameAction(() =>
 			{
 				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
+				MyAPIGateway.Players.GetPlayers(players);
 			});
+
+			IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == userId);			
 
 			string result = "";
 			int count = 0;
@@ -90,9 +94,9 @@ namespace EssentialsPlugin.ChatHandlers
 					if(result != "")
 						result += "\r\n";
 
-					if(CubeGrids.IsFullOwner(gridBuilder, playerId) && !dialog)
+					if(CubeGrids.IsFullOwner(gridBuilder, playerId, player) && !dialog)
 						result += string.Format("Grid '{0}' at {2}", grid.DisplayName, grid.EntityId, ShowCoordinates(grid.GetPosition()));
-					else if (CubeGrids.IsFullOwner(gridBuilder, playerId) && dialog)
+					else if (CubeGrids.IsFullOwner(gridBuilder, playerId, player) && dialog)
 						result += string.Format("{0} - {1} - {2}bl - {3}", grid.DisplayName, ShowCoordinates(grid.GetPosition()), gridBuilder.CubeBlocks.Count, gridBuilder.GridSizeEnum);
 					else
 						result += string.Format("Grid '{0}'", grid.DisplayName, grid.EntityId);

@@ -61,7 +61,6 @@ namespace EssentialsPlugin.ChatHandlers
 				}
 			}
 
-
 			Vector3D startPosition = new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2]));
 			Vector3D movePosition = new Vector3(float.Parse(words[3]), float.Parse(words[4]), float.Parse(words[5]));
 			Vector3D difference = startPosition - movePosition;

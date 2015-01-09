@@ -175,9 +175,21 @@ namespace EssentialsPlugin.ProcessHandler
 			// Give a list of commands
 			foreach(ChatHandlerBase chatBase in Essentials.ChatHandlers)
 			{
-				string[] command = chatBase.GetCommandText().Split(new char[] {' '}, 2);
-				if (!commands.Contains(command[0]))
-					commands.Add(command[0]);
+				if (chatBase.GetMultipleCommandText().Length > 0)
+				{
+					foreach (string cmd in chatBase.GetMultipleCommandText())
+					{
+						string[] command = cmd.Split(new char[] { ' ' }, 2);
+						if (!commands.Contains(command[0]))
+							commands.Add(command[0]);
+					}
+				}
+				else
+				{
+					string[] command = chatBase.GetCommandText().Split(new char[] { ' ' }, 2);
+					if (!commands.Contains(command[0]))
+						commands.Add(command[0]);
+				}
 			}
 
 			string finalText = "";

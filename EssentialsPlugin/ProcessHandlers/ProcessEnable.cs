@@ -25,12 +25,12 @@ using Sandbox.Definitions;
 
 namespace EssentialsPlugin.ProcessHandler
 {
-	public class ProcessConceal : ProcessHandlerBase
+	public class ProcessEnable : ProcessHandlerBase
 	{
-		private static DateTime m_lastConcealCheck;
-		private static DateTime m_lastRevealCheck;
+		private static DateTime m_lastEnableCheck;
+		private static DateTime m_lastDisableCheck;
 
-		public ProcessConceal()
+		public ProcessEnable()
 		{
 			//EntityManagement.RevealAll();
 		}
@@ -45,29 +45,19 @@ namespace EssentialsPlugin.ProcessHandler
 			if (!PluginSettings.Instance.DynamicConcealEnabled)
 				return;
 
-			if (DateTime.Now - m_lastRevealCheck > TimeSpan.FromSeconds(4))
+			if (DateTime.Now - m_lastEnableCheck > TimeSpan.FromSeconds(5))
 			{
-				//Logging.WriteLineAndConsole("CheckAndRevealEntities");
-				EntityManagement.CheckAndRevealEntities();
-				m_lastRevealCheck = DateTime.Now;
+				EntityManagement.CheckAndEnableTurrets();
+				m_lastEnableCheck = DateTime.Now;
 			}
 
-			if (DateTime.Now - m_lastConcealCheck > TimeSpan.FromSeconds(30))
+			if (DateTime.Now - m_lastDisableCheck > TimeSpan.FromSeconds(30))
 			{
-				//Logging.WriteLineAndConsole("CheckAndConcealEntities");
-				EntityManagement.CheckAndConcealEntities();
-				m_lastConcealCheck = DateTime.Now;
+				EntityManagement.CheckAndDisableTurrets();
+				m_lastDisableCheck = DateTime.Now;
 			}
 
 			base.Handle();
-		}
-
-		public override void OnPlayerJoined(ulong remoteUserId)
-		{
-			EntityManagement.CheckAndRevealEntities();
-			Logging.WriteLineAndConsole(string.Format("Check Reveal due to: {0}", remoteUserId));
-
-			base.OnPlayerJoined(remoteUserId);
 		}
 	}
 }

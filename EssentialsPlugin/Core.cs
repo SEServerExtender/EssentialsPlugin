@@ -397,6 +397,26 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.NewUserTransportSpawnType = value; }
 		}
 
+		[Category("Automated New User Transport")]
+		[Description("The names of spawnships.  Used for automated spawn ship stopping.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public string[] NewUserTransportSpawnShipNames
+		{
+			get { return PluginSettings.Instance.NewUserTransportSpawnShipNames; }
+			set { PluginSettings.Instance.NewUserTransportSpawnShipNames = value; }
+		}
+
+		[Category("Automated New User Transport")]
+		[Description("Enable / Disable automatic spawn ship stopping.  The theory is, they cause havok errors if they jump physics worlds.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool NewUserTransportStopRunawaySpawnShips
+		{
+			get { return PluginSettings.Instance.NewUserTransportStopRunawaySpawnShips; }
+			set { PluginSettings.Instance.NewUserTransportStopRunawaySpawnShips = value; }				
+		}
+
 		[Category("Player Login Tracking")]
 		[Description("Enable / Disable Player Login Tracking.  This option tracks users login/logouts.  It also reads old logs to get player history.  It's recommended to enable this.")]
 		[Browsable(true)]
@@ -466,7 +486,7 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.DockingShipsPerZone = value; }
 		}
 
-		[Category("Dynamic Entity Concealment")]
+		[Category("Dynamic Entity Management")]
 		[Description("Enable / Disable dynamic entity concealment.  This option will automatically 'hide' ships that players are not close to, meaning they won't be processed by the physics engine.  This should improve performance.")]
 		[Browsable(true)]
 		[ReadOnly(false)]
@@ -476,7 +496,7 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.DynamicConcealEnabled = value; }
 		}
 
-		[Category("Dynamic Entity Concealment")]
+		[Category("Dynamic Entity Management")]
 		[Description("The distance a player must be from a grid for it to be revealed due to distance.  The smaller this value is, the longer a grid will be hidden from sight.  Default is 8000m (max view distance)")]
 		[Browsable(true)]
 		[ReadOnly(false)]
@@ -486,7 +506,7 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.DynamicConcealDistance = value; }
 		}
 
-		[Category("Dynamic Entity Concealment")]
+		[Category("Dynamic Entity Management")]
 		[Description("Enable / Disable management of large block grids.  Large block grids require a different set of scans due to them having medical bays.")]
 		[Browsable(true)]
 		[ReadOnly(false)]
@@ -496,7 +516,7 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.ConcealIncludeLargeGrids = value; }
 		}
 
-		[Category("Dynamic Entity Concealment")]
+		[Category("Dynamic Entity Management")]
 		[Description("The list of subtype blocks that will make the entity manager ignore a grid.  If a grid contains any of these block subtypes, it will automatically not include it when deciding whether to conceal the grid or not")]
 		[Browsable(true)]
 		[ReadOnly(false)]
@@ -506,7 +526,7 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.DynamicConcealIgnoreSubTypeList = value; }
 		}
 
-		[Category("Dynamic Entity Concealment")]
+		[Category("Dynamic Entity Management")]
 		[Description("The list of subtype blocks that will make the entity manager ignore a grid.  If a grid contains any of these block subtypes, it will automatically not include it when deciding whether to conceal the grid or not")]
 		[Browsable(true)]
 		[ReadOnly(false)]
@@ -516,7 +536,7 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.DynamicConcealIncludeMedBays = value; }
 		}
 
-		[Category("Dynamic Entity Concealment")]
+		[Category("Dynamic Entity Management")]
 		[Description("Enable / Disable console messages that display whether an entity is concealed or revealed.  Should be off if you don't care about seeing how many entities get revealed/concealed.")]
 		[Browsable(true)]
 		[ReadOnly(false)]
@@ -526,6 +546,45 @@ namespace EssentialsPlugin
 			set
 			{
 				PluginSettings.Instance.DynamicShowMessages = value;
+			}
+		}
+
+		[Category("Dynamic Entity Management")]
+		[Description("Enable / Disable dynamic management of turrets.  Turrets that do not have a valid target within their target range will be disabled.  This will improve sim speed.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DynamicTurretManagment
+		{
+			get { return PluginSettings.Instance.DynamicTurretManagment; }
+			set
+			{
+				PluginSettings.Instance.DynamicTurretManagment = value;
+			}
+		}
+
+		[Category("Dynamic Entity Management")]
+		[Description("Distance from a grid that has a turret that a valid target must be before enabling.  Should be 2x or more than the scan distance of a turret.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public int DynamicTurretTargetDistance
+		{
+			get { return PluginSettings.Instance.DynamicTurretTargetDistance; }
+			set
+			{
+				PluginSettings.Instance.DynamicTurretTargetDistance = value;
+			}
+		}
+
+		[Category("Dynamic Entity Management")]
+		[Description("Enable / Disable Allowing users to manually exempt their turrets from control with the [ManualControl] tag in custom name of turret.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DynamicTurretAllowExemption
+		{
+			get { return PluginSettings.Instance.DynamicTurretAllowExemption; }
+			set
+			{
+				PluginSettings.Instance.DynamicTurretAllowExemption = value;
 			}
 		}
 
@@ -573,6 +632,16 @@ namespace EssentialsPlugin
 			get { return PluginSettings.Instance.WaypointDefaultItems; }
 		}
 
+		[Category("Waypoint System")]
+		[Description("Maximum faction waypoints per faction")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public int WaypointsMaxPerFaction
+		{
+			get { return PluginSettings.Instance.WaypointsMaxPerFaction; }
+			set { PluginSettings.Instance.WaypointsMaxPerFaction = value; }
+		}
+
 		[Category("Automated Cleanup System")]
 		[Description("Enable / Disable automated cleanup")]
 		[Browsable(true)]
@@ -609,7 +678,7 @@ namespace EssentialsPlugin
 		{
 			get { return PluginSettings.Instance.CleanupNotificationItems; }
 		}
-		/*
+
 		[Category("Block Enforcement System")]
 		[Description("Enable / Disable block type max count enforcement.  This removes blocks that exceed a certain count.  They are removed forcefully from a grid.  When max is reached, a warning is given.  When max is exceeded another warning.")]
 		[Browsable(true)]
@@ -628,7 +697,7 @@ namespace EssentialsPlugin
 		{
 			get { return PluginSettings.Instance.BlockEnforcementItems; }
 		}
-		*/
+
 		#endregion
 
 		#region Constructors and Initializers
@@ -656,6 +725,9 @@ namespace EssentialsPlugin
 			m_processHandlers.Add(new ProcessConceal());
 			m_processHandlers.Add(new ProcessWaypoints());
 			m_processHandlers.Add(new ProcessCleanup());
+			m_processHandlers.Add(new ProcessBlockEnforcement());
+			m_processHandlers.Add(new ProcessEnable());
+			m_processHandlers.Add(new ProcessSpawnShipTracking());
 			
 			// Setup chat handlers
 			m_chatHandlers = new List<ChatHandlerBase>();
@@ -712,6 +784,12 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleWaypointAdd());
 			m_chatHandlers.Add(new HandleWaypointRemove());
 			m_chatHandlers.Add(new HandleWaypointList());
+			m_chatHandlers.Add(new HandleWaypointGroupAdd());
+			m_chatHandlers.Add(new HandleWaypointGroupRemove());
+			m_chatHandlers.Add(new HandleWaypointToggle());
+			m_chatHandlers.Add(new HandleWaypointRefresh());
+			m_chatHandlers.Add(new HandleWaypointFactionAdd());
+			m_chatHandlers.Add(new HandleWaypointFactionRemove());
 
 			m_chatHandlers.Add(new HandleUtilityExportServer());
 			m_chatHandlers.Add(new HandleUtilityGridsList());
@@ -906,10 +984,25 @@ namespace EssentialsPlugin
 				List<string> commands = new List<string>();
 				foreach (ChatHandlerBase handler in m_chatHandlers)
 				{
-					string commandBase = handler.GetCommandText().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
-					if (!commands.Contains(commandBase) && (!handler.IsClientOnly()) && (!handler.IsAdminCommand() || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
+					// We should replace this to just have the handler return a string[] of base commands
+					if (handler.GetMultipleCommandText().Length < 1)
 					{
-						commands.Add(commandBase);
+						string commandBase = handler.GetCommandText().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
+						if (!commands.Contains(commandBase) && (!handler.IsClientOnly()) && (!handler.IsAdminCommand() || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
+						{
+							commands.Add(commandBase);
+						}
+					}
+					else
+					{
+						foreach (string cmd in handler.GetMultipleCommandText())
+						{
+							string commandBase = cmd.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
+							if (!commands.Contains(commandBase) && (!handler.IsClientOnly()) && (!handler.IsAdminCommand() || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
+							{
+								commands.Add(commandBase);
+							}
+						}
 					}
 				}
 
@@ -923,10 +1016,25 @@ namespace EssentialsPlugin
 				bool found = false;
 				foreach (ChatHandlerBase handler in m_chatHandlers)
 				{
-					if (handler.GetCommandText().ToLower() == helpTarget.ToLower())
+					// Again, we should get handler to just return string[] of command Text
+					if (handler.GetMultipleCommandText().Length < 1)
 					{
-						Communication.SendPrivateInformation(remoteUserId, handler.GetHelp());
-						found = true;
+						if (handler.GetCommandText().ToLower() == helpTarget.ToLower())
+						{
+							Communication.SendPrivateInformation(remoteUserId, handler.GetHelp());
+							found = true;
+						}
+					}
+					else
+					{
+						foreach (string cmd in handler.GetMultipleCommandText())
+						{
+							if (cmd.ToLower() == helpTarget.ToLower())
+							{
+								Communication.SendPrivateInformation(remoteUserId, handler.GetHelp());
+								found = true;
+							}
+						}
 					}
 				}
 
@@ -936,9 +1044,23 @@ namespace EssentialsPlugin
 
 					foreach (ChatHandlerBase handler in m_chatHandlers)
 					{
-						if (handler.GetCommandText().ToLower().StartsWith(helpTarget.ToLower()) && ((!handler.IsAdminCommand()) || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
+						// Again, cleanup to one function
+						if (handler.GetMultipleCommandText().Length < 1)
 						{
-							helpTopics.Add(handler.GetCommandText().ToLower().Replace(helpTarget.ToLower(), ""));
+							if (handler.GetCommandText().ToLower().StartsWith(helpTarget.ToLower()) && ((!handler.IsAdminCommand()) || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
+							{
+								helpTopics.Add(handler.GetCommandText().ToLower().Replace(helpTarget.ToLower(), ""));
+							}
+						}
+						else
+						{
+							foreach (string cmd in handler.GetMultipleCommandText())
+							{
+								if (cmd.ToLower().StartsWith(helpTarget.ToLower()) && ((!handler.IsAdminCommand()) || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
+								{
+									helpTopics.Add(cmd.ToLower().Replace(helpTarget.ToLower(), ""));
+								}
+							}
 						}
 					}
 
@@ -965,13 +1087,30 @@ namespace EssentialsPlugin
 			List<string> availableCommands = new List<string>();
 			foreach (ChatHandlerBase chatHandler in m_chatHandlers)
 			{
-				string command = chatHandler.GetCommandText();
-				if (command.StartsWith(message))
+				// Cleanup to one function
+				if (chatHandler.GetMultipleCommandText().Length < 1)
 				{
-					string[] cmdPart = command.Replace(message, "").Trim().Split(new char[] { ' ' });
+					string command = chatHandler.GetCommandText();
+					if (command.StartsWith(message))
+					{
+						string[] cmdPart = command.Replace(message, "").Trim().Split(new char[] { ' ' });
 
-					if (!availableCommands.Contains(cmdPart[0]))
-						availableCommands.Add(cmdPart[0]);
+						if (!availableCommands.Contains(cmdPart[0]))
+							availableCommands.Add(cmdPart[0]);
+					}
+				}
+				else
+				{
+					foreach (string command in chatHandler.GetMultipleCommandText())
+					{
+						if (command.StartsWith(message))
+						{
+							string[] cmdPart = command.Replace(message, "").Trim().Split(new char[] { ' ' });
+
+							if (!availableCommands.Contains(cmdPart[0]))
+								availableCommands.Add(cmdPart[0]);
+						}
+					}
 				}
 			}
 

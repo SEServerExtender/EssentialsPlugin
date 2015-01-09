@@ -9,6 +9,7 @@ using System.IO;
 using EssentialsPlugin.Utility;
 
 using Sandbox.ModAPI;
+using Sandbox.ModAPI.Interfaces;
 using Sandbox.Common.ObjectBuilders;
 
 using VRageMath;
@@ -24,10 +25,21 @@ namespace EssentialsPlugin.Utility
 {
 	public class EntityManagement
 	{
+		private static volatile bool m_checkReveal = false;
+		private static volatile bool m_checkConceal = false;
 		private static HashSet<IMyEntity> m_processedGrids = new HashSet<IMyEntity>();
 		private static List<long> m_removedGrids = new List<long>();
+		private static List<IMyEntity> m_scanCache = new List<IMyEntity>();
+		private static int m_turretsEnabled = 0;
+		private static int m_turretsDisabled = 0;
+		private static int m_turretsToggled = 0;
+
 		public static void CheckAndConcealEntities()
 		{
+			if (m_checkConceal)
+				return;
+
+			m_checkConceal = true;
 			try
 			{
 				DateTime start = DateTime.Now;
@@ -48,8 +60,6 @@ namespace EssentialsPlugin.Utility
 						Logging.WriteLineAndConsole(string.Format("Error getting players list.  Check and Conceal failed: {0}", ex.ToString()));
 						return;
 					}
-
-					//CubeGrids.GetConnectedGrids(entities);
 				});
 
 				try
@@ -140,6 +150,10 @@ namespace EssentialsPlugin.Utility
 			catch (Exception ex)
 			{
 				Logging.WriteLineAndConsole(string.Format("CheckAndConceal(): {0}", ex.ToString()));
+			}
+			finally
+			{
+				m_checkConceal = false;
 			}
 		}
 
@@ -313,8 +327,11 @@ namespace EssentialsPlugin.Utility
 					}
 
 					pos = 2;
-					entity.Physics.LinearVelocity = Vector3.Zero;
-					entity.Physics.AngularVelocity = Vector3.Zero;
+					if (entity.Physics != null)
+					{
+						entity.Physics.LinearVelocity = Vector3.Zero;
+						entity.Physics.AngularVelocity = Vector3.Zero;
+					}
 
 					/*
 					entity.InScene = false;
@@ -402,6 +419,10 @@ namespace EssentialsPlugin.Utility
 
 		public static void CheckAndRevealEntities()
 		{
+			if(m_checkReveal)
+				return;
+
+			m_checkReveal = true;
 			try
 			{
 				DateTime start = DateTime.Now;
@@ -410,8 +431,8 @@ namespace EssentialsPlugin.Utility
 				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 				//Wrapper.GameAction(() =>
 				//{
-					MyAPIGateway.Players.GetPlayers(players);
-					MyAPIGateway.Entities.GetEntities(entities);
+				MyAPIGateway.Players.GetPlayers(players);
+				MyAPIGateway.Entities.GetEntities(entities);
 				//});
 
 				Dictionary<IMyEntity, string> entitiesToReveal = new Dictionary<IMyEntity, string>();
@@ -422,7 +443,7 @@ namespace EssentialsPlugin.Utility
 					if (!(entity is IMyCubeGrid))
 						continue;
 
-					if(entity.InScene)
+					if (entity.InScene)
 						continue;
 
 					IMyCubeGrid grid = (IMyCubeGrid)entity;
@@ -443,7 +464,7 @@ namespace EssentialsPlugin.Utility
 
 					if (!found)
 					{
-						if(CheckRevealBlockRules(grid, players, out currentReason))
+						if (CheckRevealBlockRules(grid, players, out currentReason))
 						{
 							found = true;
 						}
@@ -459,12 +480,16 @@ namespace EssentialsPlugin.Utility
 				if (entitiesToReveal.Count > 0)
 					RevealEntities(entitiesToReveal);
 
-				if((DateTime.Now - start).TotalMilliseconds > 1000)
+				if ((DateTime.Now - start).TotalMilliseconds > 2000)
 					Logging.WriteLineAndConsole(string.Format("Completed Reveal Check: {0}ms", (DateTime.Now - start).TotalMilliseconds));
 			}
 			catch (Exception ex)
 			{
 				Logging.WriteLineAndConsole(string.Format("CheckAndReveal(): {0}", ex.ToString()));
+			}
+			finally
+			{
+				m_checkReveal = false;
 			}
 		}
 
@@ -635,7 +660,8 @@ namespace EssentialsPlugin.Utility
 				else
 				{
 					Logging.WriteLineAndConsole("Conceal", string.Format("Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
-
+//					builder.PositionAndOrientation = new MyPositionAndOrientation(new Vector3D(Math.Round(builder.PositionAndOrientation.Value.Position.X, 0), Math.Round(builder.PositionAndOrientation.Value.Position.Y, 0), Math.Round(builder.PositionAndOrientation.Value.Position.Z, 0)), builder.PositionAndOrientation.Value.Forward, builder.PositionAndOrientation.Value.Up);
+					//builder.PositionAndOrientation = new MyPositionAndOrientation(new Vector3(builder.PositionAndOrientation.Value.Position.X, builder.PositionAndOrientation.Value.Position.Y, builder.PositionAndOrientation.Value.Position.Z), builder.PositionAndOrientation.Value.Forward, builder.PositionAndOrientation.Value.Up);
 					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
 					if (newEntity == null)
 					{
@@ -711,6 +737,303 @@ namespace EssentialsPlugin.Utility
 			});
 
 			Logging.WriteLineAndConsole(string.Format("Revealed {0} grids", count));
+		}
+
+		public static void CheckAndDisableTurrets()
+		{
+			try
+			{
+				DateTime start = DateTime.Now;
+				List<IMyEntity> turretList = new List<IMyEntity>();
+				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+				MyAPIGateway.Entities.GetEntities(entities);
+				m_turretsEnabled = 0;
+				m_turretsDisabled = 0;
+				m_turretsToggled = 0;
+				foreach (IMyEntity entity in entities)
+				{
+					if (!(entity is IMyCubeGrid))
+						continue;
+
+					if (!entity.InScene)
+						continue;
+
+					turretList.AddList(DisableTurretsWithoutTargets(entity));
+				}
+
+				if (turretList.Count > 0)
+				{
+					Wrapper.GameAction(() =>
+					{
+						foreach (IMyEntity entity in turretList)
+						{
+							FunctionalBlockEntity.SetState(entity, false);
+						}
+					});
+				}
+
+				if (m_turretsToggled > 0 || DateTime.Now - start > TimeSpan.FromSeconds(1))
+				{
+					Logging.WriteLineAndConsole(string.Format("Disable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", m_turretsEnabled, m_turretsDisabled, m_turretsToggled, (DateTime.Now - start).TotalMilliseconds));
+				}
+			}
+			catch (Exception ex)			
+			{
+				Logging.WriteLineAndConsole(string.Format("CheckAndDisableTurrets(): {0}", ex.ToString()));
+			}
+		}
+
+		private static List<IMyEntity> DisableTurretsWithoutTargets(IMyEntity entity)
+		{
+			List<IMyEntity> turretList = new List<IMyEntity>();
+			if (!(entity is IMyCubeGrid))
+				return turretList;
+
+			IMyCubeGrid grid = (IMyCubeGrid)entity;
+			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
+			grid.GetBlocks(blocks);
+			bool disable = false;
+			bool ignore = false;
+			foreach (IMySlimBlock block in blocks)
+			{
+				if (block.FatBlock == null)
+					continue;
+
+				if (block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_InteriorTurret) ||
+				   block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_LargeGatlingTurret) ||
+				   block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_LargeMissileTurret))
+				{
+					IMyEntity turret = block.FatBlock;
+					bool state = FunctionalBlockEntity.GetState(turret);
+
+					if (state)
+						m_turretsEnabled++;
+					else
+						m_turretsDisabled++;
+
+					if (state && !ignore)
+					{
+						// No target, so we're not going to enable anything on this grid
+						//if (!disable && DoesGridHaveTarget(grid, block))
+						if (DoesGridHaveTarget(grid, block))
+						{
+							// We'll ignore state and only collect for statistics
+							ignore = true;
+							continue;
+						}
+
+//						Console.WriteLine("Disabling");
+						//disable = true;
+						
+						if (PluginSettings.Instance.DynamicTurretAllowExemption)
+						{
+							IMyFunctionalBlock functional = (IMyFunctionalBlock)turret;
+							if (functional.CustomName.ToLower().Contains("[manualcontrol]"))
+							{
+								continue;
+							}
+						}
+						
+						m_turretsToggled++;
+						turretList.Add(turret);
+					}
+				}
+			}
+
+			return turretList;
+		}
+
+		public static void CheckAndEnableTurrets()
+		{
+			try
+			{
+				DateTime start = DateTime.Now;
+
+				List<IMyEntity> turretList = new List<IMyEntity>();
+				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+				MyAPIGateway.Entities.GetEntities(entities);
+				m_turretsEnabled = 0;
+				m_turretsDisabled = 0;
+				m_turretsToggled = 0;
+				foreach (IMyEntity entity in entities)
+				{
+					if (!(entity is IMyCubeGrid))
+						continue;
+
+					if (!entity.InScene)
+						continue;
+
+					turretList.AddList(EnableTurretsWithTargets(entity));
+				}
+
+				if (turretList.Count > 0)
+				{
+					Wrapper.GameAction(() =>
+					{
+						foreach (IMyEntity entity in turretList)
+						{
+							FunctionalBlockEntity.SetState(entity, true);
+						}
+					});
+				}
+
+				if (m_turretsToggled > 0 || DateTime.Now - start > TimeSpan.FromSeconds(1))
+				{
+					Logging.WriteLineAndConsole(string.Format("Enable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", m_turretsEnabled, m_turretsDisabled, m_turretsToggled, (DateTime.Now - start).TotalMilliseconds));
+				}
+			}
+			catch (Exception ex)
+			{
+				Logging.WriteLineAndConsole(string.Format("CheckAndDisableTurrets(): {0}", ex.ToString()));
+			}
+		}
+
+		private static List<IMyEntity> EnableTurretsWithTargets(IMyEntity entity)
+		{
+			List<IMyEntity> turretList = new List<IMyEntity>();
+
+			if (!(entity is IMyCubeGrid))
+				return turretList;
+
+			IMyCubeGrid grid = (IMyCubeGrid)entity;
+			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
+			m_scanCache.Clear();
+			grid.GetBlocks(blocks);
+			bool enable = false;
+			bool ignore = false;
+			foreach (IMySlimBlock block in blocks)
+			{
+				if (block.FatBlock == null)
+					continue;
+
+				if (block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_InteriorTurret) ||
+				   block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_LargeGatlingTurret) ||
+				   block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_LargeMissileTurret))
+				{
+					IMyEntity turret = block.FatBlock;
+					bool state = FunctionalBlockEntity.GetState(turret);
+
+					if (state)
+						m_turretsEnabled++;
+					else
+						m_turretsDisabled++;
+
+					if (!state && !ignore)
+					{
+						// No target, so we're not going to disable anything on this grid
+						//if (!enable && !DoesGridHaveTarget(grid, block))
+						if (!DoesGridHaveTarget(grid, block))
+						{
+							// We'll ignore state check and only collect for statistics
+//							Console.WriteLine("Ignore");
+							ignore = true;
+							continue;
+						}
+
+//						Console.WriteLine("Enabling");
+						///enable = true;
+						
+						if (PluginSettings.Instance.DynamicTurretAllowExemption)
+						{
+							IMyFunctionalBlock functional = (IMyFunctionalBlock)turret;
+							if (functional.CustomName.ToLower().Contains("[manualcontrol]"))
+							{
+								continue;
+							}
+						}
+						
+						m_turretsToggled++;
+						turretList.Add(turret);
+					}
+				}
+			}
+
+			return turretList;
+		}
+
+		private static bool DoesGridHaveTarget(IMyCubeGrid grid, IMySlimBlock block)
+		{
+			if (m_scanCache.Count < 1)
+			{
+				BoundingSphereD sphere = new BoundingSphereD(grid.GetPosition(), 2000);
+				m_scanCache = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
+			}
+			/*
+			HashSet<IMyEntity> testEntities = new HashSet<IMyEntity>();
+			try
+			{
+				MyAPIGateway.Entities.GetEntities(testEntities);
+			}
+			catch
+			{
+				return false;
+			}
+			*/
+			bool found = false;
+			foreach (IMyEntity testEntity in m_scanCache)
+			{
+				if ((IMyEntity)grid == testEntity)
+					continue;
+
+				if (!testEntity.InScene)
+					continue;
+
+				if (testEntity is IMyCubeBlock)
+					continue;
+
+				if (!(testEntity is IMyControllableEntity))
+				{
+					continue;
+				}
+
+				if (testEntity is IMyCubeGrid)
+				{
+					IMyCubeGrid testGrid = (IMyCubeGrid)testEntity;
+					// Always enable if grid has no owner.  Seems suspect.  Might be a user trying to abuse a no ownership ship.
+					if (testGrid.BigOwners.Count < 1 && testGrid.SmallOwners.Count < 1)
+						return true;
+
+					foreach (long owner in testGrid.BigOwners)
+					{
+						if (block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies ||
+						    block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Neutral)
+						{
+							return true;
+						}
+					}
+				}
+				else
+				{
+					var builderBase = testEntity.GetObjectBuilder();
+					if (builderBase is MyObjectBuilder_Character)
+					{
+						IMyPlayer player = null;
+						try
+						{
+							List<IMyPlayer> players = new List<IMyPlayer>();
+							MyAPIGateway.Players.GetPlayers(players);
+							player = players.FirstOrDefault(x => x.DisplayName == testEntity.DisplayName);
+						}
+						catch (Exception ex)
+						{
+
+						}
+
+						if (player == null)
+							continue;
+
+						long playerId = player.PlayerID;
+
+						if (block.FatBlock.GetUserRelationToOwner(playerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies ||
+						    block.FatBlock.GetUserRelationToOwner(playerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Neutral)
+						{
+							return true;
+						}
+					}
+				}
+			}
+
+			return false;
 		}
 	}
 }

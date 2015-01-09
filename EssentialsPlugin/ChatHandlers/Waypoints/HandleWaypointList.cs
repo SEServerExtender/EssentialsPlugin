@@ -27,6 +27,11 @@ namespace EssentialsPlugin.ChatHandlers
 			return "/waypoint list";
 		}
 
+		public override string[] GetMultipleCommandText()
+		{
+			return new string[] { "/waypoint list", "/wp list" };
+		}
+
 		public override bool IsAdminCommand()
 		{
 			return false;
@@ -47,33 +52,54 @@ namespace EssentialsPlugin.ChatHandlers
 			if (!PluginSettings.Instance.WaypointsEnabled)
 				return false;
 
-			bool dialog = false;
-			if(words.FirstOrDefault(x => x.ToLower() == "dialog") != null)
-				dialog = true;
-
-			if(!dialog)
-				Communication.SendPrivateInformation(userId, "Personal Waypoints:");
+			Communication.SendPrivateInformation(userId, "Personal / Faction Waypoints:");
+			int personalCount = 0;
+			int factionCount = 0;
 
 			List<WaypointItem> items = Waypoints.Instance.Get(userId);
 			string waypoints = "";
-			foreach (WaypointItem item in items)
+			foreach (WaypointItem item in items.OrderBy(x => x.Group))
 			{
 				if(waypoints != "")
 					waypoints += "\r\n";
 
-				waypoints += string.Format("Waypoint {0}: '{1}'  Location: {2}", item.Name, item.Text, General.Vector3DToString(item.Position));
+				if(item.Group != null && item.Group != "")
+					waypoints += string.Format("Group {3} - {0}: '{1}' : ({2})", item.Name, item.Text, General.Vector3DToString(item.Position), item.Group);
+				else
+					waypoints += string.Format("{0}: '{1}' : ({2})", item.Name, item.Text, General.Vector3DToString(item.Position));
+			}
+			personalCount = items.Count;
+
+			long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(userId);
+			IMyFaction faction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(playerId);
+			if (faction != null)
+			{
+				items = Waypoints.Instance.Get((ulong)faction.FactionId);
+				if (waypoints != "" && items.Count > 0)
+					waypoints += "\r\n";
+				
+				foreach (WaypointItem item in items.OrderBy(x => x.Group))
+				{
+					if (waypoints != "")
+						waypoints += "\r\n";
+
+					if (item.Group != null && item.Group != "")
+						waypoints += string.Format("F: Group {3} - {0}: '{1}' : ({2})", item.Name, item.Text, General.Vector3DToString(item.Position), item.Group);
+					else
+						waypoints += string.Format("F: {0}: '{1}' : ({2})", item.Name, item.Text, General.Vector3DToString(item.Position));
+				}
+
+				factionCount = items.Count;
 			}
 
 			if(waypoints != "")
 				waypoints += "\r\n";
 
-			if(!dialog)
-				waypoints += string.Format("Total waypoints: {0}", items.Count);
+			Communication.DisplayDialog(userId, "Waypoints", string.Format("Your defined waypoints: {0} personal, {1} faction", personalCount, factionCount), waypoints);
 
-			if (!dialog)
-				Communication.SendPrivateInformation(userId, waypoints);
-			else
-				Communication.DisplayDialog(userId, "Waypoints", string.Format("Your defined waypoints: {0} waypoints", items.Count), waypoints);
+			waypoints += string.Format("Your defined waypoints: {0} personal, {1} faction", personalCount, factionCount);
+			Communication.SendPrivateInformation(userId, waypoints);
+
 
 			return true;
 		}

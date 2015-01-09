@@ -77,6 +77,12 @@
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanAreaAt.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveAreaToPosition.cs" />
     <Compile Include="ChatHandlers\HandleMotd.cs" />
+    <Compile Include="ChatHandlers\Waypoints\HandleWaypointFactionRemove.cs" />
+    <Compile Include="ChatHandlers\Waypoints\HandleWaypointFactionAdd.cs" />
+    <Compile Include="ChatHandlers\Waypoints\HandleWaypointGroupRemove.cs" />
+    <Compile Include="ChatHandlers\Waypoints\HandleWaypointGroupAdd.cs" />
+    <Compile Include="ChatHandlers\Waypoints\HandleWaypointRefresh.cs" />
+    <Compile Include="ChatHandlers\Waypoints\HandleWaypointToggle.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointList.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointRemove.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointAdd.cs" />
@@ -95,9 +101,12 @@
       <DependentUpon>ControlForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core.cs" />
+    <Compile Include="ProcessHandlers\ProcessBlockEnforcement.cs" />
     <Compile Include="ProcessHandlers\ProcessCleanup.cs" />
-    <Compile Include="ProcessHandlers\ProcessDockingZone.cs" />
     <Compile Include="ProcessHandlers\ProcessConceal.cs" />
+    <Compile Include="ProcessHandlers\ProcessDockingZone.cs" />
+    <Compile Include="ProcessHandlers\ProcessEnable.cs" />
+    <Compile Include="ProcessHandlers\ProcessSpawnShipTracking.cs" />
     <Compile Include="ProcessHandlers\ProcessWaypoints.cs" />
     <Compile Include="ProcessHandlers\ProcessProtection.cs" />
     <Compile Include="Settings\PluginSettings.cs" />

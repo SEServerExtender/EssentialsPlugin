@@ -8,6 +8,7 @@ using VRageMath;
 
 using Sandbox.ModAPI;
 using Sandbox.Common.ObjectBuilders;
+using Sandbox.Common;
 
 using SEModAPIInternal.API.Entity;
 using SEModAPIInternal.API.Entity.Sector.SectorObject;
@@ -504,6 +505,7 @@ namespace EssentialsPlugin.Utility
 			int terminal = 0;
 			int power = 0;
 			int owner = 0;
+			int online = 0;
 
 			// debug
 			// hasdisplayname
@@ -595,6 +597,18 @@ namespace EssentialsPlugin.Utility
 				{
 					options.Add("Has Power", "false");
 					power = 1;
+				}
+
+				if (words.FirstOrDefault(x => x.ToLower() == "notonline") != null)
+				{
+					options.Add("Online", "false");
+					online = 1;
+				}
+
+				if (words.FirstOrDefault(x => x.ToLower() == "online") != null)
+				{
+					options.Add("Online", "true");
+					online = 2;
 				}
 
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")) != null)
@@ -834,6 +848,7 @@ namespace EssentialsPlugin.Utility
 				if (PluginSettings.Instance.LoginEntityWhitelist.Contains(entity.EntityId.ToString()) || PluginSettings.Instance.LoginEntityWhitelist.Contains(entity.DisplayName))
 					continue;
 
+
 				if (hasDisplayName && displayName != "")
 				{
 					if (!hasDisplayNameExact && entity.DisplayName.Contains(displayName))
@@ -842,11 +857,11 @@ namespace EssentialsPlugin.Utility
 					if (hasDisplayNameExact && entity.DisplayName.Equals(displayName))
 						entitiesToConfirm.Add(entity);
 				}
-				else if(hasCustomName && HasCustomName(gridBuilder, customName, hasCustomNameExact))
+				else if (hasCustomName && HasCustomName(gridBuilder, customName, hasCustomNameExact))
 				{
 					entitiesToConfirm.Add(entity);
 				}
-				else if(hasCustomName)
+				else if (hasCustomName)
 				{
 					continue;
 				}
@@ -879,6 +894,46 @@ namespace EssentialsPlugin.Utility
 				typeDict.Clear();
 				checkList.Clear();
 				MyObjectBuilder_CubeGrid grid = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder();
+
+				if (online == 1) // notonline
+				{
+					bool foundOnline = false;
+					foreach (ulong player in PlayerManager.Instance.ConnectedPlayers)
+					{
+						long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(player);
+						if (playerId < 1)
+							continue;
+
+						if (CubeGrids.GetAllOwners(grid).Contains(playerId))
+						{
+							foundOnline = true;
+							break;
+						}
+					}
+
+					if (foundOnline)
+						continue;
+				}
+				else if (online == 2) // online
+				{
+					bool foundOnline = true;
+					foreach (ulong player in PlayerManager.Instance.ConnectedPlayers)
+					{
+						long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(player);
+						if (playerId < 1)
+							continue;
+
+						if (CubeGrids.GetAllOwners(grid).Contains(playerId))
+						{
+							foundOnline = false;
+							break;
+						}
+					}
+
+					if (foundOnline)
+						continue;
+				}
+
 				bool found = true;
 				foreach (MyObjectBuilder_CubeBlock block in grid.CubeBlocks)
 				{
@@ -1168,22 +1223,37 @@ namespace EssentialsPlugin.Utility
 			return false;
 		}
 
-		public static bool IsFullOwner(MyObjectBuilder_CubeGrid grid, long ownerId)
+		public static bool IsFullOwner(MyObjectBuilder_CubeGrid grid, long ownerId, IMyPlayer factionPlayer = null)
 		{
 			bool found = false;
 			foreach (MyObjectBuilder_CubeBlock block in grid.CubeBlocks)
 			{
 				if (!(block is MyObjectBuilder_TerminalBlock))
 					continue;
-
+				
 				MyObjectBuilder_TerminalBlock functional = (MyObjectBuilder_TerminalBlock)block;
-				if (functional.Owner != 0 && functional.Owner != ownerId)
+				if (factionPlayer == null)
 				{
-					return false;
+					if (functional.Owner != 0 && functional.Owner != ownerId)
+					{
+						return false;
+					}
+					else if (functional.Owner != 0)
+					{
+						found = true;
+					}
 				}
-				else if (functional.Owner != 0)
+				else
 				{
-					found = true;
+					MyRelationsBetweenPlayerAndBlock relation = factionPlayer.GetRelationTo(functional.Owner);
+					if (functional.Owner != 0 && (relation == MyRelationsBetweenPlayerAndBlock.Owner || relation == MyRelationsBetweenPlayerAndBlock.FactionShare))
+					{
+						found = true;
+					}
+					else if(functional.Owner != 0 && relation != MyRelationsBetweenPlayerAndBlock.FactionShare && relation != MyRelationsBetweenPlayerAndBlock.FactionShare)				
+					{
+						return false;
+					}
 				}
 			}
 
@@ -1421,6 +1491,28 @@ namespace EssentialsPlugin.Utility
                 }
             }
         }
+
+		public static HashSet<IMyEntity> GetRecursiveGridList(IMyCubeGrid startGrid, HashSet<IMyEntity> ignoreList = null)
+		{
+			HashSet<IMyEntity> results = new HashSet<IMyEntity>();
+			List<IMySlimBlock> currentBlocks = new List<IMySlimBlock>();
+
+            results.Add(startGrid);
+            GetGridBlocks(startGrid, currentBlocks);
+			foreach (IMyCubeGrid connectedGrid in GetConnectedGridList(results, currentBlocks))
+			{
+				if (ignoreList != null && ignoreList.Contains(connectedGrid))
+					continue;
+
+				results.Add(connectedGrid);
+				foreach (IMyEntity entity in GetRecursiveGridList(connectedGrid, results))
+				{
+					results.Add(entity);
+				}
+			}
+
+			return results;
+		}
 
         private static List<IMyCubeGrid> GetConnectedGridList(HashSet<IMyEntity> checkedGrids, List<IMySlimBlock> blocks)
         {
