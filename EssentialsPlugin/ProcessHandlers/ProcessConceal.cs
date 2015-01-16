@@ -71,17 +71,25 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override void OnPlayerJoined(ulong remoteUserId)
 		{
-			if(!PluginSettings.Instance.DynamicConcealEnabled)
+			if (!PluginSettings.Instance.DynamicConcealEnabled)
+				return;
+
+			if (HandleUtilityGridsRefresh.RefreshTrack.Contains(remoteUserId))
+				HandleUtilityGridsRefresh.RefreshTrack.Remove(remoteUserId);
+
+			base.OnPlayerJoined(remoteUserId);
+		}
+
+		public override void OnPlayerWorldSent(ulong remoteUserId)
+		{
+			if (!PluginSettings.Instance.DynamicConcealEnabled)
 				return;
 
 			EntityManagement.CheckAndRevealEntities();
 			m_lastRevealCheck = DateTime.Now;
 			Logging.WriteLineAndConsole(string.Format("Check Reveal due to: {0}", remoteUserId));
 
-			if (HandleUtilityGridsRefresh.RefreshTrack.Contains(remoteUserId))
-				HandleUtilityGridsRefresh.RefreshTrack.Remove(remoteUserId);
-
-			base.OnPlayerJoined(remoteUserId);
+			base.OnPlayerWorldSent(remoteUserId);
 		}
 	}
 }

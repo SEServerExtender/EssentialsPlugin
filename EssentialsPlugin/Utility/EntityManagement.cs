@@ -399,7 +399,6 @@ namespace EssentialsPlugin.Utility
 
 				builder.PersistentFlags = MyPersistentEntityFlags2.None;
 				MyAPIGateway.Entities.RemapObjectBuilder(builder);
-				builder.EntityId = 0;
 
 				pos = 3;
 				if (m_removedGrids.Contains(entity.EntityId))
@@ -412,10 +411,7 @@ namespace EssentialsPlugin.Utility
 					pos = 4;
 					Logging.WriteLineAndConsole("Conceal", string.Format("Start Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
 
-					m_removedGrids.Add(entity.EntityId);
-					//MyAPIGateway.Entities.RemoveEntity(entity);
-					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
-					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(builder);
+					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
 					if (newEntity == null)
 					{
 						Logging.WriteLineAndConsole("Conceal", string.Format("Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId));
@@ -423,10 +419,10 @@ namespace EssentialsPlugin.Utility
 					}
 
 					pos = 5;
-					//MyAPIGateway.Entities.AddEntity(newEntity, false);
-					List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>();
-					addList.Add(builder);
-					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
+					m_removedGrids.Add(entity.EntityId);
+					MyAPIGateway.Entities.RemoveEntity(entity);
+					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
+					MyAPIGateway.Entities.AddEntity(newEntity, false);
 					Logging.WriteLineAndConsole("Conceal", string.Format("End Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
 					pos = 6;
 				}
@@ -751,7 +747,7 @@ namespace EssentialsPlugin.Utility
 
 				builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
 				MyAPIGateway.Entities.RemapObjectBuilder(builder);
-				builder.EntityId = 0;	
+				builder.EntityId = 0;
 
 				if(m_removedGrids.Contains(entity.EntityId))
 				{
@@ -780,8 +776,11 @@ namespace EssentialsPlugin.Utility
 					Logging.WriteLineAndConsole("Conceal", string.Format("Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
 					//builder.PositionAndOrientation = new MyPositionAndOrientation(new Vector3D(Math.Round(builder.PositionAndOrientation.Value.Position.X, 0), Math.Round(builder.PositionAndOrientation.Value.Position.Y, 0), Math.Round(builder.PositionAndOrientation.Value.Position.Z, 0)), builder.PositionAndOrientation.Value.Forward, builder.PositionAndOrientation.Value.Up);
 					//builder.PositionAndOrientation = new MyPositionAndOrientation(new Vector3(builder.PositionAndOrientation.Value.Position.X, builder.PositionAndOrientation.Value.Position.Y, builder.PositionAndOrientation.Value.Position.Z), builder.PositionAndOrientation.Value.Forward, builder.PositionAndOrientation.Value.Up);
+					//MyAPIGateway.Entities.RemoveEntity(entity);
 					m_removedGrids.Add(entity.EntityId);
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
+					//MyAPIGateway.Entities.AddEntity(newEntity, true);
+
 					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(builder);
 					if (newEntity == null)
 					{
@@ -789,7 +788,7 @@ namespace EssentialsPlugin.Utility
 						return;
 					}
 
-					//MyAPIGateway.Entities.AddEntity(newEntity, true);
+					builder.EntityId = newEntity.EntityId;
 					List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>();
 					addList.Add(builder);
 					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
