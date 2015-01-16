@@ -20,6 +20,7 @@ using SEModAPIInternal.API.Entity;
 using Sandbox.Common.ObjectBuilders;
 
 using EssentialsPlugin.Settings;
+using EssentialsPlugin.ChatHandlers;
 
 using Sandbox.Definitions;
 
@@ -29,6 +30,12 @@ namespace EssentialsPlugin.ProcessHandler
 	{
 		private static DateTime m_lastConcealCheck;
 		private static DateTime m_lastRevealCheck;
+
+		public static DateTime LastRevealCheck
+		{
+			get { return m_lastRevealCheck; }
+			set { m_lastRevealCheck = value; }
+		}
 
 		public ProcessConceal()
 		{
@@ -45,13 +52,6 @@ namespace EssentialsPlugin.ProcessHandler
 			if (!PluginSettings.Instance.DynamicConcealEnabled)
 				return;
 
-			if (DateTime.Now - m_lastRevealCheck > TimeSpan.FromSeconds(4))
-			{
-				//Logging.WriteLineAndConsole("CheckAndRevealEntities");
-				EntityManagement.CheckAndRevealEntities();
-				m_lastRevealCheck = DateTime.Now;
-			}
-
 			if (DateTime.Now - m_lastConcealCheck > TimeSpan.FromSeconds(30))
 			{
 				//Logging.WriteLineAndConsole("CheckAndConcealEntities");
@@ -59,13 +59,27 @@ namespace EssentialsPlugin.ProcessHandler
 				m_lastConcealCheck = DateTime.Now;
 			}
 
+			if (DateTime.Now - m_lastRevealCheck > TimeSpan.FromSeconds(5))
+			{
+				//Logging.WriteLineAndConsole("CheckAndRevealEntities");
+				EntityManagement.CheckAndRevealEntities();
+				m_lastRevealCheck = DateTime.Now;
+			}
+
 			base.Handle();
 		}
 
 		public override void OnPlayerJoined(ulong remoteUserId)
 		{
+			if(!PluginSettings.Instance.DynamicConcealEnabled)
+				return;
+
 			EntityManagement.CheckAndRevealEntities();
+			m_lastRevealCheck = DateTime.Now;
 			Logging.WriteLineAndConsole(string.Format("Check Reveal due to: {0}", remoteUserId));
+
+			if (HandleUtilityGridsRefresh.RefreshTrack.Contains(remoteUserId))
+				HandleUtilityGridsRefresh.RefreshTrack.Remove(remoteUserId);
 
 			base.OnPlayerJoined(remoteUserId);
 		}

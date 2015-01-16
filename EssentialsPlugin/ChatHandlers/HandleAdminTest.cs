@@ -184,5 +184,29 @@ namespace EssentialsPlugin.ChatHandlers
 			Communication.SendPrivateInformation(userId, string.Format("{0} turrets.  {1} on, {2} off.  {3} keepon ({4} ms)", count, enabled, disabled, keepOn, (DateTime.Now - start).TotalMilliseconds));
 			return true;
 		}
+
+		/*
+		IMyGridTerminalSystem GridTerminalSystem;
+		List<IMyTerminalBlock> buffer = new List<IMyTerminalBlock>(); 
+		void Main()
+		{
+
+			if (buffer.Count < 1)
+			{
+				GridTerminalSystem.GetBlocksOfType<IMyShipConnector>(buffer);
+			}
+
+			if(buffer.Count < 1)
+				return;
+
+			IMyTerminalBlock block1 = buffer[0];
+			IMyTerminalBlock block2 = buffer[1];
+
+			IMyCubeGrid grid1Parent = ((IMyCubeBlock)block1).CubeGrid
+			IMyCubeGrid grid2Parent = ((IMyCubeBlock)block2).CubeGrid
+
+			throw new Exception(string.Format("Here: {0} - {1} - {2}", buffer.Count, grid1Parent.GridIntegerToWorld(block1.Min), grid2Parent.GridIntegerToWorld(block2.Min)));
+		}
+		 */ 
 	}
 }

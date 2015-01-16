@@ -19,11 +19,13 @@ namespace EssentialsPlugin.Utility
 {
 	public static class DockingZone
 	{
+		private static List<DockingCooldownItem> m_cooldownItems = new List<DockingCooldownItem>();
+
 		public static bool IsGridInside(IMyCubeGrid dockingEntity, List<IMyCubeBlock> beaconList)
 		{
 			// Get bounding box of both the docking zone and docking ship
-			OrientedBoundingBox targetBounding = Entity.GetBoundingBox(beaconList);
-			OrientedBoundingBox dockingBounding = Entity.GetBoundingBox(dockingEntity);
+			OrientedBoundingBoxD targetBounding = Entity.GetBoundingBox(beaconList);
+			OrientedBoundingBoxD dockingBounding = Entity.GetBoundingBox(dockingEntity);
 
 			// If the docking entity is bigger in some way than the zone, this will fail (docking ship larger than dock) ???
 			if (!Entity.GreaterThan(dockingBounding.HalfExtent * 2, targetBounding.HalfExtent * 2))
@@ -53,25 +55,12 @@ namespace EssentialsPlugin.Utility
 				if (!(entityBlock.FatBlock is IMyCubeBlock))
 					continue;
 
-				MyObjectBuilder_CubeBlock blockObject;
-				try
-				{
-					blockObject = entityBlock.FatBlock.GetObjectBuilderCubeBlock();
-					if (blockObject == null)
-						continue;
-				}
-				catch
-				{
-					continue;
-				}
+				IMyCubeBlock cubeBlock = (IMyCubeBlock)entityBlock.FatBlock;
 
-				if (!(blockObject is MyObjectBuilder_Beacon))
+				if (!(cubeBlock is Sandbox.ModAPI.Ingame.IMyBeacon))
 					continue;
 
-				if (entityBlock.FatBlock == null)
-					continue;
-
-				MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)blockObject;
+				Sandbox.ModAPI.Ingame.IMyBeacon beacon = (Sandbox.ModAPI.Ingame.IMyBeacon)cubeBlock;
 				if (beacon.CustomName == null || beacon.CustomName == "")
 					continue;
 
@@ -91,7 +80,9 @@ namespace EssentialsPlugin.Utility
 			foreach (KeyValuePair<String, List<IMyCubeBlock>> p in testList)
 			{
 				if (p.Value.Count == 4)
+				{
 					resultList.Add(p.Key, p.Value);
+				}
 			}
 
 			return resultList;
@@ -140,6 +131,13 @@ namespace EssentialsPlugin.Utility
 					if (!(entityBlock.FatBlock is IMyCubeBlock))
 						continue;
 
+					IMyCubeBlock cubeBlock = (IMyCubeBlock)entityBlock.FatBlock;
+
+					if (!(cubeBlock is Sandbox.ModAPI.Ingame.IMyBeacon))
+						continue;
+
+					IMyTerminalBlock beacon = (IMyTerminalBlock)cubeBlock;
+					/*
 					MyObjectBuilder_CubeBlock blockObject;
 					try
 					{
@@ -156,15 +154,17 @@ namespace EssentialsPlugin.Utility
 						continue;
 
 					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)blockObject;
+					 */ 
+
 					if (beacon.CustomName == null || beacon.CustomName == "")
 						continue;
 
-					if (beacon.BuildPercent == 1 &&
+					if (beacon.IsFunctional &&
 					   beacon.CustomName.ToLower() == pylonName.ToLower()
 					  )
 					{
 						beaconList.Add(entityBlock.FatBlock);
-						Vector3 beaconPos = Entity.GetBlockEntityPosition(entityBlock.FatBlock);
+						Vector3D beaconPos = Entity.GetBlockEntityPosition(entityBlock.FatBlock);
 						continue;
 					}
 
@@ -181,6 +181,38 @@ namespace EssentialsPlugin.Utility
 				if (beaconList.Count == 4)
 					break;
 			}
+		}
+
+		public static void AddCooldown(string name)
+		{
+			DockingCooldownItem item = new DockingCooldownItem();
+			item.Start = DateTime.Now;
+			item.Name = name;
+
+			lock (m_cooldownItems)
+				m_cooldownItems.Add(item);
+		}
+
+		public static bool CheckCooldown(string name)
+		{
+			lock (m_cooldownItems)
+			{
+				DockingCooldownItem item = m_cooldownItems.FindAll(x => x.Name == name).FirstOrDefault();
+				if (item != null)
+				{
+					if (DateTime.Now - item.Start > TimeSpan.FromSeconds(15))
+					{
+						m_cooldownItems.RemoveAll(x => x.Name == name);
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
+			}
+
+			return true;
 		}
 	}
 
@@ -348,6 +380,23 @@ namespace EssentialsPlugin.Utility
 		{
 			get { return dockedName; }
 			set { dockedName = value; }
+		}
+	}
+
+	public class DockingCooldownItem
+	{
+		private DateTime start;
+		public DateTime Start
+		{
+			get { return start; }
+			set { start = value; }
+		}
+
+		private string name;
+		public string Name
+		{
+			get { return name; }
+			set { name = value; }
 		}
 	}
 }

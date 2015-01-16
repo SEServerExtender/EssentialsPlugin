@@ -88,7 +88,7 @@ namespace EssentialsPlugin.ChatHandlers
 				entitiesToConfirm.Add(entity);
 			}
 
-			CubeGrids.GetBlocksUnconnected(entitiesUnconnected, entitiesToConfirm);
+			CubeGrids.GetGridsUnconnected(entitiesUnconnected, entitiesToConfirm);
 			foreach(IMyEntity entity in entitiesUnconnected)
 			{
 				IMyCubeGrid grid = (IMyCubeGrid)entity;

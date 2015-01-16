@@ -61,8 +61,10 @@ namespace EssentialsPlugin.ProcessHandler
 		private void ProcessTimedItem(SettingsCleanupTimedItem item)
 		{
 			DateTime time = new DateTime(m_start.Year, m_start.Month, m_start.Day, item.Restart.Hour, item.Restart.Minute, 0);
-			if (time - DateTime.Now < TimeSpan.Zero)
-				return;
+			if (time - DateTime.Now < TimeSpan.FromSeconds(-20))
+			{
+				time = new DateTime(m_start.Year, m_start.Month, m_start.Day + 1, item.Restart.Hour, item.Restart.Minute, 0);
+			}
 
 			if (DateTime.Now - item.LastRan < TimeSpan.FromMinutes(1))
 				return;

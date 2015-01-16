@@ -77,13 +77,13 @@ namespace EssentialsPlugin.ChatHandlers
             Dictionary<String, List<IMyCubeBlock>> testList;
             List<IMyCubeBlock> beaconList;
             DockingZone.FindByName(pylonName, out testList, out beaconList, playerId);
-
             if (beaconList.Count == 4)
             {
                 // Check ownership
                 foreach (IMyCubeBlock entityBlock in beaconList)
                 {
-                    if (!Entity.CheckOwnership(entityBlock, playerId))
+					IMyTerminalBlock terminal = (IMyTerminalBlock)entityBlock;
+                    if (!terminal.HasPlayerAccess(playerId))
                     {
 						Communication.SendPrivateInformation(userId, string.Format("You do not have permission to use '{0}'.  You must either own all the beacons or they must be shared with faction.", pylonName));
 						return true;
@@ -111,20 +111,20 @@ namespace EssentialsPlugin.ChatHandlers
                 }
 
                 // Figure out center of docking area, and other distance information
-                float maxDistance = 99;
-                Vector3 vPos = new Vector3(0, 0, 0);
+                double maxDistance = 99;
+                Vector3D vPos = new Vector3D(0, 0, 0);
 
                 foreach (IMyCubeBlock b in beaconList)
                 {
-                    Vector3 beaconPos = Entity.GetBlockEntityPosition(b);
+                    Vector3D beaconPos = Entity.GetBlockEntityPosition(b);
                     vPos += beaconPos;
                 }
 
                 vPos = vPos / 4;
                 foreach (IMyCubeBlock b in beaconList)
                 {
-                    Vector3 beaconPos = Entity.GetBlockEntityPosition(b);
-                    maxDistance = Math.Min(maxDistance, Vector3.Distance(vPos, beaconPos));
+                    Vector3D beaconPos = Entity.GetBlockEntityPosition(b);
+                    maxDistance = Math.Min(maxDistance, Vector3D.Distance(vPos, beaconPos));
                 }
 
                 // Find ship in docking area
@@ -136,7 +136,7 @@ namespace EssentialsPlugin.ChatHandlers
                     if (gridCheck.IsStatic || gridCheck == parent)
                         continue;
 
-                    float distance = Vector3.Distance(gridCheck.GetPosition(), vPos);
+                    double distance = Vector3D.Distance(gridCheck.GetPosition(), vPos);
                     if (distance < maxDistance)
                     {
                         dockingEntity = gridCheck;
@@ -148,8 +148,8 @@ namespace EssentialsPlugin.ChatHandlers
                 if (dockingEntity != null)
                 {
                     // Get bounding box of both the docking zone and docking ship
-                    OrientedBoundingBox targetBounding = Entity.GetBoundingBox(beaconList);
-                    OrientedBoundingBox dockingBounding = Entity.GetBoundingBox(dockingEntity);
+                    OrientedBoundingBoxD targetBounding = Entity.GetBoundingBox(beaconList);
+                    OrientedBoundingBoxD dockingBounding = Entity.GetBoundingBox(dockingEntity);
 
                     // Make sure the docking zone contains the docking ship.  If they intersect or are disjointed, then fail
                     if (!Entity.GreaterThan(dockingBounding.HalfExtent * 2, targetBounding.HalfExtent * 2))
@@ -191,7 +191,7 @@ namespace EssentialsPlugin.ChatHandlers
                     // Get our dock rotation as a quaternion
                     Quaternion saveQuat = Quaternion.CreateFromRotationMatrix(parent.WorldMatrix.GetOrientation());
                     // Transform docked ship's local position by inverse of the the parent (unwinds parent) and save it for when we undock
-                    Vector3 savePos = Vector3.Transform(dockingEntity.GetPosition() - parent.GetPosition(), Quaternion.Inverse(saveQuat));
+                    Vector3D savePos = Vector3D.Transform(dockingEntity.GetPosition() - parent.GetPosition(), Quaternion.Inverse(saveQuat));
                     // Get local rotation of dock ship, and save it for when we undock
                     saveQuat = Quaternion.Inverse(saveQuat) * Quaternion.CreateFromRotationMatrix(dockingEntity.WorldMatrix.GetOrientation());
 

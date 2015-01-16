@@ -37,28 +37,14 @@ namespace EssentialsPlugin.ChatHandlers
 			{
 				if (words.Count() < 1)
 				{
-					String noticeList = "";
-					foreach (InformationItem item in PluginSettings.Instance.InformationItems)
-					{
-						if (!item.Enabled)
-							continue;
-
-						if (item.SubCommand == "")
-							continue;
-
-						if (noticeList != "")
-							noticeList += ", ";
-
-						noticeList += item.SubCommand;
-					}
-
-					Communication.SendPrivateInformation(userId, "Type /info followed by: " + noticeList + " for more info.  For example: '/info motd' to view MOTD.");
+					ShowTopicList(userId);
 				}
 				else
 				{
+					bool found = false;
 					foreach (InformationItem item in PluginSettings.Instance.InformationItems)
 					{
-						if (item.SubCommand == "")
+						if (item.SubCommand == null || item.SubCommand == "")
 							continue;
 
 						if (item.SubCommand.ToLower() == words[0].ToLower() && item.Enabled)
@@ -66,13 +52,40 @@ namespace EssentialsPlugin.ChatHandlers
 							string userName = PlayerMap.Instance.GetPlayerNameFromSteamId(userId);
 							string subText = item.SubText.Replace("%name%", userName).Split(new string[] { "\n" }, 2, StringSplitOptions.None).First();
 							Communication.SendPrivateInformation(userId, subText);
+							found = true;
 							break;
 						}
+					}
+
+					if (!found)
+					{
+						Communication.SendPrivateInformation(userId, "ERROR: Topic not found.");
+						ShowTopicList(userId);
 					}
 				}
 			}
 
 			return true;
+		}
+
+		private static void ShowTopicList(ulong userId)
+		{
+			String noticeList = "";
+			foreach (InformationItem item in PluginSettings.Instance.InformationItems)
+			{
+				if (!item.Enabled)
+					continue;
+
+				if (item.SubCommand == null || item.SubCommand == "")
+					continue;
+
+				if (noticeList != "")
+					noticeList += ", ";
+
+				noticeList += item.SubCommand;
+			}
+
+			Communication.SendPrivateInformation(userId, "Type /info followed by: " + noticeList + " for more info.  For example: '/info motd' to view MOTD.");
 		}
 	}
 }

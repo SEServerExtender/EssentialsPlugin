@@ -77,6 +77,8 @@
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanAreaAt.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveAreaToPosition.cs" />
     <Compile Include="ChatHandlers\HandleMotd.cs" />
+    <Compile Include="ChatHandlers\Utility\HandleUtilityGridsCompare.cs" />
+    <Compile Include="ChatHandlers\Utility\HandleUtilityGridsRefresh.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointFactionRemove.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointFactionAdd.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointGroupRemove.cs" />
