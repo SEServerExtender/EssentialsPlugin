@@ -36,12 +36,12 @@ namespace EssentialsPlugin.ProcessHandler
 						if (item.Hour == -1)
 						{
 							if (item.Minute == DateTime.Now.Minute)
-								Backup.Create(PluginSettings.Instance.BackupBaseDirectory, PluginSettings.Instance.BackupCreateSubDirectories, PluginSettings.Instance.BackupAsteroids);
+								Backup.Create(PluginSettings.Instance.BackupBaseDirectory, PluginSettings.Instance.BackupCreateSubDirectories, PluginSettings.Instance.BackupAsteroids, PluginSettings.Instance.BackupEssentials);
 						}
 						else
 						{
 							if (item.Hour == DateTime.Now.Hour && item.Minute == DateTime.Now.Minute)
-								Backup.Create(PluginSettings.Instance.BackupBaseDirectory, PluginSettings.Instance.BackupCreateSubDirectories, PluginSettings.Instance.BackupAsteroids);
+								Backup.Create(PluginSettings.Instance.BackupBaseDirectory, PluginSettings.Instance.BackupCreateSubDirectories, PluginSettings.Instance.BackupAsteroids, PluginSettings.Instance.BackupEssentials);
 						}
 					}
 

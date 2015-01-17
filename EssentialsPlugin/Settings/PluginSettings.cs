@@ -55,6 +55,7 @@ namespace EssentialsPlugin
 		private bool m_backupCleanup;
 		private int m_backupCleanupTime;
 		private bool m_backupAsteroids;
+		private bool m_backupEssentials;
 
 		private bool m_newUserTransportEnabled;
 		private int m_newUserTransportDistance;
@@ -170,9 +171,9 @@ namespace EssentialsPlugin
 				m_restartEnabled = value;
 				Save();
 
-				if (m_restartEnabled)
+				if (m_restartEnabled && !m_loading)
 					Communication.SendPublicInformation("[NOTICE]: Automatic restarts have been enabled by the Administrator.  You will be notified in advance before a restart occurs.");
-				else
+				else if(!m_loading)
 					Communication.SendPublicInformation("[NOTICE]: Automatic restarts have been disabled by the Administrator.");
 			}
 		}
@@ -341,6 +342,16 @@ namespace EssentialsPlugin
 			set
 			{
 				m_backupAsteroids = value;
+				Save();
+			}
+		}
+
+		public bool BackupEssentials
+		{
+			get { return m_backupEssentials; }
+			set 
+			{ 
+				m_backupEssentials = value;
 				Save();
 			}
 		}
@@ -582,8 +593,8 @@ namespace EssentialsPlugin
 			get { return m_dynamicTurretManagementType; }
 			set 
 			{ 
-				//m_dynamicTurretManagementType = value;
-				m_dynamicTurretManagementType = DynamicTurretManagementTypes.All;
+				m_dynamicTurretManagementType = value;
+				//m_dynamicTurretManagementType = DynamicTurretManagementTypes.All;
 				Save();
 			}
 		}
@@ -1135,6 +1146,7 @@ namespace EssentialsPlugin
 	{
 		All,
 		AllButOwner,
-		NeutralAndEnemy
+		NeutralAndEnemy,
+		Enemy
 	}
 }

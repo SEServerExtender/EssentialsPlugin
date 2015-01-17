@@ -11,7 +11,7 @@ namespace EssentialsPlugin.Utility
 {
 	static class Backup
 	{
-		static public void Create(string baseDirectory, bool createSubDirectories, bool backupAsteroids)
+		static public void Create(string baseDirectory, bool createSubDirectories, bool backupAsteroids, bool backupSettings = false)
 		{
 			Logging.WriteLineAndConsole(string.Format("Creating backup ..."));
 			//string baseDirectory = PluginSettings.Instance.BackupBaseDirectory;
@@ -50,6 +50,21 @@ namespace EssentialsPlugin.Utility
 						continue;
 
 					File.Copy(file, tempDirectory + "\\" + info.Name, true);
+				}
+			}
+
+			if (backupSettings)
+			{
+				if(!Directory.Exists(tempDirectory + "\\Essentials"))
+					Directory.CreateDirectory(tempDirectory + "\\Essentials");
+
+				foreach(string file in Directory.GetFiles(Essentials.PluginPath))
+				{
+					FileInfo info = new FileInfo(file);
+					if(!info.Extension.ToLower().Equals(".xml"))
+						continue;
+
+					File.Copy(file, tempDirectory + "\\Essentials\\" + info.Name, true);					
 				}
 			}
 

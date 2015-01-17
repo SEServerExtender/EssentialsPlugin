@@ -46,7 +46,7 @@ namespace EssentialsPlugin.ChatHandlers
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
 			Communication.SendPrivateInformation(userId, string.Format("Creating a save game backup ..."));
-			Backup.Create(PluginSettings.Instance.BackupBaseDirectory, PluginSettings.Instance.BackupCreateSubDirectories, PluginSettings.Instance.BackupAsteroids);
+			Backup.Create(PluginSettings.Instance.BackupBaseDirectory, PluginSettings.Instance.BackupCreateSubDirectories, PluginSettings.Instance.BackupAsteroids, PluginSettings.Instance.BackupEssentials);
 			Communication.SendPrivateInformation(userId, string.Format("Save game backup created"));
 			return true;
 		}

@@ -79,5 +79,11 @@ namespace EssentialsPlugin.ProcessHandler
 		{
 
 		}
+
+		public virtual void OnPlayerWorldSent(ulong remoteUserId)
+		{
+
+		}
+
 	}
 }

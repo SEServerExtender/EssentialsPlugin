@@ -31,7 +31,7 @@ namespace EssentialsPlugin.ProcessHandler
 
 		public override int GetUpdateResolution()
 		{
-			return 300;
+			return 400;
 		}
 
 		public override void Handle()

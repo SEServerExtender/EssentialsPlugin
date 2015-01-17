@@ -17,7 +17,7 @@ namespace EssentialsPlugin.Utility
 {
 	class Entity
 	{
-		static public Boolean GreaterThan(Vector3 v, Vector3 container)
+		static public Boolean GreaterThan(Vector3D v, Vector3D container)
 		{
 			if (v.X > container.X || v.Y > container.Y || v.Z > container.Z)
 				return false;
@@ -55,7 +55,7 @@ namespace EssentialsPlugin.Utility
 		{
 			Boolean intersects = false;
 			intersectElement = 0;
-			OrientedBoundingBox targetTestBounding = Entity.GetBoundingBox(beaconList);
+			OrientedBoundingBoxD targetTestBounding = Entity.GetBoundingBox(beaconList);
 			if (testList.Count > 0)
 			{
 				for (int r = 0; r < testList.Count; r++)
@@ -64,7 +64,7 @@ namespace EssentialsPlugin.Utility
 					if (beaconTestList.Count != 4)
 						continue;
 
-					OrientedBoundingBox testBounding = Entity.GetBoundingBox(beaconTestList);
+					OrientedBoundingBoxD testBounding = Entity.GetBoundingBox(beaconTestList);
 					if (testBounding.Contains(ref targetTestBounding) != ContainmentType.Disjoint)
 					{
 						intersectElement = r;
@@ -77,10 +77,10 @@ namespace EssentialsPlugin.Utility
 			return intersects;
 		}
 
-		static public OrientedBoundingBox GetBoundingBox(IMyCubeGrid entity)
+		static public OrientedBoundingBoxD GetBoundingBox(IMyCubeGrid entity)
 		{
-			var min = new Vector3(int.MaxValue, int.MaxValue, int.MaxValue);
-			var max = new Vector3(int.MinValue, int.MinValue, int.MinValue);
+			var min = new Vector3D(int.MaxValue, int.MaxValue, int.MaxValue);
+			var max = new Vector3D(int.MinValue, int.MinValue, int.MinValue);
 
 			float multiplier = 2.5f;
 			if (entity.GridSizeEnum == MyCubeSize.Small)
@@ -92,20 +92,20 @@ namespace EssentialsPlugin.Utility
 			foreach (IMySlimBlock block in blocks)
 			{
 				//Vector3 pos = Entity.GetBlockEntityPosition(block);
-				min = Vector3.Min(block.Position * multiplier, min);
-				max = Vector3.Max(block.Position * multiplier, max);
+				min = Vector3D.Min(block.Position * multiplier, min);
+				max = Vector3D.Max(block.Position * multiplier, max);
 			}
 
-			Vector3 size = max - min;
-			BoundingBox bb = new BoundingBox(new Vector3(0, 0, 0), size).Translate(entity.GetPosition() - (size / 2));
-			return new OrientedBoundingBox(bb.Center, bb.HalfExtents, Quaternion.CreateFromRotationMatrix(entity.WorldMatrix.GetOrientation()));
+			Vector3D size = max - min;
+			BoundingBoxD bb = new BoundingBoxD(new Vector3D(0, 0, 0), size).Translate(entity.GetPosition() - (size / 2));
+			return new OrientedBoundingBoxD(bb.Center, bb.HalfExtents, Quaternion.CreateFromRotationMatrix(entity.WorldMatrix.GetOrientation()));
 		}
 
-		static public OrientedBoundingBox GetBoundingBox(List<IMyCubeBlock> cubeList)
+		static public OrientedBoundingBoxD GetBoundingBox(List<IMyCubeBlock> cubeList)
 		{
-			Vector3 min = new Vector3(int.MaxValue, int.MaxValue, int.MaxValue);
-			Vector3 max = new Vector3(int.MinValue, int.MinValue, int.MinValue);
-			Vector3 pos = new Vector3(0, 0, 0);
+			Vector3D min = new Vector3D(int.MaxValue, int.MaxValue, int.MaxValue);
+			Vector3D max = new Vector3D(int.MinValue, int.MinValue, int.MinValue);
+			Vector3D pos = new Vector3D(0, 0, 0);
 
 			IMyCubeGrid parent = (IMyCubeGrid)cubeList[0].Parent;
 
@@ -124,14 +124,14 @@ namespace EssentialsPlugin.Utility
 
 			// scale box to GridSize
 			var size = max - min;
-			float smallestNotZero = Math.Max(Math.Min(size.X, size.Y), Math.Min(Math.Max(size.X, size.Y), size.Z));
+			double smallestNotZero = Math.Max(Math.Min(size.X, size.Y), Math.Min(Math.Max(size.X, size.Y), size.Z));
 
-			Vector3 rawSize = new Vector3(size.X * 2.5f, size.Y * 2.5f, size.Z * 2.5f);
-			Vector3 expandedSize = new Vector3(Math.Max(size.X, smallestNotZero) * 2.5f, Math.Max(size.Y, smallestNotZero) * 2.5f, Math.Max(size.Z, smallestNotZero) * 2.5f);
+			Vector3D rawSize = new Vector3D(size.X * 2.5f, size.Y * 2.5f, size.Z * 2.5f);
+			Vector3D expandedSize = new Vector3D(Math.Max(size.X, smallestNotZero) * 2.5f, Math.Max(size.Y, smallestNotZero) * 2.5f, Math.Max(size.Z, smallestNotZero) * 2.5f);
 
-			BoundingBox bb;
-			bb = new BoundingBox(new Vector3(0, 0, 0), expandedSize).Translate(pos - (expandedSize / 2));
-			return new OrientedBoundingBox(bb.Center, bb.HalfExtents, Quaternion.CreateFromRotationMatrix(parent.WorldMatrix.GetOrientation()));
+			BoundingBoxD bb;
+			bb = new BoundingBoxD(new Vector3D(0, 0, 0), expandedSize).Translate(pos - (expandedSize / 2));
+			return new OrientedBoundingBoxD(bb.Center, bb.HalfExtents, Quaternion.CreateFromRotationMatrix(parent.WorldMatrix.GetOrientation()));
 		}
 
 		static public Boolean CheckOwnership(IMyCubeBlock entity, long playerId)
@@ -165,7 +165,7 @@ namespace EssentialsPlugin.Utility
 			return mass;
 		}
 
-		static public Vector3 GetBlockEntityPosition(IMyCubeBlock entity)
+		static public Vector3D GetBlockEntityPosition(IMyCubeBlock entity)
 		{
 			return ((IMyCubeGrid)entity.Parent).GridIntegerToWorld(entity.Position);
 		}

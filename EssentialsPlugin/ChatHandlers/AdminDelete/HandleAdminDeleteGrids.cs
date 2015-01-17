@@ -47,12 +47,13 @@ namespace EssentialsPlugin.ChatHandlers
 		{
 			HashSet<IMyEntity> grids = CubeGrids.ScanGrids(userId, words);
 
-			bool confirm = false;
+			bool confirm = true;
+			/*
 			if (words.FirstOrDefault(x => x.ToLower() == "confirm") != null)
 			{
 				confirm = true;
 			}
-
+			*/
 			int count = 0;
 			foreach (IMyEntity entity in grids)
 			{
@@ -79,7 +80,6 @@ namespace EssentialsPlugin.ChatHandlers
 			}
 
 			Communication.SendPrivateInformation(userId, string.Format("Operation deletes {0} grids", count));
-
 			return true;
 		}
 	}

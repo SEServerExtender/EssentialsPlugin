@@ -77,7 +77,7 @@ namespace EssentialsPlugin.Utility
             return new MyPositionAndOrientation(position, rot.Forward, rot.Up);
 		}
 
-		public static void GetBlocksUnconnected(HashSet<IMyEntity> connectedList, HashSet<IMyEntity> entitiesToConfirm)
+		public static void GetGridsUnconnected(HashSet<IMyEntity> connectedList, HashSet<IMyEntity> entitiesToConfirm)
 		{
 			foreach (IMyEntity entity in entitiesToConfirm)
 			{
@@ -383,7 +383,7 @@ namespace EssentialsPlugin.Utility
 			}
 
 			Dictionary<string, int> subTypeDict = new Dictionary<string, int>();
-			CubeGrids.GetBlocksUnconnected(entitiesUnconnected, entitiesToConfirm);
+			CubeGrids.GetGridsUnconnected(entitiesUnconnected, entitiesToConfirm);
 			foreach (IMyEntity entity in entitiesUnconnected)
 			{
 				subTypeDict.Clear();
@@ -892,7 +892,7 @@ namespace EssentialsPlugin.Utility
 			Dictionary<string, int> subTypeDict = new Dictionary<string, int>();
 			Dictionary<string, int> typeDict = new Dictionary<string, int>();
 			List<string> checkList = new List<string>();
-			CubeGrids.GetBlocksUnconnected(entitiesUnconnected, entitiesToConfirm);
+			CubeGrids.GetGridsUnconnected(entitiesUnconnected, entitiesToConfirm);
 			//int blocks = 0;
 			foreach (IMyEntity entity in entitiesUnconnected)
 			{

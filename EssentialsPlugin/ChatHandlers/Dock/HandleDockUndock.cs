@@ -56,7 +56,6 @@ namespace EssentialsPlugin.ChatHandlers
 			}
 
 			String pylonName = String.Join(" ", words);
-
 			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(userId).Count < 1)
 			{
 				Communication.SendPrivateInformation(userId, string.Format("Unable to find player Id: {0}", userId));
@@ -95,19 +94,19 @@ namespace EssentialsPlugin.ChatHandlers
 				DockingItem dockingItem = dockingItems.First();
 
 				// Figure out center of docking area, and other distance information
-				float maxDistance = 99;
-				Vector3 vPos = new Vector3(0, 0, 0);
+				double maxDistance = 99;
+				Vector3D vPos = new Vector3D(0, 0, 0);
 				foreach (IMyCubeBlock b in beaconList)
 				{
-					Vector3 beaconPos = Entity.GetBlockEntityPosition(b);
+					Vector3D beaconPos = Entity.GetBlockEntityPosition(b);
 					vPos += beaconPos;
 				}
 
 				vPos = vPos / 4;
 				foreach (IMyCubeBlock b in beaconList)
 				{
-					Vector3 beaconPos = Entity.GetBlockEntityPosition(b);
-					maxDistance = Math.Min(maxDistance, Vector3.Distance(vPos, beaconPos));
+					Vector3D beaconPos = Entity.GetBlockEntityPosition(b);
+					maxDistance = Math.Min(maxDistance, Vector3D.Distance(vPos, beaconPos));
 				}
 
 				List<IMySlimBlock> blocks = new List<IMySlimBlock>();
@@ -157,13 +156,12 @@ namespace EssentialsPlugin.ChatHandlers
 				/*
 				// Queue for cooldown
 				DockingCooldownItem cItem = new DockingCooldownItem();
-				cItem.name = pylonName;
+				cItem.Name = pylonName;
 				cItem.startTime = DateTime.Now;
 
 				lock (m_cooldownList)
 					m_cooldownList.Add(cItem);
-				*/
-				/*
+
 				IMyEntity gridEntity = MyAPIGateway.Entities.GetEntityById(dockingItem.DockedEntityId);
 				IMyCubeGrid cubeGrid = (IMyCubeGrid)gridEntity;
 

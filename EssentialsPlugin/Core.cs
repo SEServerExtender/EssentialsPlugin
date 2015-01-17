@@ -347,6 +347,20 @@ namespace EssentialsPlugin
 			}
 		}
 
+		[Category("Automated Backup")]
+		[Description("Enable / Disable Backing up of essentials settings")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool BackupEssentials
+		{
+			get { return PluginSettings.Instance.BackupEssentials; }
+			set
+			{
+				PluginSettings.Instance.BackupEssentials = value;
+			}
+		}
+
+
 		[Category("Automated New User Transport")]
 		[Description("Enable / Disable New User Transport.  This option will transport new user ships closer to asteroids.  It will randomly choose an appropriate asteroid that has enough resources inside it, and move them closer to that asteroid.  This helps on servers that have asteroids far apart.")]
 		[Browsable(true)]
@@ -806,6 +820,8 @@ namespace EssentialsPlugin
 
 			m_chatHandlers.Add(new HandleUtilityExportServer());
 			m_chatHandlers.Add(new HandleUtilityGridsList());
+			m_chatHandlers.Add(new HandleUtilityGridsRefresh());
+			m_chatHandlers.Add(new HandleUtilityGridsCompare());
 
 //			m_chatHandlers.Add(new HandleAdminPlayer());
 
@@ -1189,6 +1205,12 @@ namespace EssentialsPlugin
 		{
 			foreach (ProcessHandlerBase handler in m_processHandlers)
 				handler.OnPlayerLeft(remoteUserId);
+		}
+
+		public void OnPlayerWorldSent(ulong remoteUserId)
+		{
+			foreach (ProcessHandlerBase handler in m_processHandlers)
+				handler.OnPlayerWorldSent(remoteUserId);
 		}
 
 		#endregion
