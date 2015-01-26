@@ -952,10 +952,10 @@ namespace EssentialsPlugin
 		/// <param name="obj"></param>
 		public void OnChatReceived(ChatManager.ChatEvent obj)
 		{
-			if (obj.message[0] != '/')
+			if (obj.Message[0] != '/')
 				return;
 
-			HandleChatMessage(obj.sourceUserId, obj.message);
+			HandleChatMessage(obj.SourceUserId, obj.Message);
 		}
 
 		public void HandleChatMessage(ulong steamId, string message)
