@@ -56,12 +56,12 @@ namespace EssentialsPlugin
 		private bool m_newUserTransportMoveAllSpawnShips;
 		private int m_newUserTransportAsteroidDistance;
 		private NewUserTransportSpawnPoint m_newUserTransportSpawnType;
-		private string[] m_NewUserTransportSpawnShipNames = new string[] { };
+		private string[] m_NewUserTransportSpawnShipNames = { };
 		private bool m_newUserTransportStopRunawaySpawnShips;
 
 		private bool m_loginEnabled;
-		private string[] m_loginEntityWhitelist = new string[] { };
-		private string[] m_loginPlayerIdWhitelist = new string[] { };
+		private string[] m_loginEntityWhitelist = { };
+		private string[] m_loginPlayerIdWhitelist = { };
 
 		private bool m_protectedEnabled;
 		private MTObservableCollection<ProtectedItem> m_protectedItems;
@@ -72,7 +72,7 @@ namespace EssentialsPlugin
 		private bool m_dynamicConcealEnabled;
 		private float m_dynamicConcealDistance;
 		private bool m_dynamicConcealIncludeLargeGrids;
-		private string[] m_dynamicConcealIgnoreSubTypeList = new string[] { };
+		private string[] m_dynamicConcealIgnoreSubTypeList = { };
 		private bool m_dynamicConcealIncludeMedBays;
 		private bool m_dynamicShowMessages;
 		private bool m_dynamicTurretManagementEnabled;
