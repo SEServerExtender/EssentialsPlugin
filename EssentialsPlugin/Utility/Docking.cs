@@ -8,42 +8,43 @@ namespace EssentialsPlugin.Utility
 
 	public class Docking
 	{
-		private static Docking m_instance;
-		private static bool m_loading = false;
+		private static Docking _instance;
+		private static bool _loading;
 
-		private List<DockingItem> m_dockingItems = new List<DockingItem>();
+		private readonly List<DockingItem> _dockingItems = new List<DockingItem>();
 
 		public Docking()
 		{
-			if (!Directory.Exists(Essentials.PluginPath + "\\Docking"))
-				Directory.CreateDirectory(Essentials.PluginPath + "\\Docking");
+			string dockingFolderPath = Path.Combine(Essentials.PluginPath , "\\Docking");
+			if (!Directory.Exists(dockingFolderPath))
+				Directory.CreateDirectory(dockingFolderPath);
 		}
 
 		public static Docking Instance
 		{
 			get 			
 			{
-				if (Docking.m_instance == null)
+				if (_instance == null)
 				{
-					Docking.m_instance = new Docking();
-					Docking.m_instance.Load();
+					_instance = new Docking();
+					_instance.Load();
 				}
 
-				return Docking.m_instance; 
+				return _instance; 
 			}
 		}
 
 		public List<DockingItem> DockingItems
 		{
-			get { return m_dockingItems; }
+			get { return _dockingItems; }
 		}
 
 		public void Save()
 		{
-			if (m_loading)
+			if (_loading)
 				return;
 
-			lock(m_instance)
+			lock(_instance)
 			{
 				try
 				{
@@ -51,7 +52,7 @@ namespace EssentialsPlugin.Utility
 					using (StreamWriter writer = new StreamWriter(fileName))
 					{
 						XmlSerializer x = new XmlSerializer(typeof(Docking));
-						x.Serialize(writer, m_instance);
+						x.Serialize(writer, _instance);
 						writer.Close();
 					}					
 				}
@@ -64,14 +65,14 @@ namespace EssentialsPlugin.Utility
 
 		public void Load()
 		{
-			if (m_loading)
+			if (_loading)
 				return;
 
-			lock (m_instance)
+			lock (_instance)
 			{
 				try
 				{
-					m_loading = true;
+					_loading = true;
 					string fileName = Essentials.PluginPath + "Eessentials-Docking.xml";
 
 					if (File.Exists(fileName))
@@ -79,11 +80,11 @@ namespace EssentialsPlugin.Utility
 						using (StreamReader reader = new StreamReader(fileName))
 						{
 							XmlSerializer x = new XmlSerializer(typeof(Docking));
-							m_instance = (Docking)x.Deserialize(reader);
+							_instance = (Docking)x.Deserialize(reader);
 							reader.Close();
 						}
 
-						Logging.WriteLineAndConsole(string.Format("Loaded {0} Docking Items", m_instance.DockingItems));
+						Logging.WriteLineAndConsole(string.Format("Loaded {0} Docking Items", _instance.DockingItems));
 					}
 				}
 				catch (Exception ex)
@@ -92,29 +93,29 @@ namespace EssentialsPlugin.Utility
 				}
 				finally
 				{
-					m_loading = false;
+					_loading = false;
 				}
 			}
 		}
 
 		public void Add(DockingItem item)
 		{
-			lock(m_instance)
-				m_dockingItems.Add(item);
+			lock(_instance)
+				_dockingItems.Add(item);
 
 			Save();
 		}
 
 		public List<DockingItem> Find(Func<DockingItem, bool> search)
 		{
-			lock (m_instance)
-				return m_dockingItems.Where(search).ToList();
+			lock (_instance)
+				return _dockingItems.Where(search).ToList();
 		}
 
 		public void Remove(DockingItem item)
 		{
-			lock (m_instance)
-				m_dockingItems.Remove(item);
+			lock (_instance)
+				_dockingItems.Remove(item);
 
 			Save();
 		}
