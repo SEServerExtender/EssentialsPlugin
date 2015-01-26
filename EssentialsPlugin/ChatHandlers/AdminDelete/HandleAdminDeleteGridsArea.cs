@@ -1,9 +1,9 @@
-﻿using System.Linq;
-using EssentialsPlugin.Utility;
-using VRageMath;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.AdminDelete
 {
+	using System.Linq;
+	using EssentialsPlugin.Utility;
+	using VRageMath;
+
 	public class HandleAdminDeleteGridsArea : ChatHandlerBase
 	{
 		public override string GetHelp()

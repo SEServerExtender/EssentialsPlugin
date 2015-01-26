@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using EssentialsPlugin.Utility;
-
-using Sandbox.ModAPI;
-using Sandbox.Common.ObjectBuilders;
-using SEModAPIInternal.API.Entity;
-using SEModAPIInternal.API.Common;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.AdminDelete
 {
+	using System.Collections.Generic;
+	using System.Linq;
+	using EssentialsPlugin.Utility;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.API.Entity;
+
 	public class HandleAdminDeleteGrids : ChatHandlerBase
 	{
 		public override string GetHelp()
