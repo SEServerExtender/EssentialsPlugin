@@ -126,8 +126,7 @@ namespace EssentialsPlugin.Utility
 			Vector3D rawSize = new Vector3D(size.X * 2.5f, size.Y * 2.5f, size.Z * 2.5f);
 			Vector3D expandedSize = new Vector3D(Math.Max(size.X, smallestNotZero) * 2.5f, Math.Max(size.Y, smallestNotZero) * 2.5f, Math.Max(size.Z, smallestNotZero) * 2.5f);
 
-			BoundingBoxD bb;
-			bb = new BoundingBoxD(new Vector3D(0, 0, 0), expandedSize).Translate(pos - (expandedSize / 2));
+			BoundingBoxD bb = new BoundingBoxD(new Vector3D(0, 0, 0), expandedSize).Translate(pos - (expandedSize / 2));
 			return new OrientedBoundingBoxD(bb.Center, bb.HalfExtents, Quaternion.CreateFromRotationMatrix(parent.WorldMatrix.GetOrientation()));
 		}
 

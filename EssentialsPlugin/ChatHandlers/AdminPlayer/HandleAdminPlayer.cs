@@ -74,7 +74,6 @@ namespace EssentialsPlugin.ChatHandlers
 				if(item.SteamId == 0)
 					continue;
 
-				PlayerItem playerItem;
 				if (!Players.Instance.PlayerLogins.ContainsKey(item.SteamId))
 				{
 					Communication.SendPrivateInformation(userId, string.Format("No login information: {0}", item.Name));
@@ -82,7 +81,7 @@ namespace EssentialsPlugin.ChatHandlers
 					continue;
 				}
 
-				playerItem = Players.Instance.PlayerLogins[item.SteamId];
+				PlayerItem playerItem = Players.Instance.PlayerLogins[item.SteamId];
 				if (DateTime.Now - playerItem.LastLogin > TimeSpan.FromDays(20))
 				{
 					Communication.SendPrivateInformation(userId, string.Format("Player hasn't logged in 20 days: {0}", item.Name));

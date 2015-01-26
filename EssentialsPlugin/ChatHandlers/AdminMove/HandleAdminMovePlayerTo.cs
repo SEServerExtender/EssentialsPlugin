@@ -53,7 +53,6 @@ namespace EssentialsPlugin.ChatHandlers
 			else
 				targetName = string.Join(" ", words.Skip(1).ToArray());
 
-			Vector3D position;
 			IMyEntity entity = Player.FindControlledEntity(targetName);
 			if (entity == null)
 			{
@@ -65,7 +64,7 @@ namespace EssentialsPlugin.ChatHandlers
 				}
 			}
 
-			position = entity.GetPosition();
+			Vector3D position = entity.GetPosition();
 
 			Communication.SendPrivateInformation(userId, string.Format("Trying to move {0} to within {1}m of {2}.  This may take about 20 seconds.", sourceName, distance, targetName));
 			Vector3D startPosition = MathUtility.RandomPositionFromPoint((Vector3)position, distance);
