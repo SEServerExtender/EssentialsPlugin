@@ -326,70 +326,25 @@ namespace EssentialsPlugin.Utility
 	[Serializable]
 	public class DockingItem
 	{
-		private long playerId;
-		public long PlayerId
-		{
-			get { return playerId; }
-			set { playerId = value; }
-		}
+		public long PlayerId { get; set; }
 
-		private long dockedEntityId;
-		public long DockedEntityId
-		{
-			get { return dockedEntityId; }
-			set { dockedEntityId = value; }
-		}
+		public long DockedEntityId { get; set; }
 
-		private long targetEntityId;
-		public long TargetEntityId
-		{
-			get { return targetEntityId; }
-			set { targetEntityId = value; }
-		}
+		public long TargetEntityId { get; set; }
 
-		private long[] dockingBeaconIds;
-		public long[] DockingBeaconIds
-		{
-			get { return dockingBeaconIds; }
-			set { dockingBeaconIds = value; }
-		}
+		public long[ ] DockingBeaconIds { get; set; }
 
-		private Vector3 savePos;
-		public Vector3 SavePos
-		{
-			get { return savePos; }
-			set { savePos = value; }
-		}
+		public Vector3 SavePos { get; set; }
 
-		private Quaternion saveQuat;
-		public Quaternion SaveQuat
-		{
-			get { return saveQuat; }
-			set { saveQuat = value; }
-		}
+		public Quaternion SaveQuat { get; set; }
 
-		private String dockedName;
-		public String DockedName
-		{
-			get { return dockedName; }
-			set { dockedName = value; }
-		}
+		public string DockedName { get; set; }
 	}
 
 	public class DockingCooldownItem
 	{
-		private DateTime start;
-		public DateTime Start
-		{
-			get { return start; }
-			set { start = value; }
-		}
+		public DateTime Start { get; set; }
 
-		private string name;
-		public string Name
-		{
-			get { return name; }
-			set { name = value; }
-		}
+		public string Name { get; set; }
 	}
 }
