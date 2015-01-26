@@ -257,7 +257,7 @@ namespace EssentialsPlugin.Utility
 				}
 				catch (Exception ex)
 				{
-					Logging.WriteLineAndConsole(string.Format("Save(): {0}", ex.ToString()));
+					Logging.WriteLineAndConsole(string.Format("Save(): {0}", ex));
 				}
 			}
 		}
@@ -288,7 +288,7 @@ namespace EssentialsPlugin.Utility
 				}
 				catch (Exception ex)
 				{
-					Logging.WriteLineAndConsole(string.Format("Load(): {0}", ex.ToString()));
+					Logging.WriteLineAndConsole(string.Format("Load(): {0}", ex));
 				}
 				finally
 				{
