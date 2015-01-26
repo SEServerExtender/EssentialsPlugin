@@ -134,26 +134,12 @@ namespace EssentialsPlugin.UtilityClasses
 		#region Private Properties
 		protected XmlSerializer ValueSerializer
 		{
-			get
-			{
-				if (valueSerializer == null)
-				{
-					valueSerializer = new XmlSerializer(typeof(TVal));
-				}
-				return valueSerializer;
-			}
+			get { return valueSerializer ?? ( valueSerializer = new XmlSerializer( typeof ( TVal ) ) ); }
 		}
 
 		private XmlSerializer KeySerializer
 		{
-			get
-			{
-				if (keySerializer == null)
-				{
-					keySerializer = new XmlSerializer(typeof(TKey));
-				}
-				return keySerializer;
-			}
+			get { return keySerializer ?? ( keySerializer = new XmlSerializer( typeof ( TKey ) ) ); }
 		}
 		#endregion
 

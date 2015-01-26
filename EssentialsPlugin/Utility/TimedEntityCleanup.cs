@@ -21,13 +21,7 @@ namespace EssentialsPlugin.Utility
 
 		public static TimedEntityCleanup Instance
 		{
-			get 			
-			{
-				if (m_instance == null)
-					m_instance = new TimedEntityCleanup();
-
-				return m_instance; 
-			}
+			get { return m_instance ?? ( m_instance = new TimedEntityCleanup( ) ); }
 		}
 
 		public TimedEntityCleanup()

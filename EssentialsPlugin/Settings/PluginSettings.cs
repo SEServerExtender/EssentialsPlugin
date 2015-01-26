@@ -107,13 +107,7 @@ namespace EssentialsPlugin
 
 		public static PluginSettings Instance
 		{
-			get
-			{
-				if (m_instance == null)
-					m_instance = new PluginSettings();
-
-				return m_instance;
-			}
+			get { return m_instance ?? ( m_instance = new PluginSettings( ) ); }
 		}
 		#endregion
 
