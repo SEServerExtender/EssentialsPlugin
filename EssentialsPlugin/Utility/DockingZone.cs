@@ -15,7 +15,7 @@ namespace EssentialsPlugin.Utility
 {
 	public static class DockingZone
 	{
-		private static List<DockingCooldownItem> m_cooldownItems = new List<DockingCooldownItem>();
+		private static readonly List<DockingCooldownItem> CooldownItems = new List<DockingCooldownItem>();
 
 		public static bool IsGridInside(IMyCubeGrid dockingEntity, List<IMyCubeBlock> beaconList)
 		{
@@ -57,28 +57,19 @@ namespace EssentialsPlugin.Utility
 				if (string.IsNullOrEmpty( beacon.CustomName ))
 					continue;
 
-				if (testList.ContainsKey(beacon.CustomName))
+				List<IMyCubeBlock> beacons;
+				if (testList.TryGetValue( beacon.CustomName, out beacons ))
 				{
-					testList[beacon.CustomName].Add(entityBlock.FatBlock);
+					beacons.Add(entityBlock.FatBlock);
 				}
 				else
 				{
-					List<IMyCubeBlock> testBeaconList = new List<IMyCubeBlock>();
-					testBeaconList.Add(entityBlock.FatBlock);
+					List<IMyCubeBlock> testBeaconList = new List<IMyCubeBlock> { entityBlock.FatBlock };
 					testList.Add(beacon.CustomName, testBeaconList);
 				}
 			}
 
-			Dictionary<String, List<IMyCubeBlock>> resultList = new Dictionary<string, List<IMyCubeBlock>>();
-			foreach (KeyValuePair<String, List<IMyCubeBlock>> p in testList)
-			{
-				if (p.Value.Count == 4)
-				{
-					resultList.Add(p.Key, p.Value);
-				}
-			}
-
-			return resultList;
+			return testList.Where( p => p.Value.Count == 4 ).ToDictionary( p => p.Key, p => p.Value );
 		}
 
 		static public bool DoesGridContainZone(IMyCubeGrid cubeGrid)
@@ -88,23 +79,19 @@ namespace EssentialsPlugin.Utility
 
 		static public void FindByName(String pylonName, out Dictionary<String, List<IMyCubeBlock>> testList, out List<IMyCubeBlock> beaconList, long playerId)
 		{
-			IMyCubeGrid beaconParent = null;
 			testList = new Dictionary<string, List<IMyCubeBlock>>();
 			beaconList = new List<IMyCubeBlock>();
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-			Wrapper.GameAction(() =>
-			{
-				MyAPIGateway.Entities.GetEntities(entities, null);
-			});
+			Wrapper.GameAction(() => MyAPIGateway.Entities.GetEntities(entities) );
 
 			foreach (IMyEntity entity in entities)
 			{
-				if (!(entity is IMyCubeGrid))
+
+				IMyCubeGrid cubeGrid = entity as IMyCubeGrid;
+				if (cubeGrid == null)
 					continue;
 
-				IMyCubeGrid cubeGrid = (IMyCubeGrid)entity;
-
-				if (cubeGrid == null || cubeGrid.GridSizeEnum == MyCubeSize.Small)
+				if (cubeGrid.GridSizeEnum == MyCubeSize.Small)
 					continue;
 
 				if (!cubeGrid.BigOwners.Contains(playerId) && !cubeGrid.SmallOwners.Contains(playerId))
@@ -112,7 +99,6 @@ namespace EssentialsPlugin.Utility
 
 				testList.Clear();
 				beaconList.Clear();
-				beaconParent = cubeGrid;
 
 				List<IMySlimBlock> cubeBlocks = new List<IMySlimBlock>();
 				cubeGrid.GetBlocks(cubeBlocks);
@@ -150,20 +136,19 @@ namespace EssentialsPlugin.Utility
 						continue;
 
 					if (beacon.IsFunctional &&
-					   beacon.CustomName.ToLower() == pylonName.ToLower()
+					   String.Equals( beacon.CustomName, pylonName, StringComparison.CurrentCultureIgnoreCase )
 					  )
 					{
 						beaconList.Add(entityBlock.FatBlock);
-						Vector3D beaconPos = Entity.GetBlockEntityPosition(entityBlock.FatBlock);
 						continue;
 					}
 
-					if (testList.ContainsKey(beacon.CustomName))
-						testList[beacon.CustomName].Add(entityBlock.FatBlock);
+					List<IMyCubeBlock> blocks;
+					if (testList.TryGetValue( beacon.CustomName, out blocks ))
+						blocks.Add(entityBlock.FatBlock);
 					else
 					{
-						List<IMyCubeBlock> testBeaconList = new List<IMyCubeBlock>();
-						testBeaconList.Add(entityBlock.FatBlock);
+						List<IMyCubeBlock> testBeaconList = new List<IMyCubeBlock> { entityBlock.FatBlock };
 						testList.Add(beacon.CustomName, testBeaconList);
 					}
 				}
@@ -175,34 +160,28 @@ namespace EssentialsPlugin.Utility
 
 		public static void AddCooldown(string name)
 		{
-			DockingCooldownItem item = new DockingCooldownItem();
-			item.Start = DateTime.Now;
-			item.Name = name;
+			DockingCooldownItem item = new DockingCooldownItem { Start = DateTime.Now, Name = name };
 
-			lock (m_cooldownItems)
-				m_cooldownItems.Add(item);
+			lock (CooldownItems)
+				CooldownItems.Add(item);
 		}
 
 		public static bool CheckCooldown(string name)
 		{
-			lock (m_cooldownItems)
+			lock (CooldownItems)
 			{
-				DockingCooldownItem item = m_cooldownItems.FindAll(x => x.Name == name).FirstOrDefault();
-				if (item != null)
+				DockingCooldownItem item = CooldownItems.FindAll(x => x.Name == name).FirstOrDefault();
+				if ( item == null )
 				{
-					if (DateTime.Now - item.Start > TimeSpan.FromSeconds(15))
-					{
-						m_cooldownItems.RemoveAll(x => x.Name == name);
-						return true;
-					}
-					else
-					{
-						return false;
-					}
+					return true;
 				}
+				if ( DateTime.Now - item.Start <= TimeSpan.FromSeconds( 15 ) )
+				{
+					return false;
+				}
+				CooldownItems.RemoveAll(x => x.Name == name);
+				return true;
 			}
-
-			return true;
 		}
 	}
 
