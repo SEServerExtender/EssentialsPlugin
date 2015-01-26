@@ -167,31 +167,31 @@
   <ItemGroup>
     <Reference Include="HavokWrapper, Version=1.0.5420.29471, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Applications\Steam\SteamApps\common\SpaceEngineers\DedicatedServer64\HavokWrapper.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\HavokWrapper.dll</HintPath>
     </Reference>
     <Reference Include="Sandbox.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Applications\Steam\SteamApps\common\SpaceEngineers\DedicatedServer64\Sandbox.Common.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\Sandbox.Common.dll</HintPath>
     </Reference>
     <Reference Include="Sandbox.Common.XmlSerializers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Applications\Steam\SteamApps\common\SpaceEngineers\DedicatedServer64\Sandbox.Common.XmlSerializers.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\Sandbox.Common.XmlSerializers.dll</HintPath>
     </Reference>
     <Reference Include="Sandbox.Game, Version=0.1.5424.28268, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Applications\Steam\SteamApps\common\SpaceEngineers\DedicatedServer64\Sandbox.Game.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\Sandbox.Game.dll</HintPath>
     </Reference>
     <Reference Include="SEModAPI, Version=0.2.7.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Applications\Steam\SteamApps\common\SpaceEngineers\DedicatedServer64\SEModAPI.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\Debug\SEModAPI.dll</HintPath>
     </Reference>
     <Reference Include="SEModAPIExtensions, Version=0.1.7.4, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Applications\Steam\SteamApps\common\SpaceEngineers\DedicatedServer64\SEModAPIExtensions.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\Debug\SEModAPIExtensions.dll</HintPath>
     </Reference>
     <Reference Include="SEModAPIInternal, Version=0.2.4.4, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Applications\Steam\SteamApps\common\SpaceEngineers\DedicatedServer64\SEModAPIInternal.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\Debug\SEModAPIInternal.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -202,15 +202,15 @@
     <Reference Include="System.XML" />
     <Reference Include="VRage.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Applications\Steam\SteamApps\common\SpaceEngineers\DedicatedServer64\VRage.Common.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\VRage.Common.dll</HintPath>
     </Reference>
     <Reference Include="VRage.Library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Applications\Steam\SteamApps\common\SpaceEngineers\DedicatedServer64\VRage.Library.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\VRage.Library.dll</HintPath>
     </Reference>
     <Reference Include="VRage.Math, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Applications\Steam\SteamApps\common\SpaceEngineers\DedicatedServer64\VRage.Math.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\VRage.Math.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
