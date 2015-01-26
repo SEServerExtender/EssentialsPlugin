@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using EssentialsPlugin.Utility;
-using Sandbox.ModAPI;
-using SEModAPIInternal.API.Common;
-using Sandbox.Common;
-
-using VRageMath;
-
-namespace EssentialsPlugin.ProcessHandler
+﻿namespace EssentialsPlugin.ProcessHandlers
 {
+	using System;
+	using System.Collections.Generic;
+	using EssentialsPlugin.Utility;
+	using Sandbox.Common;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
+	using VRageMath;
+
 	public class ProcessDockingZone : ProcessHandlerBase
 	{
 		private DateTime m_lastZoneUpdate;

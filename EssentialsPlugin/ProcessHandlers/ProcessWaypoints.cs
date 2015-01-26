@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Sandbox.ModAPI;
-using VRageMath;
-using EssentialsPlugin.Utility;
-using EssentialsPlugin.Settings;
-
-namespace EssentialsPlugin.ProcessHandler
+﻿namespace EssentialsPlugin.ProcessHandlers
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using EssentialsPlugin.Settings;
+	using EssentialsPlugin.Utility;
+	using Sandbox.ModAPI;
+	using VRageMath;
+
 	public class ProcessWaypoints : ProcessHandlerBase
 	{
 		private List<ulong> m_waypointAdd = new List<ulong>();

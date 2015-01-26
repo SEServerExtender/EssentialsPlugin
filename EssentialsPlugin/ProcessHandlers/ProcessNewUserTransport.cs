@@ -1,24 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using EssentialsPlugin.Utility;
-using Sandbox.ModAPI;
-using SEModAPIInternal.API.Common;
-using Sandbox.Common.ObjectBuilders;
-using VRageMath;
-using System.Threading;
-using SEModAPIInternal.API.Entity;
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-
-namespace EssentialsPlugin.ProcessHandler
+﻿namespace EssentialsPlugin.ProcessHandlers
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Threading;
+	using EssentialsPlugin.Utility;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.API.Entity;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+	using VRageMath;
+
 	public class ProcessNewUserTransport : ProcessHandlerBase
 	{
 		private List<ulong> m_newUserList;
 		private volatile bool m_ready = false;
 		private Random m_random;
 		private bool m_init;
-		private DateTime m_lastUpdate = DateTime.Now;
 
 		public ProcessNewUserTransport()
 		{

@@ -1,6 +1,5 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
-	using EssentialsPlugin.ProcessHandler;
 	using EssentialsPlugin.Utility;
 
 	public class ProcessLoginTracking : ProcessHandlerBase

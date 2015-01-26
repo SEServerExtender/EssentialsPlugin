@@ -1,7 +1,6 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
 	using System;
-	using EssentialsPlugin.ProcessHandler;
 	using EssentialsPlugin.Utility;
 
 	public class ProcessEnable : ProcessHandlerBase

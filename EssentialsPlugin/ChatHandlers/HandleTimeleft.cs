@@ -1,10 +1,11 @@
 ﻿using System;
 using EssentialsPlugin.Utility;
 using EssentialsPlugin.Settings;
-using EssentialsPlugin.ProcessHandler;
 
 namespace EssentialsPlugin.ChatHandlers
 {
+	using EssentialsPlugin.ProcessHandlers;
+
 	public class HandleTimeleft : ChatHandlerBase
 	{
 		DateTime m_start = DateTime.Now;

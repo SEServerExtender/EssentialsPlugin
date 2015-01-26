@@ -11,10 +11,10 @@ using SEModAPIInternal.API.Entity;
 using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
 using SEModAPIInternal.API.Common;
 
-using EssentialsPlugin.ProcessHandler;
-
 namespace EssentialsPlugin.Utility
 {
+	using EssentialsPlugin.ProcessHandlers;
+
 	public class EntityManagement
 	{
 		private static volatile bool _checkReveal;

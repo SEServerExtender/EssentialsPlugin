@@ -1,22 +1,17 @@
-﻿using System;
-
-namespace EssentialsPlugin.ProcessHandler
+﻿namespace EssentialsPlugin.ProcessHandlers
 {
+	using System;
+
 	public abstract class ProcessHandlerBase
 	{
-		private DateTime m_lastUpdate;
-		public DateTime LastUpdate
-		{
-			get { return m_lastUpdate; }
-			set { m_lastUpdate = value; }
-		}
+		public DateTime LastUpdate { get; set; }
 
 		/// <summary>
 		/// Initializer
 		/// </summary>
-		public ProcessHandlerBase()
+		protected ProcessHandlerBase()
 		{
-			m_lastUpdate = DateTime.Now;
+			LastUpdate = DateTime.Now;
 
 			//Logging.WriteLineAndConsole(string.Format("Added process handler: Raised every {0}ms", GetUpdateResolution()));
 		}
@@ -27,7 +22,7 @@ namespace EssentialsPlugin.ProcessHandler
 		/// <returns></returns>
 		public bool CanProcess()
 		{
-			if(DateTime.Now - m_lastUpdate > TimeSpan.FromMilliseconds(GetUpdateResolution()))
+			if(DateTime.Now - LastUpdate > TimeSpan.FromMilliseconds(GetUpdateResolution()))
 			{
 				return true;
 			}
@@ -49,7 +44,7 @@ namespace EssentialsPlugin.ProcessHandler
 		/// </summary>
 		public virtual void Handle()
 		{
-			m_lastUpdate = DateTime.Now;
+			LastUpdate = DateTime.Now;
 		}
 
 		/// <summary>

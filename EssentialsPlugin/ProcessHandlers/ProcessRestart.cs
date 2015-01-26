@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using EssentialsPlugin.Utility;
-using System.Windows.Forms;
-using SEModAPIInternal.API.Common;
-using SEModAPIExtensions.API;
-using Sandbox.ModAPI;
-using VRageMath;
-
-using EssentialsPlugin.Settings;
-
-namespace EssentialsPlugin.ProcessHandler
+﻿namespace EssentialsPlugin.ProcessHandlers
 {
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Threading;
+	using System.Windows.Forms;
+	using EssentialsPlugin.Settings;
+	using EssentialsPlugin.Utility;
+	using Sandbox.ModAPI;
+	using SEModAPIExtensions.API;
+	using SEModAPIInternal.API.Common;
+	using VRageMath;
+
 	class ProcessRestart : ProcessHandlerBase
 	{
 		static private DateTime? m_forcedRestart = null;

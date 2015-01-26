@@ -1,17 +1,15 @@
-﻿using System;
-using System.IO;
-using EssentialsPlugin.Utility;
-using EssentialsPlugin.Settings;
-
-namespace EssentialsPlugin.ProcessHandler
+﻿namespace EssentialsPlugin.ProcessHandlers
 {
+	using System;
+	using System.IO;
+	using EssentialsPlugin.Settings;
+	using EssentialsPlugin.Utility;
+
 	class ProcessBackup : ProcessHandlerBase
 	{
-		private DateTime m_start = DateTime.Now;
-
 		public ProcessBackup()
 		{
-			m_start = DateTime.Now;
+			
 		}
 		public override int GetUpdateResolution()
 		{

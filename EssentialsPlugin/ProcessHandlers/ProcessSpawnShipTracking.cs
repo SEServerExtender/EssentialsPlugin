@@ -3,7 +3,6 @@
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
-	using EssentialsPlugin.ProcessHandler;
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
@@ -11,8 +10,6 @@
 
 	public class ProcessSpawnShipTracking : ProcessHandlerBase
 	{		
-		private DateTime _lastUpdate = DateTime.Now;
-
 		public override int GetUpdateResolution()
 		{
 			return 5000;
@@ -28,9 +25,9 @@
 
 			if (PluginSettings.Instance.NewUserTransportStopRunawaySpawnShips)
 			{
-				if (DateTime.Now - _lastUpdate > TimeSpan.FromSeconds(5))
+				if (DateTime.Now - LastUpdate > TimeSpan.FromSeconds(5))
 				{
-					_lastUpdate = DateTime.Now;
+					LastUpdate = DateTime.Now;
 					HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 					try
 					{

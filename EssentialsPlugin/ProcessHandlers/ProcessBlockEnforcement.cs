@@ -2,7 +2,6 @@
 {
 	using System;
 	using System.Collections.Generic;
-	using EssentialsPlugin.ProcessHandler;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;

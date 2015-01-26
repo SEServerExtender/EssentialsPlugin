@@ -1,9 +1,10 @@
 ﻿using System;
 using EssentialsPlugin.Utility;
-using EssentialsPlugin.ProcessHandler;
 
 namespace EssentialsPlugin.ChatHandlers
 {
+	using EssentialsPlugin.ProcessHandlers;
+
 	public class HandleAdminRestart : ChatHandlerBase
 	{
 		public override string GetHelp()

@@ -2,7 +2,6 @@
 {
 	using System;
 	using System.Linq;
-	using EssentialsPlugin.ProcessHandler;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
 	using SEModAPIInternal.API.Common;

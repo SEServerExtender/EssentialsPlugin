@@ -2,7 +2,6 @@
 {
 	using System;
 	using EssentialsPlugin.ChatHandlers;
-	using EssentialsPlugin.ProcessHandler;
 	using EssentialsPlugin.Utility;
 
 	public class ProcessConceal : ProcessHandlerBase

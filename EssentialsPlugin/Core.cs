@@ -15,7 +15,6 @@ using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
 using SEModAPIInternal.API.Common;
 
 using EssentialsPlugin.Utility;
-using EssentialsPlugin.ProcessHandler;
 using EssentialsPlugin.ChatHandlers;
 using EssentialsPlugin.UtilityClasses;
 using EssentialsPlugin.Settings;

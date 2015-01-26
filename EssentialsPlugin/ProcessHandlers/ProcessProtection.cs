@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-using EssentialsPlugin.Utility;
-using Sandbox.ModAPI;
-using SEModAPIInternal.API.Common;
-using System.Threading;
-
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-using Sandbox.Common.ObjectBuilders;
-
-using EssentialsPlugin.Settings;
-
-namespace EssentialsPlugin.ProcessHandler
+﻿namespace EssentialsPlugin.ProcessHandlers
 {
+	using System.Collections.Generic;
+	using System.Threading;
+	using EssentialsPlugin.Settings;
+	using EssentialsPlugin.Utility;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+
 	public class ProcessProtection : ProcessHandlerBase
 	{
 		public ProcessProtection()
