@@ -17,23 +17,23 @@ namespace EssentialsPlugin.Utility
 {
 	public class EntityManagement
 	{
-		private static volatile bool m_checkReveal = false;
-		private static volatile bool m_checkConceal = false;
-		private static HashSet<IMyEntity> m_processedGrids = new HashSet<IMyEntity>();
-		private static List<long> m_removedGrids = new List<long>();
-		private static List<IMyEntity> m_scanCache = new List<IMyEntity>();
-		private static List<IMyIdentity> m_identityCache = new List<IMyIdentity>();
-		private static DateTime m_lastIdentityUpdate = DateTime.Now.AddHours(-1);
-		private static int m_turretsEnabled = 0;
-		private static int m_turretsDisabled = 0;
-		private static int m_turretsToggled = 0;
+		private static volatile bool _checkReveal;
+		private static volatile bool _checkConceal;
+		private static readonly HashSet<IMyEntity> ProcessedGrids = new HashSet<IMyEntity>();
+		private static readonly List<long> RemovedGrids = new List<long>();
+		private static List<IMyEntity> _scanCache = new List<IMyEntity>();
+		private static readonly List<IMyIdentity> IdentityCache = new List<IMyIdentity>();
+		private static DateTime _lastIdentityUpdate = DateTime.Now.AddHours(-1);
+		private static int _turretsEnabled;
+		private static int _turretsDisabled;
+		private static int _turretsToggled;
 
 		public static void CheckAndConcealEntities()
 		{
-			if (m_checkConceal)
+			if (_checkConceal)
 				return;
 			
-			m_checkConceal = true;
+			_checkConceal = true;
 			try
 			{
 				DateTime start = DateTime.Now;
@@ -42,7 +42,7 @@ namespace EssentialsPlugin.Utility
 				double getGrids = 0d;
 				double co = 0f;
 
-				m_processedGrids.Clear();
+				ProcessedGrids.Clear();
 				List<IMyPlayer> players = new List<IMyPlayer>();
 				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 				HashSet<IMyEntity> entitiesFiltered = new HashSet<IMyEntity>();
@@ -169,7 +169,7 @@ namespace EssentialsPlugin.Utility
 			}
 			finally
 			{
-				m_checkConceal = false;
+				_checkConceal = false;
 			}
 		}
 
@@ -179,7 +179,7 @@ namespace EssentialsPlugin.Utility
 
 			// Live dangerously
 			grid.GetBlocks(blocks, x => x.FatBlock != null);
-			//CubeGrids.GetAllConnectedBlocks(m_processedGrids, grid, blocks, x => x.FatBlock != null);
+			//CubeGrids.GetAllConnectedBlocks(_processedGrids, grid, blocks, x => x.FatBlock != null);
 
 			int beaconCount = 0;
 			//bool found = false;
@@ -393,7 +393,7 @@ namespace EssentialsPlugin.Utility
 				MyAPIGateway.Entities.RemapObjectBuilder(builder);
 
 				pos = 3;
-				if (m_removedGrids.Contains(entity.EntityId))
+				if (RemovedGrids.Contains(entity.EntityId))
 				{
 					Logging.WriteLineAndConsole("Conceal", string.Format("Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
@@ -411,7 +411,7 @@ namespace EssentialsPlugin.Utility
 					}
 
 					pos = 5;
-					m_removedGrids.Add(entity.EntityId);
+					RemovedGrids.Add(entity.EntityId);
 					MyAPIGateway.Entities.RemoveEntity(entity);
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
 					MyAPIGateway.Entities.AddEntity(newEntity, false);
@@ -469,10 +469,10 @@ namespace EssentialsPlugin.Utility
 
 		public static void CheckAndRevealEntities()
 		{
-			if(m_checkReveal)
+			if(_checkReveal)
 				return;
 
-			m_checkReveal = true;
+			_checkReveal = true;
 			try
 			{
 				DateTime start = DateTime.Now;
@@ -544,7 +544,7 @@ namespace EssentialsPlugin.Utility
 			}
 			finally
 			{
-				m_checkReveal = false;
+				_checkReveal = false;
 			}
 		}
 
@@ -556,7 +556,7 @@ namespace EssentialsPlugin.Utility
 			// Live dangerously
 			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
 			grid.GetBlocks(blocks, x => x.FatBlock != null);
-			//CubeGrids.GetAllConnectedBlocks(m_processedGrids, grid, blocks, x => x.FatBlock != null);
+			//CubeGrids.GetAllConnectedBlocks(_processedGrids, grid, blocks, x => x.FatBlock != null);
 			//bool found = false;
 			//bool powered = false;
 			foreach (IMySlimBlock block in blocks)
@@ -741,7 +741,7 @@ namespace EssentialsPlugin.Utility
 				MyAPIGateway.Entities.RemapObjectBuilder(builder);
 				builder.EntityId = 0;
 
-				if(m_removedGrids.Contains(entity.EntityId))
+				if(RemovedGrids.Contains(entity.EntityId))
 				{
 					Logging.WriteLineAndConsole("Conceal", string.Format("Revealing - Id: {0} DUPE FOUND Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
@@ -751,7 +751,7 @@ namespace EssentialsPlugin.Utility
 					/*
 					Logging.WriteLineAndConsole("Conceal", string.Format("Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
-					m_removedGrids.Add(entity.EntityId);
+					_removedGrids.Add(entity.EntityId);
 
 					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(builder);
 					if (newEntity == null)
@@ -769,7 +769,7 @@ namespace EssentialsPlugin.Utility
 					//builder.PositionAndOrientation = new MyPositionAndOrientation(new Vector3D(Math.Round(builder.PositionAndOrientation.Value.Position.X, 0), Math.Round(builder.PositionAndOrientation.Value.Position.Y, 0), Math.Round(builder.PositionAndOrientation.Value.Position.Z, 0)), builder.PositionAndOrientation.Value.Forward, builder.PositionAndOrientation.Value.Up);
 					//builder.PositionAndOrientation = new MyPositionAndOrientation(new Vector3(builder.PositionAndOrientation.Value.Position.X, builder.PositionAndOrientation.Value.Position.Y, builder.PositionAndOrientation.Value.Position.Z), builder.PositionAndOrientation.Value.Forward, builder.PositionAndOrientation.Value.Up);
 					//MyAPIGateway.Entities.RemoveEntity(entity);
-					m_removedGrids.Add(entity.EntityId);
+					RemovedGrids.Add(entity.EntityId);
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
 					//MyAPIGateway.Entities.AddEntity(newEntity, true);
 
@@ -857,9 +857,9 @@ namespace EssentialsPlugin.Utility
 				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 				MyAPIGateway.Entities.GetEntities(entities);
 				UpdateIdentityCache();
-				m_turretsEnabled = 0;
-				m_turretsDisabled = 0;
-				m_turretsToggled = 0;
+				_turretsEnabled = 0;
+				_turretsDisabled = 0;
+				_turretsToggled = 0;
 				foreach (IMyEntity entity in entities)
 				{
 					if (!(entity is IMyCubeGrid))
@@ -882,9 +882,9 @@ namespace EssentialsPlugin.Utility
 					});
 				}
 
-				if (m_turretsToggled > 0 || DateTime.Now - start > TimeSpan.FromSeconds(1))
+				if (_turretsToggled > 0 || DateTime.Now - start > TimeSpan.FromSeconds(1))
 				{
-					Logging.WriteLineAndConsole(string.Format("Disable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", m_turretsEnabled, m_turretsDisabled, m_turretsToggled, (DateTime.Now - start).TotalMilliseconds));
+					Logging.WriteLineAndConsole(string.Format("Disable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", _turretsEnabled, _turretsDisabled, _turretsToggled, (DateTime.Now - start).TotalMilliseconds));
 				}
 			}
 			catch (Exception ex)			
@@ -895,7 +895,7 @@ namespace EssentialsPlugin.Utility
 
 		private static List<IMyEntity> DisableTurretsWithoutTargets(IMyEntity entity)
 		{
-			m_scanCache.Clear();
+			_scanCache.Clear();
 
 			List<IMyEntity> turretList = new List<IMyEntity>();
 			if (!(entity is IMyCubeGrid))
@@ -919,9 +919,9 @@ namespace EssentialsPlugin.Utility
 					bool state = FunctionalBlockEntity.GetState(turret);
 
 					if (state)
-						m_turretsEnabled++;
+						_turretsEnabled++;
 					else
-						m_turretsDisabled++;
+						_turretsDisabled++;
 
 					if (state)// && !ignore)
 					{
@@ -947,7 +947,7 @@ namespace EssentialsPlugin.Utility
 							}
 						}
 						
-						m_turretsToggled++;
+						_turretsToggled++;
 						turretList.Add(turret);
 					}
 				}
@@ -966,9 +966,9 @@ namespace EssentialsPlugin.Utility
 				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 				MyAPIGateway.Entities.GetEntities(entities);
 				UpdateIdentityCache();
-				m_turretsEnabled = 0;
-				m_turretsDisabled = 0;
-				m_turretsToggled = 0;
+				_turretsEnabled = 0;
+				_turretsDisabled = 0;
+				_turretsToggled = 0;
 				foreach (IMyEntity entity in entities)
 				{
 					if (!(entity is IMyCubeGrid))
@@ -991,9 +991,9 @@ namespace EssentialsPlugin.Utility
 					});
 				}
 
-				if (m_turretsToggled > 0 || DateTime.Now - start > TimeSpan.FromSeconds(1))
+				if (_turretsToggled > 0 || DateTime.Now - start > TimeSpan.FromSeconds(1))
 				{
-					Logging.WriteLineAndConsole(string.Format("Enable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", m_turretsEnabled, m_turretsDisabled, m_turretsToggled, (DateTime.Now - start).TotalMilliseconds));
+					Logging.WriteLineAndConsole(string.Format("Enable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", _turretsEnabled, _turretsDisabled, _turretsToggled, (DateTime.Now - start).TotalMilliseconds));
 				}
 			}
 			catch (Exception ex)
@@ -1011,7 +1011,7 @@ namespace EssentialsPlugin.Utility
 
 			IMyCubeGrid grid = (IMyCubeGrid)entity;
 			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
-			m_scanCache.Clear();
+			_scanCache.Clear();
 			grid.GetBlocks(blocks);
 			//bool enable = false;
 			bool ignore = false;
@@ -1028,9 +1028,9 @@ namespace EssentialsPlugin.Utility
 					bool state = FunctionalBlockEntity.GetState(turret);
 
 					if (state)
-						m_turretsEnabled++;
+						_turretsEnabled++;
 					else
-						m_turretsDisabled++;
+						_turretsDisabled++;
 
 					if (!state) // && !ignore)
 					{
@@ -1056,7 +1056,7 @@ namespace EssentialsPlugin.Utility
 							}
 						}
 						
-						m_turretsToggled++;
+						_turretsToggled++;
 						turretList.Add(turret);
 					}
 				}
@@ -1067,10 +1067,10 @@ namespace EssentialsPlugin.Utility
 
 		private static bool DoesGridHaveTarget(IMyCubeGrid grid, IMySlimBlock block, bool disabling = false)
 		{
-			if (m_scanCache.Count < 1)
+			if (_scanCache.Count < 1)
 			{
 				BoundingSphereD sphere = new BoundingSphereD(grid.GetPosition(), PluginSettings.Instance.DynamicTurretTargetDistance);
-				m_scanCache = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
+				_scanCache = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
 			}
 			/*
 			HashSet<IMyEntity> testEntities = new HashSet<IMyEntity>();
@@ -1084,7 +1084,7 @@ namespace EssentialsPlugin.Utility
 			}
 			*/
 			//bool found = false;
-			foreach (IMyEntity testEntity in m_scanCache)
+			foreach (IMyEntity testEntity in _scanCache)
 			{
 				if ((IMyEntity)grid == testEntity)
 					continue;
@@ -1225,7 +1225,7 @@ namespace EssentialsPlugin.Utility
 						long playerId = 0;
 						try
 						{
-							identity = m_identityCache.FirstOrDefault(x => x.DisplayName == testEntity.DisplayName);
+							identity = IdentityCache.FirstOrDefault(x => x.DisplayName == testEntity.DisplayName);
 							//List<IMyPlayer> players = new List<IMyPlayer>();
 							//MyAPIGateway.Players.GetPlayers(players);							
 							//player = players.FirstOrDefault(x => x.DisplayName == testEntity.DisplayName);
@@ -1298,24 +1298,24 @@ namespace EssentialsPlugin.Utility
 
 		private static void UpdateIdentityCache()
 		{
-			if(DateTime.Now - m_lastIdentityUpdate > TimeSpan.FromMinutes(1))
+			if(DateTime.Now - _lastIdentityUpdate > TimeSpan.FromMinutes(1))
 			{
-				m_lastIdentityUpdate = DateTime.Now;
-				m_identityCache.Clear();
-				MyAPIGateway.Players.GetAllIdentites(m_identityCache);
+				_lastIdentityUpdate = DateTime.Now;
+				IdentityCache.Clear();
+				MyAPIGateway.Players.GetAllIdentites(IdentityCache);
 			}
 		}
 
 		public static bool ToggleMedbayGrids(ulong steamId)
 		{
-			if (m_checkConceal || m_checkReveal)
+			if (_checkConceal || _checkReveal)
 			{
 				Communication.SendPrivateInformation(steamId, "Server busy");
 				return false;
 			}
 
-			m_checkConceal = true;
-			m_checkReveal = true;
+			_checkConceal = true;
+			_checkReveal = true;
 			try
 			{
 				DateTime start = DateTime.Now;
@@ -1403,8 +1403,8 @@ namespace EssentialsPlugin.Utility
 			}
 			finally
 			{
-				m_checkConceal = false;
-				m_checkReveal = false;
+				_checkConceal = false;
+				_checkReveal = false;
 			}
 
 			return true;
