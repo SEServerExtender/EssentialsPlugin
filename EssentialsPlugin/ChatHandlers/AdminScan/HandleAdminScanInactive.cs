@@ -37,7 +37,7 @@ namespace EssentialsPlugin.ChatHandlers
 			if(words.Count() > 3)
 				return false;
 
-			if(words.Count() == 0)
+			if(!words.Any())
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());
 				return true;
@@ -54,7 +54,7 @@ namespace EssentialsPlugin.ChatHandlers
 			bool removeNoLoginInformation = true;
 			bool removeOwnerless = true;
 
-			if(words.Count() > 1)
+			if(words.Any())
 			{
 				foreach(string word in words)
 				{

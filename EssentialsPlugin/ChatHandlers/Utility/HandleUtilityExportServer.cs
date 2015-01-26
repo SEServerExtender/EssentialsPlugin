@@ -38,7 +38,7 @@ namespace EssentialsPlugin.ChatHandlers
 
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			if(words.Count() == 0)
+			if(!words.Any())
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());
 				return true;

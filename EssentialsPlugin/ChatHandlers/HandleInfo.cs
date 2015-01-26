@@ -32,7 +32,7 @@ namespace EssentialsPlugin.ChatHandlers
 		{
 			if (PluginSettings.Instance.InformationEnabled)
 			{
-				if (words.Count() < 1)
+				if (!words.Any())
 				{
 					ShowTopicList(userId);
 				}

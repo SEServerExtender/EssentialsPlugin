@@ -34,7 +34,7 @@ namespace EssentialsPlugin.ChatHandlers
 
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			if(words.Count() < 1)
+			if(!words.Any())
 			{
 				Communication.SendClientMessage(userId, "/message Server " + GetHelp());
 			}

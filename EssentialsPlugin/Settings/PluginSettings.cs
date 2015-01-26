@@ -422,7 +422,7 @@ namespace EssentialsPlugin
 				m_loginEnabled = value;
 				if (value && !m_loading)
 				{
-					if (Players.Instance.PlayerLogins.Count() == 0)
+					if (!Players.Instance.PlayerLogins.Any())
 						Players.ProcessServerLogsForLogins(true);
 				}
 				Save();

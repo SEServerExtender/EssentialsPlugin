@@ -237,7 +237,7 @@ namespace EssentialsPlugin.ProcessHandler
 			if (!PluginSettings.Instance.NewUserTransportEnabled)
 				return;
 
-			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Count() > 0 && !PluginSettings.Instance.NewUserTransportMoveAllSpawnShips)
+			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Any() && !PluginSettings.Instance.NewUserTransportMoveAllSpawnShips)
 				return;
 
 			lock (m_newUserList)

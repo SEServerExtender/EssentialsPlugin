@@ -45,7 +45,7 @@ namespace EssentialsPlugin.Utility
 		{
 			lock (m_items)
 			{
-				if (m_items.Count() < 1)
+				if (!m_items.Any())
 					return;
 
 				for (int r = m_items.Count() - 1; r >= 0; r--)

@@ -152,7 +152,7 @@ namespace EssentialsPlugin.ProcessHandler
 			item.SteamId = remoteUserId;
 			item.Timeout = TimeSpan.FromMinutes(10);
 			item.Start = DateTime.Now;
-			item.IsNewUser = PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Count() == 0;
+			item.IsNewUser = !PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Any();
 
 			Logging.WriteLineAndConsole(string.Format("New User: {0}", remoteUserId));
 

@@ -38,7 +38,7 @@ namespace EssentialsPlugin.ChatHandlers
 			if (words.Count() > 3)
 				return false;
 
-			if (words.Count() == 0)
+			if (!words.Any())
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());
 				return true;
