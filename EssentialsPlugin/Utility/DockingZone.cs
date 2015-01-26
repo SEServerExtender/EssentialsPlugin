@@ -48,7 +48,7 @@ namespace EssentialsPlugin.Utility
 				if (entityBlock.FatBlock == null)
 					continue;
 
-				IMyCubeBlock cubeBlock = (IMyCubeBlock)entityBlock.FatBlock;
+				IMyCubeBlock cubeBlock = entityBlock.FatBlock;
 
 				if (!(cubeBlock is Sandbox.ModAPI.Ingame.IMyBeacon))
 					continue;
@@ -124,7 +124,7 @@ namespace EssentialsPlugin.Utility
 					if (!(entityBlock.FatBlock is IMyCubeBlock))
 						continue;
 
-					IMyCubeBlock cubeBlock = (IMyCubeBlock)entityBlock.FatBlock;
+					IMyCubeBlock cubeBlock = entityBlock.FatBlock;
 
 					if (!(cubeBlock is Sandbox.ModAPI.Ingame.IMyBeacon))
 						continue;
