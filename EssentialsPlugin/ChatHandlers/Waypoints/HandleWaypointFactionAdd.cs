@@ -2,6 +2,7 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
@@ -21,7 +22,7 @@
 
 		public override string[] GetMultipleCommandText()
 		{
-			return new string[] { "/waypoint factionadd", "/wp factionadd", "/waypoint fa", "/wp fa" };
+			return new[] { "/waypoint factionadd", "/wp factionadd", "/waypoint fa", "/wp fa" };
 		}
 
 		public override bool IsAdminCommand()
@@ -89,13 +90,15 @@
 					}
 				}
 
-				WaypointItem item = new WaypointItem();
-				item.SteamId = (ulong)faction.FactionId;
-				item.Name = name;
-				item.Text = name;
-				item.Position = pos;
-				item.WaypointType = WaypointTypes.Neutral;
-				item.Leader = faction.IsLeader(playerId);
+				WaypointItem item = new WaypointItem
+				                    {
+					                    SteamId = (ulong) faction.FactionId,
+					                    Name = name,
+					                    Text = name,
+					                    Position = pos,
+					                    WaypointType = WaypointTypes.Neutral,
+					                    Leader = faction.IsLeader( playerId )
+				                    };
 				Waypoints.Instance.Add(item);
 
 				Communication.SendFactionClientMessage(userId, string.Format("/message Server {2} has added the waypoint: {0} at {1} by {2}", item.Name, General.Vector3DToString(item.Position), playerName));
@@ -104,7 +107,7 @@
 			{
 				for (int r = 3; r < 6; r++)
 				{
-					double test = 0d;
+					double test;
 					if (!double.TryParse(splits[r], out test))
 					{
 						Communication.SendPrivateInformation(userId, string.Format("Invalid position information: {0} is invalid", splits[r]));
@@ -112,14 +115,7 @@
 					}
 				}
 
-				string add = "";
-				foreach (string split in splits)
-				{
-					if (add == "")
-						add += split.ToLower();
-					else
-						add += " " + split;
-				}
+				string add = string.Join( " ", splits.Select( s => s.ToLowerInvariant( ) ) );
 
 				foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
 				{
@@ -133,12 +129,14 @@
 				if (splits.Length == 7)
 					group = splits[7];
 
-				WaypointItem item = new WaypointItem();
-				item.SteamId = (ulong)faction.FactionId;
-				item.Name = splits[0];
-				item.Text = splits[1];
-				WaypointTypes type = WaypointTypes.Neutral;
-				Enum.TryParse<WaypointTypes>(splits[2], true, out type);
+				WaypointItem item = new WaypointItem
+				                    {
+					                    SteamId = (ulong) faction.FactionId,
+					                    Name = splits[ 0 ],
+					                    Text = splits[ 1 ]
+				                    };
+				WaypointTypes type;
+				Enum.TryParse(splits[2], true, out type);
 				item.WaypointType = type;
 				item.Position = new Vector3D(double.Parse(splits[3]), double.Parse(splits[4]), double.Parse(splits[5]));
 				item.Group = group;
