@@ -134,9 +134,9 @@ namespace EssentialsPlugin.Utility
 			foreach (MyObjectBuilder_CubeBlock block in gridEntity.BaseCubeBlocks)
 			{
 				// set ownership
-				if (block is MyObjectBuilder_Cockpit)
+				MyObjectBuilder_Cockpit cockpit = block as MyObjectBuilder_Cockpit;
+				if (cockpit != null)
 				{
-					MyObjectBuilder_Cockpit cockpit = (MyObjectBuilder_Cockpit)block;
 					cockpit.Pilot = charEntity;
 				}
 			}

@@ -112,9 +112,9 @@ namespace EssentialsPlugin.ChatHandlers
 								}
 
 
-								if (testEntity is IMyCubeGrid)
+								IMyCubeGrid testGrid = testEntity as IMyCubeGrid;
+								if (testGrid != null)
 								{
-									IMyCubeGrid testGrid = (IMyCubeGrid)testEntity;
 									foreach (long owner in testGrid.BigOwners)
 									{
 										if (block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies ||
@@ -136,9 +136,9 @@ namespace EssentialsPlugin.ChatHandlers
 								else
 								{
 									var builderBase = testEntity.GetObjectBuilder();
-									if (builderBase is MyObjectBuilder_Character)
+									MyObjectBuilder_Character c = builderBase as MyObjectBuilder_Character;
+									if (c != null)
 									{
-										MyObjectBuilder_Character c = (MyObjectBuilder_Character)builderBase;
 										ulong steamId = PlayerMap.Instance.GetSteamId(c.EntityId);
 										if (steamId < 1)
 											continue;

@@ -48,9 +48,9 @@ namespace EssentialsPlugin.Utility
 
 			foreach (MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks)
 			{
-				if (block is MyObjectBuilder_Beacon)
+				MyObjectBuilder_Beacon beacon = block as MyObjectBuilder_Beacon;
+				if (beacon != null)
 				{
-					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)block;
 					beacon.CustomName = message;
 				}
 			}
@@ -69,9 +69,9 @@ namespace EssentialsPlugin.Utility
 
 			foreach (MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks)
 			{
-				if (block is MyObjectBuilder_Beacon)
+				MyObjectBuilder_Beacon beacon = block as MyObjectBuilder_Beacon;
+				if (beacon != null)
 				{
-					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)block;
 					beacon.CustomName = message;
 				}
 			}

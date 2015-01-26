@@ -94,9 +94,9 @@ namespace EssentialsPlugin.ProcessHandler
 			string command = "";
 			foreach(MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
 			{
-				if(block is MyObjectBuilder_Beacon)
+				MyObjectBuilder_Beacon beacon = block as MyObjectBuilder_Beacon;
+				if(beacon != null)
 				{
-					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)block;
 					command = beacon.CustomName;
 					break;
 				}
@@ -205,9 +205,9 @@ namespace EssentialsPlugin.ProcessHandler
 
 			foreach(MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks)
 			{
-				if (block is MyObjectBuilder_Beacon)
+				MyObjectBuilder_Beacon beacon = block as MyObjectBuilder_Beacon;
+				if (beacon != null)
 				{
-					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)block;
 					beacon.CustomName = finalText;
 				}
 			}

@@ -235,7 +235,7 @@ namespace EssentialsPlugin.Utility
 			Dictionary<string, int> blockSubTypes = new Dictionary<string, int>();
 			Dictionary<string, int> blockSubTypeLimits = new Dictionary<string, int>();
 
-			if (words.Count() > 0)
+			if (words.Any())
 			{
 				if (words.FirstOrDefault(x => x.ToLower() == "debug") != null)
 				{
@@ -533,7 +533,7 @@ namespace EssentialsPlugin.Utility
 			int blockCount = 0;
 			int blockCountLess = 0;
 			int blockSize = 0;
-			if (words.Count() > 0)
+			if (words.Any())
 			{
 				if (words.FirstOrDefault(x => x.ToLower() == "debug") != null)
 				{
@@ -1302,9 +1302,9 @@ namespace EssentialsPlugin.Utility
 		{
 			foreach (MyObjectBuilder_CubeBlock block in grid.CubeBlocks)
 			{
-				if (block is MyObjectBuilder_TerminalBlock)
+				MyObjectBuilder_TerminalBlock termBlock = block as MyObjectBuilder_TerminalBlock;
+				if (termBlock != null)
 				{
-					MyObjectBuilder_TerminalBlock termBlock = (MyObjectBuilder_TerminalBlock)block;
 					if (exact)
 					{
 						if (termBlock.CustomName != null && termBlock.CustomName == name)
@@ -1358,16 +1358,16 @@ namespace EssentialsPlugin.Utility
 
 		public static bool DoesBlockSupplyPower(MyObjectBuilder_CubeBlock block)
 		{
-			if (block is MyObjectBuilder_BatteryBlock)
+			MyObjectBuilder_BatteryBlock battery = block as MyObjectBuilder_BatteryBlock;
+			if (battery != null)
 			{
-				MyObjectBuilder_BatteryBlock battery = (MyObjectBuilder_BatteryBlock)block;
 				if (battery.CurrentStoredPower > 0f)
 					return true;
 			}
 
-			if (block is MyObjectBuilder_Reactor)
+			MyObjectBuilder_Reactor reactor = block as MyObjectBuilder_Reactor;
+			if (reactor != null)
 			{
-				MyObjectBuilder_Reactor reactor = (MyObjectBuilder_Reactor)block;
 				if (reactor.Inventory.Items.Count > 0)
 					return true;
 			}
