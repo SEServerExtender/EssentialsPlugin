@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using Sandbox.ModAPI;
-using EssentialsPlugin.Settings;
-using EssentialsPlugin.Utility;
-using SEModAPIInternal.API.Common;
-
-namespace EssentialsPlugin.ProcessHandler
+﻿namespace EssentialsPlugin.ProcessHandlers
 {
+	using System;
+	using System.Collections.Generic;
+	using EssentialsPlugin.ProcessHandler;
+	using EssentialsPlugin.Settings;
+	using EssentialsPlugin.Utility;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
+
 	class ProcessBlockEnforcement : ProcessHandlerBase
 	{
 

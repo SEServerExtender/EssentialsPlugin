@@ -1,8 +1,9 @@
-﻿using System;
-using EssentialsPlugin.Utility;
-
-namespace EssentialsPlugin.ProcessHandler
+﻿namespace EssentialsPlugin.ProcessHandlers
 {
+	using System;
+	using EssentialsPlugin.ProcessHandler;
+	using EssentialsPlugin.Utility;
+
 	public class ProcessEnable : ProcessHandlerBase
 	{
 		private static DateTime m_lastEnableCheck;

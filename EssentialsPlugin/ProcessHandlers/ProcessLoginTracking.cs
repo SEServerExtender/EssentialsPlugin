@@ -1,7 +1,8 @@
-﻿using EssentialsPlugin.Utility;
-
-namespace EssentialsPlugin.ProcessHandler
+﻿namespace EssentialsPlugin.ProcessHandlers
 {
+	using EssentialsPlugin.ProcessHandler;
+	using EssentialsPlugin.Utility;
+
 	public class ProcessLoginTracking : ProcessHandlerBase
 	{
 		public ProcessLoginTracking()
@@ -18,11 +19,6 @@ namespace EssentialsPlugin.ProcessHandler
 		public override int GetUpdateResolution()
 		{
 			return 10000;
-		}
-
-		public override void Handle()
-		{
-			base.Handle();
 		}
 
 		public override void OnPlayerJoined(ulong remoteUserId)

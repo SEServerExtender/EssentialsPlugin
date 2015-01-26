@@ -1,9 +1,10 @@
-﻿using System;
-using EssentialsPlugin.Utility;
-using EssentialsPlugin.ChatHandlers;
-
-namespace EssentialsPlugin.ProcessHandler
+﻿namespace EssentialsPlugin.ProcessHandlers
 {
+	using System;
+	using EssentialsPlugin.ChatHandlers;
+	using EssentialsPlugin.ProcessHandler;
+	using EssentialsPlugin.Utility;
+
 	public class ProcessConceal : ProcessHandlerBase
 	{
 		private static DateTime m_lastConcealCheck;
