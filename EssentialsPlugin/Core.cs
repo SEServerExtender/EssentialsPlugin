@@ -22,6 +22,8 @@ using EssentialsPlugin.Settings;
 
 namespace EssentialsPlugin
 {
+	using EssentialsPlugin.ChatHandlers.AdminConceal;
+
 	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler
 	{
 		#region Private Fields
