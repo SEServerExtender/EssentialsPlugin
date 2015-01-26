@@ -1103,8 +1103,8 @@ namespace EssentialsPlugin
 		/// <summary>
 		/// Displays the available commands for the command entered
 		/// </summary>
-		/// <param name="obj"></param>
 		/// <param name="remoteUserId"></param>
+		/// <param name="recvMessage"></param>
 		private void DisplayAvailableCommands(ulong remoteUserId, string recvMessage)
 		{
 			string message = recvMessage.ToLower().Trim();

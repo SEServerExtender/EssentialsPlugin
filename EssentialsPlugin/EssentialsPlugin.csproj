@@ -142,6 +142,7 @@
     <Compile Include="UtilityClasses\SerializeableDictionary.cs" />
     <Compile Include="UtilityClasses\UIEditors.cs" />
     <Compile Include="Utility\Backup.cs" />
+    <Compile Include="Utility\Docking.cs" />
     <Compile Include="Utility\TimedEntityCleanup.cs" />
     <Compile Include="Utility\Communication.cs" />
     <Compile Include="Utility\CubeGrid.cs" />
