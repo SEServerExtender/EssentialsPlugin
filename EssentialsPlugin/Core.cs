@@ -34,6 +34,7 @@ namespace EssentialsPlugin
 		private List<Thread> _processThreads;
 		private List<ProcessHandlerBase> _processHandlers;
 		private List<ChatHandlerBase> _chatHandlers;
+		private bool _running = true;
 		#endregion
 
 		#region Properties
@@ -837,7 +838,7 @@ namespace EssentialsPlugin
 					ProcessHandlerBase currentHandler = handler;
 					Thread thread = new Thread(() =>
 					{
-						while (true)
+						while (_running)
 						{
 							if (currentHandler.CanProcess())
 							{
