@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using EssentialsPlugin.Utility;
-using Sandbox.ModAPI;
-using SEModAPIInternal.API.Common;
-using VRageMath;
-
-namespace EssentialsPlugin.ProcessHandler
+﻿namespace EssentialsPlugin.ProcessHandlers
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using EssentialsPlugin.ProcessHandler;
+	using EssentialsPlugin.Utility;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
+	using VRageMath;
+
 	public class ProcessSpawnShipTracking : ProcessHandlerBase
 	{		
-		private DateTime m_lastUpdate = DateTime.Now;
+		private DateTime _lastUpdate = DateTime.Now;
 
 		public override int GetUpdateResolution()
 		{
@@ -26,9 +28,9 @@ namespace EssentialsPlugin.ProcessHandler
 
 			if (PluginSettings.Instance.NewUserTransportStopRunawaySpawnShips)
 			{
-				if (DateTime.Now - m_lastUpdate > TimeSpan.FromSeconds(5))
+				if (DateTime.Now - _lastUpdate > TimeSpan.FromSeconds(5))
 				{
-					m_lastUpdate = DateTime.Now;
+					_lastUpdate = DateTime.Now;
 					HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 					try
 					{
@@ -45,57 +47,40 @@ namespace EssentialsPlugin.ProcessHandler
 						if (!(entity is IMyCubeGrid))
 							continue;
 
-						bool found = false;
-						foreach (string name in PluginSettings.Instance.NewUserTransportSpawnShipNames)
-						{
-							if (entity.DisplayName.Contains(name))
-							{
-								found = true;
-								break;
-							}
-						}
+						bool found = PluginSettings.Instance.NewUserTransportSpawnShipNames.Any( name => entity.DisplayName.Contains( name ) );
 
 						if (!found)
 							continue;
 
 						IMyCubeGrid grid = (IMyCubeGrid)entity;
-						if (grid.Physics != null)
+						if ( grid.Physics == null )
 						{
-							bool foundControlled = false;
-							foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
-							{
-								long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(steamId);
-								IMyEntity testEntity = Player.FindControlledEntity(playerId);
-								if (testEntity == entity)
-								{
-									foundControlled = true;
-									break; ;
-								}
-							}
-
-							if (foundControlled)
-								continue;
-
-							Wrapper.GameAction(() =>
-							{
-								try
-								{
-									double linear = Math.Round(((Vector3)grid.Physics.LinearVelocity).LengthSquared(), 1);
-									double angular = Math.Round(((Vector3)grid.Physics.AngularVelocity).LengthSquared(), 1);
-
-									if (linear > 0 || angular > 0)
-									{
-										grid.Physics.LinearVelocity = Vector3.Zero;
-										grid.Physics.AngularVelocity = Vector3.Zero;
-										Logging.WriteLineAndConsole(string.Format("Stopping runaway spawnship: {0}", grid.EntityId));
-									}
-								}
-								catch (Exception ex)
-								{
-									Logging.WriteLineAndConsole(string.Format("Error stopping spawnship: {0}", ex.ToString()));
-								}
-							});
+							continue;
 						}
+						bool foundControlled = PlayerManager.Instance.ConnectedPlayers.Select( steamId => PlayerMap.Instance.GetFastPlayerIdFromSteamId( steamId ) ).Select( Player.FindControlledEntity ).Any( testEntity => testEntity == entity );
+
+						if (foundControlled)
+							continue;
+
+						Wrapper.GameAction(() =>
+						                   {
+							                   try
+							                   {
+								                   double linear = Math.Round(grid.Physics.LinearVelocity.LengthSquared(), 1);
+								                   double angular = Math.Round(grid.Physics.AngularVelocity.LengthSquared(), 1);
+
+								                   if (linear > 0 || angular > 0)
+								                   {
+									                   grid.Physics.LinearVelocity = Vector3.Zero;
+									                   grid.Physics.AngularVelocity = Vector3.Zero;
+									                   Logging.WriteLineAndConsole(string.Format("Stopping runaway spawnship: {0}", grid.EntityId));
+								                   }
+							                   }
+							                   catch (Exception ex)
+							                   {
+								                   Logging.WriteLineAndConsole(string.Format("Error stopping spawnship: {0}", ex));
+							                   }
+						                   });
 					}
 				}
 			}
