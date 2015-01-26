@@ -54,7 +54,7 @@ namespace EssentialsPlugin.Utility
 					continue;
 
 				Sandbox.ModAPI.Ingame.IMyBeacon beacon = (Sandbox.ModAPI.Ingame.IMyBeacon)cubeBlock;
-				if (beacon.CustomName == null || beacon.CustomName == "")
+				if (string.IsNullOrEmpty( beacon.CustomName ))
 					continue;
 
 				if (testList.ContainsKey(beacon.CustomName))
@@ -149,7 +149,7 @@ namespace EssentialsPlugin.Utility
 					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)blockObject;
 					 */ 
 
-					if (beacon.CustomName == null || beacon.CustomName == "")
+					if (string.IsNullOrEmpty( beacon.CustomName ))
 						continue;
 
 					if (beacon.IsFunctional &&
