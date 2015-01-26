@@ -54,7 +54,7 @@ namespace EssentialsPlugin.Utility
 				}
 				catch(Exception ex)
 				{
-					Logging.WriteLineAndConsole(string.Format("Error getting players list.  Check and Conceal failed: {0}", ex.ToString()));
+					Logging.WriteLineAndConsole(string.Format("Error getting players list.  Check and Conceal failed: {0}", ex));
 					return;
 				}
 
@@ -104,7 +104,7 @@ namespace EssentialsPlugin.Utility
 					DateTime distStart = DateTime.Now;
 					foreach(IMyPlayer player in players)
 					{
-						double distance = 0f;
+						double distance;
 						if (GetDistanceBetweenGridAndPlayer(grid, player, out distance))
 						{
 							if (distance < PluginSettings.Instance.DynamicConcealDistance)
@@ -131,7 +131,7 @@ namespace EssentialsPlugin.Utility
 							}	
 							catch
 							{
-								continue;
+								
 							}
 						}
 					}
@@ -165,7 +165,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckAndConceal(): {0}", ex.ToString()));
+				Logging.WriteLineAndConsole(string.Format("CheckAndConceal(): {0}", ex));
 			}
 			finally
 			{
@@ -202,8 +202,8 @@ namespace EssentialsPlugin.Utility
 					if (!beacon.Enabled)
 						continue;
 
-					Sandbox.ModAPI.Ingame.IMyTerminalBlock terminalBlock = (Sandbox.ModAPI.Ingame.IMyTerminalBlock)cubeBlock;
-//					Console.WriteLine("Found: {0} {1} {2}", beacon.BroadcastRadius, terminalBlock.IsWorking, terminalBlock.IsFunctional);
+					//Sandbox.ModAPI.Ingame.IMyTerminalBlock terminalBlock = (Sandbox.ModAPI.Ingame.IMyTerminalBlock)cubeBlock;
+					//Console.WriteLine( "Found: {0} {1} {2}", beacon.BroadcastRadius, terminalBlock.IsWorking, terminalBlock.IsFunctional );
 					//if (!terminalBlock.IsWorking)
 					//{
 //						continue;
@@ -211,7 +211,7 @@ namespace EssentialsPlugin.Utility
 
 					foreach(IMyPlayer player in players)
 					{
-						double distance = 0d;
+						double distance;
 						if(GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
 						{
 							if (distance < beacon.Radius)
@@ -233,13 +233,13 @@ namespace EssentialsPlugin.Utility
 					if (!antenna.Enabled)
 						continue;
 
-					Sandbox.ModAPI.Ingame.IMyTerminalBlock terminalBlock = (Sandbox.ModAPI.Ingame.IMyTerminalBlock)cubeBlock;
+					//Sandbox.ModAPI.Ingame.IMyTerminalBlock terminalBlock = (Sandbox.ModAPI.Ingame.IMyTerminalBlock)cubeBlock;
 					//if (!terminalBlock.IsWorking)
 					//	continue;
 
 					foreach (IMyPlayer player in players)
 					{
-						double distance = 0d;
+						double distance;
 						if (GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
 						{
 							if (distance < antenna.Radius)
@@ -261,7 +261,7 @@ namespace EssentialsPlugin.Utility
 					if (!medical.Enabled)
 						continue;
 
-					Sandbox.ModAPI.Ingame.IMyTerminalBlock terminalBlock = (Sandbox.ModAPI.Ingame.IMyTerminalBlock)cubeBlock;
+					//Sandbox.ModAPI.Ingame.IMyTerminalBlock terminalBlock = (Sandbox.ModAPI.Ingame.IMyTerminalBlock)cubeBlock;
 					//if (!terminalBlock.IsWorking)
 					//	continue;
 
@@ -367,9 +367,9 @@ namespace EssentialsPlugin.Utility
 					return;
 
 				pos = 1;
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				long ownerId = 0;
-				string ownerName = "";
+				//IMyCubeGrid grid = (IMyCubeGrid)entity;
+				long ownerId;
+				string ownerName = string.Empty;
 				if (CubeGrids.GetOwner(builder, out ownerId))
 				{
 					//ownerId = grid.BigOwners.First();
@@ -395,7 +395,7 @@ namespace EssentialsPlugin.Utility
 				pos = 3;
 				if (RemovedGrids.Contains(entity.EntityId))
 				{
-					Logging.WriteLineAndConsole("Conceal", string.Format("Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
+					Logging.WriteLineAndConsole("Conceal", string.Format("Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName));
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
 				}
 				else
@@ -421,7 +421,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("ConcealEntity({1}): {0}", ex.ToString(), pos));
+				Logging.WriteLineAndConsole(string.Format("ConcealEntity({1}): {0}", ex, pos));
 			}
 		}
 
@@ -488,7 +488,6 @@ namespace EssentialsPlugin.Utility
 				//});
 
 				Dictionary<IMyEntity, string> entitiesToReveal = new Dictionary<IMyEntity, string>();
-				string currentReason = "";
 				//HashSet<IMyEntity> entitiesToReveal = new HashSet<IMyEntity>();
 				foreach (IMyEntity entity in entities)
 				{
@@ -500,10 +499,10 @@ namespace EssentialsPlugin.Utility
 
 					IMyCubeGrid grid = (IMyCubeGrid)entity;
 					bool found = false;
-					currentReason = "";
+					string currentReason = string.Empty;
 					foreach (IMyPlayer player in players)
 					{
-						double distance = 0f;
+						double distance;
 						if (GetDistanceBetweenGridAndPlayer(grid, player, out distance))
 						{
 							if (distance < PluginSettings.Instance.DynamicConcealDistance)
@@ -540,7 +539,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckAndReveal(): {0}", ex.ToString()));
+				Logging.WriteLineAndConsole(string.Format("CheckAndReveal(): {0}", ex));
 			}
 			finally
 			{
@@ -581,7 +580,7 @@ namespace EssentialsPlugin.Utility
 					
 					foreach (IMyPlayer player in players)
 					{
-						double distance = 0d;
+						double distance;
 						if (GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
 						{
 							if (distance < beacon.Radius)
@@ -609,7 +608,7 @@ namespace EssentialsPlugin.Utility
 
 					foreach (IMyPlayer player in players)
 					{
-						double distance = 0d;
+						double distance;
 						if (GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
 						{
 							if (distance < antenna.Radius)
@@ -661,7 +660,6 @@ namespace EssentialsPlugin.Utility
 					if (!production.Enabled)
 						continue;
 
-					Sandbox.ModAPI.Ingame.IMyProductionBlock productionBlock = (Sandbox.ModAPI.Ingame.IMyProductionBlock)cubeBlock;
 					if (production.Queue.Length > 0)
 					{
 						reason = string.Format("Grid has production facility that has a queue");
@@ -723,9 +721,8 @@ namespace EssentialsPlugin.Utility
 				if (builder == null)
 					return;
 
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				long ownerId = 0;
-				string ownerName = "";
+				string ownerName = string.Empty;
 				if (CubeGrids.GetBigOwners(builder).Count > 0)
 				{
 					ownerId = CubeGrids.GetBigOwners(builder).First();
@@ -781,8 +778,7 @@ namespace EssentialsPlugin.Utility
 					}
 
 					builder.EntityId = newEntity.EntityId;
-					List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>();
-					addList.Add(builder);
+					List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase> { builder };
 					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
 					Logging.WriteLineAndConsole("Conceal", string.Format("End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
 				}
@@ -792,10 +788,7 @@ namespace EssentialsPlugin.Utility
 		static public void RevealAll()
 		{
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-			Wrapper.GameAction(() =>
-			{
-				MyAPIGateway.Entities.GetEntities(entities);
-			});
+			Wrapper.GameAction(() => MyAPIGateway.Entities.GetEntities(entities) );
 
 			List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>();
 			int count = 0;
@@ -814,7 +807,7 @@ namespace EssentialsPlugin.Utility
 						continue;
 
 					count++;
-					IMyCubeGrid grid = (IMyCubeGrid)entity;
+					//IMyCubeGrid grid = (IMyCubeGrid)entity;
 					long ownerId = 0;
 					string ownerName = "";
 					if (CubeGrids.GetBigOwners(builder).Count > 0)
@@ -838,7 +831,7 @@ namespace EssentialsPlugin.Utility
 					}
 
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
-					MyAPIGateway.Entities.AddEntity(newEntity, true);
+					MyAPIGateway.Entities.AddEntity(newEntity);
 					addList.Add(builder);
 					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
 					addList.Clear();
@@ -889,7 +882,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)			
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckAndDisableTurrets(): {0}", ex.ToString()));
+				Logging.WriteLineAndConsole(string.Format("CheckAndDisableTurrets(): {0}", ex));
 			}
 		}
 
@@ -905,7 +898,6 @@ namespace EssentialsPlugin.Utility
 			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
 			grid.GetBlocks(blocks);
 			//bool disable = false;
-			bool ignore = false;
 			foreach (IMySlimBlock block in blocks)
 			{
 				if (block.FatBlock == null)
@@ -931,7 +923,6 @@ namespace EssentialsPlugin.Utility
 						if (DoesGridHaveTarget(grid, block))
 						{
 							// We'll ignore state and only collect for statistics
-							ignore = true;
 							continue;
 						}
 
@@ -998,7 +989,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckAndDisableTurrets(): {0}", ex.ToString()));
+				Logging.WriteLineAndConsole(string.Format("CheckAndDisableTurrets(): {0}", ex));
 			}
 		}
 
@@ -1014,7 +1005,6 @@ namespace EssentialsPlugin.Utility
 			_scanCache.Clear();
 			grid.GetBlocks(blocks);
 			//bool enable = false;
-			bool ignore = false;
 			foreach (IMySlimBlock block in blocks)
 			{
 				if (block.FatBlock == null)
@@ -1040,12 +1030,11 @@ namespace EssentialsPlugin.Utility
 						{
 							// We'll ignore state check and only collect for statistics
 //							Console.WriteLine("Ignore");
-							ignore = true;
 							continue;
 						}
 
 //						Console.WriteLine("Enabling");
-						///enable = true;
+						//enable = true;
 						
 						if (PluginSettings.Instance.DynamicTurretAllowExemption)
 						{
@@ -1065,7 +1054,7 @@ namespace EssentialsPlugin.Utility
 			return turretList;
 		}
 
-		private static bool DoesGridHaveTarget(IMyCubeGrid grid, IMySlimBlock block, bool disabling = false)
+		private static bool DoesGridHaveTarget(IMyCubeGrid grid, IMySlimBlock block)
 		{
 			if (_scanCache.Count < 1)
 			{
@@ -1086,7 +1075,7 @@ namespace EssentialsPlugin.Utility
 			//bool found = false;
 			foreach (IMyEntity testEntity in _scanCache)
 			{
-				if ((IMyEntity)grid == testEntity)
+				if (grid == testEntity)
 					continue;
 
 				if (!testEntity.InScene)
@@ -1130,12 +1119,14 @@ namespace EssentialsPlugin.Utility
 					 */ 
 				}
 
-				if (testEntity is IMyCubeGrid)
+				IMyCubeGrid entity = testEntity as IMyCubeGrid;
+				DynamicTurretManagementTypes dynamicTurretManagementType = PluginSettings.Instance.DynamicTurretManagementType;
+				if (entity != null)
 				{
-					if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.All)
+					if (dynamicTurretManagementType == DynamicTurretManagementTypes.All)
 						return true;
 
-					IMyCubeGrid testGrid = (IMyCubeGrid)testEntity;
+					IMyCubeGrid testGrid = entity;
 					// Always enable if grid has no owner.  Seems suspect.  Might be a user trying to abuse a no ownership ship.
 					/*
 					if (testGrid.BigOwners.Count < 1 && testGrid.SmallOwners.Count < 1)
@@ -1148,7 +1139,7 @@ namespace EssentialsPlugin.Utility
 
 					foreach (long owner in testGrid.BigOwners)
 					{
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner)
+						if (dynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(owner) != Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Owner)
 							{
@@ -1157,7 +1148,7 @@ namespace EssentialsPlugin.Utility
 							}
 						}
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.NeutralAndEnemy)
+						if (dynamicTurretManagementType == DynamicTurretManagementTypes.NeutralAndEnemy)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies ||
 								block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Neutral)
@@ -1167,7 +1158,7 @@ namespace EssentialsPlugin.Utility
 							}
 						}
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.Enemy)
+						if (dynamicTurretManagementType == DynamicTurretManagementTypes.Enemy)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies)
 							{
@@ -1182,7 +1173,7 @@ namespace EssentialsPlugin.Utility
 					/*
 					foreach (long owner in testGrid.SmallOwners)
 					{
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner)
+						if (dynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(owner) != Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Owner)
 							{
@@ -1191,7 +1182,7 @@ namespace EssentialsPlugin.Utility
 							}
 						}
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.NeutralAndEnemy)
+						if (dynamicTurretManagementType == DynamicTurretManagementTypes.NeutralAndEnemy)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies ||
 								block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Neutral)
@@ -1201,7 +1192,7 @@ namespace EssentialsPlugin.Utility
 							}
 						}
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.Enemy)
+						if (dynamicTurretManagementType == DynamicTurretManagementTypes.Enemy)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies)
 							{
@@ -1210,18 +1201,18 @@ namespace EssentialsPlugin.Utility
 							}
 						}
 					}
-					 */ 
+					 */
 				}
 				else
 				{
-					if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.All)
+					if (dynamicTurretManagementType == DynamicTurretManagementTypes.All)
 						return true;
 
 					var builderBase = testEntity.GetObjectBuilder();
 					if (builderBase is MyObjectBuilder_Character)
 					{
 						IMyPlayer player = null;
-						IMyIdentity identity = null;
+						IMyIdentity identity;
 						long playerId = 0;
 						try
 						{
@@ -1265,13 +1256,13 @@ namespace EssentialsPlugin.Utility
 						if (player != null)
 							playerId = player.PlayerID;
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner && block.FatBlock.GetUserRelationToOwner(playerId) != Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Owner)
+						if (dynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner && block.FatBlock.GetUserRelationToOwner(playerId) != Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Owner)
 						{
 							//Console.WriteLine("Character: Not Owner: {0} - {1}", block.FatBlock.OwnerId, playerId);
 							return true;
 						}
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.NeutralAndEnemy)
+						if (dynamicTurretManagementType == DynamicTurretManagementTypes.NeutralAndEnemy)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(playerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies ||
 								block.FatBlock.GetUserRelationToOwner(playerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Neutral)
@@ -1281,7 +1272,7 @@ namespace EssentialsPlugin.Utility
 							}
 						}
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.Enemy)
+						if (dynamicTurretManagementType == DynamicTurretManagementTypes.Enemy)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(playerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies)
 							{
@@ -1370,7 +1361,7 @@ namespace EssentialsPlugin.Utility
 						}
 						catch
 						{
-							continue;
+							
 						}
 					}
 
@@ -1388,7 +1379,7 @@ namespace EssentialsPlugin.Utility
 
 				if (entitiesToConceal.Count > 0)
 				{
-					Communication.SendClientMessage(steamId, string.Format("/conceal {0}", string.Join(",", entitiesToConceal.Select(x => x.EntityId.ToString() + ":" + ((MyObjectBuilder_CubeGrid)x.GetObjectBuilder()).CubeBlocks.Count.ToString() + ":" + x.DisplayName).ToArray())));
+					Communication.SendClientMessage(steamId, string.Format("/conceal {0}", string.Join(",", entitiesToConceal.Select(x => string.Format( "{0}:{1}:{2}", x.EntityId, ((MyObjectBuilder_CubeGrid)x.GetObjectBuilder()).CubeBlocks.Count, x.DisplayName )).ToArray())));
 					Thread.Sleep(1500);
 					ConcealEntities(entitiesToConceal);
 					//CheckAndRevealEntities();
@@ -1399,7 +1390,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckAndConceal(): {0}", ex.ToString()));
+				Logging.WriteLineAndConsole(string.Format("CheckAndConceal(): {0}", ex));
 			}
 			finally
 			{
