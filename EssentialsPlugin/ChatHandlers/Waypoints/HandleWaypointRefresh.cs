@@ -1,7 +1,7 @@
-﻿using EssentialsPlugin.Utility;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.Waypoints
 {
+	using EssentialsPlugin.Utility;
+
 	public class HandleWaypointRefresh : ChatHandlerBase
 	{
 		public override string GetHelp()

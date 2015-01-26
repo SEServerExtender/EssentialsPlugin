@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Sandbox.ModAPI;
-using EssentialsPlugin.Utility;
-using SEModAPIInternal.API.Common;
-
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.Waypoints
 {
+	using System.Collections.Generic;
+	using System.Linq;
+	using EssentialsPlugin.Utility;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
+
 	public class HandleWaypointList : ChatHandlerBase
 	{
 		public override string GetHelp()

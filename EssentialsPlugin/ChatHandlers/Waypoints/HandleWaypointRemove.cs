@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using EssentialsPlugin.Utility;
-
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.Waypoints
 {
+	using System.Collections.Generic;
+	using System.Linq;
+	using EssentialsPlugin.Utility;
+
 	public class HandleWaypointRemove : ChatHandlerBase
 	{
 		public override string GetHelp()

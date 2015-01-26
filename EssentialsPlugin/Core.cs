@@ -22,6 +22,7 @@ using EssentialsPlugin.Settings;
 namespace EssentialsPlugin
 {
 	using EssentialsPlugin.ChatHandlers.AdminConceal;
+	using EssentialsPlugin.ChatHandlers.Waypoints;
 	using EssentialsPlugin.ProcessHandlers;
 
 	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler

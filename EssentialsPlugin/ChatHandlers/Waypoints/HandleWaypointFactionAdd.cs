@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Sandbox.ModAPI;
-using EssentialsPlugin.Utility;
-using VRageMath;
-using SEModAPIInternal.API.Common;
-
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.Waypoints
 {
+	using System;
+	using System.Collections.Generic;
+	using EssentialsPlugin.Utility;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
+	using VRageMath;
+
 	public class HandleWaypointFactionAdd : ChatHandlerBase
 	{
 		public override string GetHelp()
