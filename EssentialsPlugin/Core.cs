@@ -27,35 +27,29 @@ namespace EssentialsPlugin
 	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler
 	{
 		#region Private Fields
-		internal static Essentials m_instance;
-		private static string m_pluginPath;
+		internal static Essentials Instance;
+		private static string _pluginPath;
 		//private static ControlForm controlForm;
-		private DateTime m_lastProcessUpdate;
-		private Thread m_processThread;
-		private List<Thread> m_processThreads;
-		private List<ProcessHandlerBase> m_processHandlers;
-		private List<ChatHandlerBase> m_chatHandlers;
+		private Thread _processThread;
+		private List<Thread> _processThreads;
+		private List<ProcessHandlerBase> _processHandlers;
+		private List<ChatHandlerBase> _chatHandlers;
 		#endregion
 
 		#region Properties
 		public static string PluginPath
 		{
-			get { return m_pluginPath; }
-			set { m_pluginPath = value; }
-		}
-
-		internal static Essentials Instance
-		{
-			get { return m_instance;  }
+			get { return _pluginPath; }
+			set { _pluginPath = value; }
 		}
 
 		internal static List<ChatHandlerBase> ChatHandlers
 		{
 			get
 			{
-				if (m_instance != null)
+				if (Instance != null)
 				{
-					return m_instance.m_chatHandlers;
+					return Instance._chatHandlers;
 				}
 
 				return null;
@@ -726,107 +720,106 @@ namespace EssentialsPlugin
 
 		private void DoInit(string path)
 		{
-			m_instance = this;
+			Instance = this;
 			//controlForm.Text = "Testing";
-			m_pluginPath = path;
+			_pluginPath = path;
 
 			// Load our settings
 			PluginSettings.Instance.Load();
 
 			// Setup process handlers
-			m_processHandlers = new List<ProcessHandlerBase>();
-			m_processHandlers.Add(new ProcessNewUserTransport());
-			m_processHandlers.Add(new ProcessGreeting());
-			m_processHandlers.Add(new ProcessRestart());
-			m_processHandlers.Add(new ProcessInfo());
-			m_processHandlers.Add(new ProcessCommunication());
-			m_processHandlers.Add(new ProcessBackup());
-			m_processHandlers.Add(new ProcessLoginTracking());
-			m_processHandlers.Add(new ProcessProtection());
-			m_processHandlers.Add(new ProcessDockingZone());
-			m_processHandlers.Add(new ProcessConceal());
-			m_processHandlers.Add(new ProcessWaypoints());
-			m_processHandlers.Add(new ProcessCleanup());
-			m_processHandlers.Add(new ProcessBlockEnforcement());
-			m_processHandlers.Add(new ProcessEnable());
-			m_processHandlers.Add(new ProcessSpawnShipTracking());
+			_processHandlers = new List<ProcessHandlerBase>();
+			_processHandlers.Add(new ProcessNewUserTransport());
+			_processHandlers.Add(new ProcessGreeting());
+			_processHandlers.Add(new ProcessRestart());
+			_processHandlers.Add(new ProcessInfo());
+			_processHandlers.Add(new ProcessCommunication());
+			_processHandlers.Add(new ProcessBackup());
+			_processHandlers.Add(new ProcessLoginTracking());
+			_processHandlers.Add(new ProcessProtection());
+			_processHandlers.Add(new ProcessDockingZone());
+			_processHandlers.Add(new ProcessConceal());
+			_processHandlers.Add(new ProcessWaypoints());
+			_processHandlers.Add(new ProcessCleanup());
+			_processHandlers.Add(new ProcessBlockEnforcement());
+			_processHandlers.Add(new ProcessEnable());
+			_processHandlers.Add(new ProcessSpawnShipTracking());
 			
 			// Setup chat handlers
-			m_chatHandlers = new List<ChatHandlerBase>();
-			m_chatHandlers.Add(new HandleInfo());
-			m_chatHandlers.Add(new HandleTimeleft());
-			m_chatHandlers.Add(new HandlePos());
-			m_chatHandlers.Add(new HandleMsg());
-			m_chatHandlers.Add(new HandleFaction());
-			m_chatHandlers.Add(new HandleFactionF());
-			m_chatHandlers.Add(new HandleMotd());
+			_chatHandlers = new List<ChatHandlerBase>();
+			_chatHandlers.Add(new HandleInfo());
+			_chatHandlers.Add(new HandleTimeleft());
+			_chatHandlers.Add(new HandlePos());
+			_chatHandlers.Add(new HandleMsg());
+			_chatHandlers.Add(new HandleFaction());
+			_chatHandlers.Add(new HandleFactionF());
+			_chatHandlers.Add(new HandleMotd());
 
-			m_chatHandlers.Add(new HandleAdminScanAreaAt());          //
-			m_chatHandlers.Add(new HandleAdminScanAreaTowards());     //
-			m_chatHandlers.Add(new HandleAdminScanNoBeacon());        //
-			m_chatHandlers.Add(new HandleAdminScanInactive());        //
-			m_chatHandlers.Add(new HandleAdminScanEntityId());        //
-			m_chatHandlers.Add(new HandleAdminScanCleanup());
-			m_chatHandlers.Add(new HandleAdminScanOverlimit());
-			m_chatHandlers.Add(new HandleAdminScanGrids());
+			_chatHandlers.Add(new HandleAdminScanAreaAt());          //
+			_chatHandlers.Add(new HandleAdminScanAreaTowards());     //
+			_chatHandlers.Add(new HandleAdminScanNoBeacon());        //
+			_chatHandlers.Add(new HandleAdminScanInactive());        //
+			_chatHandlers.Add(new HandleAdminScanEntityId());        //
+			_chatHandlers.Add(new HandleAdminScanCleanup());
+			_chatHandlers.Add(new HandleAdminScanOverlimit());
+			_chatHandlers.Add(new HandleAdminScanGrids());
 
-			m_chatHandlers.Add(new HandleAdminMoveAreaToPosition());  //
-			m_chatHandlers.Add(new HandleAdminMoveAreaTowards());     //
-			m_chatHandlers.Add(new HandleAdminMovePlayerTo());        // 
-			m_chatHandlers.Add(new HandleAdminMovePlayerPosition());  //
-			m_chatHandlers.Add(new HandleAdminMoveGridTo());          //
+			_chatHandlers.Add(new HandleAdminMoveAreaToPosition());  //
+			_chatHandlers.Add(new HandleAdminMoveAreaTowards());     //
+			_chatHandlers.Add(new HandleAdminMovePlayerTo());        // 
+			_chatHandlers.Add(new HandleAdminMovePlayerPosition());  //
+			_chatHandlers.Add(new HandleAdminMoveGridTo());          //
 
-			m_chatHandlers.Add(new HandleAdminDeleteGridsArea());     //
-			m_chatHandlers.Add(new HandleAdminDeleteShipsArea());     //
-			m_chatHandlers.Add(new HandleAdminDeleteStationsArea());  //
-			m_chatHandlers.Add(new HandleAdminDeleteNoBeacon());      //
-			m_chatHandlers.Add(new HandleAdminDeleteInactive());      //
-			m_chatHandlers.Add(new HandleAdminDeleteCleanup());
-			m_chatHandlers.Add(new HandleAdminDeleteGrids());
+			_chatHandlers.Add(new HandleAdminDeleteGridsArea());     //
+			_chatHandlers.Add(new HandleAdminDeleteShipsArea());     //
+			_chatHandlers.Add(new HandleAdminDeleteStationsArea());  //
+			_chatHandlers.Add(new HandleAdminDeleteNoBeacon());      //
+			_chatHandlers.Add(new HandleAdminDeleteInactive());      //
+			_chatHandlers.Add(new HandleAdminDeleteCleanup());
+			_chatHandlers.Add(new HandleAdminDeleteGrids());
 
-			m_chatHandlers.Add(new HandleAdminSettings());
-			m_chatHandlers.Add(new HandleAdminNotify());
-			m_chatHandlers.Add(new HandleAdminBackup());
-			m_chatHandlers.Add(new HandleAdminRestart());
-			m_chatHandlers.Add(new HandleAdminMemory());
+			_chatHandlers.Add(new HandleAdminSettings());
+			_chatHandlers.Add(new HandleAdminNotify());
+			_chatHandlers.Add(new HandleAdminBackup());
+			_chatHandlers.Add(new HandleAdminRestart());
+			_chatHandlers.Add(new HandleAdminMemory());
 
-			m_chatHandlers.Add(new HandleAdminOwnershipChange());     //
+			_chatHandlers.Add(new HandleAdminOwnershipChange());     //
 
-			m_chatHandlers.Add(new HandleAdminPlayerListActive());    //
-			m_chatHandlers.Add(new HandleAdminPlayerListInactive());  //
+			_chatHandlers.Add(new HandleAdminPlayerListActive());    //
+			_chatHandlers.Add(new HandleAdminPlayerListInactive());  //
 
-			m_chatHandlers.Add(new HandleAdminConceal());
-			m_chatHandlers.Add(new HandleAdminReveal());
+			_chatHandlers.Add(new HandleAdminConceal());
+			_chatHandlers.Add(new HandleAdminReveal());
 
-			m_chatHandlers.Add(new HandleDockValidate());
-			m_chatHandlers.Add(new HandleDockDock());
-			m_chatHandlers.Add(new HandleDockUndock());
-			m_chatHandlers.Add(new HandleDockList());
+			_chatHandlers.Add(new HandleDockValidate());
+			_chatHandlers.Add(new HandleDockDock());
+			_chatHandlers.Add(new HandleDockUndock());
+			_chatHandlers.Add(new HandleDockList());
 
-			m_chatHandlers.Add(new HandleWaypointAdd());
-			m_chatHandlers.Add(new HandleWaypointRemove());
-			m_chatHandlers.Add(new HandleWaypointList());
-			m_chatHandlers.Add(new HandleWaypointGroupAdd());
-			m_chatHandlers.Add(new HandleWaypointGroupRemove());
-			m_chatHandlers.Add(new HandleWaypointToggle());
-			m_chatHandlers.Add(new HandleWaypointRefresh());
-			m_chatHandlers.Add(new HandleWaypointFactionAdd());
-			m_chatHandlers.Add(new HandleWaypointFactionRemove());
+			_chatHandlers.Add(new HandleWaypointAdd());
+			_chatHandlers.Add(new HandleWaypointRemove());
+			_chatHandlers.Add(new HandleWaypointList());
+			_chatHandlers.Add(new HandleWaypointGroupAdd());
+			_chatHandlers.Add(new HandleWaypointGroupRemove());
+			_chatHandlers.Add(new HandleWaypointToggle());
+			_chatHandlers.Add(new HandleWaypointRefresh());
+			_chatHandlers.Add(new HandleWaypointFactionAdd());
+			_chatHandlers.Add(new HandleWaypointFactionRemove());
 
-			m_chatHandlers.Add(new HandleUtilityExportServer());
-			m_chatHandlers.Add(new HandleUtilityGridsList());
-			m_chatHandlers.Add(new HandleUtilityGridsRefresh());
-			m_chatHandlers.Add(new HandleUtilityGridsCompare());
+			_chatHandlers.Add(new HandleUtilityExportServer());
+			_chatHandlers.Add(new HandleUtilityGridsList());
+			_chatHandlers.Add(new HandleUtilityGridsRefresh());
+			_chatHandlers.Add(new HandleUtilityGridsCompare());
 
-//			m_chatHandlers.Add(new HandleAdminPlayer());
+//			_chatHandlers.Add(new HandleAdminPlayer());
 
-			m_chatHandlers.Add(new HandleAdminTest());
-//			m_chatHandlers.Add(new HandleAdmin());
+			_chatHandlers.Add(new HandleAdminTest());
+//			_chatHandlers.Add(new HandleAdmin());
 
-			m_lastProcessUpdate = DateTime.Now;
-			m_processThreads = new List<Thread>();
-			m_processThread = new Thread(new ThreadStart(PluginProcessing));
-			m_processThread.Start();
+			_processThreads = new List<Thread>();
+			_processThread = new Thread(new ThreadStart(PluginProcessing));
+			_processThread.Start();
 
 			Logging.WriteLineAndConsole(string.Format("Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id));
 		}
@@ -838,7 +831,7 @@ namespace EssentialsPlugin
 		{
 			try
 			{
-				foreach (ProcessHandlerBase handler in m_processHandlers)
+				foreach (ProcessHandlerBase handler in _processHandlers)
 				{
 					Thread thread = new Thread(() =>
 					{
@@ -863,11 +856,11 @@ namespace EssentialsPlugin
 						}
 					});
 
-					m_processThreads.Add(thread);
+					_processThreads.Add(thread);
 					thread.Start();
 				}
 
-				foreach (Thread thread in m_processThreads)
+				foreach (Thread thread in _processThreads)
 					thread.Join();
 
 				/*
@@ -875,7 +868,7 @@ namespace EssentialsPlugin
 				{
 					if (DateTime.Now - m_lastProcessUpdate > TimeSpan.FromMilliseconds(100))
 					{
-						Parallel.ForEach(m_processHandlers, handler => 
+						Parallel.ForEach(_processHandlers, handler => 
 						{
 							if (handler.CanProcess())
 							{
@@ -893,7 +886,7 @@ namespace EssentialsPlugin
 							}
 						});
 
-						//foreach (ProcessHandlerBase handler in m_processHandlers)
+						//foreach (ProcessHandlerBase handler in _processHandlers)
 						//{
 						//}
 						m_lastProcessUpdate = DateTime.Now;
@@ -925,10 +918,10 @@ namespace EssentialsPlugin
 		{
 			Logging.WriteLineAndConsole(string.Format("Shutting down plugin: {0} - {1}", Name, Version));
 
-			foreach (Thread thread in m_processThreads)
+			foreach (Thread thread in _processThreads)
 				thread.Abort();
 
-			m_processThread.Abort();
+			_processThread.Abort();
 		}
 
 		public void Update()
@@ -969,7 +962,7 @@ namespace EssentialsPlugin
 
 			// See if we have any valid handlers
 			bool handled = false;
-			foreach (ChatHandlerBase chatHandler in m_chatHandlers)
+			foreach (ChatHandlerBase chatHandler in _chatHandlers)
 			{
 				int commandCount = 0;
 				if (remoteUserId == 0 && !chatHandler.AllowedInConsole())
@@ -1006,7 +999,7 @@ namespace EssentialsPlugin
 			if (commandParts.Count() == 1)
 			{
 				List<string> commands = new List<string>();
-				foreach (ChatHandlerBase handler in m_chatHandlers)
+				foreach (ChatHandlerBase handler in _chatHandlers)
 				{
 					// We should replace this to just have the handler return a string[] of base commands
 					if (handler.GetMultipleCommandText().Length < 1)
@@ -1038,7 +1031,7 @@ namespace EssentialsPlugin
 			{
 				string helpTarget = string.Join(" ", commandParts.Skip(1).ToArray());
 				bool found = false;
-				foreach (ChatHandlerBase handler in m_chatHandlers)
+				foreach (ChatHandlerBase handler in _chatHandlers)
 				{
 					// Again, we should get handler to just return string[] of command Text
 					if (handler.GetMultipleCommandText().Length < 1)
@@ -1066,7 +1059,7 @@ namespace EssentialsPlugin
 				{
 					List<string> helpTopics = new List<string>();
 
-					foreach (ChatHandlerBase handler in m_chatHandlers)
+					foreach (ChatHandlerBase handler in _chatHandlers)
 					{
 						// Again, cleanup to one function
 						if (handler.GetMultipleCommandText().Length < 1)
@@ -1109,7 +1102,7 @@ namespace EssentialsPlugin
 		{
 			string message = recvMessage.ToLower().Trim();
 			List<string> availableCommands = new List<string>();
-			foreach (ChatHandlerBase chatHandler in m_chatHandlers)
+			foreach (ChatHandlerBase chatHandler in _chatHandlers)
 			{
 				// Cleanup to one function
 				if (chatHandler.GetMultipleCommandText().Length < 1)
@@ -1192,19 +1185,19 @@ namespace EssentialsPlugin
 
 		public void OnPlayerJoined(ulong remoteUserId)
 		{
-			foreach (ProcessHandlerBase handler in m_processHandlers)
+			foreach (ProcessHandlerBase handler in _processHandlers)
 				handler.OnPlayerJoined(remoteUserId);
 		}
 
 		public void OnPlayerLeft(ulong remoteUserId)
 		{
-			foreach (ProcessHandlerBase handler in m_processHandlers)
+			foreach (ProcessHandlerBase handler in _processHandlers)
 				handler.OnPlayerLeft(remoteUserId);
 		}
 
 		public void OnPlayerWorldSent(ulong remoteUserId)
 		{
-			foreach (ProcessHandlerBase handler in m_processHandlers)
+			foreach (ProcessHandlerBase handler in _processHandlers)
 				handler.OnPlayerWorldSent(remoteUserId);
 		}
 
