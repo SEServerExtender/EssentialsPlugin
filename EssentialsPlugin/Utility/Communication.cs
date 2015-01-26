@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-
-using Sandbox.ModAPI;
 using Sandbox.Common.ObjectBuilders;
 using Sandbox.Common;
 using VRageMath;
@@ -14,9 +9,6 @@ using SEModAPIInternal.API.Entity;
 using SEModAPIInternal.API.Entity.Sector.SectorObject;
 using SEModAPIInternal.API.Common;
 using SEModAPIExtensions.API;
-
-using EssentialsPlugin.Utility;
-using EssentialsPlugin.ChatHandlers;
 
 namespace EssentialsPlugin.Utility
 {

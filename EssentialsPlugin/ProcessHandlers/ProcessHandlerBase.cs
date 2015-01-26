@@ -1,14 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using SEModAPIExtensions.API;
-using SEModAPIExtensions.API.Plugin;
-using SEModAPIExtensions.API.Plugin.Events;
-
-using EssentialsPlugin.Utility;
 
 namespace EssentialsPlugin.ProcessHandler
 {

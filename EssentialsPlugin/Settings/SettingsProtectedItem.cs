@@ -1,22 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Collections;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using VRage.Common.Utils;
-using System.Windows.Forms.Design;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Windows.Forms;
-using System.ComponentModel.Design;
-using System.Reflection;
-
-using EssentialsPlugin.Settings;
-using EssentialsPlugin.UtilityClasses;
 
 namespace EssentialsPlugin.Settings
 {

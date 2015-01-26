@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using EssentialsPlugin.Utility;
-using Sandbox.ModAPI;
-using SEModAPIInternal.API.Common;
-using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
-using VRage.Common.Utils;
-using System.Text.RegularExpressions;
-using System.Threading;
+﻿using EssentialsPlugin.Utility;
 
 namespace EssentialsPlugin.ProcessHandler
 {

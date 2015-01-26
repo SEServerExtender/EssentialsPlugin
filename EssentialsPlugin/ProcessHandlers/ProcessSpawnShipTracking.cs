@@ -1,18 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EssentialsPlugin.Utility;
 using Sandbox.ModAPI;
 using SEModAPIInternal.API.Common;
-using Sandbox.Common.ObjectBuilders;
 using VRageMath;
-using System.Threading;
-using SEModAPIInternal.API.Entity;
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
 
 namespace EssentialsPlugin.ProcessHandler
 {

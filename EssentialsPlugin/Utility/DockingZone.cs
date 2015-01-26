@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Xml.Serialization;
 
 using VRageMath;
 
 using Sandbox.Common.ObjectBuilders;
-using Sandbox.Definitions;
-using Sandbox.Common;
 using Sandbox.ModAPI;
 
 using EssentialsPlugin.UtilityClasses;

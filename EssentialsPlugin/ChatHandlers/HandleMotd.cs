@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EssentialsPlugin.Utility;
 using EssentialsPlugin.Settings;
-using EssentialsPlugin.ProcessHandler;
 using Sandbox.ModAPI;
 
 namespace EssentialsPlugin.ChatHandlers

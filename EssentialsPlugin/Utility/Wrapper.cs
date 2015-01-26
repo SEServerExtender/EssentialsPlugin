@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SEModAPIInternal.API.Common;
 using System.Reflection;
 using SEModAPIInternal.Support;
-using VRage;
 
 
 namespace EssentialsPlugin.Utility

@@ -1,12 +1,7 @@
 ﻿using System;
-using System.IO;
-using System.IO.Compression;
 using System.Collections.Generic;
 
 using Sandbox.ModAPI;
-
-using SEModAPIExtensions.API;
-
 using EssentialsPlugin.Settings;
 using EssentialsPlugin.Utility;
 

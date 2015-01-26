@@ -4,21 +4,14 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows.Forms.Design;
-using System.Drawing.Design;
-using System.ComponentModel.Design;
-
 using SEModAPIExtensions.API;
 using SEModAPIExtensions.API.Plugin;
 using SEModAPIExtensions.API.Plugin.Events;
 
 using SEModAPIInternal.API.Entity.Sector.SectorObject;
 using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-using SEModAPIInternal.API.Entity;
 using SEModAPIInternal.API.Common;
 
 using EssentialsPlugin.Utility;

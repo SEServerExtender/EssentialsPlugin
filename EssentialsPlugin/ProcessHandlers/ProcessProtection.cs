@@ -1,27 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using EssentialsPlugin.Utility;
 using Sandbox.ModAPI;
 using SEModAPIInternal.API.Common;
-using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
-using VRage.Common.Utils;
-using System.Text.RegularExpressions;
 using System.Threading;
 
 using SEModAPIInternal.API.Entity.Sector.SectorObject;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-using SEModAPIInternal.API.Entity;
-
 using Sandbox.Common.ObjectBuilders;
 
 using EssentialsPlugin.Settings;
-
-using Sandbox.Definitions;
 
 namespace EssentialsPlugin.ProcessHandler
 {

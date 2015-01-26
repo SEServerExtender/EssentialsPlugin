@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.ComponentModel.Design;
-using System.Runtime.CompilerServices;
-using VRage;
 
 namespace EssentialsPlugin.Settings
 {

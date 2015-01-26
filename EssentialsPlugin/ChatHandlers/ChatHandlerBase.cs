@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using SEModAPIInternal.API.Common;
-using EssentialsPlugin.Utility;
 
 namespace EssentialsPlugin.ChatHandlers
 {
