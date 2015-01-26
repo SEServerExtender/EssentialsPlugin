@@ -72,6 +72,11 @@ namespace EssentialsPlugin.ChatHandlers
 			foreach (IMyEntity entity in entitiesFound)
 			{
 				CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(entity.EntityId);
+                if (gridEntity == null)
+                {
+                    Logging.WriteLineAndConsole("A found entity gridEntity was null!");
+                    continue;
+                }
 				Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) at {2} with no beacon.", gridEntity.Name, entity.EntityId, General.Vector3DToString(entity.GetPosition())));
 			}
 
