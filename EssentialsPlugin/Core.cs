@@ -834,23 +834,24 @@ namespace EssentialsPlugin
 			{
 				foreach (ProcessHandlerBase handler in _processHandlers)
 				{
+					ProcessHandlerBase currentHandler = handler;
 					Thread thread = new Thread(() =>
 					{
 						while (true)
 						{
-							if (handler.CanProcess())
+							if (currentHandler.CanProcess())
 							{
 								try
 								{
-									handler.Handle();
+									currentHandler.Handle();
 								}
 								catch (Exception ex)
 								{
-									Logging.WriteLineAndConsole(String.Format("Handler Problems: {0} - {1}", handler.GetUpdateResolution(), ex.ToString()));
+									Logging.WriteLineAndConsole(String.Format("Handler Problems: {0} - {1}", currentHandler.GetUpdateResolution(), ex));
 								}
 
 								// Let's make sure LastUpdate is set to now otherwise we may start processing too quickly
-								handler.LastUpdate = DateTime.Now;
+								currentHandler.LastUpdate = DateTime.Now;
 							}
 
 							Thread.Sleep(100);
@@ -899,7 +900,7 @@ namespace EssentialsPlugin
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("PluginProcessing(): {0}", ex.ToString()));
+				Logging.WriteLineAndConsole(string.Format("PluginProcessing(): {0}", ex));
 			}
 		}
 		#endregion
@@ -952,7 +953,6 @@ namespace EssentialsPlugin
 			// Parse chat message
 			ulong remoteUserId = steamId;
 			string[] commandParts = message.Split(' ');
-			int paramCount = commandParts.Length - 1;
 
 			// User wants some help
 			if (commandParts[0].ToLower() == "/help")
@@ -977,7 +977,7 @@ namespace EssentialsPlugin
 					}
 					catch (Exception ex)
 					{
-						Logging.WriteLineAndConsole(string.Format("ChatHandler Error: {0}", ex.ToString()));
+						Logging.WriteLineAndConsole(string.Format("ChatHandler Error: {0}", ex));
 					}
 
 					handled = true;
@@ -1005,7 +1005,7 @@ namespace EssentialsPlugin
 					// We should replace this to just have the handler return a string[] of base commands
 					if (handler.GetMultipleCommandText().Length < 1)
 					{
-						string commandBase = handler.GetCommandText().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
+						string commandBase = handler.GetCommandText().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
 						if (!commands.Contains(commandBase) && (!handler.IsClientOnly()) && (!handler.IsAdminCommand() || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
 						{
 							commands.Add(commandBase);
@@ -1015,7 +1015,7 @@ namespace EssentialsPlugin
 					{
 						foreach (string cmd in handler.GetMultipleCommandText())
 						{
-							string commandBase = cmd.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
+							string commandBase = cmd.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
 							if (!commands.Contains(commandBase) && (!handler.IsClientOnly()) && (!handler.IsAdminCommand() || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
 							{
 								commands.Add(commandBase);
@@ -1037,7 +1037,7 @@ namespace EssentialsPlugin
 					// Again, we should get handler to just return string[] of command Text
 					if (handler.GetMultipleCommandText().Length < 1)
 					{
-						if (handler.GetCommandText().ToLower() == helpTarget.ToLower())
+						if (String.Equals( handler.GetCommandText(), helpTarget, StringComparison.CurrentCultureIgnoreCase ))
 						{
 							Communication.SendPrivateInformation(remoteUserId, handler.GetHelp());
 							found = true;
@@ -1047,7 +1047,7 @@ namespace EssentialsPlugin
 					{
 						foreach (string cmd in handler.GetMultipleCommandText())
 						{
-							if (cmd.ToLower() == helpTarget.ToLower())
+							if (String.Equals( cmd, helpTarget, StringComparison.CurrentCultureIgnoreCase ))
 							{
 								Communication.SendPrivateInformation(remoteUserId, handler.GetHelp());
 								found = true;
@@ -1063,26 +1063,27 @@ namespace EssentialsPlugin
 					foreach (ChatHandlerBase handler in _chatHandlers)
 					{
 						// Again, cleanup to one function
-						if (handler.GetMultipleCommandText().Length < 1)
+						string[ ] multipleCommandText = handler.GetMultipleCommandText();
+						if (multipleCommandText.Length == 0)
 						{
 							if (handler.GetCommandText().ToLower().StartsWith(helpTarget.ToLower()) && ((!handler.IsAdminCommand()) || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
 							{
-								helpTopics.Add(handler.GetCommandText().ToLower().Replace(helpTarget.ToLower(), ""));
+								helpTopics.Add(handler.GetCommandText().ToLower().Replace(helpTarget.ToLower(), string.Empty));
 							}
 						}
 						else
 						{
-							foreach (string cmd in handler.GetMultipleCommandText())
+							foreach (string cmd in multipleCommandText)
 							{
 								if (cmd.ToLower().StartsWith(helpTarget.ToLower()) && ((!handler.IsAdminCommand()) || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
 								{
-									helpTopics.Add(cmd.ToLower().Replace(helpTarget.ToLower(), ""));
+									helpTopics.Add(cmd.ToLower().Replace(helpTarget.ToLower(), string.Empty));
 								}
 							}
 						}
 					}
 
-					if (helpTopics.Count() > 0)
+					if (helpTopics.Any())
 					{
 						Communication.SendPrivateInformation(remoteUserId, string.Format("Help topics for command '{0}': {1}", helpTarget.ToLower(), string.Join(",", helpTopics.ToArray())));
 						found = true;
@@ -1111,7 +1112,7 @@ namespace EssentialsPlugin
 					string command = chatHandler.GetCommandText();
 					if (command.StartsWith(message))
 					{
-						string[] cmdPart = command.Replace(message, "").Trim().Split(new char[] { ' ' });
+						string[] cmdPart = command.Replace(message, string.Empty).Trim().Split(new[] { ' ' });
 
 						if (!availableCommands.Contains(cmdPart[0]))
 							availableCommands.Add(cmdPart[0]);
@@ -1123,7 +1124,7 @@ namespace EssentialsPlugin
 					{
 						if (command.StartsWith(message))
 						{
-							string[] cmdPart = command.Replace(message, "").Trim().Split(new char[] { ' ' });
+							string[] cmdPart = command.Replace(message, string.Empty).Trim().Split(new[] { ' ' });
 
 							if (!availableCommands.Contains(cmdPart[0]))
 								availableCommands.Add(cmdPart[0]);
@@ -1132,7 +1133,7 @@ namespace EssentialsPlugin
 				}
 			}
 
-			if (availableCommands.Count() > 0)
+			if (availableCommands.Any())
 			{
 				Communication.SendPrivateInformation(remoteUserId, string.Format("Available subcommands for '{0}' command: {1}", message, string.Join(", ", availableCommands.ToArray())));
 			}
