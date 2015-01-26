@@ -1343,17 +1343,7 @@ namespace EssentialsPlugin.Utility
 
 		private static string GetOptionsText(Dictionary<string, string> options)
 		{
-			string result = "";
-
-			foreach(KeyValuePair<string, string> p in options)
-			{
-				if (result != "")
-					result += ", ";
-
-				result += p.Key + "=" + p.Value;
-			}
-
-			return result;
+			return string.Join( ", ", options.Select( o => string.Format( "{0}={1}", o.Key, o.Value ) ) );
 		}
 
 		public static bool DoesBlockSupplyPower(MyObjectBuilder_CubeBlock block)
@@ -1382,13 +1372,7 @@ namespace EssentialsPlugin.Utility
 
 		public static bool DoesGridHavePowerSupply(MyObjectBuilder_CubeGrid grid)
 		{
-			foreach(MyObjectBuilder_CubeBlock block in grid.CubeBlocks)
-			{
-				if (DoesBlockSupplyPower(block))
-					return true;
-			}
-
-			return false;
+			return grid.CubeBlocks.Any( DoesBlockSupplyPower );
 		}
 
 		public static bool DoesGridHaveFourBeacons(MyObjectBuilder_CubeGrid grid)
