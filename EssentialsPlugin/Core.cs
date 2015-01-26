@@ -728,97 +728,98 @@ namespace EssentialsPlugin
 			PluginSettings.Instance.Load();
 
 			// Setup process handlers
-			_processHandlers = new List<ProcessHandlerBase>();
-			_processHandlers.Add(new ProcessNewUserTransport());
-			_processHandlers.Add(new ProcessGreeting());
-			_processHandlers.Add(new ProcessRestart());
-			_processHandlers.Add(new ProcessInfo());
-			_processHandlers.Add(new ProcessCommunication());
-			_processHandlers.Add(new ProcessBackup());
-			_processHandlers.Add(new ProcessLoginTracking());
-			_processHandlers.Add(new ProcessProtection());
-			_processHandlers.Add(new ProcessDockingZone());
-			_processHandlers.Add(new ProcessConceal());
-			_processHandlers.Add(new ProcessWaypoints());
-			_processHandlers.Add(new ProcessCleanup());
-			_processHandlers.Add(new ProcessBlockEnforcement());
-			_processHandlers.Add(new ProcessEnable());
-			_processHandlers.Add(new ProcessSpawnShipTracking());
-			
+			_processHandlers = new List<ProcessHandlerBase>
+			                   {
+				                   new ProcessNewUserTransport( ),
+				                   new ProcessGreeting( ),
+				                   new ProcessRestart( ),
+				                   new ProcessInfo( ),
+				                   new ProcessCommunication( ),
+				                   new ProcessBackup( ),
+				                   new ProcessLoginTracking( ),
+				                   new ProcessProtection( ),
+				                   new ProcessDockingZone( ),
+				                   new ProcessConceal( ),
+				                   new ProcessWaypoints( ),
+				                   new ProcessCleanup( ),
+				                   new ProcessBlockEnforcement( ),
+				                   new ProcessEnable( ),
+				                   new ProcessSpawnShipTracking( )
+			                   };
+
 			// Setup chat handlers
-			_chatHandlers = new List<ChatHandlerBase>();
-			_chatHandlers.Add(new HandleInfo());
-			_chatHandlers.Add(new HandleTimeleft());
-			_chatHandlers.Add(new HandlePos());
-			_chatHandlers.Add(new HandleMsg());
-			_chatHandlers.Add(new HandleFaction());
-			_chatHandlers.Add(new HandleFactionF());
-			_chatHandlers.Add(new HandleMotd());
+			_chatHandlers = new List<ChatHandlerBase>
+			                {
+				                new HandleInfo( ),
+				                new HandleTimeleft( ),
+				                new HandlePos( ),
+				                new HandleMsg( ),
+				                new HandleFaction( ),
+				                new HandleFactionF( ),
+				                new HandleMotd( ),
 
-			_chatHandlers.Add(new HandleAdminScanAreaAt());          //
-			_chatHandlers.Add(new HandleAdminScanAreaTowards());     //
-			_chatHandlers.Add(new HandleAdminScanNoBeacon());        //
-			_chatHandlers.Add(new HandleAdminScanInactive());        //
-			_chatHandlers.Add(new HandleAdminScanEntityId());        //
-			_chatHandlers.Add(new HandleAdminScanCleanup());
-			_chatHandlers.Add(new HandleAdminScanOverlimit());
-			_chatHandlers.Add(new HandleAdminScanGrids());
+				                new HandleAdminScanAreaAt( ),
+				                new HandleAdminScanAreaTowards( ),
+				                new HandleAdminScanNoBeacon( ),
+				                new HandleAdminScanInactive( ),
+				                new HandleAdminScanEntityId( ),
+				                new HandleAdminScanCleanup( ),
+				                new HandleAdminScanOverlimit( ),
+				                new HandleAdminScanGrids( ),
 
-			_chatHandlers.Add(new HandleAdminMoveAreaToPosition());  //
-			_chatHandlers.Add(new HandleAdminMoveAreaTowards());     //
-			_chatHandlers.Add(new HandleAdminMovePlayerTo());        // 
-			_chatHandlers.Add(new HandleAdminMovePlayerPosition());  //
-			_chatHandlers.Add(new HandleAdminMoveGridTo());          //
+				                new HandleAdminMoveAreaToPosition( ),
+				                new HandleAdminMoveAreaTowards( ),
+				                new HandleAdminMovePlayerTo( ),
+				                new HandleAdminMovePlayerPosition( ),
+				                new HandleAdminMoveGridTo( ),
 
-			_chatHandlers.Add(new HandleAdminDeleteGridsArea());     //
-			_chatHandlers.Add(new HandleAdminDeleteShipsArea());     //
-			_chatHandlers.Add(new HandleAdminDeleteStationsArea());  //
-			_chatHandlers.Add(new HandleAdminDeleteNoBeacon());      //
-			_chatHandlers.Add(new HandleAdminDeleteInactive());      //
-			_chatHandlers.Add(new HandleAdminDeleteCleanup());
-			_chatHandlers.Add(new HandleAdminDeleteGrids());
+				                new HandleAdminDeleteGridsArea( ),
+				                new HandleAdminDeleteShipsArea( ),
+				                new HandleAdminDeleteStationsArea( ),
+				                new HandleAdminDeleteNoBeacon( ),
+				                new HandleAdminDeleteInactive( ),
+				                new HandleAdminDeleteCleanup( ),
+				                new HandleAdminDeleteGrids( ),
 
-			_chatHandlers.Add(new HandleAdminSettings());
-			_chatHandlers.Add(new HandleAdminNotify());
-			_chatHandlers.Add(new HandleAdminBackup());
-			_chatHandlers.Add(new HandleAdminRestart());
-			_chatHandlers.Add(new HandleAdminMemory());
+				                new HandleAdminSettings( ),
+				                new HandleAdminNotify( ),
+				                new HandleAdminBackup( ),
+				                new HandleAdminRestart( ),
+				                new HandleAdminMemory( ),
 
-			_chatHandlers.Add(new HandleAdminOwnershipChange());     //
+				                new HandleAdminOwnershipChange( ),
 
-			_chatHandlers.Add(new HandleAdminPlayerListActive());    //
-			_chatHandlers.Add(new HandleAdminPlayerListInactive());  //
+				                new HandleAdminPlayerListActive( ),
+				                new HandleAdminPlayerListInactive( ),
 
-			_chatHandlers.Add(new HandleAdminConceal());
-			_chatHandlers.Add(new HandleAdminReveal());
+				                new HandleAdminConceal( ),
+				                new HandleAdminReveal( ),
 
-			_chatHandlers.Add(new HandleDockValidate());
-			_chatHandlers.Add(new HandleDockDock());
-			_chatHandlers.Add(new HandleDockUndock());
-			_chatHandlers.Add(new HandleDockList());
+				                new HandleDockValidate( ),
+				                new HandleDockDock( ),
+				                new HandleDockUndock( ),
+				                new HandleDockList( ),
 
-			_chatHandlers.Add(new HandleWaypointAdd());
-			_chatHandlers.Add(new HandleWaypointRemove());
-			_chatHandlers.Add(new HandleWaypointList());
-			_chatHandlers.Add(new HandleWaypointGroupAdd());
-			_chatHandlers.Add(new HandleWaypointGroupRemove());
-			_chatHandlers.Add(new HandleWaypointToggle());
-			_chatHandlers.Add(new HandleWaypointRefresh());
-			_chatHandlers.Add(new HandleWaypointFactionAdd());
-			_chatHandlers.Add(new HandleWaypointFactionRemove());
+				                new HandleWaypointAdd( ),
+				                new HandleWaypointRemove( ),
+				                new HandleWaypointList( ),
+				                new HandleWaypointGroupAdd( ),
+				                new HandleWaypointGroupRemove( ),
+				                new HandleWaypointToggle( ),
+				                new HandleWaypointRefresh( ),
+				                new HandleWaypointFactionAdd( ),
+				                new HandleWaypointFactionRemove( ),
 
-			_chatHandlers.Add(new HandleUtilityExportServer());
-			_chatHandlers.Add(new HandleUtilityGridsList());
-			_chatHandlers.Add(new HandleUtilityGridsRefresh());
-			_chatHandlers.Add(new HandleUtilityGridsCompare());
+				                new HandleUtilityExportServer( ),
+				                new HandleUtilityGridsList( ),
+				                new HandleUtilityGridsRefresh( ),
+				                new HandleUtilityGridsCompare( ),
 
-//			_chatHandlers.Add(new HandleAdminPlayer());
-
-			_chatHandlers.Add(new HandleAdminTest());
-//			_chatHandlers.Add(new HandleAdmin());
+				                new HandleAdminTest( )
+			                };
 
 			_processThreads = new List<Thread>();
-			_processThread = new Thread(new ThreadStart(PluginProcessing));
+			_processThread = new Thread(PluginProcessing);
 			_processThread.Start();
 
 			Logging.WriteLineAndConsole(string.Format("Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id));
