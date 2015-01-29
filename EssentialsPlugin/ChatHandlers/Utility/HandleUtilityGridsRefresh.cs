@@ -9,7 +9,7 @@ namespace EssentialsPlugin.ChatHandlers
 
 		public static HashSet<ulong> RefreshTrack
 		{
-			get { return HandleUtilityGridsRefresh.m_refreshTrack; }
+			get { return m_refreshTrack; }
 		}
 
 		public override string GetHelp()

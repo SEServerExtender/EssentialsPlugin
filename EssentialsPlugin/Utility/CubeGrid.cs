@@ -81,7 +81,7 @@ namespace EssentialsPlugin.Utility
 					continue;
 
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
+				MyObjectBuilder_CubeGrid gridBuilder = SafeGetObjectBuilder(grid);
 				if (gridBuilder == null)
 					continue;
 
@@ -379,7 +379,7 @@ namespace EssentialsPlugin.Utility
 			}
 
 			Dictionary<string, int> subTypeDict = new Dictionary<string, int>();
-			CubeGrids.GetGridsUnconnected(entitiesUnconnected, entitiesToConfirm);
+			GetGridsUnconnected(entitiesUnconnected, entitiesToConfirm);
 			foreach (IMyEntity entity in entitiesUnconnected)
 			{
 				subTypeDict.Clear();
@@ -888,7 +888,7 @@ namespace EssentialsPlugin.Utility
 			Dictionary<string, int> subTypeDict = new Dictionary<string, int>();
 			Dictionary<string, int> typeDict = new Dictionary<string, int>();
 			List<string> checkList = new List<string>();
-			CubeGrids.GetGridsUnconnected(entitiesUnconnected, entitiesToConfirm);
+			GetGridsUnconnected(entitiesUnconnected, entitiesToConfirm);
 			//int blocks = 0;
 			foreach (IMyEntity entity in entitiesUnconnected)
 			{
@@ -906,7 +906,7 @@ namespace EssentialsPlugin.Utility
 						if (playerId < 1)
 							continue;
 
-						if (CubeGrids.GetAllOwners(grid).Contains(playerId))
+						if (GetAllOwners(grid).Contains(playerId))
 						{
 							foundOnline = true;
 							break;
@@ -925,7 +925,7 @@ namespace EssentialsPlugin.Utility
 						if (playerId < 1)
 							continue;
 
-						if (CubeGrids.GetAllOwners(grid).Contains(playerId))
+						if (GetAllOwners(grid).Contains(playerId))
 						{
 							foundOnline = false;
 							break;
@@ -1164,11 +1164,11 @@ namespace EssentialsPlugin.Utility
 			foreach (IMyEntity entity in entitiesFound)
 			{
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
+				MyObjectBuilder_CubeGrid gridBuilder = SafeGetObjectBuilder(grid);
 				string ownerName = "none";
-				if (CubeGrids.GetBigOwners(gridBuilder).Count > 0)
+				if (GetBigOwners(gridBuilder).Count > 0)
 				{
-					long ownerId = CubeGrids.GetBigOwners(gridBuilder).First();
+					long ownerId = GetBigOwners(gridBuilder).First();
 					ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
 				}
 
@@ -1191,12 +1191,12 @@ namespace EssentialsPlugin.Utility
 					if (!(entity is IMyCubeGrid))
 						continue;
 
-					MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
+					MyObjectBuilder_CubeGrid gridBuilder = SafeGetObjectBuilder((IMyCubeGrid)entity);
 					long ownerId = 0;
 					string ownerName = "";
-					if (CubeGrids.GetBigOwners(gridBuilder).Count > 0)
+					if (GetBigOwners(gridBuilder).Count > 0)
 					{
-						ownerId = CubeGrids.GetBigOwners(gridBuilder).First();
+						ownerId = GetBigOwners(gridBuilder).First();
 						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
 					}
 

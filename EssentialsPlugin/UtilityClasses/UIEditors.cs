@@ -14,9 +14,9 @@ namespace EssentialsPlugin.UtilityClasses
 		{
 			if (provider != null)
 			{
-				this.editorService = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+				editorService = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
 			}
-			if (this.editorService != null)
+			if (editorService != null)
 			{
 				if (value == null)
 				{
@@ -33,7 +33,7 @@ namespace EssentialsPlugin.UtilityClasses
 					picker.Value = DateTime.Parse((string)value);
 				}
 
-				this.editorService.DropDownControl(picker);
+				editorService.DropDownControl(picker);
 				value = picker.Value.ToString("HH:mm");
 			}
 			return value;

@@ -86,7 +86,7 @@ namespace EssentialsPlugin.Utility
 			{
 				if (Player.CheckPlayerSameFaction(playerSteamId, steamId))
 				{
-					Communication.SendClientMessage(steamId, message);
+					SendClientMessage(steamId, message);
 				}
 			}
 		}

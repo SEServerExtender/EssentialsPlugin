@@ -378,7 +378,7 @@ namespace EssentialsPlugin.Utility
 					Load();
 				}
 
-				return Players.m_instance; 
+				return m_instance; 
 			}
 		}
 
@@ -579,8 +579,8 @@ namespace EssentialsPlugin.Utility
 
 					});
 
-					Players.Instance.UpdatePlayers(playerItems);
-					Logging.WriteLineAndConsole(string.Format("Completed checking logs in {0}s: {2} ({1}) steamIds", (DateTime.Now - start).TotalSeconds, playerItems.Count, Players.Instance.PlayerLogins.Count));
+					Instance.UpdatePlayers(playerItems);
+					Logging.WriteLineAndConsole(string.Format("Completed checking logs in {0}s: {2} ({1}) steamIds", (DateTime.Now - start).TotalSeconds, playerItems.Count, Instance.PlayerLogins.Count));
 				}));
 			}
 			finally

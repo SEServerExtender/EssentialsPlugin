@@ -45,7 +45,7 @@ namespace EssentialsPlugin.Utility
 			if (halfExtent == 0f)
 				halfExtent = 900000f;
 
-			return new Vector3(MathUtility.GenerateRandomCoord(halfExtent), MathUtility.GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent));
+			return new Vector3(GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent));
 		}
 
 		public static float GenerateRandomCoord(float halfExtent)

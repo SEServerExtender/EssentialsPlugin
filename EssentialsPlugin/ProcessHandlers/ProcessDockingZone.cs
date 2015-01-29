@@ -16,8 +16,8 @@
 
 		public static HashSet<IMyCubeGrid> ZoneCache
 		{
-			get { return ProcessDockingZone.m_zoneCache; }
-			set { ProcessDockingZone.m_zoneCache = value; }
+			get { return m_zoneCache; }
+			set { m_zoneCache = value; }
 		}
 
 		public ProcessDockingZone()

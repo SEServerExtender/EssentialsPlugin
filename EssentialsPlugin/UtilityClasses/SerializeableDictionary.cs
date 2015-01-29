@@ -56,13 +56,13 @@ namespace EssentialsPlugin.UtilityClasses
 			for (int i = 0; i < itemCount; i++)
 			{
 				KeyValuePair<TKey, TVal> kvp = (KeyValuePair<TKey, TVal>)info.GetValue(String.Format("Item{0}", i), typeof(KeyValuePair<TKey, TVal>));
-				this.Add(kvp.Key, kvp.Value);
+				Add(kvp.Key, kvp.Value);
 			}
 		}
 
 		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
 		{
-			info.AddValue("ItemCount", this.Count);
+			info.AddValue("ItemCount", Count);
 			int itemIdx = 0;
 			foreach (KeyValuePair<TKey, TVal> kvp in this)
 			{
@@ -75,7 +75,7 @@ namespace EssentialsPlugin.UtilityClasses
 
 		#region IXmlSerializable Members
 
-		void IXmlSerializable.WriteXml(System.Xml.XmlWriter writer)
+		void IXmlSerializable.WriteXml(XmlWriter writer)
 		{
 			//writer.WriteStartElement(DictionaryNodeName);
 			foreach (KeyValuePair<TKey, TVal> kvp in this)
@@ -92,7 +92,7 @@ namespace EssentialsPlugin.UtilityClasses
 			//writer.WriteEndElement();
 		}
 
-		void IXmlSerializable.ReadXml(System.Xml.XmlReader reader)
+		void IXmlSerializable.ReadXml(XmlReader reader)
 		{
 			if (reader.IsEmptyElement)
 			{
@@ -116,7 +116,7 @@ namespace EssentialsPlugin.UtilityClasses
 				TVal value = (TVal)ValueSerializer.Deserialize(reader);
 				reader.ReadEndElement();
 				reader.ReadEndElement();
-				this.Add(key, value);
+				Add(key, value);
 				reader.MoveToContent();
 			}
 			//reader.ReadEndElement();

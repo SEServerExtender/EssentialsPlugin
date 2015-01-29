@@ -129,7 +129,7 @@ namespace EssentialsPlugin.UtilityClasses
 			Vector3 boxA_center = (boxA.Max + boxA.Min) * 0.5f;
 			Matrix mb = Matrix.CreateFromQuaternion(oboxB.Orientation);
 			mb.Translation = oboxB.Center - boxA_center;
-			return OrientedBoundingBox.ContainsRelativeBox(ref boxA_halfExtent, ref oboxB.HalfExtent, ref mb);
+			return ContainsRelativeBox(ref boxA_halfExtent, ref oboxB.HalfExtent, ref mb);
 		}
 		#endregion
 		#region Test vs. BoundingOrientedBox
@@ -725,7 +725,7 @@ namespace EssentialsPlugin.UtilityClasses
 			Vector3D boxA_center = (boxA.Max + boxA.Min) * 0.5f;
 			MatrixD mb = MatrixD.CreateFromQuaternion(oboxB.Orientation);
 			mb.Translation = oboxB.Center - boxA_center;
-			return OrientedBoundingBoxD.ContainsRelativeBox(ref boxA_halfExtent, ref oboxB.HalfExtent, ref mb);
+			return ContainsRelativeBox(ref boxA_halfExtent, ref oboxB.HalfExtent, ref mb);
 		}
 		#endregion
 		#region Test vs. BoundingOrientedBox

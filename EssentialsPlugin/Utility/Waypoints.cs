@@ -210,7 +210,7 @@ namespace EssentialsPlugin.Utility
 
 		public static void SendClientWaypoints(ulong userId)
 		{
-			List<WaypointItem> items = Waypoints.Instance.Get(userId);
+			List<WaypointItem> items = Instance.Get(userId);
 			string waypoints = "/waypoint clear";
 			foreach (WaypointItem item in items)
 			{
@@ -227,7 +227,7 @@ namespace EssentialsPlugin.Utility
 			IMyFaction faction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(playerId);
 			if (faction != null)
 			{
-				items = Waypoints.Instance.Get((ulong)faction.FactionId);
+				items = Instance.Get((ulong)faction.FactionId);
 				foreach (WaypointItem item in items.OrderBy(x => x.Group))
 				{
 					if (!item.Toggle.Contains(userId))

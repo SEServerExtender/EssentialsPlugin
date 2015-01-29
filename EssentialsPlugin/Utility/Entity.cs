@@ -52,7 +52,7 @@ namespace EssentialsPlugin.Utility
 		{
 			Boolean intersects = false;
 			intersectElement = 0;
-			OrientedBoundingBoxD targetTestBounding = Entity.GetBoundingBox(beaconList);
+			OrientedBoundingBoxD targetTestBounding = GetBoundingBox(beaconList);
 			if (testList.Count > 0)
 			{
 				for (int r = 0; r < testList.Count; r++)
@@ -61,7 +61,7 @@ namespace EssentialsPlugin.Utility
 					if (beaconTestList.Count != 4)
 						continue;
 
-					OrientedBoundingBoxD testBounding = Entity.GetBoundingBox(beaconTestList);
+					OrientedBoundingBoxD testBounding = GetBoundingBox(beaconTestList);
 					if (testBounding.Contains(ref targetTestBounding) != ContainmentType.Disjoint)
 					{
 						intersectElement = r;
