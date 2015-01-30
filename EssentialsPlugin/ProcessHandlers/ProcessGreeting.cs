@@ -58,7 +58,7 @@ namespace EssentialsPlugin.ProcessHandler
 			{
 				if (MyAPIGateway.Players == null)
 					return;
-
+				
 				int pos = 0;
 				try
 				{
@@ -107,6 +107,10 @@ namespace EssentialsPlugin.ProcessHandler
 									message = PluginSettings.Instance.GreetingNewUserMessage.Replace("%name%", player.DisplayName);
 								else
 									message = PluginSettings.Instance.GreetingMessage.Replace("%name%", player.DisplayName);
+
+								message = message.Replace("%name%", player.DisplayName);
+								message = message.Replace("%players%", players.Count.ToString());
+								message = message.Replace("%maxplayers%", MyAPIGateway.Session.SessionSettings.MaxPlayers.ToString());
 
 								string finalMessage = message;
 

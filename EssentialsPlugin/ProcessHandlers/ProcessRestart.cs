@@ -98,7 +98,7 @@ namespace EssentialsPlugin.ProcessHandler
 				String restartText = "%windir%/system32/timeout /t 30\r\n";
 				restartText += String.Format("cd /d \"{0}\"\r\n", System.IO.Path.GetDirectoryName(Application.ExecutablePath));
 				restartText += PluginSettings.Instance.RestartAddedProcesses + "\r\n";
-				restartText += System.IO.Path.GetFileName(Application.ExecutablePath) + " " + Server.Instance.CommandLineArgs.args + "\r\n";
+				restartText += System.IO.Path.GetFileName(Application.ExecutablePath) + " " + Server.Instance.CommandLineArgs.Args + "\r\n";
 
 				File.WriteAllText("RestartApp.bat", restartText);
 				System.Diagnostics.Process.Start("RestartApp.bat");

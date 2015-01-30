@@ -33,11 +33,28 @@ namespace EssentialsPlugin.Utility
 		public static MyObjectBuilder_Character FindCharacter(string userName)
 		{
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+			List<IMyPlayer> players = new List<IMyPlayer>();
 			Wrapper.GameAction(() =>
 			{
 				MyAPIGateway.Entities.GetEntities(entities);
+				MyAPIGateway.Players.GetPlayers(players);
 			});
 
+			foreach (IMyEntity entity in entities)
+			{
+				if (entity is IMyCharacter)
+				{
+					foreach (IMyPlayer player in players)
+					{
+						if (player.Controller != null && player.Controller.ControlledEntity != null && player.DisplayName.ToLower() == userName.ToLower() && player.Controller.ControlledEntity.Entity.GetTopMostParent() == entity.GetTopMostParent())
+						{
+							return (MyObjectBuilder_Character)entity.GetObjectBuilder();
+						}
+					}
+				}
+			}
+
+			/*
 			foreach(IMyEntity entity in entities)
 			{
 				MyObjectBuilder_Character character = null;
@@ -53,13 +70,14 @@ namespace EssentialsPlugin.Utility
 					continue;
 				}
 
+
 				CharacterEntity charEntity = new CharacterEntity(character, entity);
 				if (character.DisplayName.ToLower().Equals(userName.ToLower()) && charEntity.Health > 0f)
 				{
 					return character;
 				}
 			}
-
+			*/
 			/*
 			 * This works, but it doesn't do what I wanted (they don't get removed from their current cockpit)
 			IMyEntity entityCheck = FindControlledEntity(userName);
@@ -425,13 +443,19 @@ namespace EssentialsPlugin.Utility
 			{
 				lock (this)
 				{
-					String fileName = Essentials.PluginPath + "Essential-PlayerLogins.xml";
-					using (StreamWriter writer = new StreamWriter(fileName))
+					string fileName = Essentials.PluginPath + "Essential-PlayerLogins.xml";
+					string fileNameNew = Essentials.PluginPath + "Essential-PlayerLogins.xml.new";
+					using (StreamWriter writer = new StreamWriter(fileNameNew))
 					{
 						XmlSerializer x = new XmlSerializer(typeof(Players));
 						x.Serialize(writer, m_instance);
 						writer.Close();
 					}
+
+					if (File.Exists(fileName))
+						File.Delete(fileName);
+
+					File.Move(fileNameNew, fileName);
 				}
 			}
 			catch (Exception ex)

@@ -18,6 +18,7 @@ using System.Reflection;
 using EssentialsPlugin.Utility;
 using EssentialsPlugin.UtilityClasses;
 using EssentialsPlugin.Settings;
+using EssentialsPlugin.GameModes;
 
 namespace EssentialsPlugin
 {
@@ -31,6 +32,7 @@ namespace EssentialsPlugin
 
 		private string m_serverName;
 		private bool m_serverUtilityGridsShowCoords;
+		private bool m_serverRespawnMenuOverride;
 
 		private bool m_informationEnabled;
 		private MTObservableCollection<InformationItem> m_informationItems;
@@ -84,7 +86,12 @@ namespace EssentialsPlugin
 		private bool m_dynamicTurretManagementEnabled;
 		private int m_dynamicTurretTargetDistance;
 		private bool m_dynamicTurretAllowExemption;
+		private bool _dynamicBlockManagementEnabled;
 		private DynamicTurretManagementTypes m_dynamicTurretManagementType;
+		
+		private bool m_dynamicConcealServerOnly;
+		private bool m_dynamicClientConcealEnabled;
+		private float m_dynamicClientConcealDistance;
 
 		private bool m_waypointsEnabled;
 		private int m_waypointsMaxPerPlayer;
@@ -100,6 +107,7 @@ namespace EssentialsPlugin
 		private bool m_blockEnforcementEnabled;
 		private MTObservableCollection<SettingsBlockEnforcementItem> m_blockEnforcementItems;
 
+		private bool m_gameModeConquestEnabled;
 		#endregion
 
 		#region Static Properties
@@ -142,6 +150,16 @@ namespace EssentialsPlugin
 			set 
 			{ 
 				m_serverUtilityGridsShowCoords = value;
+				Save();
+			}
+		}
+
+		public bool ServerRespawnMenuOverride
+		{
+			get { return m_serverRespawnMenuOverride; }
+			set 
+			{ 
+				m_serverRespawnMenuOverride = value;
 				Save();
 			}
 		}
@@ -548,6 +566,36 @@ namespace EssentialsPlugin
 			}
 		}
 
+		public bool DynamicConcealServerOnly
+		{
+			get { return m_dynamicConcealServerOnly; }
+			set 
+			{ 
+				m_dynamicConcealServerOnly = value;
+				Save();
+			}
+		}
+
+		public bool DynamicClientConcealEnabled
+		{
+			get { return m_dynamicClientConcealEnabled; }
+			set 
+			{ 
+				m_dynamicClientConcealEnabled = value;
+				Save();
+			}
+		}
+
+		public float DynamicClientConcealDistance
+		{
+			get { return m_dynamicClientConcealDistance; }
+			set 
+			{ 
+				m_dynamicClientConcealDistance = value;
+				Save();
+			}
+		}
+		
 		public bool DynamicShowMessages
 		{
 			get { return m_dynamicShowMessages; }
@@ -595,6 +643,16 @@ namespace EssentialsPlugin
 			{ 
 				m_dynamicTurretManagementType = value;
 				//m_dynamicTurretManagementType = DynamicTurretManagementTypes.All;
+				Save();
+			}
+		}
+
+		public bool DynamicBlockManagementEnabled
+		{
+			get { return _dynamicBlockManagementEnabled; }
+			set 
+			{ 
+				_dynamicBlockManagementEnabled = value;
 				Save();
 			}
 		}
@@ -697,6 +755,21 @@ namespace EssentialsPlugin
 			get { return m_blockEnforcementItems; }
 		}
 
+		public bool GameModeConquestEnabled
+		{
+			get { return m_gameModeConquestEnabled; }
+			set 
+			{ 
+				m_gameModeConquestEnabled = value;
+				Save();
+
+				if (value)
+				{
+					//Communication.SendPublicInformation("[CONQUEST]: Conquest game mode has been enabled by the administrator.  To view conquest leaderboard, type /leaderboard conquest.");
+					Conquest.Process(true);
+				}
+			}
+		}
 
 		#endregion
 

@@ -8,6 +8,11 @@ using SEModAPIExtensions.API;
 using SEModAPIExtensions.API.Plugin;
 using SEModAPIExtensions.API.Plugin.Events;
 
+using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
+using SEModAPIInternal.API.Entity.Sector.SectorObject;
+
+using Sandbox.ModAPI;
+
 using EssentialsPlugin.Utility;
 
 namespace EssentialsPlugin.ProcessHandler
@@ -85,5 +90,29 @@ namespace EssentialsPlugin.ProcessHandler
 
 		}
 
+		public virtual void OnEntityAdd(IMyEntity entity)
+		{
+
+		}
+
+		public virtual void OnEntityRemove(IMyEntity entity)
+		{
+
+		}
+
+		public virtual void OnCubeGridCreated(CubeGridEntity entity)
+		{
+
+		}
+
+		public virtual void OnCubeGridDeleted(CubeGridEntity entity)
+		{
+
+		}
+
+		public virtual void OnSectorSaved()
+		{
+
+		}
 	}
 }

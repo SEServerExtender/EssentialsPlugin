@@ -20,17 +20,18 @@ using SEModAPIInternal.API.Entity;
 using Sandbox.Common.ObjectBuilders;
 
 using EssentialsPlugin.Settings;
+using EssentialsPlugin.EntityManagers;
 
 using Sandbox.Definitions;
 
 namespace EssentialsPlugin.ProcessHandler
 {
-	public class ProcessEnable : ProcessHandlerBase
+	public class ProcessTurrets : ProcessHandlerBase
 	{
 		private static DateTime m_lastEnableCheck;
 		private static DateTime m_lastDisableCheck;
 
-		public ProcessEnable()
+		public ProcessTurrets()
 		{
 			//EntityManagement.RevealAll();
 		}
@@ -46,13 +47,13 @@ namespace EssentialsPlugin.ProcessHandler
 			{
 				if (DateTime.Now - m_lastEnableCheck > TimeSpan.FromSeconds(6))
 				{
-					EntityManagement.CheckAndEnableTurrets();
+					TurretManagement.CheckAndEnableTurrets();
 					m_lastEnableCheck = DateTime.Now;
 				}
 
 				if (DateTime.Now - m_lastDisableCheck > TimeSpan.FromSeconds(45))
 				{
-					EntityManagement.CheckAndDisableTurrets();
+					TurretManagement.CheckAndDisableTurrets();
 					m_lastDisableCheck = DateTime.Now;
 				}
 			}

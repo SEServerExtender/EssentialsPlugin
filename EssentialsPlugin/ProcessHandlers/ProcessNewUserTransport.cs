@@ -13,13 +13,13 @@ using SEModAPIInternal.API.Entity;
 using SEModAPIInternal.API.Entity.Sector.SectorObject;
 using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
 using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+using EssentialsPlugin.EntityManagers;
 
 namespace EssentialsPlugin.ProcessHandler
 {
 	public class ProcessNewUserTransport : ProcessHandlerBase
 	{
 		private List<ulong> m_newUserList;
-		private volatile bool m_ready = false;
 		private Random m_random;
 		private bool m_init;
 		private DateTime m_lastUpdate = DateTime.Now;
@@ -33,7 +33,12 @@ namespace EssentialsPlugin.ProcessHandler
 
 		private void Init()
 		{
+			List<IMyVoxelMap> voxels = new List<IMyVoxelMap>();
+			MyAPIGateway.Session.VoxelMaps.GetInstances(voxels);
+			Logging.WriteLineAndConsole(string.Format("Current Voxel Count: {0}", voxels.Count));
+
 			// Cache asteroids
+			/*
 			if (PluginSettings.Instance.NewUserTransportSpawnType == NewUserTransportSpawnPoint.Asteroids)
 			{
 				Logging.WriteLineAndConsole(string.Format("Voxel Caching Initializing"));
@@ -62,8 +67,7 @@ namespace EssentialsPlugin.ProcessHandler
 				thread.IsBackground = true;
 				thread.Start();
 			}
-
-			m_ready = true;
+			 */
 
 			/*
 			ThreadPool.QueueUserWorkItem(new WaitCallback((object state) =>
@@ -102,6 +106,7 @@ namespace EssentialsPlugin.ProcessHandler
 				Init();
 			}
 
+			/*
 			if (!m_ready)
 				return;
 
@@ -228,10 +233,10 @@ namespace EssentialsPlugin.ProcessHandler
 						gridEntity.PositionAndOrientation = CubeGrids.CreatePositionAndOrientation(validPosition, asteroidPosition);
 						SectorObjectManager.Instance.AddEntity(gridEntity);
 						//Communication.SendPrivateInformation(steamId, string.Format("You have been moved!  You should be within {0} meters of an asteroid.", PluginSettings.Instance.NewUserTransportDistance));
-						 */ 
 					}
 				}
 			}
+						 */ 
 
 			base.Handle();
 		}
@@ -270,6 +275,110 @@ namespace EssentialsPlugin.ProcessHandler
 			base.OnPlayerLeft(remoteUserId);
 		}
 
+		public override void OnEntityAdd(IMyEntity entity)
+		{
+			if (!PluginSettings.Instance.NewUserTransportEnabled)
+				return;
+
+			TransportPlayer(entity);
+			
+			base.OnEntityAdd(entity);
+		}
+
+		private void TransportPlayer(IMyEntity entity)
+		{
+			if (entity is IMyCharacter)
+			{
+				MyObjectBuilder_Character c = (MyObjectBuilder_Character)entity.GetObjectBuilder();
+				if (c.Health < 1)
+					return;
+
+				Thread.Sleep(50);
+				BoundingSphereD sphere = new BoundingSphereD(entity.GetTopMostParent().GetPosition(), 300);
+				List<IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
+
+				bool found = false;
+				foreach (IMyEntity testEntity in entities)
+				{
+					if (testEntity == entity)
+						continue;
+
+					found = true;
+					break;
+				}
+
+				if (found)
+					return;
+
+				MoveEntity(entity);
+			}
+			else if (entity is IMyCubeGrid)
+			{
+				foreach (string name in PluginSettings.Instance.NewUserTransportSpawnShipNames)
+				{
+					if (entity.DisplayName.ToLower().Contains(name.ToLower()))
+					{
+						if (PluginSettings.Instance.DynamicClientConcealEnabled)
+						{
+							//ClientEntityManagement.SyncFix.Add(entity.EntityId, DateTime.Now);
+						}
+
+						MoveEntity(entity);
+						break;
+					}
+				}
+			}
+		}
+
+		private void MoveEntity(IMyEntity entity)
+		{
+			Thread.Sleep(100);
+			Vector3D validPosition = Vector3D.Zero;
+			Vector3D asteroidPosition = Vector3D.Zero;
+
+			if (PluginSettings.Instance.NewUserTransportSpawnType == NewUserTransportSpawnPoint.Asteroids)
+				FindViableAsteroid(out validPosition, out asteroidPosition);
+			else if (PluginSettings.Instance.NewUserTransportSpawnType == NewUserTransportSpawnPoint.Origin)
+				validPosition = MathUtility.RandomPositionFromPoint(Vector3D.Zero, PluginSettings.Instance.NewUserTransportDistance);
+
+			if (validPosition == Vector3D.Zero)
+			{
+				Logging.WriteLineAndConsole("Could not find a valid asteroid to drop off a new user.");
+				return;
+			}
+
+			//Logging.WriteLineAndConsole(string.Format("Attempting to move a character to: {0}", General.Vector3DToString(validPosition)));
+			List<IMyPlayer> players = new List<IMyPlayer>();
+			MyAPIGateway.Players.GetPlayers(players);
+			IMyPlayer targetPlayer = null;
+			foreach(IMyPlayer player in players)
+			{
+				if(player.Controller == null || player.Controller.ControlledEntity == null || player.Controller.ControlledEntity.Entity == null)
+					continue;
+
+				if(player.Controller.ControlledEntity.Entity.GetTopMostParent() == entity)
+				{
+					targetPlayer = player;
+					break;
+				}
+			}
+
+			if(targetPlayer == null)
+			{
+				//Logging.WriteLineAndConsole(string.Format("Unable to find target player for entity"));
+				return;
+			}
+
+			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(targetPlayer.SteamUserId).Count() > 0 && !PluginSettings.Instance.NewUserTransportMoveAllSpawnShips)
+			{
+				Logging.WriteLineAndConsole(string.Format("Not a new user, skipping"));
+				return;
+			}
+
+			Logging.WriteLineAndConsole(string.Format("Moving player {0} to '{1}'", targetPlayer.DisplayName, validPosition));
+			Communication.SendClientMessage(targetPlayer.SteamUserId, string.Format("/move normal {0} {1} {2}", validPosition.X, validPosition.Y, validPosition.Z));
+		}
+
 		private void FindViableAsteroid(out Vector3D validPosition, out Vector3D asteroidPosition)
 		{
 			validPosition = Vector3D.Zero;
@@ -285,6 +394,12 @@ namespace EssentialsPlugin.ProcessHandler
 				if (PluginSettings.Instance.NewUserTransportAsteroidDistance > 0 && Vector3D.Distance(voxelMap.Position, Vector3D.Zero) > PluginSettings.Instance.NewUserTransportAsteroidDistance)
 					continue;
 
+				Logging.WriteLineAndConsole(string.Format("Found asteroid with viable materials: {0} - {1}", voxelMap.Name, voxelMap.Materials.Count()));
+				asteroidPosition = voxelMap.Position;
+				validPosition = MathUtility.RandomPositionFromPoint(asteroidPosition, PluginSettings.Instance.NewUserTransportDistance);
+				break;
+
+				/*
 				if (voxelMap.Materials.Count > 3)
 				{
 					Logging.WriteLineAndConsole(string.Format("Found asteroid with viable materials: {0} - {1}", voxelMap.Name, voxelMap.Materials.Count()));
@@ -292,6 +407,7 @@ namespace EssentialsPlugin.ProcessHandler
 					validPosition = MathUtility.RandomPositionFromPoint(asteroidPosition, PluginSettings.Instance.NewUserTransportDistance);
 					break;
 				}
+				 */ 
 			}
 		}
 	}

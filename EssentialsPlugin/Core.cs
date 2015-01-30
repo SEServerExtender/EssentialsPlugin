@@ -11,6 +11,8 @@ using System.Windows.Forms.Design;
 using System.Drawing.Design;
 using System.ComponentModel.Design;
 
+using Sandbox.ModAPI;
+
 using SEModAPIExtensions.API;
 using SEModAPIExtensions.API.Plugin;
 using SEModAPIExtensions.API.Plugin.Events;
@@ -29,7 +31,7 @@ using EssentialsPlugin.Settings;
 
 namespace EssentialsPlugin
 {
-	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler
+	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
 	{
 		#region Private Fields
 		internal static Essentials m_instance;
@@ -98,6 +100,19 @@ namespace EssentialsPlugin
 		{
 			get { return PluginSettings.Instance.ServerUtilityGridsShowCoords; }
 			set { PluginSettings.Instance.ServerUtilityGridsShowCoords = value; }
+		}
+
+		[Category("General")]
+		[Description("Enable / Disable respawn menu override.  If you're having issues with a very slow respawn menu, this will help, though please note it may cause more problems if your server is running quickly.  (Will give the spawn menu twice)")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool ServerRespawnMenuOverride
+		{
+			get { return PluginSettings.Instance.ServerRespawnMenuOverride; }
+			set
+			{
+				PluginSettings.Instance.ServerRespawnMenuOverride = value;
+			}
 		}
 
 		[Category("Information")]
@@ -550,6 +565,47 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.DynamicConcealIncludeMedBays = value; }
 		}
 
+		/*  Experiments not working yet */
+		/*
+		[Category("Dynamic Entity Management")]
+		[Description("")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DynamicConcealServerOnly
+		{
+			get { return PluginSettings.Instance.DynamicConcealServerOnly; }
+			set
+			{
+				PluginSettings.Instance.DynamicConcealServerOnly = value;
+			}
+		}
+
+		[Category("Dynamic Entity Management")]
+		[Description("")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DynamicClientConcealEnabled
+		{
+			get { return PluginSettings.Instance.DynamicClientConcealEnabled; }
+			set
+			{
+				PluginSettings.Instance.DynamicClientConcealEnabled = value;
+			}
+		}
+
+		[Category("Dynamic Entity Management")]
+		[Description("")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public float DynamicClientConcealDistance
+		{
+			get { return PluginSettings.Instance.DynamicClientConcealDistance; }
+			set
+			{
+				PluginSettings.Instance.DynamicClientConcealDistance = value;
+			}
+		}
+		/**/
 		[Category("Dynamic Entity Management")]
 		[Description("Enable / Disable console messages that display whether an entity is concealed or revealed.  Should be off if you don't care about seeing how many entities get revealed/concealed.")]
 		[Browsable(true)]
@@ -614,6 +670,21 @@ namespace EssentialsPlugin
 				PluginSettings.Instance.DynamicTurretManagementType = value;
 			}
 		}
+
+		/*
+		[Category("Dynamic Entity Management")]
+		[Description("Enable / Disable dynamic block management.  This manager disables blocks of ships that can't be concealed to further increase gamelogic savings.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DynamicBlockManagementEnabled
+		{
+			get { return PluginSettings.Instance.DynamicBlockManagementEnabled; }
+			set
+			{
+				PluginSettings.Instance.DynamicBlockManagementEnabled = value;
+			}
+		}
+		*/
 
 		[Category("Waypoint System")]
 		[Description("Enable / Disable personal waypoints.  These are hud displayed waypoints that only a user can see.")]
@@ -725,6 +796,20 @@ namespace EssentialsPlugin
 			get { return PluginSettings.Instance.BlockEnforcementItems; }
 		}
 
+		/*
+		[Category("Game Modes")]
+		[Description("Conquest Game Mode - This mode tracks asteroid owners by counting owned blocks near an asteroid to determine the owner.  Includes a leaderboard")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool GameModeConquestEnabled
+		{
+			get { return PluginSettings.Instance.GameModeConquestEnabled; }
+			set
+			{
+				PluginSettings.Instance.GameModeConquestEnabled = value;
+			}
+		}
+		*/
 		#endregion
 
 		#region Constructors and Initializers
@@ -749,13 +834,19 @@ namespace EssentialsPlugin
 			m_processHandlers.Add(new ProcessLoginTracking());
 			m_processHandlers.Add(new ProcessProtection());
 			m_processHandlers.Add(new ProcessDockingZone());
-			m_processHandlers.Add(new ProcessConceal());
 			m_processHandlers.Add(new ProcessWaypoints());
 			m_processHandlers.Add(new ProcessCleanup());
 			m_processHandlers.Add(new ProcessBlockEnforcement());
-			m_processHandlers.Add(new ProcessEnable());
 			m_processHandlers.Add(new ProcessSpawnShipTracking());
-			
+//CC			m_processHandlers.Add(new ProcessConquest());
+			m_processHandlers.Add(new ProcessRespawn());
+
+			// Entity Managers
+			m_processHandlers.Add(new ProcessConceal());
+			m_processHandlers.Add(new ProcessTurrets());
+			m_processHandlers.Add(new ProcessBlocks());
+//CC			m_processHandlers.Add(new ProcessClientConceal());
+
 			// Setup chat handlers
 			m_chatHandlers = new List<ChatHandlerBase>();
 			m_chatHandlers.Add(new HandleInfo());
@@ -765,6 +856,7 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleFaction());
 			m_chatHandlers.Add(new HandleFactionF());
 			m_chatHandlers.Add(new HandleMotd());
+			m_chatHandlers.Add(new HandleLastSeen());
 
 			m_chatHandlers.Add(new HandleAdminScanAreaAt());          //
 			m_chatHandlers.Add(new HandleAdminScanAreaTowards());     //
@@ -794,11 +886,13 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleAdminBackup());
 			m_chatHandlers.Add(new HandleAdminRestart());
 			m_chatHandlers.Add(new HandleAdminMemory());
+			m_chatHandlers.Add(new HandleAdminStatistics());
 
 			m_chatHandlers.Add(new HandleAdminOwnershipChange());     //
 
 			m_chatHandlers.Add(new HandleAdminPlayerListActive());    //
 			m_chatHandlers.Add(new HandleAdminPlayerListInactive());  //
+			m_chatHandlers.Add(new HandleAdminPlayerCleanup());
 
 			m_chatHandlers.Add(new HandleAdminConceal());
 			m_chatHandlers.Add(new HandleAdminReveal());
@@ -807,6 +901,7 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleDockDock());
 			m_chatHandlers.Add(new HandleDockUndock());
 			m_chatHandlers.Add(new HandleDockList());
+			m_chatHandlers.Add(new HandleAdminUndockAll());
 
 			m_chatHandlers.Add(new HandleWaypointAdd());
 			m_chatHandlers.Add(new HandleWaypointRemove());
@@ -823,6 +918,8 @@ namespace EssentialsPlugin
 			m_chatHandlers.Add(new HandleUtilityGridsRefresh());
 			m_chatHandlers.Add(new HandleUtilityGridsCompare());
 
+			m_chatHandlers.Add(new HandleLeaderboardConquest());
+
 //			m_chatHandlers.Add(new HandleAdminPlayer());
 
 			m_chatHandlers.Add(new HandleAdminTest());
@@ -830,8 +927,13 @@ namespace EssentialsPlugin
 
 			m_lastProcessUpdate = DateTime.Now;
 			m_processThreads = new List<Thread>();
-			m_processThread = new Thread(new ThreadStart(PluginProcessing));
+			m_processThread = new Thread(new ThreadStart(PluginProcessing));			
 			m_processThread.Start();
+
+			MyAPIGateway.Entities.OnEntityAdd -= OnEntityAdd;
+			MyAPIGateway.Entities.OnEntityRemove -= OnEntityRemove;
+			MyAPIGateway.Entities.OnEntityAdd += OnEntityAdd;
+			MyAPIGateway.Entities.OnEntityRemove += OnEntityRemove;
 
 			Logging.WriteLineAndConsole(string.Format("Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id));
 		}
@@ -912,6 +1014,11 @@ namespace EssentialsPlugin
 			{
 				Logging.WriteLineAndConsole(string.Format("PluginProcessing(): {0}", ex.ToString()));
 			}
+			finally
+			{
+				MyAPIGateway.Entities.OnEntityAdd -= OnEntityAdd;
+				MyAPIGateway.Entities.OnEntityRemove -= OnEntityRemove;
+			}
 		}
 		#endregion
 
@@ -952,10 +1059,10 @@ namespace EssentialsPlugin
 		/// <param name="obj"></param>
 		public void OnChatReceived(ChatManager.ChatEvent obj)
 		{
-			if (obj.message[0] != '/')
+			if (obj.Message[0] != '/')
 				return;
 
-			HandleChatMessage(obj.sourceUserId, obj.message);
+			HandleChatMessage(obj.SourceUserId, obj.Message);
 		}
 
 		public void HandleChatMessage(ulong steamId, string message)
@@ -1158,14 +1265,34 @@ namespace EssentialsPlugin
 
 		#region ICubeGridHandler Members
 
+		public void OnEntityAdd(IMyEntity obj)
+		{
+			ThreadPool.QueueUserWorkItem(new WaitCallback((object state) =>
+			{
+				foreach (ProcessHandlerBase handler in m_processHandlers)
+					handler.OnEntityAdd(obj);			
+			}));
+		}
+
+		public void OnEntityRemove(IMyEntity obj)
+		{
+			ThreadPool.QueueUserWorkItem(new WaitCallback((object state) =>
+			{
+				foreach (ProcessHandlerBase handler in m_processHandlers)
+					handler.OnEntityRemove(obj);
+			}));
+		}
+
 		public void OnCubeGridCreated(CubeGridEntity cubeGrid)
 		{
-
+			foreach (ProcessHandlerBase handler in m_processHandlers)
+				handler.OnCubeGridCreated(cubeGrid);
 		}
 
 		public void OnCubeGridDeleted(CubeGridEntity cubeGrid)
 		{
-
+			foreach (ProcessHandlerBase handler in m_processHandlers)
+				handler.OnCubeGridDeleted(cubeGrid);
 		}
 
 		public void OnCubeGridLoaded(CubeGridEntity cubeGrid)
@@ -1214,6 +1341,12 @@ namespace EssentialsPlugin
 		}
 
 		#endregion
+
+		public void OnSectorSaved(object state)
+		{
+			foreach (ProcessHandlerBase handler in m_processHandlers)
+				handler.OnSectorSaved();
+		}
 
 		#region IPlugin Members
 

@@ -45,6 +45,7 @@
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteCleanup.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteGrids.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveGridTo.cs" />
+    <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayerCleanup.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayer.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayerListInactive.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayerListActive.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanOverlimit.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanCleanup.cs" />
     <Compile Include="ChatHandlers\AdminSettings\HandleAdminSettings.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminStatistics.cs" />
     <Compile Include="ChatHandlers\ChatHandlerBase.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteNoBeacon.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteStationsArea.cs" />
@@ -61,17 +63,21 @@
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMovePlayerPosition.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveAreaTowards.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanAreaTowards.cs" />
+    <Compile Include="ChatHandlers\Dock\HandleAdminUndockAll.cs" />
     <Compile Include="ChatHandlers\Dock\HandleDockUndock.cs" />
     <Compile Include="ChatHandlers\Dock\HandleDockDock.cs" />
     <Compile Include="ChatHandlers\Dock\HandleDockList.cs" />
     <Compile Include="ChatHandlers\Dock\HandleDockValidate.cs" />
-    <Compile Include="ChatHandlers\HandleAdminBackup.cs" />
-    <Compile Include="ChatHandlers\HandleAdminOwnershipChange.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminBackup.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminOwnershipChange.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanInactive.cs" />
-    <Compile Include="ChatHandlers\HandleAdminRestart.cs" />
-    <Compile Include="ChatHandlers\HandleAdminMemory.cs" />
-    <Compile Include="ChatHandlers\HandleAdminTest.cs" />
-    <Compile Include="ChatHandlers\HandleAdminNotify.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminRestart.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminMemory.cs" />
+    <Compile Include="ChatHandlers\HandleLastSeen.cs" />
+    <Compile Include="ChatHandlers\Leaderboard\HandleLeaderboardConquest.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminTurrets.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminTest.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminNotify.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteGridsArea.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanNoBeacon.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanAreaAt.cs" />
@@ -103,17 +109,23 @@
       <DependentUpon>ControlForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core.cs" />
+    <Compile Include="EntityManagers\BlockManagement.cs" />
+    <Compile Include="EntityManagers\TurretManagement.cs" />
+    <Compile Include="GameModes\Conquest.cs" />
     <Compile Include="ProcessHandlers\ProcessBlockEnforcement.cs" />
     <Compile Include="ProcessHandlers\ProcessCleanup.cs" />
     <Compile Include="ProcessHandlers\ProcessConceal.cs" />
     <Compile Include="ProcessHandlers\ProcessDockingZone.cs" />
-    <Compile Include="ProcessHandlers\ProcessEnable.cs" />
+    <Compile Include="ProcessHandlers\ProcessBlocks.cs" />
+    <Compile Include="ProcessHandlers\ProcessTurrets.cs" />
+    <Compile Include="ProcessHandlers\ProcessConquest.cs" />
+    <Compile Include="ProcessHandlers\ProcessLoginTracking.cs" />
     <Compile Include="ProcessHandlers\ProcessSpawnShipTracking.cs" />
     <Compile Include="ProcessHandlers\ProcessWaypoints.cs" />
     <Compile Include="ProcessHandlers\ProcessProtection.cs" />
     <Compile Include="Settings\PluginSettings.cs" />
     <Compile Include="ProcessHandlers\ProcessCommunication.cs" />
-    <Compile Include="ProcessHandlers\ProcessLoginTracking.cs" />
+    <Compile Include="ProcessHandlers\ProcessRespawn.cs" />
     <Compile Include="ProcessHandlers\ProcessNewUserTransport.cs" />
     <Compile Include="ProcessHandlers\ProcessGreeting.cs" />
     <Compile Include="ProcessHandlers\ProcessHandlerBase.cs" />
@@ -147,7 +159,7 @@
     <Compile Include="Utility\CubeGrid.cs" />
     <Compile Include="Utility\DockingZone.cs" />
     <Compile Include="Utility\Entity.cs" />
-    <Compile Include="Utility\EntityManagement.cs" />
+    <Compile Include="EntityManagers\EntityManagement.cs" />
     <Compile Include="Utility\Faction.cs" />
     <Compile Include="Utility\MathUtility.cs" />
     <Compile Include="Utility\Player.cs" />
@@ -228,7 +240,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "C:\ProgramData\SpaceEngineersDedicated\Transcend\Mods\Essentials\"
+    <PostBuildEvent>copy "$(TargetPath)" "C:\ProgramData\SpaceEngineersDedicated\survival test\Mods\Essentials\"
 set textTemplatingPath="%25CommonProgramFiles(x86)%25\Microsoft Shared\TextTemplating\$(VisualStudioVersion)\texttransform.exe"
 if %25textTemplatingPath%25=="\Microsoft Shared\TextTemplating\$(VisualStudioVersion)\texttransform.exe" set textTemplatingPath="%25CommonProgramFiles%25\Microsoft Shared\TextTemplating\$(VisualStudioVersion)\texttransform.exe"
 %25textTemplatingPath%25 "$(ProjectDir)AssemblyFileVersion.tt"</PostBuildEvent>

@@ -59,7 +59,7 @@ namespace EssentialsPlugin.ChatHandlers
 
 					if (!found)
 					{
-						Communication.SendPrivateInformation(userId, "ERROR: Topic not found.");
+						Communication.SendPrivateInformation(userId, "Info Error: Topic not found.");
 						ShowTopicList(userId);
 					}
 				}

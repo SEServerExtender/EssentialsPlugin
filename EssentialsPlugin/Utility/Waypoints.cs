@@ -72,13 +72,19 @@ namespace EssentialsPlugin.Utility
 			{
 				lock (Instance)
 				{
-					String fileName = Essentials.PluginPath + "Essential-Waypoints.xml";
-					using (StreamWriter writer = new StreamWriter(fileName))
+					string fileName = Essentials.PluginPath + "Essential-Waypoints.xml";
+					string fileNameNew = Essentials.PluginPath + "Essential-Waypoints.xml.new";
+					using (StreamWriter writer = new StreamWriter(fileNameNew))
 					{
 						XmlSerializer x = new XmlSerializer(typeof(Waypoints));
 						x.Serialize(writer, m_instance);
 						writer.Close();
 					}
+
+					if (File.Exists(fileName))
+						File.Delete(fileName);
+
+					File.Move(fileNameNew, fileName);
 				}
 			}
 			catch (Exception ex)

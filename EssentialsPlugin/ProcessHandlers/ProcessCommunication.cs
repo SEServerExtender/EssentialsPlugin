@@ -169,7 +169,7 @@ namespace EssentialsPlugin.ProcessHandler
 			CubeGridEntity entity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "CommRelay.sbc"));
 			entity.EntityId = BaseEntity.GenerateEntityId();
 			entity.DisplayName = "CommRelayGlobal";
-			entity.PositionAndOrientation = new MyPositionAndOrientation(new Vector3D(MathUtility.GenerateRandomCoord(50000), MathUtility.GenerateRandomCoord(50000), MathUtility.GenerateRandomCoord(50000)), Vector3.Forward, Vector3.Up);
+			entity.PositionAndOrientation = new MyPositionAndOrientation(MathUtility.GenerateRandomEdgeVector(), Vector3.Forward, Vector3.Up);
 
 			List<string> commands = new List<string>();
 			// Give a list of commands

@@ -8,6 +8,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 using EssentialsPlugin.Utility;
+using EssentialsPlugin.EntityManagers;
 
 using Sandbox.ModAPI;
 using Sandbox.Common.ObjectBuilders;

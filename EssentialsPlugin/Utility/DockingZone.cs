@@ -293,7 +293,7 @@ namespace EssentialsPlugin.Utility
 							reader.Close();
 						}
 
-						Logging.WriteLineAndConsole(string.Format("Loaded {0} Docking Items", m_instance.DockingItems));
+						Logging.WriteLineAndConsole(string.Format("Loaded {0} Docking Items", m_instance.DockingItems.Count));
 					}
 				}
 				catch (Exception ex)
