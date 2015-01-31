@@ -18,52 +18,41 @@ namespace EssentialsPlugin.EntityManagers
 {
 	public class BlockManagement
 	{
-		private static BlockManagement m_instance = null;
-		private static bool m_checkDisable = false;
-		private static bool m_checkEnable = false;
-		private static int m_enableCount = 0;
-		private static DateTime m_lastCleanup = DateTime.Now;
-
-		private HashSet<long> m_gridsDisabled;
-		private SerializableDictionary<long, HashSet<long>> m_gridBlocksDisabled;
+		private static BlockManagement _instance = null;
+		private static bool _checkDisable = false;
+		private static bool _checkEnable = false;
+		private static int _enableCount = 0;
+		private static DateTime _lastCleanup = DateTime.Now;
 
 		public BlockManagement()
 		{
-			m_gridsDisabled = new HashSet<long>();
-			m_gridBlocksDisabled = new SerializableDictionary<long, HashSet<long>>();
+			GridDisabled = new HashSet<long>();
+			GridBlocksDisabled = new SerializableDictionary<long, HashSet<long>>();
 		}
 
 		public static BlockManagement Instance
 		{
 			get
 			{
-				if (BlockManagement.m_instance == null)
+				if (BlockManagement._instance == null)
 				{
 					Load();
 				}
 
-				return BlockManagement.m_instance;
+				return BlockManagement._instance;
 			}
 		}
 
-		public SerializableDictionary<long, HashSet<long>> GridBlocksDisabled
-		{
-			get { return m_gridBlocksDisabled; }
-			set { m_gridBlocksDisabled = value; }
-		}
+		public SerializableDictionary<long, HashSet<long>> GridBlocksDisabled { get; set; }
 
-		public HashSet<long> GridDisabled
-		{
-			get { return m_gridsDisabled; }
-			set { m_gridsDisabled = value; }
-		}
+		public HashSet<long> GridDisabled { get; set; }
 
 		public void CheckAndDisableBlocks()
 		{
-			if (m_checkDisable)
+			if (_checkDisable)
 				return;
 
-			m_checkDisable = true;
+			_checkDisable = true;
 			try
 			{
 				GridListCleanup();
@@ -123,7 +112,7 @@ namespace EssentialsPlugin.EntityManagers
 					}
 				}
 
-				m_enableCount = 0;
+				_enableCount = 0;
 				Wrapper.GameAction(() =>
 				{
 					foreach (IMyEntity entity in disableSet)
@@ -134,7 +123,7 @@ namespace EssentialsPlugin.EntityManagers
 
 				if (disableSet.Count > 0)
 				{
-					Logging.WriteLineAndConsole(string.Format("Disable: Block Management disabled {0} grids ({1} blocks diabled) - ({0} ms)", disableSet.Count, m_enableCount, (DateTime.Now - start).TotalMilliseconds));
+					Logging.WriteLineAndConsole(string.Format("Disable: Block Management disabled {0} grids ({1} blocks diabled) - ({0} ms)", disableSet.Count, _enableCount, (DateTime.Now - start).TotalMilliseconds));
 				}
 			}
 			catch (Exception ex)
@@ -143,7 +132,7 @@ namespace EssentialsPlugin.EntityManagers
 			}
 			finally
 			{
-				m_checkDisable = false;
+				_checkDisable = false;
 			}
 		}
 		
@@ -185,7 +174,7 @@ namespace EssentialsPlugin.EntityManagers
 				{
 					FunctionalBlockEntity.SetState(cubeBlock, false);
 					disabledBlocks.Add(cubeBlock.EntityId);
-					m_enableCount++;
+					_enableCount++;
 				}
 			}
 
@@ -202,10 +191,10 @@ namespace EssentialsPlugin.EntityManagers
 
 		public void CheckAndEnableBlocks()
 		{
-			if (m_checkEnable)
+			if (_checkEnable)
 				return;
 
-			m_checkEnable = true;
+			_checkEnable = true;
 			try
 			{
 				GridListCleanup();
@@ -262,7 +251,7 @@ namespace EssentialsPlugin.EntityManagers
 					}
 				}
 
-				m_enableCount = 0;
+				_enableCount = 0;
 				Wrapper.GameAction(() =>
 				{
 					foreach (IMyEntity entity in enableSet)
@@ -273,7 +262,7 @@ namespace EssentialsPlugin.EntityManagers
 
 				if (enableSet.Count > 0)
 				{
-					Logging.WriteLineAndConsole(string.Format("Enable: Block Management enabled {0} grids ({1} blocks enabled) - ({0} ms)", enableSet.Count, m_enableCount, (DateTime.Now - start).TotalMilliseconds));
+					Logging.WriteLineAndConsole(string.Format("Enable: Block Management enabled {0} grids ({1} blocks enabled) - ({0} ms)", enableSet.Count, _enableCount, (DateTime.Now - start).TotalMilliseconds));
 				}
 			}
 			catch (Exception ex)
@@ -282,7 +271,7 @@ namespace EssentialsPlugin.EntityManagers
 			}
 			finally
 			{
-				m_checkEnable = false;
+				_checkEnable = false;
 			}
 		}
 
@@ -320,7 +309,7 @@ namespace EssentialsPlugin.EntityManagers
 				if (!FunctionalBlockEntity.GetState(cubeBlock))
 				{
 					FunctionalBlockEntity.SetState(cubeBlock, true);
-					m_enableCount++;
+					_enableCount++;
 				}
 			}
 
@@ -343,17 +332,17 @@ namespace EssentialsPlugin.EntityManagers
 					using (StreamReader reader = new StreamReader(fileName))
 					{
 						XmlSerializer x = new XmlSerializer(typeof(BlockManagement));
-						BlockManagement.m_instance = (BlockManagement)x.Deserialize(reader);
+						BlockManagement._instance = (BlockManagement)x.Deserialize(reader);
 						reader.Close();
 					}
 				}
 				else
-					BlockManagement.m_instance = new BlockManagement();
+					BlockManagement._instance = new BlockManagement();
 			}
 			catch (Exception ex)
 			{
 				Logging.WriteLineAndConsole(string.Format("BlockManagement Load Error: {0}", ex.ToString()));
-				BlockManagement.m_instance = new BlockManagement();
+				BlockManagement._instance = new BlockManagement();
 			}
 		}
 
@@ -387,10 +376,10 @@ namespace EssentialsPlugin.EntityManagers
 
 		private void GridListCleanup()
 		{
-			if (DateTime.Now - m_lastCleanup < TimeSpan.FromSeconds(120))
+			if (DateTime.Now - _lastCleanup < TimeSpan.FromSeconds(120))
 				return;
 
-			m_lastCleanup = DateTime.Now;
+			_lastCleanup = DateTime.Now;
 
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 			MyAPIGateway.Entities.GetEntities(entities);
