@@ -22,23 +22,18 @@
 
 	public class EntityManagement
 	{
-		private static volatile bool m_checkReveal = false;
-		private static volatile bool m_checkConceal = false;
-		private static HashSet<IMyEntity> m_processedGrids = new HashSet<IMyEntity>();
-		private static List<long> m_removedGrids = new List<long>();
-		private static List<ulong> m_online = new List<ulong>();
-
-		public static List<ulong> Online
-		{
-			get { return m_online; }
-		}
+		private static volatile bool _checkReveal = false;
+		private static volatile bool _checkConceal = false;
+		private static readonly HashSet<IMyEntity> ProcessedGrids = new HashSet<IMyEntity>();
+		private static readonly List<long> RemovedGrids = new List<long>();
+		private static readonly List<ulong> Online = new List<ulong>();
 
 		public static void CheckAndConcealEntities()
 		{
-			if (m_checkConceal)
+			if (_checkConceal)
 				return;
 			
-			m_checkConceal = true;
+			_checkConceal = true;
 			try
 			{
 				DateTime start = DateTime.Now;
@@ -47,7 +42,7 @@
 				double getGrids = 0d;
 				double co = 0f;
 
-				m_processedGrids.Clear();
+				ProcessedGrids.Clear();
 				List<IMyPlayer> players = new List<IMyPlayer>();
 				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 				HashSet<IMyEntity> entitiesFiltered = new HashSet<IMyEntity>();
@@ -176,7 +171,7 @@
 			}
 			finally
 			{
-				m_checkConceal = false;
+				_checkConceal = false;
 			}
 		}
 
@@ -186,7 +181,7 @@
 
 			// Live dangerously
 			grid.GetBlocks(blocks, x => x.FatBlock != null);
-			//CubeGrids.GetAllConnectedBlocks(m_processedGrids, grid, blocks, x => x.FatBlock != null);
+			//CubeGrids.GetAllConnectedBlocks(_processedGrids, grid, blocks, x => x.FatBlock != null);
 
 			int beaconCount = 0;
 			//bool found = false;
@@ -274,9 +269,9 @@
 
 					if(PluginSettings.Instance.DynamicConcealIncludeMedBays)
 					{
-						lock (m_online)
+						lock (Online)
 						{
-							foreach (ulong connectedPlayer in m_online)
+							foreach (ulong connectedPlayer in Online)
 							{
 								//if (PlayerMap.Instance.GetPlayerIdsFromSteamId(connectedPlayer).Count < 1)
 								//continue;
@@ -421,7 +416,7 @@
 				MyAPIGateway.Entities.RemapObjectBuilder(builder);
 
 				pos = 3;
-				if (m_removedGrids.Contains(entity.EntityId))
+				if (RemovedGrids.Contains(entity.EntityId))
 				{
 					Logging.WriteLineAndConsole("Conceal", string.Format("Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
@@ -452,7 +447,7 @@
 						return;
 					}
 
-						m_removedGrids.Add(entity.EntityId);
+						RemovedGrids.Add(entity.EntityId);
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
 					MyAPIGateway.Entities.AddEntity(newEntity, false);
 						Logging.WriteLineAndConsole("Conceal", string.Format("End Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId));
@@ -473,10 +468,10 @@
 
 		public static void CheckAndRevealEntities()
 		{
-			if(m_checkReveal)
+			if(_checkReveal)
 				return;
 
-			m_checkReveal = true;
+			_checkReveal = true;
 			try
 			{
 				DateTime start = DateTime.Now;
@@ -551,7 +546,7 @@
 			}
 			finally
 			{
-				m_checkReveal = false;
+				_checkReveal = false;
 			}
 		}
 
@@ -563,7 +558,7 @@
 			// Live dangerously
 			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
 			grid.GetBlocks(blocks, x => x.FatBlock != null);
-			//CubeGrids.GetAllConnectedBlocks(m_processedGrids, grid, blocks, x => x.FatBlock != null);
+			//CubeGrids.GetAllConnectedBlocks(_processedGrids, grid, blocks, x => x.FatBlock != null);
 			//bool found = false;
 			//bool powered = false;
 			foreach (IMySlimBlock block in blocks)
@@ -646,9 +641,9 @@
 					
 					if (PluginSettings.Instance.DynamicConcealIncludeMedBays)
 					{
-						lock (m_online)
+						lock (Online)
 						{
-							foreach (ulong connectedPlayer in m_online)
+							foreach (ulong connectedPlayer in Online)
 							{
 								long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(connectedPlayer);
 								//if (medical.Owner == playerId || (medical.ShareMode == MyOwnershipShareModeEnum.Faction && Player.CheckPlayerSameFaction(medical.Owner, playerId)))
@@ -773,7 +768,7 @@
 				MyAPIGateway.Entities.RemapObjectBuilder(builder);
 				//builder.EntityId = 0;
 
-				if(m_removedGrids.Contains(entity.EntityId))
+				if(RemovedGrids.Contains(entity.EntityId))
 				{
 					Logging.WriteLineAndConsole("Conceal", string.Format("Revealing - Id: {0} DUPE FOUND Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
@@ -790,7 +785,7 @@
 						return;
 					}
 
-					m_removedGrids.Add(entity.EntityId);
+					RemovedGrids.Add(entity.EntityId);
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
 						MyAPIGateway.Entities.AddEntity(newEntity, true);
 
@@ -888,14 +883,14 @@
 
 		public static bool ToggleMedbayGrids(ulong steamId)
 		{
-			if (m_checkConceal || m_checkReveal)
+			if (_checkConceal || _checkReveal)
 			{
 				Communication.SendPrivateInformation(steamId, "Server busy");
 				return false;
 			}
 
-			m_checkConceal = true;
-			m_checkReveal = true;
+			_checkConceal = true;
+			_checkReveal = true;
 			try
 			{
 				DateTime start = DateTime.Now;
@@ -988,8 +983,8 @@
 			}
 			finally
 			{
-				m_checkConceal = false;
-				m_checkReveal = false;
+				_checkConceal = false;
+				_checkReveal = false;
 			}
 
 			return true;
@@ -997,20 +992,20 @@
 
 		public static void SetOnline(ulong steamId, bool online)
 		{
-			lock (m_online)
+			lock (Online)
 			{
 				if (online)
 				{
-					if (!m_online.Contains(steamId))
+					if (!Online.Contains(steamId))
 					{
-						m_online.Add(steamId);
+						Online.Add(steamId);
 					}
 				}
 				else
 				{
-					if (m_online.Contains(steamId))
+					if (Online.Contains(steamId))
 					{
-						m_online.Remove(steamId);
+						Online.Remove(steamId);
 					}
 				}
 			}
