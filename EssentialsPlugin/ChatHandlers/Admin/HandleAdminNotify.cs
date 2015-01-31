@@ -1,13 +1,12 @@
-﻿using System;
-using System.Linq;
-using EssentialsPlugin.Utility;
-using Sandbox.Common;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
+	using System;
+	using System.Linq;
+	using EssentialsPlugin.Utility;
+	using Sandbox.Common;
+
 	public class HandleAdminNotify : ChatHandlerBase
 	{
-		private Random m_random = new Random();
 		public override string GetHelp()
 		{
 			return "This will broadcast a notification to all users.  Usage: /admin notify <color> <time> <message>";
