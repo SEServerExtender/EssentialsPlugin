@@ -9,6 +9,8 @@ using VRage.Common.Utils;
 
 namespace EssentialsPlugin.Utility
 {
+	using System.Collections.Generic;
+
 	public static class Logging
 	{
 		private static object m_lockObj = new object();
@@ -155,6 +157,14 @@ namespace EssentialsPlugin.Utility
 												 .SelectMany(element => element).ToList();
 
 			return result.ToArray();
+		}
+
+		public static void Update<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue value)
+		{
+			if (dictionary.ContainsKey(key))
+				dictionary[key] = value;
+			else
+				dictionary.Add(key, value);
 		}
 	}
 }

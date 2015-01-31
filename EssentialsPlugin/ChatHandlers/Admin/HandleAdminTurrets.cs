@@ -12,7 +12,7 @@ using SEModAPIInternal.API.Common;
 
 namespace EssentialsPlugin.ChatHandlers
 {
-	public class HandleAdminTest : ChatHandlerBase
+	public class HandleAdminTurrets : ChatHandlerBase
 	{
 		private Random m_random = new Random();
 		//private bool m_working = false;
@@ -23,7 +23,7 @@ namespace EssentialsPlugin.ChatHandlers
 
 		public override string GetCommandText()
 		{
-			return "/admin test";
+			return "/admin turrets";
 		}
 
 		public override bool IsAdminCommand()

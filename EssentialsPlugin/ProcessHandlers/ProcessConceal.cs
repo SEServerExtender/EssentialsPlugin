@@ -2,6 +2,7 @@
 {
 	using System;
 	using EssentialsPlugin.ChatHandlers;
+	using EssentialsPlugin.EntityManagers;
 	using EssentialsPlugin.Utility;
 
 	public class ProcessConceal : ProcessHandlerBase
@@ -60,15 +61,25 @@
 
 		public override void OnPlayerWorldSent(ulong remoteUserId)
 		{
+			EntityManagement.SetOnline(remoteUserId, true);
+
 			if (!PluginSettings.Instance.DynamicConcealEnabled)
 				return;
 
 			EntityManagement.CheckAndRevealEntities();
 			m_lastRevealCheck = DateTime.Now;
+
 			Logging.WriteLineAndConsole(string.Format("Check Reveal due to: {0}", remoteUserId));
 
 			base.OnPlayerWorldSent(remoteUserId);
 		}
+
+		public override void OnPlayerLeft(ulong remoteUserId)
+		{
+			EntityManagement.SetOnline(remoteUserId, false);
+			base.OnPlayerLeft(remoteUserId);
+		}
+
 	}
 }
 

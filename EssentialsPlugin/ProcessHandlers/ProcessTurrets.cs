@@ -1,14 +1,15 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
 	using System;
+	using EssentialsPlugin.EntityManagers;
 	using EssentialsPlugin.Utility;
 
-	public class ProcessEnable : ProcessHandlerBase
+	public class ProcessTurrets : ProcessHandlerBase
 	{
 		private static DateTime m_lastEnableCheck;
 		private static DateTime m_lastDisableCheck;
 
-		public ProcessEnable()
+		public ProcessTurrets()
 		{
 			//EntityManagement.RevealAll();
 		}
@@ -24,13 +25,13 @@
 			{
 				if (DateTime.Now - m_lastEnableCheck > TimeSpan.FromSeconds(6))
 				{
-					EntityManagement.CheckAndEnableTurrets();
+					TurretManagement.CheckAndEnableTurrets();
 					m_lastEnableCheck = DateTime.Now;
 				}
 
 				if (DateTime.Now - m_lastDisableCheck > TimeSpan.FromSeconds(45))
 				{
-					EntityManagement.CheckAndDisableTurrets();
+					TurretManagement.CheckAndDisableTurrets();
 					m_lastDisableCheck = DateTime.Now;
 				}
 			}

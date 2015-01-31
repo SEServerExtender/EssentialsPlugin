@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using EssentialsPlugin.Utility;
+using EssentialsPlugin.EntityManagers;
 
 namespace EssentialsPlugin.ChatHandlers
 {

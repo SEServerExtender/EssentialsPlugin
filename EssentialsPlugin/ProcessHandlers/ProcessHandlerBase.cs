@@ -1,17 +1,24 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
 	using System;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject;
 
 	public abstract class ProcessHandlerBase
 	{
-		public DateTime LastUpdate { get; set; }
+		private DateTime m_lastUpdate;
+		public DateTime LastUpdate
+		{
+			get { return m_lastUpdate; }
+			set { m_lastUpdate = value; }
+		}
 
 		/// <summary>
 		/// Initializer
 		/// </summary>
-		protected ProcessHandlerBase()
+		public ProcessHandlerBase()
 		{
-			LastUpdate = DateTime.Now;
+			m_lastUpdate = DateTime.Now;
 
 			//Logging.WriteLineAndConsole(string.Format("Added process handler: Raised every {0}ms", GetUpdateResolution()));
 		}
@@ -22,7 +29,7 @@
 		/// <returns></returns>
 		public bool CanProcess()
 		{
-			if(DateTime.Now - LastUpdate > TimeSpan.FromMilliseconds(GetUpdateResolution()))
+			if(DateTime.Now - m_lastUpdate > TimeSpan.FromMilliseconds(GetUpdateResolution()))
 			{
 				return true;
 			}
@@ -44,7 +51,7 @@
 		/// </summary>
 		public virtual void Handle()
 		{
-			LastUpdate = DateTime.Now;
+			m_lastUpdate = DateTime.Now;
 		}
 
 		/// <summary>
@@ -70,5 +77,29 @@
 
 		}
 
+		public virtual void OnEntityAdd(IMyEntity entity)
+		{
+
+		}
+
+		public virtual void OnEntityRemove(IMyEntity entity)
+		{
+
+		}
+
+		public virtual void OnCubeGridCreated(CubeGridEntity entity)
+		{
+
+		}
+
+		public virtual void OnCubeGridDeleted(CubeGridEntity entity)
+		{
+
+		}
+
+		public virtual void OnSectorSaved()
+		{
+
+		}
 	}
 }

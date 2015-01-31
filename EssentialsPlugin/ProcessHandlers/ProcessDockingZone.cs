@@ -152,6 +152,7 @@
 				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
 			});
 
+			m_zoneCache.Clear();
 			foreach (IMyEntity entity in entities)
 			{
 				IMyCubeGrid grid = (IMyCubeGrid)entity;

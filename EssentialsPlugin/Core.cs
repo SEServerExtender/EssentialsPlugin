@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Threading;
 using System.IO;
 using System.Runtime.InteropServices;
+using Sandbox.ModAPI;
+
 using SEModAPIExtensions.API;
 using SEModAPIExtensions.API.Plugin;
 using SEModAPIExtensions.API.Plugin.Events;
@@ -26,7 +28,7 @@ namespace EssentialsPlugin
 	using EssentialsPlugin.ChatHandlers.Waypoints;
 	using EssentialsPlugin.ProcessHandlers;
 
-	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler
+	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
 	{
 		#region Private Fields
 		internal static Essentials Instance;
@@ -37,6 +39,8 @@ namespace EssentialsPlugin
 		private List<ProcessHandlerBase> _processHandlers;
 		private List<ChatHandlerBase> _chatHandlers;
 		private bool _running = true;
+		private DateTime m_lastProcessUpdate;
+
 		#endregion
 
 		#region Properties
@@ -90,6 +94,19 @@ namespace EssentialsPlugin
 		{
 			get { return PluginSettings.Instance.ServerUtilityGridsShowCoords; }
 			set { PluginSettings.Instance.ServerUtilityGridsShowCoords = value; }
+		}
+
+		[Category("General")]
+		[Description("Enable / Disable respawn menu override.  If you're having issues with a very slow respawn menu, this will help, though please note it may cause more problems if your server is running quickly.  (Will give the spawn menu twice)")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool ServerRespawnMenuOverride
+		{
+			get { return PluginSettings.Instance.ServerRespawnMenuOverride; }
+			set
+			{
+				PluginSettings.Instance.ServerRespawnMenuOverride = value;
+			}
 		}
 
 		[Category("Information")]
@@ -542,6 +559,47 @@ namespace EssentialsPlugin
 			set { PluginSettings.Instance.DynamicConcealIncludeMedBays = value; }
 		}
 
+		/*  Experiments not working yet */
+		/*
+		[Category("Dynamic Entity Management")]
+		[Description("")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DynamicConcealServerOnly
+		{
+			get { return PluginSettings.Instance.DynamicConcealServerOnly; }
+			set
+			{
+				PluginSettings.Instance.DynamicConcealServerOnly = value;
+			}
+		}
+
+		[Category("Dynamic Entity Management")]
+		[Description("")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DynamicClientConcealEnabled
+		{
+			get { return PluginSettings.Instance.DynamicClientConcealEnabled; }
+			set
+			{
+				PluginSettings.Instance.DynamicClientConcealEnabled = value;
+			}
+		}
+
+		[Category("Dynamic Entity Management")]
+		[Description("")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public float DynamicClientConcealDistance
+		{
+			get { return PluginSettings.Instance.DynamicClientConcealDistance; }
+			set
+			{
+				PluginSettings.Instance.DynamicClientConcealDistance = value;
+			}
+		}
+		/**/
 		[Category("Dynamic Entity Management")]
 		[Description("Enable / Disable console messages that display whether an entity is concealed or revealed.  Should be off if you don't care about seeing how many entities get revealed/concealed.")]
 		[Browsable(true)]
@@ -606,6 +664,21 @@ namespace EssentialsPlugin
 				PluginSettings.Instance.DynamicTurretManagementType = value;
 			}
 		}
+
+		/*
+		[Category("Dynamic Entity Management")]
+		[Description("Enable / Disable dynamic block management.  This manager disables blocks of ships that can't be concealed to further increase gamelogic savings.")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool DynamicBlockManagementEnabled
+		{
+			get { return PluginSettings.Instance.DynamicBlockManagementEnabled; }
+			set
+			{
+				PluginSettings.Instance.DynamicBlockManagementEnabled = value;
+			}
+		}
+		*/
 
 		[Category("Waypoint System")]
 		[Description("Enable / Disable personal waypoints.  These are hud displayed waypoints that only a user can see.")]
@@ -717,6 +790,20 @@ namespace EssentialsPlugin
 			get { return PluginSettings.Instance.BlockEnforcementItems; }
 		}
 
+		/*
+		[Category("Game Modes")]
+		[Description("Conquest Game Mode - This mode tracks asteroid owners by counting owned blocks near an asteroid to determine the owner.  Includes a leaderboard")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public bool GameModeConquestEnabled
+		{
+			get { return PluginSettings.Instance.GameModeConquestEnabled; }
+			set
+			{
+				PluginSettings.Instance.GameModeConquestEnabled = value;
+			}
+		}
+		*/
 		#endregion
 
 		#region Constructors and Initializers
@@ -746,7 +833,6 @@ namespace EssentialsPlugin
 				                   new ProcessWaypoints( ),
 				                   new ProcessCleanup( ),
 				                   new ProcessBlockEnforcement( ),
-				                   new ProcessEnable( ),
 				                   new ProcessSpawnShipTracking( )
 			                   };
 
@@ -824,6 +910,11 @@ namespace EssentialsPlugin
 			_processThreads = new List<Thread>();
 			_processThread = new Thread(PluginProcessing);
 			_processThread.Start();
+
+			MyAPIGateway.Entities.OnEntityAdd -= OnEntityAdd;
+			MyAPIGateway.Entities.OnEntityRemove -= OnEntityRemove;
+			MyAPIGateway.Entities.OnEntityAdd += OnEntityAdd;
+			MyAPIGateway.Entities.OnEntityRemove += OnEntityRemove;
 
 			Logging.WriteLineAndConsole(string.Format("Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id));
 		}
@@ -904,6 +995,11 @@ namespace EssentialsPlugin
 			catch (Exception ex)
 			{
 				Logging.WriteLineAndConsole(string.Format("PluginProcessing(): {0}", ex));
+			}
+			finally
+			{
+				MyAPIGateway.Entities.OnEntityAdd -= OnEntityAdd;
+				MyAPIGateway.Entities.OnEntityRemove -= OnEntityRemove;
 			}
 		}
 		#endregion
@@ -1151,14 +1247,34 @@ namespace EssentialsPlugin
 
 		#region ICubeGridHandler Members
 
+		public void OnEntityAdd(IMyEntity obj)
+		{
+			ThreadPool.QueueUserWorkItem(new WaitCallback((object state) =>
+			{
+				foreach (ProcessHandlerBase handler in _processHandlers)
+					handler.OnEntityAdd(obj);			
+			}));
+		}
+
+		public void OnEntityRemove(IMyEntity obj)
+		{
+			ThreadPool.QueueUserWorkItem(new WaitCallback((object state) =>
+			{
+				foreach (ProcessHandlerBase handler in _processHandlers)
+					handler.OnEntityRemove(obj);
+			}));
+		}
+
 		public void OnCubeGridCreated(CubeGridEntity cubeGrid)
 		{
-
+			foreach (ProcessHandlerBase handler in _processHandlers)
+				handler.OnCubeGridCreated(cubeGrid);
 		}
 
 		public void OnCubeGridDeleted(CubeGridEntity cubeGrid)
 		{
-
+			foreach (ProcessHandlerBase handler in _processHandlers)
+				handler.OnCubeGridDeleted(cubeGrid);
 		}
 
 		public void OnCubeGridLoaded(CubeGridEntity cubeGrid)
@@ -1207,6 +1323,12 @@ namespace EssentialsPlugin
 		}
 
 		#endregion
+
+		public void OnSectorSaved(object state)
+		{
+			foreach (ProcessHandlerBase handler in _processHandlers)
+				handler.OnSectorSaved();
+		}
 
 		#region IPlugin Members
 

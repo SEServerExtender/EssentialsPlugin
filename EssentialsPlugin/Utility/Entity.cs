@@ -165,5 +165,47 @@ namespace EssentialsPlugin.Utility
 		{
 			return ((IMyCubeGrid)entity.Parent).GridIntegerToWorld(entity.Position);
 		}
+
+		public static bool GetDistanceBetweenGridAndPlayer(IMyCubeGrid grid, IMyPlayer player, out double distance)
+		{
+			distance = 0d;
+
+			try
+			{
+				if (player.Controller == null || player.Controller.ControlledEntity == null || player.Controller.ControlledEntity.Entity == null)
+					return false;
+
+				Vector3D playerPosition = player.Controller.ControlledEntity.Entity.GetPosition();
+				distance = Vector3D.Distance(grid.GetPosition(), playerPosition);
+			}
+			catch (Exception ex)
+			{
+				Logging.WriteLineAndConsole("GetDistanceBetweenGridAndPlayer(): {0}", ex.ToString());
+				return false;
+			}
+
+			return true;
+		}
+
+		public static bool GetDistanceBetweenPointAndPlayer(Vector3D point, IMyPlayer player, out double distance)
+		{
+			distance = 0d;
+
+			try
+			{
+				if (player.Controller == null || player.Controller.ControlledEntity == null || player.Controller.ControlledEntity.Entity == null)
+					return false;
+
+				Vector3D playerPosition = player.Controller.ControlledEntity.Entity.GetPosition();
+				distance = Vector3D.Distance(point, playerPosition);
+			}
+			catch (Exception ex)
+			{
+				Logging.WriteLineAndConsole("GetDistanceBetweenPointAndPlayer(): {0}", ex.ToString());
+				return false;
+			}
+
+			return true;
+		}
 	}
 }
