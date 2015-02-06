@@ -195,10 +195,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="HavokWrapper, Version=1.0.5420.29471, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\HavokWrapper.dll</HintPath>
-    </Reference>
     <Reference Include="Sandbox.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SE-Community-Mod-API\GameLibraries\Sandbox.Common.dll</HintPath>
@@ -211,20 +207,19 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SE-Community-Mod-API\GameLibraries\Sandbox.Game.dll</HintPath>
     </Reference>
-    <Reference Include="SEModAPI, Version=0.2.7.1, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="SEModAPI, Version=0.3.0.1, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\Debug\SEModAPI.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\x64\Release\SEModAPI.dll</HintPath>
     </Reference>
-    <Reference Include="SEModAPIExtensions, Version=0.1.7.4, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="SEModAPIExtensions, Version=0.2.0.1, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\Debug\SEModAPIExtensions.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\x64\Release\SEModAPIExtensions.dll</HintPath>
     </Reference>
-    <Reference Include="SEModAPIInternal, Version=0.2.4.4, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="SEModAPIInternal, Version=0.3.0.1, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\Debug\SEModAPIInternal.dll</HintPath>
+      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\x64\Release\SEModAPIInternal.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression.FileSystem" />
