@@ -1,9 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Xml.Serialization;
+
 using VRageMath;
 
 using Sandbox.Common.ObjectBuilders;
+using Sandbox.Definitions;
+using Sandbox.Common;
 using Sandbox.ModAPI;
 
 using EssentialsPlugin.UtilityClasses;
@@ -12,7 +19,7 @@ namespace EssentialsPlugin.Utility
 {
 	public static class DockingZone
 	{
-		private static readonly List<DockingCooldownItem> CooldownItems = new List<DockingCooldownItem>();
+		private static List<DockingCooldownItem> m_cooldownItems = new List<DockingCooldownItem>();
 
 		public static bool IsGridInside(IMyCubeGrid dockingEntity, List<IMyCubeBlock> beaconList)
 		{
@@ -45,28 +52,40 @@ namespace EssentialsPlugin.Utility
 				if (entityBlock.FatBlock == null)
 					continue;
 
-				IMyCubeBlock cubeBlock = entityBlock.FatBlock;
+				if (!(entityBlock.FatBlock is IMyCubeBlock))
+					continue;
+
+				IMyCubeBlock cubeBlock = (IMyCubeBlock)entityBlock.FatBlock;
 
 				if (!(cubeBlock is Sandbox.ModAPI.Ingame.IMyBeacon))
 					continue;
 
 				Sandbox.ModAPI.Ingame.IMyBeacon beacon = (Sandbox.ModAPI.Ingame.IMyBeacon)cubeBlock;
-				if (string.IsNullOrEmpty( beacon.CustomName ))
+				if (beacon.CustomName == null || beacon.CustomName == "")
 					continue;
 
-				List<IMyCubeBlock> beacons;
-				if (testList.TryGetValue( beacon.CustomName, out beacons ))
+				if (testList.ContainsKey(beacon.CustomName))
 				{
-					beacons.Add(entityBlock.FatBlock);
+					testList[beacon.CustomName].Add(entityBlock.FatBlock);
 				}
 				else
 				{
-					List<IMyCubeBlock> testBeaconList = new List<IMyCubeBlock> { entityBlock.FatBlock };
+					List<IMyCubeBlock> testBeaconList = new List<IMyCubeBlock>();
+					testBeaconList.Add(entityBlock.FatBlock);
 					testList.Add(beacon.CustomName, testBeaconList);
 				}
 			}
 
-			return testList.Where( p => p.Value.Count == 4 ).ToDictionary( p => p.Key, p => p.Value );
+			Dictionary<String, List<IMyCubeBlock>> resultList = new Dictionary<string, List<IMyCubeBlock>>();
+			foreach (KeyValuePair<String, List<IMyCubeBlock>> p in testList)
+			{
+				if (p.Value.Count == 4)
+				{
+					resultList.Add(p.Key, p.Value);
+				}
+			}
+
+			return resultList;
 		}
 
 		static public bool DoesGridContainZone(IMyCubeGrid cubeGrid)
@@ -76,19 +95,23 @@ namespace EssentialsPlugin.Utility
 
 		static public void FindByName(String pylonName, out Dictionary<String, List<IMyCubeBlock>> testList, out List<IMyCubeBlock> beaconList, long playerId)
 		{
+			IMyCubeGrid beaconParent = null;
 			testList = new Dictionary<string, List<IMyCubeBlock>>();
 			beaconList = new List<IMyCubeBlock>();
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-			Wrapper.GameAction(() => MyAPIGateway.Entities.GetEntities(entities) );
+			Wrapper.GameAction(() =>
+			{
+				MyAPIGateway.Entities.GetEntities(entities, null);
+			});
 
 			foreach (IMyEntity entity in entities)
 			{
-
-				IMyCubeGrid cubeGrid = entity as IMyCubeGrid;
-				if (cubeGrid == null)
+				if (!(entity is IMyCubeGrid))
 					continue;
 
-				if (cubeGrid.GridSizeEnum == MyCubeSize.Small)
+				IMyCubeGrid cubeGrid = (IMyCubeGrid)entity;
+
+				if (cubeGrid == null || cubeGrid.GridSizeEnum == MyCubeSize.Small)
 					continue;
 
 				if (!cubeGrid.BigOwners.Contains(playerId) && !cubeGrid.SmallOwners.Contains(playerId))
@@ -96,6 +119,7 @@ namespace EssentialsPlugin.Utility
 
 				testList.Clear();
 				beaconList.Clear();
+				beaconParent = cubeGrid;
 
 				List<IMySlimBlock> cubeBlocks = new List<IMySlimBlock>();
 				cubeGrid.GetBlocks(cubeBlocks);
@@ -104,7 +128,10 @@ namespace EssentialsPlugin.Utility
 					if (entityBlock.FatBlock == null)
 						continue;
 
-					IMyCubeBlock cubeBlock = entityBlock.FatBlock;
+					if (!(entityBlock.FatBlock is IMyCubeBlock))
+						continue;
+
+					IMyCubeBlock cubeBlock = (IMyCubeBlock)entityBlock.FatBlock;
 
 					if (!(cubeBlock is Sandbox.ModAPI.Ingame.IMyBeacon))
 						continue;
@@ -129,23 +156,24 @@ namespace EssentialsPlugin.Utility
 					MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)blockObject;
 					 */ 
 
-					if (string.IsNullOrEmpty( beacon.CustomName ))
+					if (beacon.CustomName == null || beacon.CustomName == "")
 						continue;
 
 					if (beacon.IsFunctional &&
-					   String.Equals( beacon.CustomName, pylonName, StringComparison.CurrentCultureIgnoreCase )
+					   beacon.CustomName.ToLower() == pylonName.ToLower()
 					  )
 					{
 						beaconList.Add(entityBlock.FatBlock);
+						Vector3D beaconPos = Entity.GetBlockEntityPosition(entityBlock.FatBlock);
 						continue;
 					}
 
-					List<IMyCubeBlock> blocks;
-					if (testList.TryGetValue( beacon.CustomName, out blocks ))
-						blocks.Add(entityBlock.FatBlock);
+					if (testList.ContainsKey(beacon.CustomName))
+						testList[beacon.CustomName].Add(entityBlock.FatBlock);
 					else
 					{
-						List<IMyCubeBlock> testBeaconList = new List<IMyCubeBlock> { entityBlock.FatBlock };
+						List<IMyCubeBlock> testBeaconList = new List<IMyCubeBlock>();
+						testBeaconList.Add(entityBlock.FatBlock);
 						testList.Add(beacon.CustomName, testBeaconList);
 					}
 				}
@@ -157,53 +185,51 @@ namespace EssentialsPlugin.Utility
 
 		public static void AddCooldown(string name)
 		{
-			DockingCooldownItem item = new DockingCooldownItem { Start = DateTime.Now, Name = name };
+			DockingCooldownItem item = new DockingCooldownItem();
+			item.Start = DateTime.Now;
+			item.Name = name;
 
-			lock (CooldownItems)
-				CooldownItems.Add(item);
+			lock (m_cooldownItems)
+				m_cooldownItems.Add(item);
 		}
 
 		public static bool CheckCooldown(string name)
 		{
-			lock (CooldownItems)
+			lock (m_cooldownItems)
 			{
-				DockingCooldownItem item = CooldownItems.FindAll(x => x.Name == name).FirstOrDefault();
-				if ( item == null )
+				DockingCooldownItem item = m_cooldownItems.FindAll(x => x.Name == name).FirstOrDefault();
+				if (item != null)
 				{
-					return true;
+					if (DateTime.Now - item.Start > TimeSpan.FromSeconds(15))
+					{
+						m_cooldownItems.RemoveAll(x => x.Name == name);
+						return true;
+					}
+					else
+					{
+						return false;
+					}
 				}
-				if ( DateTime.Now - item.Start <= TimeSpan.FromSeconds( 15 ) )
-				{
-					return false;
-				}
-				CooldownItems.RemoveAll(x => x.Name == name);
-				return true;
 			}
+
+			return true;
 		}
-	}
-
-	[Serializable]
-	public class DockingItem
-	{
-		public long PlayerId { get; set; }
-
-		public long DockedEntityId { get; set; }
-
-		public long TargetEntityId { get; set; }
-
-		public long[ ] DockingBeaconIds { get; set; }
-
-		public Vector3 SavePos { get; set; }
-
-		public Quaternion SaveQuat { get; set; }
-
-		public string DockedName { get; set; }
 	}
 
 	public class DockingCooldownItem
 	{
-		public DateTime Start { get; set; }
+		private DateTime start;
+		public DateTime Start
+		{
+			get { return start; }
+			set { start = value; }
+		}
 
-		public string Name { get; set; }
+		private string name;
+		public string Name
+		{
+			get { return name; }
+			set { name = value; }
+		}
 	}
 }

@@ -120,7 +120,7 @@ namespace EssentialsPlugin.ChatHandlers
 					else
 					{
 						Logging.WriteLineAndConsole(string.Format("Removing member with no player info: {0}", member.PlayerId));
-						MyAPIGateway.Session.Factions.KickPlayerFromFaction(member.PlayerId);
+						MyAPIGateway.Session.Factions.KickMember(faction.FactionId,member.PlayerId );
 					}
 				}
 
