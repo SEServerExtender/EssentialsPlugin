@@ -689,7 +689,7 @@ namespace EssentialsPlugin.Utility
 						isOwnedBy = true;
 						ownedBy = parts[1];
 						if(PlayerMap.Instance.GetPlayerItemsFromPlayerName(ownedBy).Count > 0)
-							ownedByPlayerId = PlayerMap.Instance.GetPlayerItemsFromPlayerName(ownedBy).First().playerId;
+							ownedByPlayerId = PlayerMap.Instance.GetPlayerItemsFromPlayerName(ownedBy).First().PlayerId;
 
 						options.Add("Owned By", ownedBy);
 					}
