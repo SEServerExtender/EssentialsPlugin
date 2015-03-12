@@ -1,7 +1,7 @@
-﻿using EssentialsPlugin.Utility;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.AdminScan
 {
+	using EssentialsPlugin.Utility;
+
 	public class HandleAdminScanGrids : ChatHandlerBase
 	{
 		public override string GetHelp()

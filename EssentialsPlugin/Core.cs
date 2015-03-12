@@ -26,6 +26,7 @@ namespace EssentialsPlugin
 	using EssentialsPlugin.ChatHandlers.Admin;
 	using EssentialsPlugin.ChatHandlers.AdminConceal;
 	using EssentialsPlugin.ChatHandlers.AdminDelete;
+	using EssentialsPlugin.ChatHandlers.AdminScan;
 	using EssentialsPlugin.ChatHandlers.Waypoints;
 	using EssentialsPlugin.ProcessHandlers;
 
