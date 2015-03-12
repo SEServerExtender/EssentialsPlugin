@@ -839,7 +839,7 @@ namespace EssentialsPlugin.Utility
 					continue;
 
 
-				if (hasDisplayName && displayName != "")
+				if (hasDisplayName && displayName != string.Empty)
 				{
 					if (!hasDisplayNameExact && entity.DisplayName.Contains(displayName))
 						entitiesToConfirm.Add(entity);
