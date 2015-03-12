@@ -99,7 +99,7 @@
 			if ( _triggerdItem == null )
 			{
 				// Increase to 5 minutes
-				if ( DateTime.Now - item.LastRan > TimeSpan.FromSeconds( 300 ) )
+				if ( DateTime.Now - item.LastRan > TimeSpan.FromMinutes( 5 ) )
 				{
 					item.LastRan = DateTime.Now;
 					string command = item.ScanCommand + " quiet";
