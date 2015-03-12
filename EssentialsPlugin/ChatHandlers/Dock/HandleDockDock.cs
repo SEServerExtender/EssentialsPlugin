@@ -45,9 +45,10 @@ namespace EssentialsPlugin.ChatHandlers
 			return false;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			if (!PluginSettings.Instance.DockingEnabled)
+			string[ ] words = command.Split( ' ' );
+			if ( !PluginSettings.Instance.DockingEnabled )
 				return false;
 
             if (words.Length < 1)

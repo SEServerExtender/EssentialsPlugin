@@ -30,9 +30,9 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			if (!PluginSettings.Instance.RestartEnabled)
+			if ( !PluginSettings.Instance.RestartEnabled )
 			{
 				Communication.SendPrivateInformation(userId, "Automatic Restarts are disabled.");
 				return true;

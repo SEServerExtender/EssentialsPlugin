@@ -32,8 +32,9 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
+			string[ ] words = command.Split( ' ' );
 			int page = 1;
 			bool dialog = false;
 			if(words.Length > 0)

@@ -28,9 +28,10 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			if (PluginSettings.Instance.InformationEnabled)
+			string[ ] words = command.Split( ' ' );
+			if ( PluginSettings.Instance.InformationEnabled )
 			{
 				if (!words.Any())
 				{

@@ -32,9 +32,10 @@ namespace EssentialsPlugin.ChatHandlers
 		}
 
 		// admin nobeacon scan
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			if(words.Count() > 3)
+			string[ ] words = command.Split( ' ' );
+			if ( words.Count( ) > 3 )
 				return false;
 
 			if(!words.Any())

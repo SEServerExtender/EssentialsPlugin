@@ -46,7 +46,7 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
 			var board = Conquest.Instance.Leaderboard;
 

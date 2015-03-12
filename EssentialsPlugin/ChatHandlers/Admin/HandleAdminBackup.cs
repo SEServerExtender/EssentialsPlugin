@@ -1,7 +1,7 @@
-﻿using EssentialsPlugin.Utility;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
+	using EssentialsPlugin.Utility;
+
 	public class HandleAdminBackup : ChatHandlerBase
 	{
 		public override string GetHelp()
@@ -24,9 +24,9 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			Communication.SendPrivateInformation(userId, string.Format("Creating a save game backup ..."));
+			Communication.SendPrivateInformation( userId, string.Format( "Creating a save game backup ..." ) );
 			Backup.Create(PluginSettings.Instance.BackupBaseDirectory, PluginSettings.Instance.BackupCreateSubDirectories, PluginSettings.Instance.BackupAsteroids, PluginSettings.Instance.BackupEssentials);
 			Communication.SendPrivateInformation(userId, string.Format("Save game backup created"));
 			return true;

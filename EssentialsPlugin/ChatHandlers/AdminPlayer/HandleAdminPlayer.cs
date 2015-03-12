@@ -30,9 +30,10 @@ namespace EssentialsPlugin.ChatHandlers
 		}
 
 		// /admin movefrom x y z x y z radius
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+			string[ ] words = command.Split( ' ' );
+			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
 			Wrapper.GameAction(() =>
 			{
 				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);

@@ -32,9 +32,9 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			if (m_refreshTrack.Contains(userId))
+			if ( m_refreshTrack.Contains( userId ) )
 			{
 				Communication.SendPrivateInformation(userId, "You may only refresh once per login.  Please relog and try again.");
 				return true;

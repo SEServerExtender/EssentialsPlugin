@@ -28,8 +28,9 @@
 		}
 
 		// admin deletearea x y z radius
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand(ulong userId, string command)
 		{
+			string[ ] words = command.Split( ' ' );
 			if (words.Length < 3)
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());

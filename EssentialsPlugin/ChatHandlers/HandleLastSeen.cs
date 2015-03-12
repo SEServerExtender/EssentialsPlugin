@@ -36,9 +36,10 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			string[] splits = General.SplitString(string.Join(" ", words));
+			string[ ] words = command.Split( ' ' );
+			string[ ] splits = General.SplitString( string.Join( " ", words ) );
 			if (splits.Count() != 1)
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());

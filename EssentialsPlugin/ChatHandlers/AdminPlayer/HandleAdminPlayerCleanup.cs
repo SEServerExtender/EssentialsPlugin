@@ -45,9 +45,10 @@ namespace EssentialsPlugin.ChatHandlers
 		}
 
 		// /admin movefrom x y z x y z radius
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			Logging.WriteLineAndConsole("Starting scan ...");
+			string[ ] words = command.Split( ' ' );
+			Logging.WriteLineAndConsole( "Starting scan ..." );
 
 			List<IMyIdentity> players = new List<IMyIdentity>();
 			MyAPIGateway.Players.GetAllIdentites(players);

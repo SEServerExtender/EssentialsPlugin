@@ -24,7 +24,7 @@
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand(ulong userId, string command)
 		{
 			/*
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();

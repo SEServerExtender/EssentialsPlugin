@@ -30,8 +30,9 @@
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand(ulong userId, string command)
 		{
+			string[ ] words = command.Split( ' ' );
 			bool force = words.FirstOrDefault(x => x.ToLower() == "force") != null;
 
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();

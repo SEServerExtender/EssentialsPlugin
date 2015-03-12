@@ -32,9 +32,10 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			if(words.Count() < 2)
+			string[ ] words = command.Split( ' ' );
+			if ( words.Count( ) < 2 )
 			{
 				Communication.SendClientMessage(userId, "/message Server " + GetHelp());
 			}

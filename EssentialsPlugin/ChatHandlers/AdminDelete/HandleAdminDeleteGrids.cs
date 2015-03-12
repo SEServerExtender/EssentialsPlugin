@@ -30,9 +30,9 @@
 		}
 
 		// admin nobeacon scan
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			HashSet<IMyEntity> grids = CubeGrids.ScanGrids(userId, words);
+			HashSet<IMyEntity> grids = CubeGrids.ScanGrids( userId, command );
 
 			bool confirm = true;
 			/*

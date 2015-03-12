@@ -31,9 +31,10 @@
 		}
 
 		// admin deletearea x y z radius
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+			string[ ] words = command.Split( ' ' );
+			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
 			HashSet<IMyEntity> entitiesToConfirm = new HashSet<IMyEntity>();
 			HashSet<IMyEntity> entitiesConnected = new HashSet<IMyEntity>();
 			HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>();

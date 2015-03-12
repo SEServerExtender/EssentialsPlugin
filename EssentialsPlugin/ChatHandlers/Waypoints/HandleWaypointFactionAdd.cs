@@ -40,9 +40,10 @@
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			if (!PluginSettings.Instance.WaypointsEnabled)
+			string[ ] words = command.Split( ' ' );
+			if ( !PluginSettings.Instance.WaypointsEnabled )
 				if (!PluginSettings.Instance.WaypointsEnabled)
 				return false;
 			

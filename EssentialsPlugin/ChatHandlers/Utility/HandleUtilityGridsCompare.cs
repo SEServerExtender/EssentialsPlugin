@@ -28,9 +28,9 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
 			MyAPIGateway.Entities.GetEntities(entities);
 			List<long> entityList = new List<long>();
 

@@ -11,7 +11,7 @@ namespace EssentialsPlugin.ChatHandlers
 			//Logging.WriteLineAndConsole(string.Format("Added chat handler: {0}", GetCommandText()));
 		}
 
-		public virtual Boolean CanHandle(ulong steamId, String[] words, ref int commandCount)
+		public virtual bool CanHandle(ulong steamId, string[] words, ref int commandCount)
 		{
 			// Administrator Command
 			if (IsAdminCommand())
@@ -23,25 +23,23 @@ namespace EssentialsPlugin.ChatHandlers
 			// Check if this command has multiple commands that do the same thing
 			if (GetMultipleCommandText().Length < 1)
 			{
-				commandCount = GetCommandText().Split(new char[] { ' ' }).Count();
+				commandCount = GetCommandText().Split( ' ' ).Length;
 				if (words.Length > commandCount - 1)
-					return String.Join(" ", words).ToLower().StartsWith(GetCommandText());
+					return string.Join(" ", words).ToLower().StartsWith(GetCommandText());
 			}
 			else
 			{
-				bool found = false;
 				foreach (string command in GetMultipleCommandText())
 				{
-					commandCount = command.Split(new char[] { ' ' }).Count();
+					commandCount = command.Split( ' ' ).Length;
 					if (words.Length > commandCount - 1)
 					{
-						found = String.Join(" ", words).ToLower().StartsWith(command);
-						if (found)
-							break;
+						if ( string.Join(" ", words).ToLower().StartsWith(command) )
+							return true;
 					}
 				}
 
-				return found;
+				return false;
 			}
 
 			return false;
@@ -49,9 +47,9 @@ namespace EssentialsPlugin.ChatHandlers
 
 		public abstract string GetHelp();
 
-		public virtual String GetCommandText()
+		public virtual string GetCommandText()
 		{
-			return "";
+			return string.Empty;
 		}
 
 		public virtual string[] GetMultipleCommandText()
@@ -74,7 +72,7 @@ namespace EssentialsPlugin.ChatHandlers
 			return false;
 		}
 
-		public virtual bool HandleCommand(ulong userId, String[] words)
+		public virtual bool HandleCommand(ulong userId, string command)
 		{
 			return false;
 		}

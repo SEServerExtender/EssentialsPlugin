@@ -32,9 +32,10 @@
 		}
 
 		// admin deletearea x y z radius
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			if (words.Count() > 3)
+			string[ ] words = command.Split( ' ' );
+			if ( words.Length > 3 )
 				return false;
 
 			if (!words.Any())

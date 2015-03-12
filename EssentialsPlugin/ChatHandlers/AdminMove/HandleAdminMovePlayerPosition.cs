@@ -26,9 +26,10 @@ namespace EssentialsPlugin.ChatHandlers
 		}
 
 		// /admin movefrom x y z x y z radius
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			if (words.Count() != 4 && words.Count() != 0)
+			string[ ] words = command.Split( ' ' );
+			if ( words.Count( ) != 4 && words.Count( ) != 0 )
 				return false;
 
 			if (words.Count() != 4)

@@ -47,9 +47,9 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			lock (Docking.Instance)
+			lock ( Docking.Instance )
 			{
 				foreach (DockingItem dockingItem in Docking.Instance.DockingItems)
 				{

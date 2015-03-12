@@ -61,8 +61,8 @@
 
 			if ( time - DateTime.Now < TimeSpan.FromSeconds( 1 ) && DateTime.Now - item.LastRan > TimeSpan.FromMinutes( 1 ) )
 			{
-				string command = item.ScanCommand + " quiet";
-				HashSet<IMyEntity> entities = CubeGrids.ScanGrids( 0, command.Split( ' ' ) );
+				string command = string.Format( "{0} quiet", item.ScanCommand );
+				HashSet<IMyEntity> entities = CubeGrids.ScanGrids( 0, command );
 				CubeGrids.DeleteGrids( entities );
 				Communication.SendPublicInformation( string.Format( "[NOTICE]: Timed cleanup has run.  {0} entities removed.  Have a nice day.", entities.Count ) );
 				item.LastRan = DateTime.Now;
@@ -102,8 +102,8 @@
 				if ( DateTime.Now - item.LastRan > TimeSpan.FromMinutes( 5 ) )
 				{
 					item.LastRan = DateTime.Now;
-					string command = item.ScanCommand + " quiet";
-					HashSet<IMyEntity> entities = CubeGrids.ScanGrids( 0, command.Split( ' ' ) );
+					string command = string.Format( "{0} quiet", item.ScanCommand );
+					HashSet<IMyEntity> entities = CubeGrids.ScanGrids( 0, command );
 					if ( entities.Count >= item.MaxCapacity )
 					{
 						Communication.SendPublicInformation( string.Format( "[NOTICE]: Cleanup triggered.  ({0} of {1}) triggered grids found.  Cleanup will run in {2} minutes.  Reason: {3}", entities.Count, item.MaxCapacity, item.MinutesAfterCapacity, item.Reason ) );
@@ -117,8 +117,8 @@
 			{
 				if ( DateTime.Now - item.LastRan > TimeSpan.FromMinutes( item.MinutesAfterCapacity ) )
 				{
-					string command = item.ScanCommand + " quiet";
-					HashSet<IMyEntity> entities = CubeGrids.ScanGrids( 0, command.Split( ' ' ) );
+					string command = string.Format( "{0} quiet", item.ScanCommand );
+					HashSet<IMyEntity> entities = CubeGrids.ScanGrids( 0, command );
 					CubeGrids.DeleteGrids( entities );
 					Communication.SendPublicInformation( string.Format( "[NOTICE]: Triggered cleanup has run.  {0} entities removed.  Have a nice day.", entities.Count ) );
 					_triggerdItem = null;

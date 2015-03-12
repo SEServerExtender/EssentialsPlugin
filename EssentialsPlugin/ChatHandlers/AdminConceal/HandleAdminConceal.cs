@@ -31,8 +31,9 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
+			string[ ] words = command.Split( ' ' );
 			bool showConcealed = true;
 			if (words.Length > 0 && words[0].ToLower() == "revealed")
 				showConcealed = false;

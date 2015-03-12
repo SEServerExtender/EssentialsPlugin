@@ -1,12 +1,12 @@
-﻿using System.Linq;
-using EssentialsPlugin.Utility;
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-using SEModAPIInternal.API.Common;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
+	using System.Linq;
+	using EssentialsPlugin.Utility;
+	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+
 	public class HandleAdminOwnershipChange : ChatHandlerBase
 	{
 		public override string GetHelp()
@@ -29,9 +29,10 @@ namespace EssentialsPlugin.ChatHandlers
 		}
 
 		// /admin ownership change name gridId
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			string name = words[0].ToLower();
+			string[ ] words = command.Split( ' ' );
+			string name = words[ 0 ].ToLower( );
 			long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(PlayerMap.Instance.GetSteamIdFromPlayerName(name, true)).First();
 			string gridId = words[1].ToLower();
 

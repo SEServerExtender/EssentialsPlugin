@@ -28,7 +28,7 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
 			Vector3D position = Vector3D.Zero;
 			Wrapper.GameAction(() => 

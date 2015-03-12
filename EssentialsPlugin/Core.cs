@@ -1074,7 +1074,7 @@ namespace EssentialsPlugin
 				{
 					try
 					{
-						chatHandler.HandleCommand(remoteUserId, commandParts.Skip(commandCount).ToArray());
+						chatHandler.HandleCommand(remoteUserId, message);
 					}
 					catch (Exception ex)
 					{

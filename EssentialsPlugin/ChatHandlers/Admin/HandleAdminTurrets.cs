@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using EssentialsPlugin.Utility;
-
-using Sandbox.ModAPI;
-using Sandbox.ModAPI.Interfaces;
-using Sandbox.Common.ObjectBuilders;
-
-using VRageMath;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-using SEModAPIInternal.API.Common;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
+	using System;
+	using System.Collections.Generic;
+	using EssentialsPlugin.Utility;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using Sandbox.ModAPI.Interfaces;
+	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+	using VRageMath;
+
 	public class HandleAdminTurrets : ChatHandlerBase
 	{
 		private Random m_random = new Random();
@@ -36,9 +34,10 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			string[] splits = General.SplitString(string.Join(" ", words));
+			string[ ] words = command.Split( ' ' );
+			string[ ] splits = General.SplitString( string.Join( " ", words ) );
 			if (splits.Length != 1)
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());

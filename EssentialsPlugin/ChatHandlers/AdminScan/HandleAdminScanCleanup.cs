@@ -24,9 +24,10 @@ namespace EssentialsPlugin.ChatHandlers
 		}
 
 		// admin nobeacon scan
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			CubeGrids.ScanCleanup(userId, words);
+			string[ ] words = command.Split( ' ' );
+			CubeGrids.ScanCleanup( userId, words );
 			return true;
 		}
 	}

@@ -29,9 +29,10 @@
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			HashSet<IMyEntity> entitiesFound = CubeGrids.ScanCleanup(userId, words);
+			string[ ] words = command.Split( ' ' );
+			HashSet<IMyEntity> entitiesFound = CubeGrids.ScanCleanup( userId, words );
 
 			foreach (IMyEntity entity in entitiesFound)
 			{

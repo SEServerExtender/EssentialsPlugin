@@ -1,9 +1,8 @@
-﻿using System;
-using EssentialsPlugin.Utility;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
+	using System;
 	using EssentialsPlugin.ProcessHandlers;
+	using EssentialsPlugin.Utility;
 
 	public class HandleAdminRestart : ChatHandlerBase
 	{
@@ -27,9 +26,10 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			if (words.Length != 1)
+			string[ ] words = command.Split( ' ' );
+			if ( words.Length != 1 )
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());
 				return true;

@@ -1,8 +1,8 @@
-﻿using System;
-using EssentialsPlugin.Utility;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
+	using System;
+	using EssentialsPlugin.Utility;
+
 	public class HandleAdminMemory : ChatHandlerBase
 	{
 		public override string GetHelp()
@@ -25,9 +25,9 @@ namespace EssentialsPlugin.ChatHandlers
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
+		public override bool HandleCommand( ulong userId, string command )
 		{
-			GC.Collect();
+			GC.Collect( );
 			Communication.SendPrivateInformation(userId, string.Format("Essential Memory Usage: {0}", GC.GetTotalMemory(false)));
 
 			Wrapper.GameAction(() =>
