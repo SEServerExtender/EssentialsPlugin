@@ -2,6 +2,7 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
@@ -28,23 +29,17 @@
 				if ( !PluginSettings.Instance.CleanupEnabled )
 					return;
 
-				foreach ( SettingsCleanupTimedItem item in PluginSettings.Instance.CleanupTimedItems )
+				foreach ( SettingsCleanupTimedItem item in PluginSettings.Instance.CleanupTimedItems.Where( item => item.Enabled ) )
 				{
-					if ( !item.Enabled )
-						continue;
-
 					ProcessTimedItem( item );
 				}
 
-				foreach ( SettingsCleanupTriggerItem item in PluginSettings.Instance.CleanupTriggerItems )
+				foreach ( SettingsCleanupTriggerItem item in PluginSettings.Instance.CleanupTriggerItems.Where( item => item.Enabled ) )
 				{
-					if ( !item.Enabled )
-						continue;
-
 					ProcessTriggerItem( item );
 				}
 			}
-			catch ( Exception ex )
+			catch ( OverflowException ex )
 			{
 				Logging.WriteLineAndConsole( string.Format( "ProcessCleanup.Handle(): {0}", ex ) );
 			}
