@@ -26,7 +26,6 @@ namespace EssentialsPlugin.Utility
 	{
 		public static Vector3D RemoveGridsInSphere(ulong userId, Vector3D startPosition, float radius, RemoveGridTypes removeType)
 		{
-			List<MyObjectBuilder_CubeGrid> gridsToMove = new List<MyObjectBuilder_CubeGrid>();
 			BoundingSphereD sphere = new BoundingSphereD(startPosition, radius);
 			List<IMyEntity> entitiesToMove = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
 			List<IMyEntity> entitiesToRemove = new List<IMyEntity>();
@@ -93,7 +92,7 @@ namespace EssentialsPlugin.Utility
 						MyObjectBuilder_ShipConnector connector = (MyObjectBuilder_ShipConnector)block;
 						if (connector.Connected)
 						{
-							IMyEntity connectedEntity = null;
+							IMyEntity connectedEntity;
 							MyAPIGateway.Entities.TryGetEntityById(connector.ConnectedEntityId, out connectedEntity);
 
 							if (connectedEntity != null)
@@ -127,7 +126,7 @@ namespace EssentialsPlugin.Utility
 						MyObjectBuilder_MotorAdvancedStator stator = (MyObjectBuilder_MotorAdvancedStator)block;
 						if (stator.RotorEntityId != 0)
 						{
-							IMyEntity connectedEntity = null;
+							IMyEntity connectedEntity;
 							MyAPIGateway.Entities.TryGetEntityById(stator.RotorEntityId, out connectedEntity);
 
 							if (connectedEntity != null)
@@ -149,7 +148,7 @@ namespace EssentialsPlugin.Utility
 						MyObjectBuilder_MotorStator stator = (MyObjectBuilder_MotorStator)block;
 						if (stator.RotorEntityId != 0)
 						{
-							IMyEntity connectedEntity = null;
+							IMyEntity connectedEntity;
 							MyAPIGateway.Entities.TryGetEntityById(stator.RotorEntityId, out connectedEntity);
 
 							if (connectedEntity != null)
@@ -181,15 +180,7 @@ namespace EssentialsPlugin.Utility
 				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
 			});
 
-			foreach (IMyEntity entity in entities)
-			{
-				if (entity.DisplayName.ToLower().Contains(displayName.ToLower()))
-				{
-					return entity;
-				}
-			}
-
-			return null;
+			return entities.FirstOrDefault( entity => entity.DisplayName.ToLower( ).Contains( displayName.ToLower( ) ) );
 		}
 
 		public static bool WaitForLoadingEntity(CubeGridEntity grid)
@@ -233,7 +224,6 @@ namespace EssentialsPlugin.Utility
 
 			string displayName = "";
 			Dictionary<string, int> blockSubTypes = new Dictionary<string, int>();
-			Dictionary<string, int> blockSubTypeLimits = new Dictionary<string, int>();
 
 			if (words.Any())
 			{
@@ -276,16 +266,16 @@ namespace EssentialsPlugin.Utility
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")) != null)
 				{
 					hasDisplayName = true;
-					displayName = words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")).Split(new char[] { ':' })[1];
+					displayName = words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")).Split( ':' )[1];
 					options["Matches Display Name Text"] = "true:" + displayName;
 
-					if (words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")).Split(new char[] { ':' }).Length > 2 && words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")).Split(new char[] { ':' })[2] == "exact")
+					if (words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")).Split( ':' ).Length > 2 && words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")).Split( ':' )[2] == "exact")
 						hasDisplayNameExact = true;
 				}
 
 				if(words.FirstOrDefault(x => x.ToLower().StartsWith("hasblocksubtype:")) != null)
 				{
-					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("hasblocksubtype:")).Split(new char[] { ':' });
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("hasblocksubtype:")).Split( ':' );
 					hasBlockSubType = true;
 					options["Has Sub Block Type"] = "true";
 
@@ -305,7 +295,7 @@ namespace EssentialsPlugin.Utility
 
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("limitblocksubtype:")) != null)
 				{
-					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("limitblocksubtype:")).Split(new char[] { ':' });
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("limitblocksubtype:")).Split( ':' );
 					hasBlockSubTypeLimits = true;
 					options["Has Sub Block Type Limits"] = "true";
 
@@ -341,7 +331,7 @@ namespace EssentialsPlugin.Utility
 					continue;
 
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = null;
+				MyObjectBuilder_CubeGrid gridBuilder;
 				try
 				{
 					 gridBuilder = (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder();
@@ -522,13 +512,11 @@ namespace EssentialsPlugin.Utility
 			bool hasCustomName = false;
 			bool hasCustomNameExact = false;
 
-			string displayName = "";
-			string customName = "";
+			string displayName = string.Empty;
+			string customName = string.Empty;
 			Dictionary<string, int> blockSubTypes = new Dictionary<string, int>();
-			Dictionary<string, int> blockSubTypeLimits = new Dictionary<string, int>();
 			Dictionary<string, int> blockTypes = new Dictionary<string, int>();
 			Dictionary<string, int> blockTypesExcluded = new Dictionary<string, int>();
-			string ownedBy = "";
 			long ownedByPlayerId = 0;
 			int blockCount = 0;
 			int blockCountLess = 0;
@@ -609,7 +597,7 @@ namespace EssentialsPlugin.Utility
 
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")) != null)
 				{
-					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")).Split(new char[] { ':' });
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("hasdisplayname:")).Split( ':' );
 					if (parts.Length > 1)
 					{
 						hasDisplayName = true;
@@ -626,7 +614,7 @@ namespace EssentialsPlugin.Utility
 
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("hascustomname:")) != null)
 				{
-					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("hascustomname:")).Split(new char[] { ':' });
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("hascustomname:")).Split( ':' );
 					if (parts.Length > 1)
 					{
 						hasCustomName = true;
@@ -643,7 +631,7 @@ namespace EssentialsPlugin.Utility
 
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("includesblocksubtype:")) != null)
 				{
-					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("includesblocksubtype:")).Split(new char[] { ':' });
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("includesblocksubtype:")).Split( ':' );
 					hasBlockSubType = true;
 					options.Add("Has Sub Block Type", "true");
 
@@ -663,7 +651,7 @@ namespace EssentialsPlugin.Utility
 
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("excludesblocksubtype:")) != null)
 				{
-					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("excludesblocksubtype:")).Split(new char[] { ':' });
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("excludesblocksubtype:")).Split( ':' );
 					hasBlockSubTypeLimits = true;
 					options.Add("Exclude Has Sub Block Type", "true");
 
@@ -683,11 +671,11 @@ namespace EssentialsPlugin.Utility
 
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("ownedby:")) != null)
 				{
-					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("ownedby:")).Split(new char[] { ':' });
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("ownedby:")).Split( ':' );
 					if (parts.Length > 1)
 					{
 						isOwnedBy = true;
-						ownedBy = parts[1];
+						string ownedBy = parts[1];
 						if(PlayerMap.Instance.GetPlayerItemsFromPlayerName(ownedBy).Count > 0)
 							ownedByPlayerId = PlayerMap.Instance.GetPlayerItemsFromPlayerName(ownedBy).First().PlayerId;
 
@@ -697,7 +685,7 @@ namespace EssentialsPlugin.Utility
 
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("includesblocktype:")) != null)
 				{
-					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("includesblocktype:")).Split(new char[] { ':' });
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("includesblocktype:")).Split( ':' );
 					includesBlockType = true;
 					options.Add("Includes Block Type", "true");
 
@@ -717,7 +705,7 @@ namespace EssentialsPlugin.Utility
 
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("excludesblocktype:")) != null)
 				{
-					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("excludesblocktype:")).Split(new char[] { ':' });
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("excludesblocktype:")).Split( ':' );
 					excludesBlockType = true;
 					options.Add("Excludes Block Type", "true");
 
@@ -737,7 +725,7 @@ namespace EssentialsPlugin.Utility
 
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("blockcount:")) != null)
 				{
-					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("blockcount:")).Split(new char[] { ':' });
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("blockcount:")).Split( ':' );
 					requireBlockCount = true;
 					options.Add("Requires Block Count", "true");
 
@@ -757,7 +745,7 @@ namespace EssentialsPlugin.Utility
 
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("blockcountlessthan:")) != null)
 				{
-					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("blockcountlessthan:")).Split(new char[] { ':' });
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("blockcountlessthan:")).Split( ':' );
 					requireBlockCountLess = true;
 					options.Add("Requires Block Count Less Than", "true");
 
@@ -777,7 +765,7 @@ namespace EssentialsPlugin.Utility
 
 				if (words.FirstOrDefault(x => x.ToLower().StartsWith("blocksize:")) != null)
 				{
-					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("blocksize:")).Split(new char[] { ':' });
+					string[] parts = words.FirstOrDefault(x => x.ToLower().StartsWith("blocksize:")).Split( ':' );
 
 					if(parts[1].ToLower() == "small")
 					{
@@ -813,7 +801,7 @@ namespace EssentialsPlugin.Utility
 				return new HashSet<IMyEntity>();
 			}
 
-			if (words.Count() > options.Count())
+			if (words.Length > options.Count)
 			{
 				Communication.SendPrivateInformation(userId, "Possible problem with your parameters (options provided is larger than options found).  Not returning any results in case of error");
 				return new HashSet<IMyEntity>();
@@ -837,7 +825,7 @@ namespace EssentialsPlugin.Utility
 					continue;
 
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = null;
+				MyObjectBuilder_CubeGrid gridBuilder;
 				try
 				{
 					gridBuilder = (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder();
@@ -1413,7 +1401,6 @@ namespace EssentialsPlugin.Utility
         public static void GetConnectedGrids(HashSet<IMyEntity> grids, Func<IMyEntity, bool> collect = null)
         {
             List<IMySlimBlock> currentBlocks = new List<IMySlimBlock>();
-            List<IMyCubeGrid> connectedGrids = new List<IMyCubeGrid>();
             HashSet<IMyEntity> gridsProcessed = new HashSet<IMyEntity>();
             HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 
@@ -1460,21 +1447,9 @@ namespace EssentialsPlugin.Utility
                 gridsProcessed.Add(currentGrid);
 
                 GetGridBlocks(currentGrid, currentBlocks);
-                foreach (IMyCubeGrid connectedGrid in GetConnectedGridList(gridsProcessed, currentBlocks))
-                {
-                    connectedGrids.Add(connectedGrid);
-                }
+	            connectedGrids.AddRange( GetConnectedGridList( gridsProcessed, currentBlocks ) );
 
-                if (collect != null)
-                {
-                    foreach (IMySlimBlock slimBlock in currentBlocks.FindAll(s => collect(s)))
-                        allBlocks.Add(slimBlock);
-                }
-                else
-                {
-                    foreach (IMySlimBlock slimBlock in currentBlocks)
-                        allBlocks.Add(slimBlock);
-                }
+	            allBlocks.AddRange( collect != null ? currentBlocks.FindAll( s => collect( s ) ) : currentBlocks );
             }
         }
 
@@ -1505,15 +1480,15 @@ namespace EssentialsPlugin.Utility
             List<IMyCubeGrid> connectedGrids = new List<IMyCubeGrid>();
             foreach (IMySlimBlock slimBlock in blocks)
             {
-                if (slimBlock.FatBlock != null && slimBlock.FatBlock is IMyCubeBlock)
+                if (slimBlock.FatBlock != null)
                 {
-                    IMyCubeBlock cubeBlock = (IMyCubeBlock)slimBlock.FatBlock;
+                    IMyCubeBlock cubeBlock = slimBlock.FatBlock;
 
                     // Check for Piston
                     if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_PistonBase))
                     {
                         MyObjectBuilder_PistonBase pistonBase = (MyObjectBuilder_PistonBase)cubeBlock.GetObjectBuilderCubeBlock();
-                        IMyEntity entity = null;
+                        IMyEntity entity;
                         if (MyAPIGateway.Entities.TryGetEntityById(pistonBase.TopBlockId, out entity))
                         {
                             IMyCubeGrid parent = (IMyCubeGrid)entity.Parent;
@@ -1524,7 +1499,7 @@ namespace EssentialsPlugin.Utility
 					else if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_ExtendedPistonBase))
 					{
 						MyObjectBuilder_PistonBase pistonBase = (MyObjectBuilder_PistonBase)cubeBlock.GetObjectBuilderCubeBlock();
-						IMyEntity entity = null;
+						IMyEntity entity;
 						if (MyAPIGateway.Entities.TryGetEntityById(pistonBase.TopBlockId, out entity))
 						{
 							IMyCubeGrid parent = (IMyCubeGrid)entity.Parent;
@@ -1536,7 +1511,7 @@ namespace EssentialsPlugin.Utility
                     else if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_ShipConnector))
                     {
                         MyObjectBuilder_ShipConnector connector = (MyObjectBuilder_ShipConnector)cubeBlock.GetObjectBuilderCubeBlock();
-                        IMyEntity entity = null;
+                        IMyEntity entity;
                         if (MyAPIGateway.Entities.TryGetEntityById(connector.ConnectedEntityId, out entity))
                         {
                             IMyCubeGrid parent = (IMyCubeGrid)entity.Parent;
@@ -1547,7 +1522,7 @@ namespace EssentialsPlugin.Utility
 					else if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorAdvancedStator))
 					{
 						MyObjectBuilder_MotorAdvancedStator stator = (MyObjectBuilder_MotorAdvancedStator)cubeBlock.GetObjectBuilderCubeBlock();
-						IMyEntity connectedEntity = null;
+						IMyEntity connectedEntity;
 						if (MyAPIGateway.Entities.TryGetEntityById(stator.RotorEntityId, out connectedEntity))
 						{
 							IMyCubeGrid parent = (IMyCubeGrid)connectedEntity.Parent;
@@ -1566,8 +1541,7 @@ namespace EssentialsPlugin.Utility
             blockList.Clear();
             List<IMySlimBlock> blocks = new List<IMySlimBlock>();
             grid.GetBlocks(blocks, collect);
-            foreach (IMySlimBlock block in blocks)
-                blockList.Add(block);
+	        blockList.AddRange( blocks );
         }    
 	}
 }
