@@ -8,12 +8,12 @@
 
 	class ProcessCleanup : ProcessHandlerBase
 	{
-		private SettingsCleanupTriggerItem triggerdItem = null;
-		private DateTime m_start;
+		private SettingsCleanupTriggerItem _triggerdItem;
+		private DateTime _start;
 
 		public ProcessCleanup()
 		{
-			m_start = DateTime.Now;
+			_start = DateTime.Now;
 		}
 
 		public override int GetUpdateResolution()
@@ -46,18 +46,19 @@
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("ProcessCleanup.Handle(): {0}", ex.ToString()));
+				Logging.WriteLineAndConsole(string.Format("ProcessCleanup.Handle(): {0}", ex));
 			} 
 			
 			base.Handle();
 		}
 
+		/// <exception cref="OverflowException"></exception>
 		private void ProcessTimedItem(SettingsCleanupTimedItem item)
 		{
-			DateTime time = new DateTime(m_start.Year, m_start.Month, m_start.Day, item.Restart.Hour, item.Restart.Minute, 0);
+			DateTime time = new DateTime(_start.Year, _start.Month, _start.Day, item.Restart.Hour, item.Restart.Minute, 0);
 			if (time - DateTime.Now < TimeSpan.FromSeconds(-20))
 			{
-				time = new DateTime(m_start.Year, m_start.Month, m_start.Day + 1, item.Restart.Hour, item.Restart.Minute, 0);
+				time = new DateTime(_start.Year, _start.Month, _start.Day + 1, item.Restart.Hour, item.Restart.Minute, 0);
 			}
 
 			if (DateTime.Now - item.LastRan < TimeSpan.FromMinutes(1))
@@ -66,7 +67,7 @@
 			if (time - DateTime.Now < TimeSpan.FromSeconds(1) && DateTime.Now - item.LastRan > TimeSpan.FromMinutes(1))
 			{
 				string command = item.ScanCommand + " quiet";
-				HashSet<IMyEntity> entities = CubeGrids.ScanGrids(0, command.Split(new char[] { ' ' }));
+				HashSet<IMyEntity> entities = CubeGrids.ScanGrids(0, command.Split( ' ' ));
 				CubeGrids.DeleteGrids(entities);
 				Communication.SendPublicInformation(string.Format("[NOTICE]: Timed cleanup has run.  {0} entities removed.  Have a nice day.", entities.Count));
 				item.LastRan = DateTime.Now;
@@ -94,24 +95,25 @@
 			}
 		}
 
+		/// <exception cref="OverflowException"></exception>
 		private void ProcessTriggerItem(SettingsCleanupTriggerItem item)
 		{
-			if (triggerdItem != null && triggerdItem != item)
+			if (_triggerdItem != null && _triggerdItem != item)
 				return;
 
-			if (triggerdItem == null)
+			if (_triggerdItem == null)
 			{
 				// Increase to 5 minutes
 				if (DateTime.Now - item.LastRan > TimeSpan.FromSeconds(300))
 				{
 					item.LastRan = DateTime.Now;
 					string command = item.ScanCommand + " quiet";
-					HashSet<IMyEntity> entities = CubeGrids.ScanGrids(0, command.Split(new char[] { ' ' }));
+					HashSet<IMyEntity> entities = CubeGrids.ScanGrids(0, command.Split( ' ' ));
 					if (entities.Count >= item.MaxCapacity)
 					{
 						Communication.SendPublicInformation(string.Format("[NOTICE]: Cleanup triggered.  ({0} of {1}) triggered grids found.  Cleanup will run in {2} minutes.  Reason: {3}", entities.Count, item.MaxCapacity, item.MinutesAfterCapacity, item.Reason));
 						item.NotificationItemsRan.Clear();
-						triggerdItem = item;
+						_triggerdItem = item;
 						return;
 					}
 				}
@@ -121,10 +123,10 @@
 				if (DateTime.Now - item.LastRan > TimeSpan.FromMinutes(item.MinutesAfterCapacity))
 				{
 					string command = item.ScanCommand + " quiet";
-					HashSet<IMyEntity> entities = CubeGrids.ScanGrids(0, command.Split(new char[] { ' ' }));
+					HashSet<IMyEntity> entities = CubeGrids.ScanGrids(0, command.Split( ' ' ));
 					CubeGrids.DeleteGrids(entities);
 					Communication.SendPublicInformation(string.Format("[NOTICE]: Triggered cleanup has run.  {0} entities removed.  Have a nice day.", entities.Count));
-					triggerdItem = null;
+					_triggerdItem = null;
 					return;
 				}
 
