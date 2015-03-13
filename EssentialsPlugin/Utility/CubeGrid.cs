@@ -615,29 +615,7 @@ namespace EssentialsPlugin.Utility
 						ParseBlockCountLessThanArgument( ref wordIndex, words, options, scanOptions );
 						break;
 					case "blocksize":
-						if ( wordIndex + 1 < words.Length )
-						{
-							switch ( words[ wordIndex + 1 ].ToLowerInvariant( ) )
-							{
-								case "small":
-									scanOptions.IsBlockSize = true;
-									scanOptions.BlockSize = 0;
-									break;
-								case "large":
-									scanOptions.IsBlockSize = true;
-									scanOptions.BlockSize = 1;
-									break;
-								case "station":
-									scanOptions.IsBlockSize = true;
-									scanOptions.BlockSize = 2;
-									break;
-								case "largeship":
-									scanOptions.IsBlockSize = true;
-									scanOptions.BlockSize = 3;
-									break;
-							}
-							wordIndex++;
-						}
+						ParseBlocksizeArgument( ref wordIndex, words, options, scanOptions );
 						break;
 				}
 			}
@@ -665,7 +643,6 @@ namespace EssentialsPlugin.Utility
 			} );
 
 			HashSet<IMyEntity> entitiesToConfirm = new HashSet<IMyEntity>( );
-			HashSet<IMyEntity> entitiesUnconnected = new HashSet<IMyEntity>( );
 			HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>( );
 			foreach ( IMyEntity entity in entities )
 			{
@@ -724,9 +701,8 @@ namespace EssentialsPlugin.Utility
 			Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
 			Dictionary<string, int> typeDict = new Dictionary<string, int>( );
 			List<string> checkList = new List<string>( );
-			GetGridsUnconnected( entitiesUnconnected, entitiesToConfirm );
 			//int blocks = 0;
-			foreach ( IMyEntity entity in entitiesUnconnected )
+			foreach ( IMyEntity entity in entitiesToConfirm )
 			{
 				subTypeDict.Clear( );
 				typeDict.Clear( );
@@ -900,7 +876,7 @@ namespace EssentialsPlugin.Utility
 					found = false;
 				}
 
-				if ( scanOptions.IsBlockSize && found && scanOptions.BlockSize == 2 && ( grid.GridSizeEnum != MyCubeSize.Large || grid.GridSizeEnum == MyCubeSize.Large && grid.IsStatic ) )
+				if ( scanOptions.IsBlockSize && found && scanOptions.BlockSize == 3 && ( grid.GridSizeEnum != MyCubeSize.Large || grid.GridSizeEnum == MyCubeSize.Large && grid.IsStatic ) )
 				{
 					found = false;
 				}
@@ -928,6 +904,38 @@ namespace EssentialsPlugin.Utility
 				Communication.SendPrivateInformation( userId, string.Format( "Found {0} grids", entitiesFound.Count ) );
 
 			return entitiesFound;
+		}
+
+		private static void ParseBlocksizeArgument( ref int wordIndex, string[ ] words, Dictionary<string, string> options, ScanOptions scanOptions )
+		{
+			options.Add( "Requires Cubegrid Block Size", "true" );
+			if ( wordIndex + 1 < words.Length )
+			{
+				switch ( words[ wordIndex + 1 ].ToLowerInvariant( ) )
+				{
+					case "small":
+						scanOptions.IsBlockSize = true;
+						scanOptions.BlockSize = 0;
+						options.Add( "Cubegrid Block Size: ", "small" );
+						break;
+					case "large":
+						scanOptions.IsBlockSize = true;
+						scanOptions.BlockSize = 1;
+						options.Add( "Cubegrid Block Size: ", "large" );
+						break;
+					case "station":
+						scanOptions.IsBlockSize = true;
+						scanOptions.BlockSize = 2;
+						options.Add( "Cubegrid Block Size: ", "station" );
+						break;
+					case "largeship":
+						scanOptions.IsBlockSize = true;
+						scanOptions.BlockSize = 3;
+						options.Add( "Cubegrid Block Size: ", "largeship" );
+						break;
+				}
+				wordIndex++;
+			}
 		}
 
 		private static void ParseBlockCountLessThanArgument( ref int wordIndex, string[ ] words, Dictionary<string, string> options, ScanOptions scanOptions )
