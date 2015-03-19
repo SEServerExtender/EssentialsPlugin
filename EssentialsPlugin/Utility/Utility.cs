@@ -17,7 +17,7 @@ namespace EssentialsPlugin.Utility
 		private static StringBuilder m_sb = new StringBuilder();
 		public static void WriteLineAndConsole(string text)
 		{
-			LogManager.APILog.WriteLineAndConsole(text);
+			ApplicationLog.Info(text);
 		}
 
 		public static void WriteLineAndConsole(string name, string text)

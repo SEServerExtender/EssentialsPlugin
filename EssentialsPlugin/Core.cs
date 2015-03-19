@@ -1041,7 +1041,7 @@ namespace EssentialsPlugin
 		/// NOTE: This is raised on a different thread
 		/// </summary>
 		/// <param name="obj"></param>
-		public void OnChatReceived(ChatManager.ChatEvent obj)
+		public void OnChatReceived(ChatEvent obj)
 		{
 			if (obj.Message[0] != '/')
 				return;
@@ -1098,7 +1098,7 @@ namespace EssentialsPlugin
 		/// <param name="commandParts"></param>
 		private void HandleHelpCommand(ulong remoteUserId, string[] commandParts)
 		{
-			if (commandParts.Count() == 1)
+			if (commandParts.Length == 1)
 			{
 				List<string> commands = new List<string>();
 				foreach (ChatHandlerBase handler in _chatHandlers)
@@ -1240,7 +1240,7 @@ namespace EssentialsPlugin
 			}
 		}
 
-		public void OnChatSent(ChatManager.ChatEvent obj)
+		public void OnChatSent(ChatEvent obj)
 		{
 
 		}

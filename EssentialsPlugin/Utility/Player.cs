@@ -260,12 +260,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to invoke entity method '" + methodName + "' on type '" + gameEntity.GetType().FullName + "': " + ex.Message);
-
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-
-				LogManager.ErrorLog.WriteLine(ex);
+				ApplicationLog.Error( "Failed to invoke entity method '" + methodName + "' on type '" + gameEntity.GetType( ).FullName + "': " + ex.Message );
 				return null;
 			}
 		}
@@ -276,7 +271,7 @@ namespace EssentialsPlugin.Utility
 			{
 				if (gameEntity == null)
 					throw new Exception("Game entity was null");
-				if (methodName == null || methodName.Length == 0)
+				if (string.IsNullOrEmpty( methodName ))
 					throw new Exception("Method name was empty");
 				MethodInfo method = gameEntity.GetType().GetMethod(methodName);
 				if (method == null)
@@ -298,10 +293,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to get entity method '" + methodName + "': " + ex.Message);
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				ApplicationLog.Error( "Failed to get entity method '" + methodName + "': " + ex.Message );
 				return null;
 			}
 		}
@@ -315,7 +307,7 @@ namespace EssentialsPlugin.Utility
 
 				if (gameEntity == null)
 					throw new Exception("Game entity was null");
-				if (methodName == null || methodName.Length == 0)
+				if (string.IsNullOrEmpty( methodName ))
 					throw new Exception("Method name was empty");
 				MethodInfo method = gameEntity.GetType().GetMethod(methodName, argTypes);
 				if (method == null)
@@ -337,10 +329,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to get entity method '" + methodName + "': " + ex.Message);
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				ApplicationLog.Error( "Failed to get entity method '" + methodName + "': " + ex.Message );
 				return null;
 			}
 		}
