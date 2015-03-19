@@ -15,6 +15,8 @@ using SEModAPIInternal.API.Common;
 
 namespace EssentialsPlugin.Utility
 {
+	using SEModAPIInternal.Support;
+
 	public enum RemoveGridTypes
 	{
 		All,
@@ -628,6 +630,11 @@ namespace EssentialsPlugin.Utility
 
 			if ( words.Length - 3 > options.Count )
 			{
+				if ( ApplicationLog.BaseLog.IsDebugEnabled )
+				{
+					ApplicationLog.BaseLog.Debug( "Essentials: Arguments: {0}", string.Join( " ", words ) );
+					ApplicationLog.BaseLog.Debug( "Essentials: Options: {0}", string.Join( ",", options.Keys ) );
+				}
 				Communication.SendPrivateInformation( userId, "Possible problem with your parameters (options provided is larger than options found).  Not returning any results in case of error" );
 
 				return new HashSet<IMyEntity>( );
@@ -1072,11 +1079,13 @@ namespace EssentialsPlugin.Utility
 
 		private static void ParseDisplayNameArgument( ref int wordIndex, string[ ] words, Dictionary<string, string> options, ScanOptions scanOptions )
 		{
+			ApplicationLog.BaseLog.Info( "Essentials: Parsing display name argument ({0})", string.Join( " ", words ) );
 			if ( wordIndex + 1 >= words.Length )
 				return;
 			scanOptions.HasDisplayName = true;
+			options.Add( "Matches Display Name", "true" );
 			scanOptions.DisplayName = words[ wordIndex + 1 ];
-			options.Add( "Matches Display Name Text", string.Format( "true:{0}", scanOptions.DisplayName ) );
+			options.Add( "Matches Display Name Text", scanOptions.DisplayName );
 			if ( wordIndex + 2 < words.Length && words[ wordIndex + 2 ].ToLowerInvariant( ) == "exact" )
 			{
 				scanOptions.HasDisplayNameExact = true;
@@ -1088,11 +1097,13 @@ namespace EssentialsPlugin.Utility
 
 		private static void ParseCustomNameArgument( ref int wordIndex, string[ ] words, Dictionary<string, string> options, ScanOptions scanOptions )
 		{
+			ApplicationLog.BaseLog.Info( "Essentials: Parsing custom name argument ({0})", string.Join( " ", words ) );
 			if ( wordIndex + 1 >= words.Length )
 				return;
 			scanOptions.HasCustomName = true;
+			options.Add( "Matches Custom Name", "true" );
 			scanOptions.CustomName = words[ wordIndex + 1 ];
-			options.Add( "Matches Custom Name Text", "true:" + scanOptions.CustomName );
+			options.Add( "Matches Custom Name Text", scanOptions.CustomName );
 			if ( wordIndex + 2 < words.Length && words[ wordIndex + 2 ].ToLowerInvariant( ) == "exact" )
 			{
 				scanOptions.HasCustomNameExact = true;
