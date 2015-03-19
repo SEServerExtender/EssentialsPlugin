@@ -125,4 +125,5 @@ $RECYCLE.BIN/
 .DS_Store
 # My Stuff
 ClientEntityManagement.cs
-ProcessClientConceal.cs
+packages/*/*
+
