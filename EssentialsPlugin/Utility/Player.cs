@@ -27,6 +27,8 @@ using EssentialsPlugin.UtilityClasses;
 
 namespace EssentialsPlugin.Utility
 {
+	using VRage.Library.Utils;
+
 	public static class Player
 	{
 		public static MyObjectBuilder_Character FindCharacter(string userName)

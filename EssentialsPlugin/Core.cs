@@ -1041,7 +1041,7 @@ namespace EssentialsPlugin
 		/// NOTE: This is raised on a different thread
 		/// </summary>
 		/// <param name="obj"></param>
-		public void OnChatReceived(ChatEvent obj)
+		public void OnChatReceived(ChatManager.ChatEvent obj)
 		{
 			if (obj.Message[0] != '/')
 				return;
@@ -1240,7 +1240,7 @@ namespace EssentialsPlugin
 			}
 		}
 
-		public void OnChatSent(ChatEvent obj)
+		public void OnChatSent(ChatManager.ChatEvent obj)
 		{
 
 		}

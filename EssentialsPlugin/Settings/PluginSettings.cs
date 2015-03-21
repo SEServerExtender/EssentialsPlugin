@@ -16,6 +16,8 @@ using EssentialsPlugin.GameModes;
 
 namespace EssentialsPlugin
 {
+	using VRage.Library.Utils;
+
 	[Serializable]
 	public class PluginSettings
 	{

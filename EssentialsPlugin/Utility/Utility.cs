@@ -10,6 +10,7 @@ using VRage.Common.Utils;
 namespace EssentialsPlugin.Utility
 {
 	using System.Collections.Generic;
+	using VRage.Library.Utils;
 
 	public static class Logging
 	{
