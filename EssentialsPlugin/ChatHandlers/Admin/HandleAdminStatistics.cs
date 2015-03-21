@@ -28,7 +28,7 @@
 		public override bool HandleCommand( ulong userId, string command )
 		{
 			StringBuilder sb = new StringBuilder( );
-			Sandbox.Stats.Generic.WriteTo(sb);
+			VRage.Utils.Stats.Generic.WriteTo(sb);
 			Communication.SendPrivateInformation(userId, sb.ToString());
 			return true;
 		}

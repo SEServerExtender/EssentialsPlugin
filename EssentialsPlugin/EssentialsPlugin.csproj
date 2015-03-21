@@ -214,17 +214,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SE-Community-Mod-API\GameLibraries\Sandbox.Game.dll</HintPath>
     </Reference>
-    <Reference Include="SEModAPI, Version=0.3.0.1, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="SEModAPI, Version=1.74.10.273, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\x64\Release\SEModAPI.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Release\SEModAPI.dll</HintPath>
     </Reference>
-    <Reference Include="SEModAPIExtensions, Version=0.2.0.1, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="SEModAPIExtensions, Version=1.74.10.233, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\x64\Release\SEModAPIExtensions.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Release\SEModAPIExtensions.dll</HintPath>
     </Reference>
-    <Reference Include="SEModAPIInternal, Version=0.3.0.1, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="SEModAPIInternal, Version=1.74.10.345, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\x64\Release\SEModAPIInternal.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Release\SEModAPIInternal.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Design" />
@@ -232,9 +232,9 @@
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.XML" />
-    <Reference Include="VRage.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="VRage, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\VRage.Common.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\VRage.dll</HintPath>
     </Reference>
     <Reference Include="VRage.Library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

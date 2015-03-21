@@ -1351,11 +1351,11 @@ namespace EssentialsPlugin
 			}
 		}
 
-		public string Version
+		public Version Version
 		{
 			get 
 			{
-				return typeof(Essentials).Assembly.GetName().Version.ToString();
+				return typeof(Essentials).Assembly.GetName().Version;
 			}
 		}
 
