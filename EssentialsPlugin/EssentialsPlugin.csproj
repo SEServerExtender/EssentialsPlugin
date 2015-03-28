@@ -204,15 +204,15 @@
     </Reference>
     <Reference Include="Sandbox.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\Sandbox.Common.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\Sandbox.Common.dll</HintPath>
     </Reference>
     <Reference Include="Sandbox.Common.XmlSerializers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\Sandbox.Common.XmlSerializers.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\Sandbox.Common.XmlSerializers.dll</HintPath>
     </Reference>
-    <Reference Include="Sandbox.Game, Version=0.1.5424.28268, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Sandbox.Game, Version=0.1.5556.30920, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\Sandbox.Game.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\Sandbox.Game.dll</HintPath>
     </Reference>
     <Reference Include="SEModAPI, Version=1.74.10.273, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
@@ -236,13 +236,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.dll</HintPath>
     </Reference>
-    <Reference Include="VRage.Library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\VRage.Library.dll</HintPath>
+    <Reference Include="VRage.Library">
+      <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Library.dll</HintPath>
     </Reference>
     <Reference Include="VRage.Math, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\VRage.Math.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Math.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
