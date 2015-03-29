@@ -628,18 +628,12 @@ namespace EssentialsPlugin.Utility
 				return new HashSet<IMyEntity>( );
 			}
 
-			if ( words.Length - 3 > options.Count )
-			{
-				if ( ApplicationLog.BaseLog.IsDebugEnabled )
-				{
-					ApplicationLog.BaseLog.Debug( "Essentials: Arguments: {0}", string.Join( " ", words ) );
-					ApplicationLog.BaseLog.Debug( "Essentials: Options: {0}", string.Join( ",", options.Keys ) );
-				}
-				Communication.SendPrivateInformation( userId, "Possible problem with your parameters (options provided is larger than options found).  Not returning any results in case of error" );
-
-				return new HashSet<IMyEntity>( );
-			}
-
+            if (ApplicationLog.BaseLog.IsDebugEnabled)
+            {
+                ApplicationLog.BaseLog.Debug("Essentials: Arguments: {0}", string.Join(" ", words));
+                ApplicationLog.BaseLog.Debug("Essentials: Options: {0}", string.Join(",", options.Keys));
+            }
+			
 			if ( !scanOptions.Quiet )
 				Communication.SendPrivateInformation( userId, string.Format( "Scanning for ships with options: {0}", GetOptionsText( options ) ) );
 
