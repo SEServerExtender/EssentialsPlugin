@@ -16,9 +16,13 @@ using EssentialsPlugin.GameModes;
 
 namespace EssentialsPlugin
 {
+	using NLog;
+	using VRage.Library.Utils;
+
 	[Serializable]
 	public class PluginSettings
 	{
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		#region Private Fields
 		private static PluginSettings m_instance;
 		private static bool m_loading = false;
@@ -844,7 +848,7 @@ namespace EssentialsPlugin
 			}
 			catch(Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("Load(): {0}", ex.ToString()));
+				Log.Info(string.Format("Load(): {0}", ex.ToString()));
 			}
 			finally
 			{
@@ -875,7 +879,7 @@ namespace EssentialsPlugin
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("Save(): {0}", ex.ToString()));
+				Log.Info(string.Format("Save(): {0}", ex.ToString()));
 			}
 		}
 
@@ -954,7 +958,7 @@ namespace EssentialsPlugin
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("GetSettings() Error: {0}", ex.ToString()));
+				Log.Info(string.Format("GetSettings() Error: {0}", ex.ToString()));
 			}
 		
 			return result;
@@ -984,7 +988,7 @@ namespace EssentialsPlugin
 				{
 					if(so == SettingsOperators.Set && propertyInfo != null && newValue != "")
 					{
-						Logging.WriteLineAndConsole(string.Format("Setting Value of {0} to '{1}'", checkType.Name, newValue));
+						Log.Info(string.Format("Setting Value of {0} to '{1}'", checkType.Name, newValue));
 						propertyInfo.SetValue(obj, Convert.ChangeType(newValue, propertyInfo.PropertyType));
 						Save();
 					}
@@ -1052,7 +1056,7 @@ namespace EssentialsPlugin
 			}
 			catch(Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("ReflectObject(): {0}", ex.ToString()));
+				Log.Info(string.Format("ReflectObject(): {0}", ex.ToString()));
 			}
 
 			return result;

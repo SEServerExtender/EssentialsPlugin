@@ -1,11 +1,13 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
 	using System;
+	using NLog;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Entity.Sector.SectorObject;
 
 	public abstract class ProcessHandlerBase
 	{
+		protected static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		private DateTime m_lastUpdate;
 		public DateTime LastUpdate
 		{
@@ -20,7 +22,7 @@
 		{
 			m_lastUpdate = DateTime.Now;
 
-			//Logging.WriteLineAndConsole(string.Format("Added process handler: Raised every {0}ms", GetUpdateResolution()));
+			//Log.Info(string.Format("Added process handler: Raised every {0}ms", GetUpdateResolution()));
 		}
 
 		/// <summary>

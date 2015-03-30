@@ -5,6 +5,7 @@
 	using System.Linq;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
+	using NLog;
 	using Sandbox.ModAPI;
 
 	class ProcessCleanup : ProcessHandlerBase
@@ -41,7 +42,7 @@
 			}
 			catch ( OverflowException ex )
 			{
-				Logging.WriteLineAndConsole( string.Format( "ProcessCleanup.Handle(): {0}", ex ) );
+				Log.Info( string.Format( "ProcessCleanup.Handle(): {0}", ex ) );
 			}
 
 			base.Handle( );

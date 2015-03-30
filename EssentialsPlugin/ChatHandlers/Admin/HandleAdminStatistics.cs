@@ -24,6 +24,8 @@ using SEModAPIInternal.API.Common;
 
 namespace EssentialsPlugin.ChatHandlers
 {
+	using VRage.Utils;
+
 	public class HandleAdminStatistics : ChatHandlerBase
 	{
 		public override string GetHelp()
@@ -49,7 +51,7 @@ namespace EssentialsPlugin.ChatHandlers
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
 			StringBuilder sb = new StringBuilder();
-			Sandbox.Stats.Generic.WriteTo(sb);
+			Stats.Generic.WriteTo(sb);
 			Communication.SendPrivateInformation(userId, sb.ToString());
 			return true;
 		}

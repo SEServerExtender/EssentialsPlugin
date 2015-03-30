@@ -64,7 +64,7 @@ namespace EssentialsPlugin.ChatHandlers
 				if (time < m_start.AddMinutes(-1))
 					time = time.AddDays(1);
 
-				//Logging.WriteLineAndConsole(string.Format("Time: {0}", time));
+				//Log.Info(string.Format("Time: {0}", time));
 
 				if (result == null)
 					result = time;

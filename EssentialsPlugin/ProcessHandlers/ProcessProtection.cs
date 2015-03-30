@@ -53,7 +53,7 @@
 
 		private void ProtectedEntity(IMyEntity entity, ProtectedItem item)
 		{
-			//Logging.WriteLineAndConsole(string.Format("Protecting: {0}", entity.EntityId));
+			//Log.Info(string.Format("Protecting: {0}", entity.EntityId));
 			//CubeGridEntity gridEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
 			CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(entity.EntityId);
 			MyObjectBuilder_CubeGrid grid = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder();
@@ -82,7 +82,7 @@
 			}
 			*/
 			if(found)
-     			Logging.WriteLineAndConsole(string.Format("Repaired Grid: {0}", gridEntity.EntityId));
+     			Log.Info(string.Format("Repaired Grid: {0}", gridEntity.EntityId));
 		}
 	}
 }

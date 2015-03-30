@@ -5,9 +5,11 @@ namespace EssentialsPlugin.Utility
 	using System.IO;
 	using System.Linq;
 	using System.Xml.Serialization;
+	using NLog;
 
 	public class Docking
 	{
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		private static Docking _instance;
 		private static bool _loading;
 
@@ -58,7 +60,7 @@ namespace EssentialsPlugin.Utility
 				}
 				catch (Exception ex)
 				{
-					Logging.WriteLineAndConsole(string.Format("Save(): {0}", ex));
+					Log.Info(string.Format("Save(): {0}", ex));
 				}
 			}
 		}
@@ -84,12 +86,12 @@ namespace EssentialsPlugin.Utility
 							reader.Close();
 						}
 
-						Logging.WriteLineAndConsole(string.Format("Loaded {0} Docking Items", _instance.DockingItems));
+						Log.Info(string.Format("Loaded {0} Docking Items", _instance.DockingItems));
 					}
 				}
 				catch (Exception ex)
 				{
-					Logging.WriteLineAndConsole(string.Format("Load(): {0}", ex));
+					Log.Info(string.Format("Load(): {0}", ex));
 				}
 				finally
 				{

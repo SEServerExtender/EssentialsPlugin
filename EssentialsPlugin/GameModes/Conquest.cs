@@ -27,9 +27,12 @@ using EssentialsPlugin.UtilityClasses;
 
 namespace EssentialsPlugin.GameModes
 {
+	using NLog;
+
 	public class Conquest
 	{
-		private SerializableDictionary<long, long> m_ownershipCache = new SerializableDictionary<long, long>();
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
+		private SerializableDictionary<long, long> m_ownershipCache = new SerializableDictionary<long, long>( );
 		private static Conquest m_instance = null;
 
 		public SerializableDictionary<long, long> Leaderboard
@@ -187,7 +190,7 @@ namespace EssentialsPlugin.GameModes
 			catch (Exception ex)
 			{
 				m_instance = new Conquest();
-				Logging.WriteLineAndConsole(string.Format("Conquest Load Error: {0}", ex.ToString()));
+				Log.Info(string.Format("Conquest Load Error: {0}", ex.ToString()));
 			}
 		}
 
@@ -208,7 +211,7 @@ namespace EssentialsPlugin.GameModes
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("Error saving Conquest Leaderboard: {0}", ex.ToString()));
+				Log.Info(string.Format("Error saving Conquest Leaderboard: {0}", ex.ToString()));
 			}
 		}
 

@@ -4,11 +4,14 @@ using SEModAPIInternal.API.Common;
 
 namespace EssentialsPlugin.ChatHandlers
 {
+	using NLog;
+
 	public abstract class ChatHandlerBase
 	{
-		public ChatHandlerBase()
+		protected static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
+		public ChatHandlerBase( )
 		{
-			//Logging.WriteLineAndConsole(string.Format("Added chat handler: {0}", GetCommandText()));
+			//Log.Info(string.Format("Added chat handler: {0}", GetCommandText()));
 		}
 
 		public virtual Boolean CanHandle(ulong steamId, String[] words, ref int commandCount)

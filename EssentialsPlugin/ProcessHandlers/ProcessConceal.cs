@@ -33,14 +33,14 @@
 
 			if (DateTime.Now - m_lastConcealCheck > TimeSpan.FromSeconds(30))
 			{
-				//Logging.WriteLineAndConsole("CheckAndConcealEntities");
+				//Log.Info("CheckAndConcealEntities");
 				EntityManagement.CheckAndConcealEntities();
 				m_lastConcealCheck = DateTime.Now;
 			}
 
 			if (DateTime.Now - m_lastRevealCheck > TimeSpan.FromSeconds(5))
 			{
-				//Logging.WriteLineAndConsole("CheckAndRevealEntities");
+				//Log.Info("CheckAndRevealEntities");
 				EntityManagement.CheckAndRevealEntities();
 				m_lastRevealCheck = DateTime.Now;
 			}
@@ -69,7 +69,7 @@
 			EntityManagement.CheckAndRevealEntities();
 			m_lastRevealCheck = DateTime.Now;
 
-			Logging.WriteLineAndConsole(string.Format("Check Reveal due to: {0}", remoteUserId));
+			Log.Info(string.Format("Check Reveal due to: {0}", remoteUserId));
 
 			base.OnPlayerWorldSent(remoteUserId);
 		}

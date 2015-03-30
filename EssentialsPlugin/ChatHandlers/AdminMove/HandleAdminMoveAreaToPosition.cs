@@ -85,9 +85,9 @@ namespace EssentialsPlugin.ChatHandlers
 				}
 //			});
 
-			Logging.WriteLineAndConsole("Entities Removed ... pausing");
+			Log.Info("Entities Removed ... pausing");
 			Thread.Sleep(5000);
-			Logging.WriteLineAndConsole("Removing entities from closed entities");
+			Log.Info("Removing entities from closed entities");
 
 			Wrapper.GameAction(() =>
 			{
@@ -96,7 +96,7 @@ namespace EssentialsPlugin.ChatHandlers
 					if (!(entity is IMyCubeGrid))
 						continue;
 
-					Logging.WriteLineAndConsole(string.Format("Removing '{0}' for move", entity.DisplayName));
+					Log.Info(string.Format("Removing '{0}' for move", entity.DisplayName));
 					MyAPIGateway.Entities.RemoveFromClosedEntities(entity);
 				}
 			});
@@ -108,7 +108,7 @@ namespace EssentialsPlugin.ChatHandlers
 				foreach(MyObjectBuilder_CubeGrid grid in gridsToMove)
 				{
 					grid.PositionAndOrientation = new MyPositionAndOrientation(grid.PositionAndOrientation.Value.Position + difference, grid.PositionAndOrientation.Value.Forward, grid.PositionAndOrientation.Value.Up);
-					//Logging.WriteLineAndConsole(string.Format("Adding '{0}' for move", grid.DisplayName));
+					//Log.Info(string.Format("Adding '{0}' for move", grid.DisplayName));
 					Communication.SendPrivateInformation(userId, string.Format("Adding grid '{0}' back to world.", grid.DisplayName));
 					SectorObjectManager.Instance.AddEntity(new CubeGridEntity(grid));
 					Thread.Sleep(1000);

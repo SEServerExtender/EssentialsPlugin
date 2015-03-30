@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using System.Linq;
 	using EssentialsPlugin.Utility;
+	using NLog;
 	using Sandbox.Common;
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
@@ -12,7 +13,8 @@
 
 	public class TurretManagement
 	{
-		private static List<IMyEntity> m_scanCache = new List<IMyEntity>();
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
+		private static List<IMyEntity> m_scanCache = new List<IMyEntity>( );
 		private static List<IMyIdentity> m_identityCache = new List<IMyIdentity>();
 		private static DateTime m_lastIdentityUpdate = DateTime.Now.AddHours(-1);
 		private static int m_turretsEnabled = 0;
@@ -55,12 +57,12 @@
 
 				if (m_turretsToggled > 0 || DateTime.Now - start > TimeSpan.FromSeconds(1))
 				{
-					Logging.WriteLineAndConsole(string.Format("Disable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", m_turretsEnabled, m_turretsDisabled, m_turretsToggled, (DateTime.Now - start).TotalMilliseconds));
+					Log.Info(string.Format("Disable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", m_turretsEnabled, m_turretsDisabled, m_turretsToggled, (DateTime.Now - start).TotalMilliseconds));
 				}
 			}
 			catch (Exception ex)			
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckAndDisableTurrets(): {0}", ex.ToString()));
+				Log.Info(string.Format("CheckAndDisableTurrets(): {0}", ex.ToString()));
 			}
 		}
 
@@ -164,12 +166,12 @@
 
 				if (m_turretsToggled > 0 || DateTime.Now - start > TimeSpan.FromSeconds(1))
 				{
-					Logging.WriteLineAndConsole(string.Format("Enable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", m_turretsEnabled, m_turretsDisabled, m_turretsToggled, (DateTime.Now - start).TotalMilliseconds));
+					Log.Info(string.Format("Enable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", m_turretsEnabled, m_turretsDisabled, m_turretsToggled, (DateTime.Now - start).TotalMilliseconds));
 				}
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckAndDisableTurrets(): {0}", ex.ToString()));
+				Log.Info(string.Format("CheckAndDisableTurrets(): {0}", ex.ToString()));
 			}
 		}
 

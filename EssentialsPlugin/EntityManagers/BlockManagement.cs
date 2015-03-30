@@ -16,8 +16,11 @@ using EssentialsPlugin.UtilityClasses;
 
 namespace EssentialsPlugin.EntityManagers
 {
+	using NLog;
+
 	public class BlockManagement
 	{
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		private static BlockManagement _instance = null;
 		private static bool _checkDisable = false;
 		private static bool _checkEnable = false;
@@ -67,7 +70,7 @@ namespace EssentialsPlugin.EntityManagers
 				}
 				catch
 				{
-					Logging.WriteLineAndConsole(string.Format("CheckAndDisableBlocks(): Entity list busy, skipping check"));
+					Log.Info(string.Format("CheckAndDisableBlocks(): Entity list busy, skipping check"));
 					return;
 				}
 
@@ -123,12 +126,12 @@ namespace EssentialsPlugin.EntityManagers
 
 				if (disableSet.Count > 0)
 				{
-					Logging.WriteLineAndConsole(string.Format("Disable: Block Management disabled {0} grids ({1} blocks diabled) - ({0} ms)", disableSet.Count, _enableCount, (DateTime.Now - start).TotalMilliseconds));
+					Log.Info(string.Format("Disable: Block Management disabled {0} grids ({1} blocks diabled) - ({0} ms)", disableSet.Count, _enableCount, (DateTime.Now - start).TotalMilliseconds));
 				}
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckAndDisableBlocks(): {0}", ex.ToString()));
+				Log.Info(string.Format("CheckAndDisableBlocks(): {0}", ex.ToString()));
 			}
 			finally
 			{
@@ -209,7 +212,7 @@ namespace EssentialsPlugin.EntityManagers
 				}
 				catch
 				{
-					Logging.WriteLineAndConsole(string.Format("CheckAndDisableBlocks(): Entity list busy, skipping check"));
+					Log.Info(string.Format("CheckAndDisableBlocks(): Entity list busy, skipping check"));
 					return;
 				}
 
@@ -262,12 +265,12 @@ namespace EssentialsPlugin.EntityManagers
 
 				if (enableSet.Count > 0)
 				{
-					Logging.WriteLineAndConsole(string.Format("Enable: Block Management enabled {0} grids ({1} blocks enabled) - ({0} ms)", enableSet.Count, _enableCount, (DateTime.Now - start).TotalMilliseconds));
+					Log.Info(string.Format("Enable: Block Management enabled {0} grids ({1} blocks enabled) - ({0} ms)", enableSet.Count, _enableCount, (DateTime.Now - start).TotalMilliseconds));
 				}
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckAndDisableBlocks(): {0}", ex.ToString()));
+				Log.Info(string.Format("CheckAndDisableBlocks(): {0}", ex.ToString()));
 			}
 			finally
 			{
@@ -341,7 +344,7 @@ namespace EssentialsPlugin.EntityManagers
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("BlockManagement Load Error: {0}", ex.ToString()));
+				Log.Info(string.Format("BlockManagement Load Error: {0}", ex.ToString()));
 				BlockManagement._instance = new BlockManagement();
 			}
 		}
@@ -370,7 +373,7 @@ namespace EssentialsPlugin.EntityManagers
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("Error saving BlockManagement Data: {0}", ex.ToString()));
+				Log.Info(string.Format("Error saving BlockManagement Data: {0}", ex.ToString()));
 			}
 		}
 
@@ -388,7 +391,7 @@ namespace EssentialsPlugin.EntityManagers
 			{
 				int removed = GridDisabled.RemoveWhere(x => entities.FirstOrDefault(y => y.EntityId == x) == null);
 				if(removed > 0)
-					Logging.WriteLineAndConsole(string.Format("Removed {0} entities from Disabled Grid List", removed));
+					Log.Info(string.Format("Removed {0} entities from Disabled Grid List", removed));
 
 				HashSet<long> removeSet = new HashSet<long>();
 				foreach (KeyValuePair<long, HashSet<long>> p in GridBlocksDisabled)

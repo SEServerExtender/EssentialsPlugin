@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
@@ -190,34 +192,39 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyFileVersion.cs</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="NLog, Version=3.2.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NLog.3.2.0.0\lib\net45\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="Sandbox.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\Sandbox.Common.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\Sandbox.Common.dll</HintPath>
     </Reference>
     <Reference Include="Sandbox.Common.XmlSerializers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\Sandbox.Common.XmlSerializers.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\Sandbox.Common.XmlSerializers.dll</HintPath>
     </Reference>
-    <Reference Include="Sandbox.Game, Version=0.1.5424.28268, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Sandbox.Game, Version=0.1.5556.30920, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\Sandbox.Game.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\Sandbox.Game.dll</HintPath>
     </Reference>
-    <Reference Include="SEModAPI, Version=0.3.0.1, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="SEModAPI, Version=1.74.10.278, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\x64\Release\SEModAPI.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Release\SEModAPI.dll</HintPath>
     </Reference>
-    <Reference Include="SEModAPIExtensions, Version=0.2.0.1, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="SEModAPIExtensions, Version=1.74.10.237, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\x64\Release\SEModAPIExtensions.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Release\SEModAPIExtensions.dll</HintPath>
     </Reference>
-    <Reference Include="SEModAPIInternal, Version=0.3.0.1, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="SEModAPIInternal, Version=1.74.10.350, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\SEServerExtender\bin\x64\Release\SEModAPIInternal.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Release\SEModAPIInternal.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Design" />
@@ -225,17 +232,17 @@
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.XML" />
-    <Reference Include="VRage.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="VRage, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\VRage.Common.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\VRage.dll</HintPath>
     </Reference>
     <Reference Include="VRage.Library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\VRage.Library.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Library.dll</HintPath>
     </Reference>
     <Reference Include="VRage.Math, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SE-Community-Mod-API\GameLibraries\VRage.Math.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Math.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -258,6 +265,13 @@ set textTemplatingPath="%25CommonProgramFiles(x86)%25\Microsoft Shared\TextTempl
 if %25textTemplatingPath%25=="\Microsoft Shared\TextTemplating\$(VisualStudioVersion)\texttransform.exe" set textTemplatingPath="%25CommonProgramFiles%25\Microsoft Shared\TextTemplating\$(VisualStudioVersion)\texttransform.exe"
 %25textTemplatingPath%25 "$(ProjectDir)AssemblyFileVersion.tt"</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

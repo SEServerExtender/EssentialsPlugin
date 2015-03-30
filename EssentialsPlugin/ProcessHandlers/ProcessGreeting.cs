@@ -71,7 +71,7 @@
 						}
 						catch (Exception ex)
 						{
-							Logging.WriteLineAndConsole(string.Format("Failed to get player list: {0}", ex.ToString()));
+							Log.Info(string.Format("Failed to get player list: {0}", ex.ToString()));
 						}
 					});
 
@@ -142,7 +142,7 @@
 				}
 				catch (Exception ex)
 				{
-					Logging.WriteLineAndConsole(string.Format("Handle(): Error at pos - {0}: {1}", pos, ex.ToString()));
+					Log.Info(string.Format("Handle(): Error at pos - {0}: {1}", pos, ex.ToString()));
 				}
 			}
 
@@ -157,12 +157,12 @@
 			item.Start = DateTime.Now;
 			item.IsNewUser = !PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Any();
 
-			Logging.WriteLineAndConsole(string.Format("New User: {0}", remoteUserId));
+			Log.Info(string.Format("New User: {0}", remoteUserId));
 
 			lock (m_greetingList)
 			{
 				m_greetingList.Add(item);
-				Logging.WriteLineAndConsole(string.Format("Greeting Added => {0} (New user: {1})", remoteUserId, item.IsNewUser));
+				Log.Info(string.Format("Greeting Added => {0} (New user: {1})", remoteUserId, item.IsNewUser));
 			}
 
 			base.OnPlayerJoined(remoteUserId);
@@ -174,7 +174,7 @@
 			{
 				if (m_greetingList.Find(x => x.SteamId == remoteUserId) != null)
 				{
-					Logging.WriteLineAndConsole(string.Format("Greeting Removed => {0}", remoteUserId));
+					Log.Info(string.Format("Greeting Removed => {0}", remoteUserId));
 					m_greetingList.RemoveAll(x => x.SteamId == remoteUserId);
 				}
 			}

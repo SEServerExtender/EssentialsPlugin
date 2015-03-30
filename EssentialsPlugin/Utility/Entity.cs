@@ -12,9 +12,12 @@ using EssentialsPlugin.UtilityClasses;
 
 namespace EssentialsPlugin.Utility
 {
+	using NLog;
+
 	class Entity
 	{
-		static public Boolean GreaterThan(Vector3D v, Vector3D container)
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
+		static public Boolean GreaterThan( Vector3D v, Vector3D container )
 		{
 			if (v.X > container.X || v.Y > container.Y || v.Z > container.Z)
 				return false;
@@ -180,7 +183,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole("GetDistanceBetweenGridAndPlayer(): {0}", ex.ToString());
+				Log.Info("GetDistanceBetweenGridAndPlayer(): {0}", ex.ToString());
 				return false;
 			}
 
@@ -201,7 +204,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole("GetDistanceBetweenPointAndPlayer(): {0}", ex.ToString());
+				Log.Info("GetDistanceBetweenPointAndPlayer(): {0}", ex.ToString());
 				return false;
 			}
 

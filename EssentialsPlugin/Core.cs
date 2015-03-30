@@ -29,9 +29,11 @@ namespace EssentialsPlugin
 	using EssentialsPlugin.ChatHandlers.AdminScan;
 	using EssentialsPlugin.ChatHandlers.Waypoints;
 	using EssentialsPlugin.ProcessHandlers;
+	using NLog;
 
 	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
 	{
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		#region Private Fields
 		internal static Essentials Instance;
 		private static string _pluginPath;
@@ -918,7 +920,7 @@ namespace EssentialsPlugin
 			MyAPIGateway.Entities.OnEntityAdd += OnEntityAdd;
 			MyAPIGateway.Entities.OnEntityRemove += OnEntityRemove;
 
-			Logging.WriteLineAndConsole(string.Format("Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id));
+			Log.Info(string.Format("Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id));
 		}
 
 		#endregion
@@ -943,7 +945,7 @@ namespace EssentialsPlugin
 								}
 								catch (Exception ex)
 								{
-									Logging.WriteLineAndConsole(String.Format("Handler Problems: {0} - {1}", currentHandler.GetUpdateResolution(), ex));
+									Log.Info(String.Format("Handler Problems: {0} - {1}", currentHandler.GetUpdateResolution(), ex));
 								}
 
 								// Let's make sure LastUpdate is set to now otherwise we may start processing too quickly
@@ -976,7 +978,7 @@ namespace EssentialsPlugin
 								}
 								catch (Exception ex)
 								{
-									Logging.WriteLineAndConsole(String.Format("Handler Problems: {0} - {1}", handler.GetUpdateResolution(), ex.ToString()));
+									Log.Info(String.Format("Handler Problems: {0} - {1}", handler.GetUpdateResolution(), ex.ToString()));
 								}
 
 								// Let's make sure LastUpdate is set to now otherwise we may start processing too quickly
@@ -996,7 +998,7 @@ namespace EssentialsPlugin
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("PluginProcessing(): {0}", ex));
+				Log.Info(string.Format("PluginProcessing(): {0}", ex));
 			}
 			finally
 			{
@@ -1019,7 +1021,7 @@ namespace EssentialsPlugin
 
 		public void Shutdown()
 		{
-			Logging.WriteLineAndConsole(string.Format("Shutting down plugin: {0} - {1}", Name, Version));
+			Log.Info(string.Format("Shutting down plugin: {0} - {1}", Name, Version));
 
 			foreach (Thread thread in _processThreads)
 				thread.Abort();
@@ -1078,7 +1080,7 @@ namespace EssentialsPlugin
 					}
 					catch (Exception ex)
 					{
-						Logging.WriteLineAndConsole(string.Format("ChatHandler Error: {0}", ex));
+						Log.Info(string.Format("ChatHandler Error: {0}", ex));
 					}
 
 					handled = true;
@@ -1351,11 +1353,11 @@ namespace EssentialsPlugin
 			}
 		}
 
-		public string Version
+		public Version Version
 		{
 			get 
 			{
-				return typeof(Essentials).Assembly.GetName().Version.ToString();
+				return typeof(Essentials).Assembly.GetName().Version;
 			}
 		}
 

@@ -10,7 +10,7 @@
 
 	public class HandleAdminDeleteCleanup : ChatHandlerBase
 	{
-		public override string GetHelp()
+		public override string GetHelp( )
 		{
 			return "This command allows you to scan for grids that are considered trash and delete them.  A trash item contains no function or terminal blocks.  Adding function or terminal to the command allows you to omit those search parameters.  Usage: /admin delete cleanup [functional] [terminal]";
 		}
@@ -47,7 +47,7 @@
 					ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
 				}
 
-				Logging.WriteLineAndConsole("Cleanup", string.Format("Cleanup Removed Grid - Id: {0} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName));
+				Log.Info("Cleanup", string.Format("Cleanup Removed Grid - Id: {0} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName));
 			}
 			return true;
 		}

@@ -6,6 +6,7 @@
 	using System.Threading;
 	using EssentialsPlugin.ProcessHandlers;
 	using EssentialsPlugin.Utility;
+	using NLog;
 	using Sandbox.Common;
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
@@ -22,6 +23,7 @@
 
 	public class EntityManagement
 	{
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		private static volatile bool _checkReveal = false;
 		private static volatile bool _checkConceal = false;
 		private static readonly HashSet<IMyEntity> ProcessedGrids = new HashSet<IMyEntity>();
@@ -54,7 +56,7 @@
 				}
 				catch(Exception ex)
 				{
-					Logging.WriteLineAndConsole(string.Format("Error getting players list.  Check and Conceal failed: {0}", ex.ToString()));
+					Log.Info(string.Format("Error getting players list.  Check and Conceal failed: {0}", ex.ToString()));
 					return;
 				}
 
@@ -64,7 +66,7 @@
 				}
 				catch
 				{
-					Logging.WriteLineAndConsole("CheckAndConcealEntities(): Error getting entity list, skipping check");
+					Log.Info("CheckAndConcealEntities(): Error getting entity list, skipping check");
 					return;
 				}
 
@@ -162,12 +164,12 @@
 				co += (DateTime.Now - coStart).TotalMilliseconds;
 
 				if ((DateTime.Now - start).TotalMilliseconds > 2000)
-					Logging.WriteLineAndConsole(string.Format("Completed Conceal Check: {0}ms (gg: {3}, dc: {2} ms, br: {1}ms, co: {4}ms)", (DateTime.Now - start).TotalMilliseconds, blockRules, distCheck, getGrids, co));
+					Log.Info(string.Format("Completed Conceal Check: {0}ms (gg: {3}, dc: {2} ms, br: {1}ms, co: {4}ms)", (DateTime.Now - start).TotalMilliseconds, blockRules, distCheck, getGrids, co));
 
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckAndConceal(): {0}", ex.ToString()));
+				Log.Info(string.Format("CheckAndConceal(): {0}", ex.ToString()));
 			}
 			finally
 			{
@@ -374,7 +376,7 @@
 				}
 			});
 
-			Logging.WriteLineAndConsole(string.Format("Concealed {0} entities.", entitesToConceal.Count));
+			Log.Info(string.Format("Concealed {0} entities.", entitesToConceal.Count));
 		}
 
 		private static void ConcealEntity(IMyEntity entity)
@@ -418,7 +420,7 @@
 				pos = 3;
 				if (RemovedGrids.Contains(entity.EntityId))
 				{
-					Logging.WriteLineAndConsole("Conceal", string.Format("Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
+					Log.Info("Conceal", string.Format("Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
 				}
 				else
@@ -440,29 +442,29 @@
 						}
 						*/
 					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
-						Logging.WriteLineAndConsole("Conceal", string.Format("Start Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId));
+						Log.Info("Conceal", string.Format("Start Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId));
 					if (newEntity == null)
 					{
-						Logging.WriteLineAndConsole("Conceal", string.Format("Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId));
+						Log.Info("Conceal", string.Format("Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId));
 						return;
 					}
 
 						RemovedGrids.Add(entity.EntityId);
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
 					MyAPIGateway.Entities.AddEntity(newEntity, false);
-						Logging.WriteLineAndConsole("Conceal", string.Format("End Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId));
+						Log.Info("Conceal", string.Format("End Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId));
 				}
 					else
 			{
-						Logging.WriteLineAndConsole("Conceal", string.Format("Start Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
+						Log.Info("Conceal", string.Format("Start Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
 						entity.InScene = false;
-						Logging.WriteLineAndConsole("Conceal", string.Format("End Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
+						Log.Info("Conceal", string.Format("End Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId));
 			}
 		}
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("ConcealEntity({1}): {0}", ex.ToString(), pos));
+				Log.Info(string.Format("ConcealEntity({1}): {0}", ex.ToString(), pos));
 			}
 		}
 
@@ -538,11 +540,11 @@
 				re += (DateTime.Now - reStart).TotalMilliseconds;
 
 				if ((DateTime.Now - start).TotalMilliseconds > 2000)
-					Logging.WriteLineAndConsole(string.Format("Completed Reveal Check: {0}ms (br: {1}ms, re: {2}ms)", (DateTime.Now - start).TotalMilliseconds, br, re));
+					Log.Info(string.Format("Completed Reveal Check: {0}ms (br: {1}ms, re: {2}ms)", (DateTime.Now - start).TotalMilliseconds, br, re));
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckAndReveal(): {0}", ex.ToString()));
+				Log.Info(string.Format("CheckAndReveal(): {0}", ex.ToString()));
 			}
 			finally
 			{
@@ -737,7 +739,7 @@
 				}
 			});
 
-			Logging.WriteLineAndConsole(string.Format("Revealed {0} entities.", entitiesToReveal.Count));
+			Log.Info(string.Format("Revealed {0} entities.", entitiesToReveal.Count));
 		}
 
 		private static void RevealEntity(KeyValuePair<IMyEntity, string> item)
@@ -770,7 +772,7 @@
 
 				if(RemovedGrids.Contains(entity.EntityId))
 				{
-					Logging.WriteLineAndConsole("Conceal", string.Format("Revealing - Id: {0} DUPE FOUND Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
+					Log.Info("Conceal", string.Format("Revealing - Id: {0} DUPE FOUND Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
 				}
 				else
@@ -778,10 +780,10 @@
 					if (!PluginSettings.Instance.DynamicConcealServerOnly)
 					{
 						IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
-						Logging.WriteLineAndConsole("Conceal", string.Format("Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, newEntity.EntityId, reason));
+						Log.Info("Conceal", string.Format("Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, newEntity.EntityId, reason));
 					if (newEntity == null)
 					{
-						Logging.WriteLineAndConsole("Conceal", string.Format("Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId));
+						Log.Info("Conceal", string.Format("Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId));
 						return;
 					}
 
@@ -800,11 +802,11 @@
 						List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>();
 						addList.Add(newEntity.GetObjectBuilder());
 						MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
-						Logging.WriteLineAndConsole("Conceal", string.Format("End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, newEntity.EntityId, reason));
+						Log.Info("Conceal", string.Format("End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, newEntity.EntityId, reason));
 					}
 					else
 					{
-						Logging.WriteLineAndConsole("Conceal", string.Format("Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
+						Log.Info("Conceal", string.Format("Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
 						entity.InScene = true;
 						// Send to users, client will remove if doesn't need - this solves login problem
 						/*CC
@@ -816,7 +818,7 @@
 					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
 						}
 						*/
-					Logging.WriteLineAndConsole("Conceal", string.Format("End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
+					Log.Info("Conceal", string.Format("End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason));
 				}
 				}
 			//});
@@ -861,12 +863,12 @@
 					//grid.CastShadows = true;
 					builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
 					MyAPIGateway.Entities.RemapObjectBuilder(builder);
-					Logging.WriteLineAndConsole("Conceal", string.Format("Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
+					Log.Info("Conceal", string.Format("Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
 
 					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
 					if (newEntity == null)
 					{
-						Logging.WriteLineAndConsole("Conceal", string.Format("Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId));
+						Log.Info("Conceal", string.Format("Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId));
 						continue;
 					}
 
@@ -878,7 +880,7 @@
 				}
 			});
 
-			Logging.WriteLineAndConsole(string.Format("Revealed {0} grids", count));
+			Log.Info(string.Format("Revealed {0} grids", count));
 		}
 
 		public static bool ToggleMedbayGrids(ulong steamId)
@@ -905,7 +907,7 @@
 				}
 				catch
 				{
-					Logging.WriteLineAndConsole("CheckAndConcealEntities(): Error getting entity list, skipping check");
+					Log.Info("CheckAndConcealEntities(): Error getting entity list, skipping check");
 					return false;
 				}
 
@@ -975,11 +977,11 @@
 				}
 
 				if ((DateTime.Now - start).TotalMilliseconds > 2000)
-					Logging.WriteLineAndConsole(string.Format("Completed Toggle: {0}ms", (DateTime.Now - start).TotalMilliseconds));
+					Log.Info(string.Format("Completed Toggle: {0}ms", (DateTime.Now - start).TotalMilliseconds));
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckAndConceal(): {0}", ex.ToString()));
+				Log.Info(string.Format("CheckAndConceal(): {0}", ex.ToString()));
 			}
 			finally
 			{

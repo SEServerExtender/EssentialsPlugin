@@ -50,7 +50,7 @@
 				return;
 
 
-			//Logging.WriteLineAndConsole(string.Format("Restart in {0} minutes", m_done));
+			//Log.Info(string.Format("Restart in {0} minutes", m_done));
 
 			if (DateTime.Now - m_start > TimeSpan.FromMinutes(m_done))
 			{
@@ -105,7 +105,7 @@
 
 		private void StopAllShips()
 		{
-			Logging.WriteLineAndConsole("Stopping all ships");
+			Log.Info("Stopping all ships");
 			int shipsStopped = 0;
 
 			Wrapper.GameAction(() =>
@@ -129,7 +129,7 @@
 				}
 			});
 
-			Logging.WriteLineAndConsole(string.Format("{0} ships have been stopped", shipsStopped));
+			Log.Info(string.Format("{0} ships have been stopped", shipsStopped));
 		}
 
 		private void SetRestartTime()
@@ -157,7 +157,7 @@
 				if (time < m_start.AddMinutes(-1))
 					time = time.AddDays(1);
 
-				//Logging.WriteLineAndConsole(string.Format("Time: {0}", time));
+				//Log.Info(string.Format("Time: {0}", time));
 
 				if (result == null)
 					result = time;
@@ -184,14 +184,14 @@
 
 				if (!are.WaitOne(120000))
 				{
-					Logging.WriteLineAndConsole("Server unresponsive for 60 seconds, restarting in 5 seconds.");
+					Log.Info("Server unresponsive for 60 seconds, restarting in 5 seconds.");
 					Thread.Sleep(5000);
 					DoRestart();
 					return;
 				}
 
 				if((DateTime.Now - start).TotalMilliseconds > 10000)
-					Logging.WriteLineAndConsole(string.Format("Warning: Server Response Time: {0}ms", (DateTime.Now - start).TotalMilliseconds));
+					Log.Info(string.Format("Warning: Server Response Time: {0}ms", (DateTime.Now - start).TotalMilliseconds));
 			});
 		}
 	}

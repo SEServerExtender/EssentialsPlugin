@@ -126,3 +126,4 @@ $RECYCLE.BIN/
 # My Stuff
 ClientEntityManagement.cs
 ProcessClientConceal.cs
+packages/*/*

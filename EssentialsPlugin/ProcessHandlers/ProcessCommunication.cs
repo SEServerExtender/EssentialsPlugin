@@ -48,7 +48,7 @@
 			}
 			catch
 			{
-				Logging.WriteLineAndConsole(string.Format("ProcessCommunication: Problem getting entities, skipping update"));
+				Log.Info(string.Format("ProcessCommunication: Problem getting entities, skipping update"));
 			}
 
 			if (!result)
@@ -65,7 +65,7 @@
 				}
 				catch(Exception ex)
 				{
-					Logging.WriteLineAndConsole(string.Format("ExtractCommandFromEntity Error: {0}", ex.ToString()));
+					Log.Info(string.Format("ExtractCommandFromEntity Error: {0}", ex.ToString()));
 				}
 			}
 
@@ -110,7 +110,7 @@
 				BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
 			});
 
-			Logging.WriteLineAndConsole(string.Format("COMMAND {1} - {2}: {0}", command, playerId, entity.EntityId));
+			Log.Info(string.Format("COMMAND {1} - {2}: {0}", command, playerId, entity.EntityId));
 			if (!m_processedRelays.Contains(entity.EntityId))
 			{
 				m_processedRelays.Add(entity.EntityId);
@@ -118,7 +118,7 @@
 			}
 			else
 			{
-				Logging.WriteLineAndConsole(string.Format("Ignoring repeat beacon: {0}", entity.EntityId));
+				Log.Info(string.Format("Ignoring repeat beacon: {0}", entity.EntityId));
 			}
 		}
 

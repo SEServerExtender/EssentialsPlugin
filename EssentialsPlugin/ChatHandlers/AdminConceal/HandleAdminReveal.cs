@@ -73,7 +73,7 @@
 					grid.CastShadows = true;
 					builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
 					MyAPIGateway.Entities.RemapObjectBuilder(builder);
-					Logging.WriteLineAndConsole("Conceal", string.Format("Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
+					Log.Info("Conceal", string.Format("Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
 
 					/*
 					entity.InScene = true;
@@ -92,7 +92,7 @@
 				}
 			});
 
-			Logging.WriteLineAndConsole( !force ? string.Format( "Command would Reveal {0} grids.  Type /admin reveal force to reveal them.", count ) : string.Format( "Command Revealed {0} grids", count ) );
+			Log.Info( !force ? string.Format( "Command would Reveal {0} grids.  Type /admin reveal force to reveal them.", count ) : string.Format( "Command Revealed {0} grids", count ) );
 
 			return true;
 		}

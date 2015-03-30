@@ -23,9 +23,11 @@ using SEModAPIInternal.API.Common;
 
 namespace EssentialsPlugin.ChatHandlers
 {
+	using NLog;
+
 	public class HandleAdminPlayerCleanup : ChatHandlerBase
 	{
-		public override string GetHelp()
+		public override string GetHelp( )
 		{
 			return "";
 		}
@@ -47,13 +49,13 @@ namespace EssentialsPlugin.ChatHandlers
 		// /admin movefrom x y z x y z radius
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			Logging.WriteLineAndConsole("Starting scan ...");
+			Log.Info("Starting scan ...");
 
 			List<IMyIdentity> players = new List<IMyIdentity>();
 			MyAPIGateway.Players.GetAllIdentites(players);
 			HashSet<long> owners = GetAllOwners();
 
-			Logging.WriteLineAndConsole(string.Format("Total Players: {0}  Total Owners: {1}", players.Count, owners.Count));
+			Log.Info(string.Format("Total Players: {0}  Total Owners: {1}", players.Count, owners.Count));
 			Communication.SendPrivateInformation(userId, string.Format("Total Players: {0}  Total Owners: {1}", players.Count, owners.Count));
 
 			Wrapper.GameAction(() =>
@@ -119,7 +121,7 @@ namespace EssentialsPlugin.ChatHandlers
 					}
 					else
 					{
-						Logging.WriteLineAndConsole(string.Format("Removing member with no player info: {0}", member.PlayerId));
+						Log.Info(string.Format("Removing member with no player info: {0}", member.PlayerId));
 						MyAPIGateway.Session.Factions.KickMember(faction.FactionId,member.PlayerId );
 					}
 				}
@@ -135,7 +137,7 @@ namespace EssentialsPlugin.ChatHandlers
 				MyAPIGateway.Session.Factions.RemoveFaction(faction.FactionId);
 			}
 
-			Logging.WriteLineAndConsole(string.Format("Removed {0} factions", removeList.Count));
+			Log.Info(string.Format("Removed {0} factions", removeList.Count));
 		}
 	}
 }

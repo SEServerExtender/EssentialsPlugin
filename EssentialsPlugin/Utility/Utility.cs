@@ -11,68 +11,6 @@ namespace EssentialsPlugin.Utility
 {
 	using System.Collections.Generic;
 
-	public static class Logging
-	{
-		private static object m_lockObj = new object();
-		private static StringBuilder m_sb = new StringBuilder();
-		public static void WriteLineAndConsole(string text)
-		{
-			LogManager.APILog.WriteLineAndConsole(text);
-		}
-
-		public static void WriteLineAndConsole(string name, string text)
-		{
-			lock(m_lockObj)
-			{
-				m_sb.Clear();
-				AppendDateAndTime(m_sb);
-				m_sb.Append(" - ");
-				m_sb.Append(text);
-
-				string logPath = MyFileSystem.UserDataPath + "\\Logs\\";
-				if (!Directory.Exists(logPath))
-					Directory.CreateDirectory(logPath);
-
-				File.AppendAllText(logPath + name + ".log", m_sb.ToString() + "\r\n");
-
-				if (!PluginSettings.Instance.DynamicShowMessages)
-					return;
-
-				Console.WriteLine(m_sb.ToString());
-				m_sb.Clear();
-			}			
-		}
-
-		private static int GetThreadId()
-		{
-			return Thread.CurrentThread.ManagedThreadId;
-		}
-
-		private static void AppendDateAndTime(StringBuilder sb)
-		{
-			try
-			{
-				DateTimeOffset now = DateTimeOffset.Now;
-				StringBuilderExtensions.Concat(sb, now.Year, 4U, '0', 10U, false).Append('-');
-				StringBuilderExtensions.Concat(sb, now.Month, 2U).Append('-');
-				StringBuilderExtensions.Concat(sb, now.Day, 2U).Append(' ');
-				StringBuilderExtensions.Concat(sb, now.Hour, 2U).Append(':');
-				StringBuilderExtensions.Concat(sb, now.Minute, 2U).Append(':');
-				StringBuilderExtensions.Concat(sb, now.Second, 2U).Append('.');
-				StringBuilderExtensions.Concat(sb, now.Millisecond, 3U);
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.ToString());
-			}
-		}
-
-		private static void AppendThreadInfo(StringBuilder sb)
-		{
-			sb.Append("Thread: " + GetThreadId().ToString());
-		}
-	}
-
 	public static class General
 	{
 		public static string TimeSpanToString(TimeSpan ts)

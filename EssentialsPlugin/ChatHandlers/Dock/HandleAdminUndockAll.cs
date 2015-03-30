@@ -59,13 +59,13 @@ namespace EssentialsPlugin.ChatHandlers
 					if (entity == null)
 					{
 						//Communication.SendPrivateInformation(userId, string.Format("Unable to undock ship due to error."));
-						Logging.WriteLineAndConsole(string.Format("Unable to find parent '{0}' for '{1}' - '{2}'", dockingItem.TargetEntityId, dockingItem.DockedEntityId, dockingItem.DockedName));
+						Log.Info(string.Format("Unable to find parent '{0}' for '{1}' - '{2}'", dockingItem.TargetEntityId, dockingItem.DockedEntityId, dockingItem.DockedName));
 						//continue;
 					}
 
 					if (!File.Exists(dockedShipFileName))
 					{
-						Logging.WriteLineAndConsole(string.Format("Unable to find ship file: {0}", dockedShipFileName));
+						Log.Info(string.Format("Unable to find ship file: {0}", dockedShipFileName));
 						continue;
 					}
 
@@ -106,7 +106,7 @@ namespace EssentialsPlugin.ChatHandlers
 						}
 						catch (Exception ex)
 						{
-							Logging.WriteLineAndConsole(string.Format("Error undocking ship: {0}", ex.ToString()));
+							Log.Info(string.Format("Error undocking ship: {0}", ex.ToString()));
 							Communication.SendPrivateInformation(userId, string.Format("Unable to undock ship due to error."));
 						}
 					});

@@ -98,7 +98,7 @@ namespace EssentialsPlugin.ChatHandlers
 					if (!(entity is IMyCubeGrid))
 						continue;
 
-					Logging.WriteLineAndConsole(string.Format("Removing '{0}' for move", entity.DisplayName));
+					Log.Info(string.Format("Removing '{0}' for move", entity.DisplayName));
 					MyAPIGateway.Entities.RemoveFromClosedEntities(entity);
 				}
 			});

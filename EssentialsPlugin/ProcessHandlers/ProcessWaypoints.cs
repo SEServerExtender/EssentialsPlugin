@@ -10,7 +10,7 @@
 
 	public class ProcessWaypoints : ProcessHandlerBase
 	{
-		private List<ulong> m_waypointAdd = new List<ulong>();
+		private List<ulong> m_waypointAdd = new List<ulong>( );
 
 		public ProcessWaypoints()
 		{
@@ -44,7 +44,7 @@
 				}
 				catch (Exception ex)
 				{
-					Logging.WriteLineAndConsole(string.Format("Waypoints(): Unable to get player list: {0}", ex.ToString()));
+					Log.Info(string.Format("Waypoints(): Unable to get player list: {0}", ex.ToString()));
 				}
 			});
 
@@ -60,7 +60,7 @@
 					IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == steamId && x.Controller != null && x.Controller.ControlledEntity != null);
 					if (player != null)
 					{
-						Logging.WriteLineAndConsole("Player in game, creating waypoints");
+						Log.Info("Player in game, creating waypoints");
 						m_waypointAdd.Remove(steamId);
 
 						// Add defaults

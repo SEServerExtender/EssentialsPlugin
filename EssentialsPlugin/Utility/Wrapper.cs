@@ -6,9 +6,12 @@ using SEModAPIInternal.Support;
 
 namespace EssentialsPlugin.Utility
 {
+	using NLog;
+
 	public static class Wrapper
 	{
-		public static void GameAction(Action action)
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
+		public static void GameAction( Action action )
 		{
 			SandboxGameAssemblyWrapper.Instance.GameAction(action);
 		}
@@ -28,10 +31,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to get static field '" + fieldName + "'");
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Info( "Failed to get static field '{0}'", fieldName );
+
+				Log.Error(ex);
 				return null;
 			}
 		}
@@ -58,10 +60,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to get entity field '" + fieldName + "'");
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Info("Failed to get entity field '" + fieldName + "'");
+
+				Log.Error( ex );
 				return null;
 			}
 		}
@@ -92,10 +93,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to get static method '" + methodName + "'");
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Info("Failed to get static method '" + methodName + "'");
+
+				Log.Error( ex );
 				return null;
 			}
 		}
@@ -129,10 +129,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to get static method '" + methodName + "'");
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Info("Failed to get static method '" + methodName + "'");
+
+				Log.Error( ex );
 				return null;
 			}
 		}
@@ -165,10 +164,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to get entity method '" + methodName + "': " + ex.Message);
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Info("Failed to get entity method '" + methodName + "': " + ex.Message);
+
+				Log.Error( ex );
 				return null;
 			}
 		}
@@ -204,10 +202,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to get entity method '" + methodName + "': " + ex.Message);
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Info("Failed to get entity method '" + methodName + "': " + ex.Message);
+
+				Log.Error( ex );
 				return null;
 			}
 		}
@@ -224,7 +221,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Error( ex );
 				return null;
 			}
 		}
@@ -240,7 +237,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Error( ex );
 			}
 		}
 
@@ -256,7 +253,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Error( ex );
 				return null;
 			}
 		}
@@ -272,7 +269,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Error( ex );
 			}
 		}
 
@@ -294,10 +291,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to invoke static method '" + methodName + "': " + ex.Message);
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Info("Failed to invoke static method '" + methodName + "': " + ex.Message);
+
+				Log.Error( ex );
 				return null;
 			}
 		}
@@ -325,12 +321,10 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to invoke entity method '" + methodName + "' on type '" + gameEntity.GetType().FullName + "': " + ex.Message);
+				Log.Info("Failed to invoke entity method '" + methodName + "' on type '" + gameEntity.GetType().FullName + "': " + ex.Message);
 
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
 
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Error( ex );
 				return null;
 			}
 		}
@@ -346,10 +340,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to get entity property '" + propertyName + "'");
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Info("Failed to get entity property '" + propertyName + "'");
+
+				Log.Error( ex );
 				return null;
 			}
 		}
@@ -367,10 +360,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to get entity property value '" + propertyName + "'");
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Info("Failed to get entity property value '" + propertyName + "'");
+
+				Log.Error( ex );
 				return null;
 			}
 		}
@@ -387,10 +379,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to set entity property value '" + propertyName + "'");
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Info("Failed to set entity property value '" + propertyName + "'");
+
+				Log.Error( ex );
 				return;
 			}
 		}

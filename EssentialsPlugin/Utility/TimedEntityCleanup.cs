@@ -7,6 +7,8 @@ using Sandbox.Common.ObjectBuilders;
 
 namespace EssentialsPlugin.Utility
 {
+	using NLog;
+
 	public class TimedEntityCleanupItem
 	{
 		public long entityId;
@@ -16,6 +18,7 @@ namespace EssentialsPlugin.Utility
 
 	public class TimedEntityCleanup
 	{
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		private static TimedEntityCleanup m_instance;
 		private List<TimedEntityCleanupItem> m_items;
 
@@ -72,11 +75,11 @@ namespace EssentialsPlugin.Utility
 								entityToDispose.Dispose();
 							}
 							else
-								Logging.WriteLineAndConsole("Entity is null");
+								Log.Info("Entity is null");
 						}
 						catch (Exception ex)
 						{
-							Logging.WriteLineAndConsole(string.Format("Dispose Error: {0}", ex.ToString()));
+							Log.Info(string.Format("Dispose Error: {0}", ex.ToString()));
 						}
 
 						m_items.RemoveAt(r);

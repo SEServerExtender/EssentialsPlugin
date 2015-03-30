@@ -175,7 +175,7 @@ namespace EssentialsPlugin.ChatHandlers
 						}
 						catch (Exception Ex)
 						{
-							Logging.WriteLineAndConsole(string.Format("Error undocking ship: {0}", Ex.ToString()));
+							Log.Info(string.Format("Error undocking ship: {0}", Ex.ToString()));
 							Communication.SendPrivateInformation(userId, string.Format("Unable to undock ship due to error."));
 						}
 					});

@@ -5,6 +5,7 @@
 	using System.Linq;
 	using System.Threading;
 	using EssentialsPlugin.Utility;
+	using NLog;
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
@@ -30,30 +31,30 @@
 		{
 			List<IMyVoxelMap> voxels = new List<IMyVoxelMap>();
 			MyAPIGateway.Session.VoxelMaps.GetInstances(voxels);
-			Logging.WriteLineAndConsole(string.Format("Current Voxel Count: {0}", voxels.Count));
+			Log.Info(string.Format("Current Voxel Count: {0}", voxels.Count));
 
 			// Cache asteroids
 			/*
 			if (PluginSettings.Instance.NewUserTransportSpawnType == NewUserTransportSpawnPoint.Asteroids)
 			{
-				Logging.WriteLineAndConsole(string.Format("Voxel Caching Initializing"));
+				Log.Info(string.Format("Voxel Caching Initializing"));
 				Thread thread = new Thread((Object state) =>
 				{
 					List<VoxelMap> voxels = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>();
 					Thread.Sleep(10000);
 					voxels = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>();
 
-					Logging.WriteLineAndConsole(string.Format("Starting Voxel Caching .. This might take awhile: {0} voxels", voxels.Count));
+					Log.Info(string.Format("Starting Voxel Caching .. This might take awhile: {0} voxels", voxels.Count));
 					int count = 0;
 					foreach (VoxelMap voxel in voxels)
 					{
 						DateTime start = DateTime.Now;
-						Logging.WriteLineAndConsole(string.Format("Caching Voxel: {0}", voxel.Name));
+						Log.Info(string.Format("Caching Voxel: {0}", voxel.Name));
 						int voxelMaterialCount = voxel.Materials.Count;
-						Logging.WriteLineAndConsole(string.Format("Caching Voxel: {0} - {1} (Took: {2}s)", voxel.Name, voxelMaterialCount, (DateTime.Now - start).TotalSeconds));
+						Log.Info(string.Format("Caching Voxel: {0} - {1} (Took: {2}s)", voxel.Name, voxelMaterialCount, (DateTime.Now - start).TotalSeconds));
 						count++;
 					}
-					Logging.WriteLineAndConsole(string.Format("Completed Voxel Caching: {0}", count));
+					Log.Info(string.Format("Completed Voxel Caching: {0}", count));
 
 					m_ready = true;
 
@@ -71,14 +72,14 @@
 				Thread.Sleep(10000);
 				voxels = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>();
 
-				Logging.WriteLineAndConsole("Starting Voxel Caching .. This might take awhile");
+				Log.Info("Starting Voxel Caching .. This might take awhile");
 				foreach (VoxelMap voxel in voxels)
 				{
 					DateTime start = DateTime.Now;
 					int voxelMaterialCount = voxel.Materials.Count;
-					Logging.WriteLineAndConsole(string.Format("Caching Voxel: {0} - {1} (Took: {2}s)", voxel.Name, voxelMaterialCount, (DateTime.Now - start).TotalSeconds));
+					Log.Info(string.Format("Caching Voxel: {0} - {1} (Took: {2}s)", voxel.Name, voxelMaterialCount, (DateTime.Now - start).TotalSeconds));
 				}
-				Logging.WriteLineAndConsole("Completed Voxel Caching");
+				Log.Info("Completed Voxel Caching");
 
 				m_ready = true;
 			}));
@@ -119,7 +120,7 @@
 				}
 				catch (Exception ex)
 				{
-					Logging.WriteLineAndConsole(string.Format("Transport(): Unable to get player list: {0}", ex.ToString()));
+					Log.Info(string.Format("Transport(): Unable to get player list: {0}", ex.ToString()));
 				}
 //			});
 
@@ -135,7 +136,7 @@
 					IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == steamId && x.Controller != null && x.Controller.ControlledEntity != null);
 					if (player != null)
 					{
-						Logging.WriteLineAndConsole(string.Format("Player entered game, starting movement."));
+						Log.Info(string.Format("Player entered game, starting movement."));
 						m_newUserList.RemoveAt(r);
 
 						// In Game
@@ -159,11 +160,11 @@
 
 						if(validPosition == Vector3D.Zero)
 						{
-							Logging.WriteLineAndConsole("Could not find a valid asteroid to drop off a new user.");
+							Log.Info("Could not find a valid asteroid to drop off a new user.");
 							continue;
 						}
 
-						Logging.WriteLineAndConsole(string.Format("Attempting to move user to: {0}", General.Vector3DToString(validPosition)));
+						Log.Info(string.Format("Attempting to move user to: {0}", General.Vector3DToString(validPosition)));
 
 						Wrapper.GameAction(() =>
 						{
@@ -210,7 +211,7 @@
 							if(block is CockpitEntity)
 							{
 								block.IntegrityPercent = 0.1f;
-								Logging.WriteLineAndConsole(string.Format("Removing User From Cockpit: {0}", steamId));
+								Log.Info(string.Format("Removing User From Cockpit: {0}", steamId));
 							}
 						}
 						*/
@@ -247,7 +248,7 @@
 			lock (m_newUserList)
 			{
 				m_newUserList.Add(remoteUserId);
-				Logging.WriteLineAndConsole(string.Format("New User Transport Queued: {0}", remoteUserId));
+				Log.Info(string.Format("New User Transport Queued: {0}", remoteUserId));
 			}
 
 			base.OnPlayerJoined(remoteUserId);
@@ -262,7 +263,7 @@
 			{
 				if (m_newUserList.Exists(x => x == remoteUserId))
 				{
-					Logging.WriteLineAndConsole(string.Format("Queued Transport Removed: {0}", remoteUserId));
+					Log.Info(string.Format("Queued Transport Removed: {0}", remoteUserId));
 					m_newUserList.RemoveAll(x => x == remoteUserId);
 				}
 			}
@@ -338,11 +339,11 @@
 
 			if (validPosition == Vector3D.Zero)
 			{
-				Logging.WriteLineAndConsole("Could not find a valid asteroid to drop off a new user.");
+				Log.Info("Could not find a valid asteroid to drop off a new user.");
 				return;
 			}
 
-			//Logging.WriteLineAndConsole(string.Format("Attempting to move a character to: {0}", General.Vector3DToString(validPosition)));
+			//Log.Info(string.Format("Attempting to move a character to: {0}", General.Vector3DToString(validPosition)));
 			List<IMyPlayer> players = new List<IMyPlayer>();
 			MyAPIGateway.Players.GetPlayers(players);
 			IMyPlayer targetPlayer = null;
@@ -360,17 +361,17 @@
 
 			if(targetPlayer == null)
 			{
-				//Logging.WriteLineAndConsole(string.Format("Unable to find target player for entity"));
+				//Log.Info(string.Format("Unable to find target player for entity"));
 				return;
 			}
 
 			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(targetPlayer.SteamUserId).Count() > 0 && !PluginSettings.Instance.NewUserTransportMoveAllSpawnShips)
 			{
-				Logging.WriteLineAndConsole(string.Format("Not a new user, skipping"));
+				Log.Info(string.Format("Not a new user, skipping"));
 				return;
 			}
 
-			Logging.WriteLineAndConsole(string.Format("Moving player {0} to '{1}'", targetPlayer.DisplayName, validPosition));
+			Log.Info(string.Format("Moving player {0} to '{1}'", targetPlayer.DisplayName, validPosition));
 			Communication.SendClientMessage(targetPlayer.SteamUserId, string.Format("/move normal {0} {1} {2}", validPosition.X, validPosition.Y, validPosition.Z));
 		}
 
@@ -389,7 +390,7 @@
 				if (PluginSettings.Instance.NewUserTransportAsteroidDistance > 0 && Vector3D.Distance(voxelMap.Position, Vector3D.Zero) > PluginSettings.Instance.NewUserTransportAsteroidDistance)
 					continue;
 
-				Logging.WriteLineAndConsole(string.Format("Found asteroid with viable materials: {0} - {1}", voxelMap.Name, voxelMap.Materials.Count()));
+				Log.Info(string.Format("Found asteroid with viable materials: {0} - {1}", voxelMap.Name, voxelMap.Materials.Count()));
 				asteroidPosition = voxelMap.Position;
 				validPosition = MathUtility.RandomPositionFromPoint(asteroidPosition, PluginSettings.Instance.NewUserTransportDistance);
 				break;
@@ -397,7 +398,7 @@
 				/*
 				if (voxelMap.Materials.Count > 3)
 				{
-					Logging.WriteLineAndConsole(string.Format("Found asteroid with viable materials: {0} - {1}", voxelMap.Name, voxelMap.Materials.Count()));
+					Log.Info(string.Format("Found asteroid with viable materials: {0} - {1}", voxelMap.Name, voxelMap.Materials.Count()));
 					asteroidPosition = voxelMap.Position;
 					validPosition = MathUtility.RandomPositionFromPoint(asteroidPosition, PluginSettings.Instance.NewUserTransportDistance);
 					break;

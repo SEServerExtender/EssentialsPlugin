@@ -75,7 +75,7 @@ namespace EssentialsPlugin.ChatHandlers
 					CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(entity.EntityId);
                     if (gridEntity == null)
                     {
-                        Logging.WriteLineAndConsole("A found entity gridEntity was null!");
+                        Log.Info("A found entity gridEntity was null!");
                         continue;
                     }
                     Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) at {2} with no beacon.", gridEntity.Name, gridEntity.EntityId, General.Vector3DToString(entity.GetPosition())));
@@ -85,7 +85,7 @@ namespace EssentialsPlugin.ChatHandlers
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("Scan error: {0}", ex.ToString()));
+				Log.Info(string.Format("Scan error: {0}", ex.ToString()));
 			}
 
 			return true;

@@ -98,7 +98,7 @@ namespace EssentialsPlugin.ChatHandlers
 				if(block is CockpitEntity)
 				{
 					block.IntegrityPercent = 0.1f;
-					Logging.WriteLineAndConsole("Removing User From Cockpit");
+					Log.Info("Removing User From Cockpit");
 				}
 			}
 			

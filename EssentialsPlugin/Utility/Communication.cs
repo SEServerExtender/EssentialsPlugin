@@ -12,9 +12,12 @@ using SEModAPIExtensions.API;
 
 namespace EssentialsPlugin.Utility
 {
+	using NLog;
+
 	public class Communication
 	{
-		private static Random m_random = new Random();
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
+		private static Random m_random = new Random( );
 
 		public static void SendPublicInformation(String infoText)
 		{
@@ -36,7 +39,7 @@ namespace EssentialsPlugin.Utility
 		{
 			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(steamId).Count < 1)
 			{
-				Logging.WriteLineAndConsole(string.Format("Unable to locate playerId for user with steamId: {0}", steamId));
+				Log.Info(string.Format("Unable to locate playerId for user with steamId: {0}", steamId));
 				return;
 			}
 

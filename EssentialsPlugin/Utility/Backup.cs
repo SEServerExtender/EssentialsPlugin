@@ -5,11 +5,14 @@ using System.IO.Compression;
 
 namespace EssentialsPlugin.Utility
 {
+	using NLog;
+
 	static class Backup
 	{
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		static public void Create(string baseDirectory, bool createSubDirectories, bool backupAsteroids, bool backupSettings = false)
 		{
-			Logging.WriteLineAndConsole(string.Format("Creating backup ..."));
+			Log.Info( "Creating backup ..." );
 			//string baseDirectory = PluginSettings.Instance.BackupBaseDirectory;
 			if (!Directory.Exists(baseDirectory))
 			{
@@ -71,7 +74,7 @@ namespace EssentialsPlugin.Utility
 				File.Delete(file);
 			}
 
-			Logging.WriteLineAndConsole(string.Format("Backup created: {0}", finalDirectory + "\\" + string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-hh-mm")) + ".zip"));
+			Log.Info(string.Format("Backup created: {0}", finalDirectory + "\\" + string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-hh-mm")) + ".zip"));
 		}
 	}
 }

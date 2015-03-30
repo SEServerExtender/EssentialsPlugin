@@ -91,7 +91,7 @@ namespace EssentialsPlugin.ChatHandlers
 			{
 				entity = MyAPIGateway.Entities.GetEntityById(entityId);
 				gridBuilder = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder();
-				Logging.WriteLineAndConsole(string.Format("Moving '{0}' from {1} to {2}", gridToMove.DisplayName, gridToMove.Position, startPosition));
+				Log.Info(string.Format("Moving '{0}' from {1} to {2}", gridToMove.DisplayName, gridToMove.Position, startPosition));
 				gridToMove.Dispose();
 			});
 
@@ -100,7 +100,7 @@ namespace EssentialsPlugin.ChatHandlers
 			Wrapper.GameAction(() =>
 			{
 				MyAPIGateway.Entities.RemoveFromClosedEntities(entity);
-				Logging.WriteLineAndConsole(string.Format("Removing '{0}' for move", entity.DisplayName));
+				Log.Info(string.Format("Removing '{0}' for move", entity.DisplayName));
 			});
 
 			Thread.Sleep(10000);
@@ -108,7 +108,7 @@ namespace EssentialsPlugin.ChatHandlers
 			Wrapper.GameAction(() =>
 			{
 				gridBuilder.PositionAndOrientation = new MyPositionAndOrientation(startPosition, gridBuilder.PositionAndOrientation.Value.Forward, gridBuilder.PositionAndOrientation.Value.Up);
-				Logging.WriteLineAndConsole(string.Format("Adding '{0}' for move", gridBuilder.DisplayName));
+				Log.Info(string.Format("Adding '{0}' for move", gridBuilder.DisplayName));
 				SectorObjectManager.Instance.AddEntity(new CubeGridEntity(gridBuilder));
 			});
 

@@ -9,8 +9,8 @@
 	using VRageMath;
 
 	public class ProcessSpawnShipTracking : ProcessHandlerBase
-	{		
-		public override int GetUpdateResolution()
+	{
+		public override int GetUpdateResolution( )
 		{
 			return 5000;
 		}
@@ -35,7 +35,7 @@
 					}
 					catch
 					{
-						Logging.WriteLineAndConsole(string.Format("StopRunaway(): Entities busy, skipping"));
+						Log.Info(string.Format("StopRunaway(): Entities busy, skipping"));
 						return;
 					}
 
@@ -70,12 +70,12 @@
 								                   {
 									                   grid.Physics.LinearVelocity = Vector3.Zero;
 									                   grid.Physics.AngularVelocity = Vector3.Zero;
-									                   Logging.WriteLineAndConsole(string.Format("Stopping runaway spawnship: {0}", grid.EntityId));
+									                   Log.Info(string.Format("Stopping runaway spawnship: {0}", grid.EntityId));
 								                   }
 							                   }
 							                   catch (Exception ex)
 							                   {
-								                   Logging.WriteLineAndConsole(string.Format("Error stopping spawnship: {0}", ex));
+								                   Log.Info(string.Format("Error stopping spawnship: {0}", ex));
 							                   }
 						                   });
 					}

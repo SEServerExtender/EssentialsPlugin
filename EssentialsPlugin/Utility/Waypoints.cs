@@ -13,8 +13,11 @@ using EssentialsPlugin.Settings;
 
 namespace EssentialsPlugin.Utility
 {
+	using NLog;
+
 	public class Waypoints
 	{
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		private static Waypoints m_instance;
 		public static Waypoints Instance
 		{
@@ -55,7 +58,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("Waypoint Load Error: {0}", ex.ToString()));
+				Log.Info(string.Format("Waypoint Load Error: {0}", ex.ToString()));
 			}
 		}
 
@@ -82,7 +85,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("Error saving Waypoints: {0}", ex.ToString()));
+				Log.Info(string.Format("Error saving Waypoints: {0}", ex.ToString()));
 			}
 		}
 

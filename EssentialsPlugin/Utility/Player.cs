@@ -27,9 +27,14 @@ using EssentialsPlugin.UtilityClasses;
 
 namespace EssentialsPlugin.Utility
 {
+	using NLog;
+	using NLog.Fluent;
+	using VRage.Library.Utils;
+
 	public static class Player
 	{
-		public static MyObjectBuilder_Character FindCharacter(string userName)
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
+		public static MyObjectBuilder_Character FindCharacter( string userName )
 		{
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 			List<IMyPlayer> players = new List<IMyPlayer>();
@@ -143,7 +148,7 @@ namespace EssentialsPlugin.Utility
 			MyObjectBuilder_Character charEntity = FindCharacter(userName);
 			if(charEntity == null)
 			{
-				Logging.WriteLineAndConsole(string.Format("Unable to find CharacterEntity of '{0}'", userName));
+				Log.Info(string.Format("Unable to find CharacterEntity of '{0}'", userName));
 				return false;
 			}
 
@@ -183,7 +188,7 @@ namespace EssentialsPlugin.Utility
 
 			if (gridEntity.IsLoading)
 			{
-				Logging.WriteLineAndConsole(string.Format("Failed to load cockpit entity: {0}", gridEntity.EntityId));
+				Log.Info(string.Format("Failed to load cockpit entity: {0}", gridEntity.EntityId));
 				return false;
 			}
 
@@ -260,12 +265,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to invoke entity method '" + methodName + "' on type '" + gameEntity.GetType().FullName + "': " + ex.Message);
+				Log.Info( "Failed to invoke entity method '{0}' on type '{1}': {2}", methodName, gameEntity.GetType().FullName, ex.Message );
 
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Error(ex);
 				return null;
 			}
 		}
@@ -298,10 +300,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to get entity method '" + methodName + "': " + ex.Message);
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Info("Failed to get entity method '" + methodName + "': " + ex.Message);
+
+				Log.Error(ex);
 				return null;
 			}
 		}
@@ -337,10 +338,9 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				LogManager.APILog.WriteLine("Failed to get entity method '" + methodName + "': " + ex.Message);
-				if (SandboxGameAssemblyWrapper.IsDebugging)
-					LogManager.ErrorLog.WriteLine(Environment.StackTrace);
-				LogManager.ErrorLog.WriteLine(ex);
+				Log.Info( "Failed to get entity method '{0}': {1}", methodName, ex.Message );
+
+				Log.Error(ex);
 				return null;
 			}
 		}
@@ -432,7 +432,7 @@ namespace EssentialsPlugin.Utility
 			catch (Exception ex)
 			{
 				m_instance = new Players();
-				Logging.WriteLineAndConsole(string.Format("LoginTracking Load Error: {0}", ex.ToString()));
+				Log.Info(string.Format("LoginTracking Load Error: {0}", ex.ToString()));
 			}
 		}
 
@@ -459,7 +459,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("Error saving player logins: {0}", ex.ToString()));
+				Log.Info(string.Format("Error saving player logins: {0}", ex.ToString()));
 			}
 		}
 
@@ -580,7 +580,7 @@ namespace EssentialsPlugin.Utility
 					string[] files = Directory.GetFiles(logPath, "SpaceEngineersDedicated_*.log");
 					List<PlayerItem> playerItems = new List<PlayerItem>();
 
-					Logging.WriteLineAndConsole(string.Format("Checking {0} log files for logins", files.Length));
+					Log.Info(string.Format("Checking {0} log files for logins", files.Length));
 					DateTime start = DateTime.Now;
 					Parallel.ForEach(files, currentFile =>
 					{
@@ -604,7 +604,7 @@ namespace EssentialsPlugin.Utility
 					});
 
 					Instance.UpdatePlayers(playerItems);
-					Logging.WriteLineAndConsole(string.Format("Completed checking logs in {0}s: {2} ({1}) steamIds", (DateTime.Now - start).TotalSeconds, playerItems.Count, Instance.PlayerLogins.Count));
+					Log.Info(string.Format("Completed checking logs in {0}s: {2} ({1}) steamIds", (DateTime.Now - start).TotalSeconds, playerItems.Count, Instance.PlayerLogins.Count));
 				}));
 			}
 			finally

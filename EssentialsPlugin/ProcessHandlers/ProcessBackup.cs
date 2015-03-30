@@ -48,7 +48,7 @@
 			}
 			catch (Exception ex)
 			{
-				Logging.WriteLineAndConsole(string.Format("ProcessBackup.Handle(): {0}", ex.ToString()));
+				Log.Info(string.Format("ProcessBackup.Handle(): {0}", ex.ToString()));
 			} 
 			
 			base.Handle();
@@ -67,7 +67,7 @@
 					FileInfo info = new FileInfo(file);
 					if(DateTime.Now - info.CreationTime >= TimeSpan.FromDays(PluginSettings.Instance.BackupCleanupTime))
 					{
-						Logging.WriteLineAndConsole(string.Format("Removed old backup: {0}", file));
+						Log.Info(string.Format("Removed old backup: {0}", file));
 						File.Delete(file);
 						Directory.Delete(path);
 						break;
@@ -80,7 +80,7 @@
 				FileInfo info = new FileInfo(file);
 				if (DateTime.Now - info.CreationTime >= TimeSpan.FromDays(PluginSettings.Instance.BackupCleanupTime))
 				{
-					Logging.WriteLineAndConsole(string.Format("Removed old backup: {0}", file));
+					Log.Info(string.Format("Removed old backup: {0}", file));
 					File.Delete(file);
 					continue;
 				}

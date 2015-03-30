@@ -15,6 +15,8 @@ using SEModAPIInternal.API.Common;
 
 namespace EssentialsPlugin.Utility
 {
+	using NLog;
+
 	public enum RemoveGridTypes
 	{
 		All,
@@ -24,6 +26,7 @@ namespace EssentialsPlugin.Utility
 
 	public static class CubeGrids
 	{
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		public static Vector3D RemoveGridsInSphere( ulong userId, Vector3D startPosition, float radius, RemoveGridTypes removeType )
 		{
 			BoundingSphereD sphere = new BoundingSphereD( startPosition, radius );
@@ -1261,7 +1264,7 @@ namespace EssentialsPlugin.Utility
 						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
 					}
 
-					Logging.WriteLineAndConsole( "Cleanup", string.Format( "Cleanup Removed Grid - Id: {0} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName ) );
+					Log.Info( "Cleanup", string.Format( "Cleanup Removed Grid - Id: {0} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName ) );
 					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
 				}
 			} );

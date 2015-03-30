@@ -92,7 +92,7 @@
 			}
 			catch(Exception ex)			
 			{
-				Logging.WriteLineAndConsole(string.Format("CheckPlayerInDockingZone(): {0}", ex.ToString()));
+				Log.Info(string.Format("CheckPlayerInDockingZone(): {0}", ex.ToString()));
 				return;
 			}
 			
