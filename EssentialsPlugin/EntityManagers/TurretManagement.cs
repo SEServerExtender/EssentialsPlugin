@@ -78,7 +78,7 @@
 			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
 			grid.GetBlocks(blocks);
 			//bool disable = false;
-			bool ignore = false;
+			//bool ignore = false;
 			foreach (IMySlimBlock block in blocks)
 			{
 				if (block.FatBlock == null)
@@ -104,7 +104,7 @@
 						if (DoesGridHaveTarget(grid, block))
 						{
 							// We'll ignore state and only collect for statistics
-							ignore = true;
+							//ignore = true;
 							continue;
 						}
 
@@ -187,7 +187,7 @@
 			m_scanCache.Clear();
 			grid.GetBlocks(blocks);
 			//bool enable = false;
-			bool ignore = false;
+			//bool ignore = false;
 			foreach (IMySlimBlock block in blocks)
 			{
 				if (block.FatBlock == null)
@@ -213,7 +213,7 @@
 						{
 							// We'll ignore state check and only collect for statistics
 //							Console.WriteLine("Ignore");
-							ignore = true;
+							//ignore = true;
 							continue;
 						}
 
