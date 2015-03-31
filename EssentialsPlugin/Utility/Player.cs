@@ -28,7 +28,6 @@ using EssentialsPlugin.UtilityClasses;
 namespace EssentialsPlugin.Utility
 {
 	using NLog;
-	using NLog.Fluent;
 	using VRage.Library.Utils;
 
 	public static class Player
@@ -385,6 +384,7 @@ namespace EssentialsPlugin.Utility
 
 	public class Players
 	{
+		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		private static volatile bool m_checking = false;
 		private static Players m_instance;
 		public static Players Instance
