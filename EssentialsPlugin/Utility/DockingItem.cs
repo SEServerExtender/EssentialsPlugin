@@ -1,58 +1,60 @@
 ﻿namespace EssentialsPlugin.Utility
 {
 	using System;
+	using System.Runtime.Serialization;
 	using VRageMath;
 
+	[DataContract]
 	[Serializable]
 	public class DockingItem
 	{
-		private long playerId;
+		private long _playerId;
 		public long PlayerId
 		{
-			get { return playerId; }
-			set { playerId = value; }
+			get { return _playerId; }
+			set { _playerId = value; }
 		}
 
-		private long dockedEntityId;
+		private long _dockedEntityId;
 		public long DockedEntityId
 		{
-			get { return dockedEntityId; }
-			set { dockedEntityId = value; }
+			get { return _dockedEntityId; }
+			set { _dockedEntityId = value; }
 		}
 
-		private long targetEntityId;
+		private long _targetEntityId;
 		public long TargetEntityId
 		{
-			get { return targetEntityId; }
-			set { targetEntityId = value; }
+			get { return _targetEntityId; }
+			set { _targetEntityId = value; }
 		}
 
-		private long[] dockingBeaconIds;
+		private long[] _dockingBeaconIds;
 		public long[] DockingBeaconIds
 		{
-			get { return dockingBeaconIds; }
-			set { dockingBeaconIds = value; }
+			get { return _dockingBeaconIds; }
+			set { _dockingBeaconIds = value; }
 		}
 
-		private Vector3 savePos;
+		private Vector3 _savePos;
 		public Vector3 SavePos
 		{
-			get { return savePos; }
-			set { savePos = value; }
+			get { return _savePos; }
+			set { _savePos = value; }
 		}
 
-		private Quaternion saveQuat;
+		private Quaternion _saveQuat;
 		public Quaternion SaveQuat
 		{
-			get { return saveQuat; }
-			set { saveQuat = value; }
+			get { return _saveQuat; }
+			set { _saveQuat = value; }
 		}
 
-		private String dockedName;
+		private String _dockedName;
 		public String DockedName
 		{
-			get { return dockedName; }
-			set { dockedName = value; }
+			get { return _dockedName; }
+			set { _dockedName = value; }
 		}
 	}
 }
