@@ -1,28 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.IO;
-
-using EssentialsPlugin.Utility;
-
-using Sandbox.ModAPI;
-using Sandbox.Common.ObjectBuilders;
-
-using VRageMath;
-
-using SEModAPIInternal.API.Entity;
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-using SEModAPIInternal.API.Common;
-using Microsoft.Xml.Serialization.GeneratedAssembly;
-
-using EssentialsPlugin.UtilityClasses;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.Dock
 {
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using EssentialsPlugin.Utility;
+	using Microsoft.Xml.Serialization.GeneratedAssembly;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Entity;
+	using VRageMath;
+
 	public class HandleAdminUndockAll : ChatHandlerBase
 	{
 		// We need to only allow one dock at a time right now until I can address this.  It's causing duping when dropped packets occur

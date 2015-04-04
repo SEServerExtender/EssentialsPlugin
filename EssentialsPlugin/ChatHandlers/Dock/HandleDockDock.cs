@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-
-using EssentialsPlugin.Utility;
-
-using Sandbox.ModAPI;
-using Sandbox.Common.ObjectBuilders;
-
-using VRageMath;
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-using SEModAPIInternal.API.Common;
-using SEModAPIInternal.API.Server;
-using Microsoft.Xml.Serialization.GeneratedAssembly;
-
-using EssentialsPlugin.UtilityClasses;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers.Dock
 {
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Linq;
+	using EssentialsPlugin.Utility;
+	using EssentialsPlugin.UtilityClasses;
+	using Microsoft.Xml.Serialization.GeneratedAssembly;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity;
+	using VRageMath;
 
 	public class HandleDockDock: ChatHandlerBase
 	{
