@@ -432,7 +432,7 @@ namespace EssentialsPlugin.Utility
 			catch (Exception ex)
 			{
 				m_instance = new Players();
-				Log.Info(string.Format("LoginTracking Load Error: {0}", ex.ToString()));
+				Log.Error( ex );
 			}
 		}
 
@@ -459,7 +459,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Log.Info(string.Format("Error saving player logins: {0}", ex.ToString()));
+				Log.Error( "Error saving player logins: {0}", ex );
 			}
 		}
 
@@ -604,7 +604,7 @@ namespace EssentialsPlugin.Utility
 					});
 
 					Instance.UpdatePlayers(playerItems);
-					Log.Info(string.Format("Completed checking logs in {0}s: {2} ({1}) steamIds", (DateTime.Now - start).TotalSeconds, playerItems.Count, Instance.PlayerLogins.Count));
+					Log.Info( "Completed checking logs in {0}s: {2} ({1}) steamIds", (DateTime.Now - start).TotalSeconds, playerItems.Count, Instance.PlayerLogins.Count );
 				}));
 			}
 			finally
