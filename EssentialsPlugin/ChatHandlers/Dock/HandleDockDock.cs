@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
+	using System.Security;
 	using EssentialsPlugin.Utility;
 	using EssentialsPlugin.UtilityClasses;
 	using Microsoft.Xml.Serialization.GeneratedAssembly;
@@ -199,7 +200,11 @@
 						saveQuat = Quaternion.Inverse(saveQuat) * Quaternion.CreateFromRotationMatrix(dockingEntity.WorldMatrix.GetOrientation());
 
 						// Save ship to file and remove
-						FileInfo info = new FileInfo(Essentials.PluginPath + String.Format("\\Docking\\docked_{0}_{1}_{2}.sbc", ownerId, parent.EntityId, dockingEntity.EntityId));
+						FileInfo info = new FileInfo( Path.Combine( Essentials.PluginPath, "Docking", string.Format( "docked_{0}_{1}_{2}.sbc", ownerId, parent.EntityId, dockingEntity.EntityId ) ) );
+						if ( !Directory.Exists( info.DirectoryName ) )
+						{
+							Directory.CreateDirectory( info.DirectoryName );
+						}
 						//CubeGridEntity dockingGrid = new CubeGridEntity((MyObjectBuilder_CubeGrid)dockingEntity.GetObjectBuilder(), dockingEntity);
 						MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(dockingEntity);
 						if (gridBuilder == null)
@@ -209,14 +214,16 @@
 						}
 
 						// Save item
-						DockingItem dockItem = new DockingItem();
-						dockItem.DockedEntityId = dockingEntity.EntityId;
-						dockItem.TargetEntityId = parent.EntityId;
-						dockItem.PlayerId = ownerId;
-						dockItem.DockingBeaconIds = beaconList.Select(s => s.EntityId).ToArray();
-						dockItem.DockedName = dockingEntity.DisplayName;
-						dockItem.SavePos = savePos;
-						dockItem.SaveQuat = saveQuat;
+						DockingItem dockItem = new DockingItem
+						                       {
+							                       DockedEntityId = dockingEntity.EntityId,
+							                       TargetEntityId = parent.EntityId,
+							                       PlayerId = ownerId,
+							                       DockingBeaconIds = beaconList.Select( s => s.EntityId ).ToArray( ),
+							                       DockedName = dockingEntity.DisplayName,
+							                       SavePos = savePos,
+							                       SaveQuat = saveQuat
+						                       };
 						Docking.Instance.Add(dockItem);
 
 						// Serialize and save ship to file
@@ -226,7 +233,7 @@
 						//dockingEntity.Close();
 
 						Communication.SendPrivateInformation(userId, string.Format("Docked ship '{0}' in docking zone '{1}'.", dockItem.DockedName, pylonName));
-
+						Log.Info( "Docked ship \"{0}\" in docking zone \"{1}\". Saved to {2}", dockItem.DockedName, pylonName, info.FullName );
 						/*
 						// Add a cool down
 						DockingCooldownItem cItem = new DockingCooldownItem();
@@ -250,6 +257,25 @@
 				}
 
 				return true;
+			}
+			catch ( SecurityException ex )
+			{
+				Log.Error( "Can't access docked ship file.", ex );
+				return false;
+			}
+			catch ( UnauthorizedAccessException ex )
+			{
+				Log.Error( "Can't access docked ship file.", ex );
+				return false;
+			}
+			catch ( DirectoryNotFoundException ex )
+			{
+				Log.Error( "Directory does not exist", ex );
+				return false;
+			}
+			catch ( IOException ex )
+			{
+				return false;
 			}
 			finally
 			{
