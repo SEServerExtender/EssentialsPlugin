@@ -42,7 +42,8 @@
 				{
 					string dockedShipFileName = Essentials.PluginPath + String.Format("\\Docking\\docked_{0}_{1}_{2}.sbc", dockingItem.PlayerId, dockingItem.TargetEntityId, dockingItem.DockedEntityId);
 
-					IMyEntity entity = MyAPIGateway.Entities.GetEntity(x => x.EntityId == dockingItem.TargetEntityId && x is IMyCubeGrid);
+					DockingItem dockedShip = dockingItem;
+					IMyEntity entity = MyAPIGateway.Entities.GetEntity(x => x.EntityId == dockedShip.TargetEntityId && x is IMyCubeGrid);
 					if (entity == null)
 					{
 						//Communication.SendPrivateInformation(userId, string.Format("Unable to undock ship due to error."));
