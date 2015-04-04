@@ -921,7 +921,7 @@ namespace EssentialsPlugin
 			MyAPIGateway.Entities.OnEntityAdd += OnEntityAdd;
 			MyAPIGateway.Entities.OnEntityRemove += OnEntityRemove;
 
-			Log.Info(string.Format("Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id));
+			Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
 		}
 
 		#endregion
@@ -946,7 +946,7 @@ namespace EssentialsPlugin
 								}
 								catch (Exception ex)
 								{
-									Log.Info(String.Format("Handler Problems: {0} - {1}", currentHandler.GetUpdateResolution(), ex));
+									Log.Info( "Handler Problems: {0} - {1}", currentHandler.GetUpdateResolution(), ex );
 								}
 
 								// Let's make sure LastUpdate is set to now otherwise we may start processing too quickly
@@ -1012,17 +1012,19 @@ namespace EssentialsPlugin
 		#region IPlugin Members
 		public void Init()
 		{
+			Log.Debug( "Initializing Essentials plugin at path {0}\\", Path.GetDirectoryName( Assembly.GetExecutingAssembly( ).Location ) );
 			DoInit(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\");
 		}
 
 		public void InitWithPath(String modPath)
 		{
+			Log.Debug( "Initializing Essentials plugin at path {0}\\", Path.GetDirectoryName( modPath ) );
 			DoInit(Path.GetDirectoryName(modPath) + "\\");
 		}
 
 		public void Shutdown()
 		{
-			Log.Info(string.Format("Shutting down plugin: {0} - {1}", Name, Version));
+			Log.Info( "Shutting down plugin: {0} - {1}", Name, Version );
 
 			foreach (Thread thread in _processThreads)
 				thread.Abort();

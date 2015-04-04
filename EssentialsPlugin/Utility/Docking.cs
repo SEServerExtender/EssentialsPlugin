@@ -18,8 +18,12 @@ namespace EssentialsPlugin.Utility
 		public Docking()
 		{
 			string dockingFolderPath = Path.Combine(Essentials.PluginPath , "\\Docking");
+			
 			if (!Directory.Exists(dockingFolderPath))
+			{
+				Log.Info( "Creating docking folder at {0}", dockingFolderPath );
 				Directory.CreateDirectory(dockingFolderPath);
+			}
 		}
 
 		public static Docking Instance
@@ -60,7 +64,7 @@ namespace EssentialsPlugin.Utility
 				}
 				catch (Exception ex)
 				{
-					Log.Info(string.Format("Save(): {0}", ex));
+					Log.Error( ex );
 				}
 			}
 		}
@@ -86,12 +90,12 @@ namespace EssentialsPlugin.Utility
 							reader.Close();
 						}
 
-						Log.Info(string.Format("Loaded {0} Docking Items", _instance.DockingItems));
+						Log.Info( "Loaded {0} Docking Items from {1}", _instance.DockingItems.Count, fileName );
 					}
 				}
 				catch (Exception ex)
 				{
-					Log.Info(string.Format("Load(): {0}", ex));
+					Log.Error( ex );
 				}
 				finally
 				{
