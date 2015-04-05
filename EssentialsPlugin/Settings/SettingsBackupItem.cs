@@ -5,31 +5,31 @@ namespace EssentialsPlugin.Settings
 	[Serializable]
 	public class BackupItem
 	{
-		private int hour;
+		private int _hour;
 		public int Hour
 		{
-			get { return hour; }
+			get { return _hour; }
 			set
 			{
-				hour = Math.Min(Math.Max(-1, value), 23);
+				_hour = Math.Min(Math.Max(-1, value), 23);
 			}
 		}
 
-		private int minute;
+		private int _minute;
 		public int Minute
 		{
-			get { return minute; }
+			get { return _minute; }
 			set
 			{
-				minute = Math.Min(Math.Max(0, value), 59);
+				_minute = Math.Min(Math.Max(0, value), 59);
 			}
 		}
 
-		private bool enabled;
+		private bool _enabled;
 		public bool Enabled
 		{
-			get { return enabled; }
-			set { enabled = value; }
+			get { return _enabled; }
+			set { _enabled = value; }
 		}
 	}
 }
