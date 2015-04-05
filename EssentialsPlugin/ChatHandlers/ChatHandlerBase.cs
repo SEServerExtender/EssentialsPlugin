@@ -4,7 +4,9 @@ using SEModAPIInternal.API.Common;
 
 namespace EssentialsPlugin.ChatHandlers
 {
+	using System.IO;
 	using NLog;
+	using NLog.Layouts;
 
 	public abstract class ChatHandlerBase
 	{

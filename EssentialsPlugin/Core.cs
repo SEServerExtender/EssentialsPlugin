@@ -34,7 +34,7 @@ namespace EssentialsPlugin
 
 	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
 	{
-		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
+		public static Logger Log;
 		#region Private Fields
 		internal static Essentials Instance;
 		private static string _pluginPath;
