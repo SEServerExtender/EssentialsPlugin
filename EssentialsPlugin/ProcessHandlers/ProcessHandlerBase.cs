@@ -7,8 +7,8 @@
 
 	public abstract class ProcessHandlerBase
 	{
-		protected static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
-		private DateTime m_lastUpdate;
+		protected static readonly Logger Log = Essentials.Log;
+		protected DateTime m_lastUpdate;
 		public DateTime LastUpdate
 		{
 			get { return m_lastUpdate; }
