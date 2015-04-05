@@ -22,7 +22,6 @@ namespace EssentialsPlugin
 	[Serializable]
 	public class PluginSettings
 	{
-		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		#region Private Fields
 		private static PluginSettings m_instance;
 		private static bool m_loading = false;
@@ -848,7 +847,7 @@ namespace EssentialsPlugin
 			}
 			catch(Exception ex)
 			{
-				Log.Info(string.Format("Load(): {0}", ex.ToString()));
+				Essentials.Log.Error( ex );
 			}
 			finally
 			{
@@ -879,7 +878,7 @@ namespace EssentialsPlugin
 			}
 			catch (Exception ex)
 			{
-				Log.Info(string.Format("Save(): {0}", ex.ToString()));
+				Essentials.Log.Error( ex );
 			}
 		}
 
@@ -958,7 +957,7 @@ namespace EssentialsPlugin
 			}
 			catch (Exception ex)
 			{
-				Log.Info(string.Format("GetSettings() Error: {0}", ex.ToString()));
+				Essentials.Log.Error( ex );
 			}
 		
 			return result;
@@ -988,7 +987,7 @@ namespace EssentialsPlugin
 				{
 					if(so == SettingsOperators.Set && propertyInfo != null && newValue != "")
 					{
-						Log.Info(string.Format("Setting Value of {0} to '{1}'", checkType.Name, newValue));
+						Essentials.Log.Info( "Setting Value of {0} to '{1}'", checkType.Name, newValue );
 						propertyInfo.SetValue(obj, Convert.ChangeType(newValue, propertyInfo.PropertyType));
 						Save();
 					}
@@ -1056,7 +1055,7 @@ namespace EssentialsPlugin
 			}
 			catch(Exception ex)
 			{
-				Log.Info(string.Format("ReflectObject(): {0}", ex.ToString()));
+				Essentials.Log.Error( ex );
 			}
 
 			return result;
