@@ -31,6 +31,7 @@ namespace EssentialsPlugin
 	using EssentialsPlugin.ChatHandlers.Waypoints;
 	using EssentialsPlugin.ProcessHandlers;
 	using NLog;
+	using SEModAPI.API.Utility;
 
 	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
 	{
@@ -928,53 +929,6 @@ namespace EssentialsPlugin
 
 		#endregion
 
-		#region Private Methods
-		private string[] GetCommandParts(string message)
-		{
-			bool quote = false;
-			List<string> commandParts = new List<string>();
-			string part = string.Empty;
-
-			for (int pos = 0; pos < message.Length; pos++)
-			{
-				char character = message[pos];
-
-				if (character == '"')
-				{
-					if (!quote)
-					{
-						quote = true;
-					}
-					else if (quote && pos + 1 < message.Length && message[pos + 1] == '"')
-					{
-						part += character;
-						pos++;
-					}
-					else
-					{
-						quote = false;
-					}
-				}
-				else if (character == ' ' && !quote)
-				{
-					commandParts.Add(part);
-					part = string.Empty;
-				}
-				else
-				{
-					part += character;
-				}
-			}
-
-			if (!quote && part.Length > 0)
-			{
-				commandParts.Add(part);
-			}
-
-			return commandParts.ToArray();
-		}
-		#endregion
-
 		#region Processing Loop
 		private void PluginProcessing()
 		{
@@ -1107,7 +1061,7 @@ namespace EssentialsPlugin
 		{
 			// Parse chat message
 			ulong remoteUserId = steamId;
-			string[] commandParts = GetCommandParts(message);
+			List<string> commandParts = CommandParser.GetCommandParts(message);
 
 			// User wants some help
 			if (commandParts[0].ToLower() == "/help")
@@ -1150,9 +1104,9 @@ namespace EssentialsPlugin
 		/// </summary>
 		/// <param name="remoteUserId"></param>
 		/// <param name="commandParts"></param>
-		private void HandleHelpCommand(ulong remoteUserId, string[] commandParts)
+		private void HandleHelpCommand(ulong remoteUserId, IReadOnlyCollection<string> commandParts)
 		{
-			if (commandParts.Count() == 1)
+			if (commandParts.Count == 1)
 			{
 				List<string> commands = new List<string>();
 				foreach (ChatHandlerBase handler in _chatHandlers)
