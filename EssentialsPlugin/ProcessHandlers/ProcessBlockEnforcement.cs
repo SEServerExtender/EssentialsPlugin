@@ -4,7 +4,6 @@
 	using System.Collections.Generic;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
-	using NLog;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
 
@@ -32,7 +31,7 @@
 			}
 			catch ( Exception ex )
 			{
-				Log.Error( "Error handling block enforcement...", ex );
+				Log.Error( ex );
 			}
 
 			base.Handle( );
@@ -46,9 +45,9 @@
 			{
 				MyAPIGateway.Entities.GetEntities( entities );
 			}
-			catch
+			catch(Exception ex)
 			{
-				Log.Error( "ScanForBlockItems(): Entity list busy, skipping scan." );
+				Log.Error( "Entity list busy, skipping scan.", ex );
 			}
 
 			foreach ( IMyEntity entity in entities )
@@ -66,8 +65,9 @@
 				Sandbox.ModAPI.Ingame.IMyGridTerminalSystem gridTerminal = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid( grid );
 
 				Dictionary<string, int> blocks = new Dictionary<string, int>( );
-				foreach ( IMyTerminalBlock block in gridTerminal.Blocks )
+				foreach ( Sandbox.ModAPI.Ingame.IMyTerminalBlock myTerminalBlock in gridTerminal.Blocks )
 				{
+					Sandbox.ModAPI.Ingame.IMyTerminalBlock block = myTerminalBlock;
 					foreach ( SettingsBlockEnforcementItem item in PluginSettings.Instance.BlockEnforcementItems )
 					{
 						if ( !item.Enabled )
