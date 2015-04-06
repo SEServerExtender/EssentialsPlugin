@@ -292,6 +292,7 @@ namespace EssentialsPlugin
 		[Description("Enable / Disabled Automated Backups")]
 		[Browsable(true)]
 		[ReadOnly(false)]
+		[DefaultValue(true)]
 		public bool BackupEnabled
 		{
 			get { return PluginSettings.Instance.BackupEnabled;  }
@@ -302,6 +303,7 @@ namespace EssentialsPlugin
 		[Description("Backup Items. These items control when backups occur.")]
 		[Browsable(true)]
 		[ReadOnly(false)]
+		[DisplayName(@"Backup Times")]
 		public MTObservableCollection<BackupItem> BackupItems
 		{
 			get { return PluginSettings.Instance.BackupItems; }
@@ -999,7 +1001,7 @@ namespace EssentialsPlugin
 			}
 			catch (Exception ex)
 			{
-				Log.Info(string.Format("PluginProcessing(): {0}", ex));
+				Log.Error( ex );
 			}
 			finally
 			{
