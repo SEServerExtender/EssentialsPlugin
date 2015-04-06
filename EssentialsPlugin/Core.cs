@@ -928,6 +928,53 @@ namespace EssentialsPlugin
 
 		#endregion
 
+		#region Private Methods
+		private string[] GetCommandParts(string message)
+		{
+			bool quote = false;
+			List<string> commandParts = new List<string>();
+			string part = string.Empty;
+
+			for (int pos = 0; pos < message.Length; pos++)
+			{
+				char character = message[pos];
+
+				if (character == '"')
+				{
+					if (!quote)
+					{
+						quote = true;
+					}
+					else if (quote && pos + 1 < message.Length && message[pos + 1] == '"')
+					{
+						part += character;
+						pos++;
+					}
+					else
+					{
+						quote = false;
+					}
+				}
+				else if (character == ' ' && !quote)
+				{
+					commandParts.Add(part);
+					part = string.Empty;
+				}
+				else
+				{
+					part += character;
+				}
+			}
+
+			if (!quote && part.Length > 0)
+			{
+				commandParts.Add(part);
+			}
+
+			return commandParts.ToArray();
+		}
+		#endregion
+
 		#region Processing Loop
 		private void PluginProcessing()
 		{
@@ -1060,7 +1107,7 @@ namespace EssentialsPlugin
 		{
 			// Parse chat message
 			ulong remoteUserId = steamId;
-			string[] commandParts = message.Split(' ');
+			string[] commandParts = GetCommandParts(message);
 
 			// User wants some help
 			if (commandParts[0].ToLower() == "/help")
