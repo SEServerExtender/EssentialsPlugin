@@ -38,8 +38,7 @@ namespace EssentialsPlugin.ChatHandlers
 
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			string[] splits = General.SplitString(string.Join(" ", words));
-			if (splits.Length != 1)
+			if (words.Length != 1)
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());
 				return true;
@@ -82,7 +81,7 @@ namespace EssentialsPlugin.ChatHandlers
 						IMyEntity turret = block.FatBlock;
 						bool state = FunctionalBlockEntity.GetState(turret);
 
-						if(splits[0].ToLower() == "toggle")
+						if (words[0].ToLower() == "toggle")
 							FunctionalBlockEntity.SetState(turret, !state);
 
 						count++;
@@ -92,7 +91,7 @@ namespace EssentialsPlugin.ChatHandlers
 						else
 							disabled++;
 
-						if (splits[0].ToLower() == "test" && state)
+						if (words[0].ToLower() == "test" && state)
 						{
 							BoundingSphereD sphere = new BoundingSphereD(grid.GetPosition(), 2000);
 							List<IMyEntity> testEntities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);

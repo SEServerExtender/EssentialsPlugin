@@ -42,23 +42,21 @@
 		{
 			if (!PluginSettings.Instance.WaypointsEnabled)
 				return false;
-			
-			string[] splits = General.SplitString(string.Join(" ", words));
 
-			if (splits.Length != 2)
+			if (words.Length != 2)
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());
 				return true;
 			}
 
-			string name = splits[0];
-			string group = splits[1];
+			string name = words[0];
+			string group = words[1];
 
 			List<WaypointItem> items = Waypoints.Instance.Get(userId);
-			WaypointItem item = items.FirstOrDefault(x => x.Name.ToLower() == splits[0]);
+			WaypointItem item = items.FirstOrDefault(x => x.Name.ToLower() == words[0]);
 			if (item != null)
 			{
-				if (Waypoints.Instance.GroupAdd(userId, splits[0], splits[1]))
+				if (Waypoints.Instance.GroupAdd(userId, words[0], words[1]))
 					Communication.SendPrivateInformation(userId, string.Format("Waypoint '{0}' added to the group '{1}'", name, group));
 				else
 					Communication.SendPrivateInformation(userId, string.Format("Failed to add waypoint '{0}' to the group '{1}'", name, group));
@@ -72,7 +70,7 @@
 			if (faction != null)
 			{
 				items = Waypoints.Instance.Get((ulong)faction.FactionId);
-				item = items.FirstOrDefault(x => x.Name.ToLower() == splits[0]);
+				item = items.FirstOrDefault(x => x.Name.ToLower() == words[0]);
 
 				if (item != null)
 				{
@@ -82,7 +80,7 @@
 						return true;
 					}
 
-					if (Waypoints.Instance.GroupAdd((ulong)faction.FactionId, splits[0], splits[1]))
+					if (Waypoints.Instance.GroupAdd((ulong)faction.FactionId, words[0], words[1]))
 						Communication.SendFactionClientMessage(userId, string.Format("/message Server {0} added the waypoint '{1}' to the group '{2}'", playerName, name, group));
 					else
 						Communication.SendPrivateInformation(userId, string.Format("Failed to add faction waypoint '{0}' to the group '{1}'", name, group));

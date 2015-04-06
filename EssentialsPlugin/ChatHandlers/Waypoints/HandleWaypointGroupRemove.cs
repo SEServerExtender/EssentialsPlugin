@@ -42,19 +42,17 @@
 		{
 			if (!PluginSettings.Instance.WaypointsEnabled)
 				return false;
-			
-			string[] splits = General.SplitString(string.Join(" ", words));
 
-			if (splits.Length != 1)
+			if (words.Length != 1)
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());
 				return true;			
 			}
 
-			string name = splits[0];
+			string name = words[0];
 
 			List<WaypointItem> items = Waypoints.Instance.Get(userId);
-			WaypointItem item = items.FirstOrDefault(x => x.Name.ToLower() == splits[0]);
+			WaypointItem item = items.FirstOrDefault(x => x.Name.ToLower() == words[0]);
 			if (item != null)
 			{
 				if (Waypoints.Instance.GroupRemove(userId, name))
@@ -71,7 +69,7 @@
 			if (faction != null)
 			{
 				items = Waypoints.Instance.Get((ulong)faction.FactionId);
-				item = items.FirstOrDefault(x => x.Name.ToLower() == splits[0]);
+				item = items.FirstOrDefault(x => x.Name.ToLower() == words[0]);
 
 				if (item != null)
 				{
