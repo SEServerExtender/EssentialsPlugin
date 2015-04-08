@@ -54,17 +54,17 @@
 				}
 				catch(Exception ex)
 				{
-					Essentials.Log.Info(string.Format("Error getting players list.  Check and Conceal failed: {0}", ex.ToString()));
+					Essentials.Log.Error( "Error getting players list.  Check and Conceal failed: {0}", ex );
 					return;
 				}
 
 				try
 				{
-					MyAPIGateway.Entities.GetEntities(entities);
+					MyAPIGateway.Entities.GetEntities( entities );
 				}
-				catch
+				catch ( Exception ex )
 				{
-					Essentials.Log.Info("CheckAndConcealEntities(): Error getting entity list, skipping check");
+					Essentials.Log.Error( "Error getting entity list, skipping check", ex );
 					return;
 				}
 
@@ -162,12 +162,12 @@
 				co += (DateTime.Now - coStart).TotalMilliseconds;
 
 				if ((DateTime.Now - start).TotalMilliseconds > 2000)
-					Essentials.Log.Info(string.Format("Completed Conceal Check: {0}ms (gg: {3}, dc: {2} ms, br: {1}ms, co: {4}ms)", (DateTime.Now - start).TotalMilliseconds, blockRules, distCheck, getGrids, co));
+					Essentials.Log.Info( "Completed Conceal Check: {0}ms (gg: {3}, dc: {2} ms, br: {1}ms, co: {4}ms)", (DateTime.Now - start).TotalMilliseconds, blockRules, distCheck, getGrids, co );
 
 			}
 			catch (Exception ex)
 			{
-				Essentials.Log.Info(string.Format("CheckAndConceal(): {0}", ex.ToString()));
+				Essentials.Log.Error( ex );
 			}
 			finally
 			{

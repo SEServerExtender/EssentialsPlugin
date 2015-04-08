@@ -1,13 +1,11 @@
 ﻿namespace EssentialsPlugin.Settings
 {
-	using System;
-
 	public class SettingsBlockEnforcementItem
 	{
 		public enum EnforcementMode
 		{
 			Off = 0,
-			BlockId = 1,
+			BlockTypeId = 1,
 			BlockSubtypeId = 2
 		}
 

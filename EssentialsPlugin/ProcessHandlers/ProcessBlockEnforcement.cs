@@ -73,9 +73,20 @@
 						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.Off )
 							continue;
 
+						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.BlockTypeId && string.IsNullOrEmpty( item.BlockTypeId ) )
+						{
+							Log.Warn( "Block Enforcement item for \"{0}\" is set to mode BlockTypeId but does not have BlockTypeId set." );
+							continue;
+						}
+						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.BlockSubtypeId && string.IsNullOrEmpty( item.BlockSubtypeId ) )
+						{
+							Log.Warn( "Block Enforcement item for \"{0}\" is set to mode BlockSubtypeId but does not have BlockSubtypeId set." );
+							continue;
+						}
+
 						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.BlockSubtypeId
 							&& !string.IsNullOrEmpty( block.BlockDefinition.SubtypeId )
-							&& block.BlockDefinition.SubtypeId.Contains( item.BlockTypeId ) )
+							&& block.BlockDefinition.SubtypeId.Contains( item.BlockSubtypeId ) )
 						{
 							if ( blocks.ContainsKey( item ) )
 								blocks[ item ] += 1;
@@ -83,7 +94,9 @@
 								blocks.Add( item, 1 );
 						}
 
-						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.BlockId && block.BlockDefinition.TypeIdString.Contains( item.BlockTypeId ) )
+						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.BlockTypeId
+							&& !string.IsNullOrEmpty( block.BlockDefinition.TypeIdString )
+							&& block.BlockDefinition.TypeIdString.Contains( item.BlockTypeId ) )
 						{
 							if ( blocks.ContainsKey( item ) )
 								blocks[ item ] += 1;
@@ -163,7 +176,7 @@
 							count++;
 						}
 						break;
-					case SettingsBlockEnforcementItem.EnforcementMode.BlockId:
+					case SettingsBlockEnforcementItem.EnforcementMode.BlockTypeId:
 						if ( block.BlockDefinition.TypeIdString.Contains( blockEnforcementSetting.BlockTypeId ) )
 						{
 							blocksToRemove.Add( block );
