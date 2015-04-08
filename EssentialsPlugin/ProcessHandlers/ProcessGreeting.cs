@@ -71,7 +71,7 @@
 						}
 						catch (Exception ex)
 						{
-							Log.Info(string.Format("Failed to get player list: {0}", ex.ToString()));
+							Log.Error( ex );
 						}
 					});
 
