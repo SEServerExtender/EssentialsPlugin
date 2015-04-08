@@ -2,13 +2,13 @@ Dedicated Server Essentials - Plugin
 ====================================
 Requirements
 ------------
-This plugin requires SEServerExtender v1.72.08 or above.  Please download and install that first from https://github.com/dodexahedron/SE-Community-Mod-API/releases. 
+This plugin requires SEServerExtender v1.72.08 or above.  Please download and install that first from https://github.com/SEServerExtender/SEServerExtender/releases. 
 
 This plugin requires a workshop mod.  This mod acts as a gateway between the client and server and is required for some functionality to work (private messaging, faction messaging, command hiding): http://steamcommunity.com/sharedfiles/filedetails/?id=340095691
 
-This plugin is available at github at: https://github.com/dodexahedron/EssentialsPlugin/releases
+This plugin is available at github at: https://github.com/SEServerExtender/EssentialsPlugin/releases
 
-Please post issues you have with the plugin at: https://github.com/dodexahedron/EssentialsPlugin/issues
+Please post issues you have with the plugin at: https://github.com/SEServerExtender/EssentialsPlugin/issues
 
 Overview
 --------
