@@ -45,7 +45,7 @@
 			{
 				MyAPIGateway.Entities.GetEntities( entities );
 			}
-			catch(Exception ex)
+			catch ( Exception ex )
 			{
 				Log.Error( "Entity list busy, skipping scan.", ex );
 			}
@@ -64,21 +64,31 @@
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				Sandbox.ModAPI.Ingame.IMyGridTerminalSystem gridTerminal = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid( grid );
 
-				Dictionary<string, int> blocks = new Dictionary<string, int>( );
+				Dictionary<SettingsBlockEnforcementItem, int> blocks = new Dictionary<SettingsBlockEnforcementItem, int>( );
 				foreach ( Sandbox.ModAPI.Ingame.IMyTerminalBlock myTerminalBlock in gridTerminal.Blocks )
 				{
 					Sandbox.ModAPI.Ingame.IMyTerminalBlock block = myTerminalBlock;
 					foreach ( SettingsBlockEnforcementItem item in PluginSettings.Instance.BlockEnforcementItems )
 					{
-						if ( !item.Enabled )
+						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.Off )
 							continue;
 
-						if ( block.BlockDefinition.TypeId.ToString( ).Contains( item.BlockType ) )
+						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.BlockSubtypeId
+							&& !string.IsNullOrEmpty( block.BlockDefinition.SubtypeId )
+							&& block.BlockDefinition.SubtypeId.Contains( item.BlockTypeId ) )
 						{
-							if ( blocks.ContainsKey( item.BlockType ) )
-								blocks[ item.BlockType ] += 1;
+							if ( blocks.ContainsKey( item ) )
+								blocks[ item ] += 1;
 							else
-								blocks.Add( item.BlockType, 1 );
+								blocks.Add( item, 1 );
+						}
+
+						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.BlockId && block.BlockDefinition.TypeIdString.Contains( item.BlockTypeId ) )
+						{
+							if ( blocks.ContainsKey( item ) )
+								blocks[ item ] += 1;
+							else
+								blocks.Add( item, 1 );
 						}
 					}
 				}
@@ -96,12 +106,12 @@
 						if (!item.Enabled)
 							continue;
 
-						if (block.GetId().ToString().Contains(item.BlockType))
+						if (block.GetId().ToString().Contains(item.BlockTypeId))
 						{
-							if (blocks.ContainsKey(item.BlockType))
-								blocks[item.BlockType] += 1;
+							if (blocks.ContainsKey(item.BlockTypeId))
+								blocks[item.BlockTypeId] += 1;
 							else
-								blocks.Add(item.BlockType, 1);
+								blocks.Add(item.BlockTypeId, 1);
 						}
 					}
 				}
@@ -109,13 +119,13 @@
 
 				foreach ( SettingsBlockEnforcementItem item in PluginSettings.Instance.BlockEnforcementItems )
 				{
-					if ( !item.Enabled )
+					if ( item.Mode== SettingsBlockEnforcementItem.EnforcementMode.Off )
 						continue;
 
-					if ( !blocks.ContainsKey( item.BlockType ) )
+					if ( !blocks.ContainsKey( item ) )
 						continue;
 
-					if ( blocks[ item.BlockType ] > item.MaxPerGrid )
+					if ( blocks[ item ] > item.MaxPerGrid )
 					{
 						//foreach(long playerId in CubeGrids.GetBigOwners(gridBuilder))
 						foreach ( long playerId in grid.BigOwners )
@@ -123,19 +133,19 @@
 							ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerId( playerId );
 							if ( steamId > 0 )
 							{
-								//Communication.SendPrivateInformation(steamId, string.Format("You have exceeded the max block count of {0} on the ship '{1}'.  We are removing {2} blocks to enforce this block limit.", item.BlockType, gridBuilder.DisplayName, blocks[item.BlockType] - item.MaxPerGrid));
-								Communication.SendPrivateInformation( steamId, string.Format( "You have exceeded the max block count of {0} on the ship '{1}'.  We are removing {2} blocks to enforce this block limit.", item.BlockType, grid.DisplayName, blocks[ item.BlockType ] - item.MaxPerGrid ) );
+								//Communication.SendPrivateInformation(steamId, string.Format("You have exceeded the max block count of {0} on the ship '{1}'.  We are removing {2} blocks to enforce this block limit.", item.BlockTypeId, gridBuilder.DisplayName, blocks[item.BlockTypeId] - item.MaxPerGrid));
+								Communication.SendPrivateInformation( steamId, string.Format( "You have exceeded the max block count of {0} on the ship '{1}'.  We are removing {2} blocks to enforce this block limit.", item.BlockTypeId, grid.DisplayName, blocks[ item ] - item.MaxPerGrid ) );
 							}
 						}
 
-						//DeleteReverse(item.BlockType, blocks[item.BlockType] - item.MaxPerGrid, grid, gridBuilder);
-						DeleteReverse( item.BlockType, blocks[ item.BlockType ] - item.MaxPerGrid, grid );
+						//DeleteReverse(item.BlockTypeId, blocks[item.BlockTypeId] - item.MaxPerGrid, grid, gridBuilder);
+						DeleteReverse( item, blocks[ item ] - item.MaxPerGrid, grid );
 					}
 				}
 			}
 		}
 
-		private void DeleteReverse( string id, int remove, IMyCubeGrid grid )
+		private void DeleteReverse( SettingsBlockEnforcementItem blockEnforcementSetting, int remove, IMyCubeGrid grid )
 		{
 			int count = 0;
 			Sandbox.ModAPI.Ingame.IMyGridTerminalSystem gridTerminal = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid( grid );
@@ -144,10 +154,22 @@
 			for ( int r = gridTerminal.Blocks.Count - 1; r >= 0; r-- )
 			{
 				IMyTerminalBlock block = (IMyTerminalBlock)gridTerminal.Blocks[ r ];
-				if ( block.BlockDefinition.TypeId.ToString( ).Contains( id ) )
+				switch ( blockEnforcementSetting.Mode )
 				{
-					blocksToRemove.Add( block );
-					count++;
+					case SettingsBlockEnforcementItem.EnforcementMode.BlockSubtypeId:
+						if ( !string.IsNullOrEmpty( block.BlockDefinition.SubtypeId ) && block.BlockDefinition.SubtypeId.Contains( blockEnforcementSetting.BlockSubtypeId ) )
+						{
+							blocksToRemove.Add( block );
+							count++;
+						}
+						break;
+					case SettingsBlockEnforcementItem.EnforcementMode.BlockId:
+						if ( block.BlockDefinition.TypeIdString.Contains( blockEnforcementSetting.BlockTypeId ) )
+						{
+							blocksToRemove.Add( block );
+							count++;
+						}
+						break;
 				}
 
 				if ( count == remove )

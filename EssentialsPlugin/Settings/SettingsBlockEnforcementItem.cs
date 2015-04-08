@@ -1,40 +1,64 @@
 ﻿namespace EssentialsPlugin.Settings
 {
+	using System;
+
 	public class SettingsBlockEnforcementItem
 	{
-		private bool enabled;
-		public bool Enabled
+		public enum EnforcementMode
 		{
-			get { return enabled; }
-			set { enabled = value; }
+			Off = 0,
+			BlockId = 1,
+			BlockSubtypeId = 2
 		}
 
-		private string blockType;
-		public string BlockType
+		private string _blockTypeId;
+		public string BlockTypeId
 		{
-			get { return blockType; }
-			set { blockType = value; }
+			get { return _blockTypeId; }
+			set { _blockTypeId = value; }
 		}
 
-		private int maxPerGrid;
+		private string _blockSubtypeId;
+
+		public string BlockSubtypeId
+		{
+			get { return _blockSubtypeId; }
+			set { _blockSubtypeId = value; }
+		}
+
+		private int _maxPerGrid;
 		public int MaxPerGrid
 		{
-			get { return maxPerGrid; }
-			set { maxPerGrid = value; }
+			get { return _maxPerGrid; }
+			set { _maxPerGrid = value; }
 		}
 
-		private string maxReachWarning;
+		private string _maxReachWarning;
 		public string MaxReachWarning
 		{
-			get { return maxReachWarning; }
-			set { maxReachWarning = value; }
+			get { return _maxReachWarning; }
+			set { _maxReachWarning = value; }
 		}
 
-		private string maxExceedWarning;
+		private string _maxExceedWarning;
+		private EnforcementMode _mode;
+
 		public string MaxExceedWarning
 		{
-			get { return maxExceedWarning; }
-			set { maxExceedWarning = value; }
+			get { return _maxExceedWarning; }
+			set { _maxExceedWarning = value; }
+		}
+
+		public EnforcementMode Mode
+		{
+			get { return _mode; }
+			set { _mode = value; }
+		}
+
+		public override int GetHashCode( )
+		{
+			return ( string.IsNullOrEmpty( _blockSubtypeId ) ? string.Empty : _blockSubtypeId ).GetHashCode( )
+			       + ( string.IsNullOrEmpty( _blockTypeId ) ? string.Empty : _blockTypeId ).GetHashCode( );
 		}
 	}
 }
