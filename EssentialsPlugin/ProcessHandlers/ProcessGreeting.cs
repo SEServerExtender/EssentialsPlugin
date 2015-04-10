@@ -10,32 +10,32 @@
 
 	class GreetingItem
 	{
-		private DateTime start;
+		private DateTime _start;
 		public DateTime Start
 		{
-			get { return start; }
-			set { start = value; }
+			get { return _start; }
+			set { _start = value; }
 		}
 
-		private ulong steamId;
+		private ulong _steamId;
 		public ulong SteamId
 		{
-			get { return steamId; }
-			set { steamId = value; }
+			get { return _steamId; }
+			set { _steamId = value; }
 		}
 
-		private TimeSpan timeout;
+		private TimeSpan _timeout;
 		public TimeSpan Timeout
 		{
-			get { return timeout; }
-			set { timeout = value; }
+			get { return _timeout; }
+			set { _timeout = value; }
 		}
 
-		private bool isNewUser;
+		private bool _isNewUser;
 		public bool IsNewUser
 		{
-			get { return isNewUser; }
-			set { isNewUser = value; }
+			get { return _isNewUser; }
+			set { _isNewUser = value; }
 		}
 	}
 
@@ -56,11 +56,9 @@
 				if (MyAPIGateway.Players == null)
 					return;
 				
-				int pos = 0;
 				try
 				{
 					List<IMyPlayer> players = new List<IMyPlayer>();
-					pos = 1;
 					bool result = false;
 					Wrapper.GameAction(() =>
 					{
@@ -78,27 +76,22 @@
 					if(!result)
 						return;
 
-					pos = 2;
 					lock (m_greetingList)
 					{
 						for (int r = m_greetingList.Count - 1; r >= 0; r--)
 						{
-							pos = 3;
 							GreetingItem item = m_greetingList[r];
 							if(DateTime.Now - item.Start > item.Timeout)
 							{
 								m_greetingList.RemoveAt(r);
 								continue;
 							}
-							pos = 4;
 							IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == item.SteamId && x.Controller != null && x.Controller.ControlledEntity != null);
-							pos = 5;
 							if (player != null)
 							{
-								pos = 6;
 								m_greetingList.RemoveAt(r);
 
-								string message = "";
+								string message;
 
 								if (item.IsNewUser)
 									message = PluginSettings.Instance.GreetingNewUserMessage.Replace("%name%", player.DisplayName);
@@ -135,14 +128,11 @@
 
 							}
 						}
-
-						pos = 7;
-
 					}
 				}
 				catch (Exception ex)
 				{
-					Log.Info(string.Format("Handle(): Error at pos - {0}: {1}", pos, ex.ToString()));
+					Log.Error( ex );
 				}
 			}
 
@@ -157,12 +147,12 @@
 			item.Start = DateTime.Now;
 			item.IsNewUser = !PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Any();
 
-			Log.Info(string.Format("New User: {0}", remoteUserId));
+			Log.Info( "New User: {0}", remoteUserId );
 
 			lock (m_greetingList)
 			{
 				m_greetingList.Add(item);
-				Log.Info(string.Format("Greeting Added => {0} (New user: {1})", remoteUserId, item.IsNewUser));
+				Log.Info( "Greeting Added => {0} (New user: {1})", remoteUserId, item.IsNewUser );
 			}
 
 			base.OnPlayerJoined(remoteUserId);
@@ -174,7 +164,7 @@
 			{
 				if (m_greetingList.Find(x => x.SteamId == remoteUserId) != null)
 				{
-					Log.Info(string.Format("Greeting Removed => {0}", remoteUserId));
+					Log.Info( "Greeting Removed => {0}", remoteUserId );
 					m_greetingList.RemoveAll(x => x.SteamId == remoteUserId);
 				}
 			}
