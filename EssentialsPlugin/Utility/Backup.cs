@@ -5,21 +5,18 @@ using System.IO.Compression;
 
 namespace EssentialsPlugin.Utility
 {
-	using NLog;
-
 	static class Backup
 	{
-		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		static public void Create(string baseDirectory, bool createSubDirectories, bool backupAsteroids, bool backupSettings = false)
 		{
-			Log.Info( "Creating backup ..." );
+			Essentials.Log.Info( "Creating backup ..." );
 			//string baseDirectory = PluginSettings.Instance.BackupBaseDirectory;
 			if (!Directory.Exists(baseDirectory))
 			{
 				Directory.CreateDirectory(baseDirectory);
 			}
 
-			var savePath = Server.Instance.Config.LoadWorld;
+			string savePath = Server.Instance.Config.LoadWorld;
 
 			string finalDirectory = baseDirectory;
 			//if (PluginSettings.Instance.BackupCreateSubDirectories)
@@ -36,7 +33,7 @@ namespace EssentialsPlugin.Utility
 			if (!Directory.Exists(tempDirectory))
 				Directory.CreateDirectory(tempDirectory);
 
-			File.Copy(savePath + "\\" + "SANDBOX_0_0_0_.sbs", tempDirectory + "\\" + "SANDBOX_0_0_0_.sbs", true);
+			File.Copy(Path.Combine( savePath, "SANDBOX_0_0_0_.sbs" ), Path.Combine( tempDirectory, "SANDBOX_0_0_0_.sbs" ), true);
 			File.Copy(savePath + "\\" + "Sandbox.sbc", tempDirectory + "\\" + "Sandbox.sbc", true);
 
 			//if (PluginSettings.Instance.BackupAsteroids)
@@ -74,7 +71,7 @@ namespace EssentialsPlugin.Utility
 				File.Delete(file);
 			}
 
-			Log.Info(string.Format("Backup created: {0}", finalDirectory + "\\" + string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-hh-mm")) + ".zip"));
+			Essentials.Log.Info( "Backup created: {0}\\" + "Backup-{1}.zip", finalDirectory, DateTime.Now.ToString( "d-M-yyyy-hh-mm" ) );
 		}
 	}
 }
