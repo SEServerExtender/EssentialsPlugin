@@ -4,7 +4,6 @@
 	using System.Collections.Generic;
 	using System.Linq;
 	using EssentialsPlugin.Utility;
-	using NLog;
 	using Sandbox.Common;
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
@@ -13,13 +12,12 @@
 
 	public class TurretManagement
 	{
-		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
-		private static List<IMyEntity> m_scanCache = new List<IMyEntity>( );
-		private static List<IMyIdentity> m_identityCache = new List<IMyIdentity>();
-		private static DateTime m_lastIdentityUpdate = DateTime.Now.AddHours(-1);
-		private static int m_turretsEnabled = 0;
-		private static int m_turretsDisabled = 0;
-		private static int m_turretsToggled = 0;
+		private static List<IMyEntity> _scanCache = new List<IMyEntity>( );
+		private static readonly List<IMyIdentity> IdentityCache = new List<IMyIdentity>();
+		private static DateTime _lastIdentityUpdate = DateTime.Now.AddHours(-1);
+		private static int _turretsEnabled;
+		private static int _turretsDisabled;
+		private static int _turretsToggled;
 
 		public static void CheckAndDisableTurrets()
 		{
@@ -30,9 +28,9 @@
 				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 				MyAPIGateway.Entities.GetEntities(entities);
 				UpdateIdentityCache();
-				m_turretsEnabled = 0;
-				m_turretsDisabled = 0;
-				m_turretsToggled = 0;
+				_turretsEnabled = 0;
+				_turretsDisabled = 0;
+				_turretsToggled = 0;
 				foreach (IMyEntity entity in entities)
 				{
 					if (!(entity is IMyCubeGrid))
@@ -55,20 +53,20 @@
 					});
 				}
 
-				if (m_turretsToggled > 0 || DateTime.Now - start > TimeSpan.FromSeconds(1))
+				if (_turretsToggled > 0 || DateTime.Now - start > TimeSpan.FromSeconds(1))
 				{
-					Log.Info(string.Format("Disable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", m_turretsEnabled, m_turretsDisabled, m_turretsToggled, (DateTime.Now - start).TotalMilliseconds));
+					Essentials.Log.Info( "Disable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", _turretsEnabled, _turretsDisabled, _turretsToggled, (DateTime.Now - start).TotalMilliseconds );
 				}
 			}
-			catch (Exception ex)			
+			catch (Exception ex)
 			{
-				Log.Info(string.Format("CheckAndDisableTurrets(): {0}", ex.ToString()));
+				Essentials.Log.Error( ex );
 			}
 		}
 
 		private static List<IMyEntity> DisableTurretsWithoutTargets(IMyEntity entity)
 		{
-			m_scanCache.Clear();
+			_scanCache.Clear();
 
 			List<IMyEntity> turretList = new List<IMyEntity>();
 			if (!(entity is IMyCubeGrid))
@@ -92,9 +90,9 @@
 					bool state = FunctionalBlockEntity.GetState(turret);
 
 					if (state)
-						m_turretsEnabled++;
+						_turretsEnabled++;
 					else
-						m_turretsDisabled++;
+						_turretsDisabled++;
 
 					if (state)// && !ignore)
 					{
@@ -120,7 +118,7 @@
 							}
 						}
 						
-						m_turretsToggled++;
+						_turretsToggled++;
 						turretList.Add(turret);
 					}
 				}
@@ -139,9 +137,9 @@
 				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 				MyAPIGateway.Entities.GetEntities(entities);
 				UpdateIdentityCache();
-				m_turretsEnabled = 0;
-				m_turretsDisabled = 0;
-				m_turretsToggled = 0;
+				_turretsEnabled = 0;
+				_turretsDisabled = 0;
+				_turretsToggled = 0;
 				foreach (IMyEntity entity in entities)
 				{
 					if (!(entity is IMyCubeGrid))
@@ -164,14 +162,14 @@
 					});
 				}
 
-				if (m_turretsToggled > 0 || DateTime.Now - start > TimeSpan.FromSeconds(1))
+				if (_turretsToggled > 0 || DateTime.Now - start > TimeSpan.FromSeconds(1))
 				{
-					Log.Info(string.Format("Enable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", m_turretsEnabled, m_turretsDisabled, m_turretsToggled, (DateTime.Now - start).TotalMilliseconds));
+					Essentials.Log.Info( "Enable: {0} turrets enabled.  {1} turrets diabled.  {2} turrets toggled. ({3} ms)", _turretsEnabled, _turretsDisabled, _turretsToggled, (DateTime.Now - start).TotalMilliseconds );
 				}
 			}
 			catch (Exception ex)
 			{
-				Log.Info(string.Format("CheckAndDisableTurrets(): {0}", ex.ToString()));
+				Essentials.Log.Error( ex );
 			}
 		}
 
@@ -184,7 +182,7 @@
 
 			IMyCubeGrid grid = (IMyCubeGrid)entity;
 			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
-			m_scanCache.Clear();
+			_scanCache.Clear();
 			grid.GetBlocks(blocks);
 			//bool enable = false;
 			//bool ignore = false;
@@ -201,9 +199,9 @@
 					bool state = FunctionalBlockEntity.GetState(turret);
 
 					if (state)
-						m_turretsEnabled++;
+						_turretsEnabled++;
 					else
-						m_turretsDisabled++;
+						_turretsDisabled++;
 
 					if (!state) // && !ignore)
 					{
@@ -218,7 +216,7 @@
 						}
 
 //						Console.WriteLine("Enabling");
-						///enable = true;
+						//enable = true;
 						
 						if (PluginSettings.Instance.DynamicTurretAllowExemption)
 						{
@@ -229,7 +227,7 @@
 							}
 						}
 						
-						m_turretsToggled++;
+						_turretsToggled++;
 						turretList.Add(turret);
 					}
 				}
@@ -240,10 +238,10 @@
 
 		private static bool DoesGridHaveTarget(IMyCubeGrid grid, IMySlimBlock block, bool disabling = false)
 		{
-			if (m_scanCache.Count < 1)
+			if (_scanCache.Count < 1)
 			{
 				BoundingSphereD sphere = new BoundingSphereD(grid.GetPosition(), PluginSettings.Instance.DynamicTurretTargetDistance);
-				m_scanCache = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
+				_scanCache = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
 			}
 			/*
 			HashSet<IMyEntity> testEntities = new HashSet<IMyEntity>();
@@ -257,9 +255,9 @@
 			}
 			*/
 			//bool found = false;
-			foreach (IMyEntity testEntity in m_scanCache)
+			foreach (IMyEntity testEntity in _scanCache)
 			{
-				if ((IMyEntity)grid == testEntity)
+				if (grid == testEntity)
 					continue;
 
 				if (!testEntity.InScene)
@@ -273,7 +271,7 @@
 					if (cubeBlock.OwnerId == 0)
 						continue;
 
-					if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner)
+					if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.AllButOwner)
 					{
 						if (block.FatBlock.GetUserRelationToOwner(cubeBlock.OwnerId) != Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Owner)
 						{
@@ -282,7 +280,7 @@
 						}
 					}
 
-					if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.NeutralAndEnemy)
+					if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.NeutralAndEnemy)
 					{
 						if (block.FatBlock.GetUserRelationToOwner(cubeBlock.OwnerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies ||
 							block.FatBlock.GetUserRelationToOwner(cubeBlock.OwnerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Neutral)
@@ -292,7 +290,7 @@
 						}
 					}
 
-					if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.Enemy)
+					if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.Enemy)
 					{
 						if (block.FatBlock.GetUserRelationToOwner(cubeBlock.OwnerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies)
 						{
@@ -305,7 +303,7 @@
 
 				if (testEntity is IMyCubeGrid)
 				{
-					if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.All)
+					if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.All)
 						return true;
 
 					IMyCubeGrid testGrid = (IMyCubeGrid)testEntity;
@@ -321,7 +319,7 @@
 
 					foreach (long owner in testGrid.BigOwners)
 					{
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner)
+						if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.AllButOwner)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(owner) != MyRelationsBetweenPlayerAndBlock.Owner)
 							{
@@ -330,7 +328,7 @@
 							}
 						}
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.NeutralAndEnemy)
+						if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.NeutralAndEnemy)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(owner) == MyRelationsBetweenPlayerAndBlock.Enemies ||
 								block.FatBlock.GetUserRelationToOwner(owner) == MyRelationsBetweenPlayerAndBlock.Neutral)
@@ -340,7 +338,7 @@
 							}
 						}
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.Enemy)
+						if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.Enemy)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(owner) == MyRelationsBetweenPlayerAndBlock.Enemies)
 							{
@@ -354,7 +352,7 @@
 
 					foreach (long owner in testGrid.SmallOwners)
 					{
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner)
+						if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.AllButOwner)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(owner) != MyRelationsBetweenPlayerAndBlock.Owner)
 							{
@@ -363,7 +361,7 @@
 							}
 						}
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.NeutralAndEnemy)
+						if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.NeutralAndEnemy)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(owner) == MyRelationsBetweenPlayerAndBlock.Enemies ||
 								block.FatBlock.GetUserRelationToOwner(owner) == MyRelationsBetweenPlayerAndBlock.Neutral)
@@ -373,7 +371,7 @@
 							}
 						}
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.Enemy)
+						if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.Enemy)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(owner) == MyRelationsBetweenPlayerAndBlock.Enemies)
 							{
@@ -385,7 +383,7 @@
 				}
 				else
 				{
-					if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.All)
+					if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.All)
 						return true;
 
 					if(testEntity is IMyCharacter)
@@ -393,11 +391,11 @@
 //					if (builderBase is MyObjectBuilder_Character)
 					{
 						IMyPlayer player = null;
-						IMyIdentity identity = null;
+						IMyIdentity identity;
 						long playerId = 0;
 						try
 						{
-							identity = m_identityCache.FirstOrDefault(x => x.DisplayName == testEntity.DisplayName);
+							identity = IdentityCache.FirstOrDefault(x => x.DisplayName == testEntity.DisplayName);
 							//List<IMyPlayer> players = new List<IMyPlayer>();
 							//MyAPIGateway.Players.GetPlayers(players);							
 							//player = players.FirstOrDefault(x => x.DisplayName == testEntity.DisplayName);
@@ -437,13 +435,13 @@
 						if (player != null)
 							playerId = player.PlayerID;
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.AllButOwner && block.FatBlock.GetUserRelationToOwner(playerId) != MyRelationsBetweenPlayerAndBlock.Owner)
+						if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.AllButOwner && block.FatBlock.GetUserRelationToOwner(playerId) != MyRelationsBetweenPlayerAndBlock.Owner)
 						{
 							//Console.WriteLine("Character: Not Owner: {0} - {1}", block.FatBlock.OwnerId, playerId);
 							return true;
 						}
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.NeutralAndEnemy)
+						if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.NeutralAndEnemy)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(playerId) == MyRelationsBetweenPlayerAndBlock.Enemies ||
 								block.FatBlock.GetUserRelationToOwner(playerId) == MyRelationsBetweenPlayerAndBlock.Neutral)
@@ -453,7 +451,7 @@
 							}
 						}
 
-						if (PluginSettings.Instance.DynamicTurretManagementType == DynamicTurretManagementTypes.Enemy)
+						if (PluginSettings.Instance.DynamicTurretManagementMode == DynamicTurretManagementMode.Enemy)
 						{
 							if (block.FatBlock.GetUserRelationToOwner(playerId) == MyRelationsBetweenPlayerAndBlock.Enemies)
 							{
@@ -470,11 +468,11 @@
 
 		private static void UpdateIdentityCache()
 		{
-			if(DateTime.Now - m_lastIdentityUpdate > TimeSpan.FromMinutes(1))
+			if(DateTime.Now - _lastIdentityUpdate > TimeSpan.FromMinutes(1))
 			{
-				m_lastIdentityUpdate = DateTime.Now;
-				m_identityCache.Clear();
-				MyAPIGateway.Players.GetAllIdentites(m_identityCache);
+				_lastIdentityUpdate = DateTime.Now;
+				IdentityCache.Clear();
+				MyAPIGateway.Players.GetAllIdentites(IdentityCache);
 			}
 		}
 

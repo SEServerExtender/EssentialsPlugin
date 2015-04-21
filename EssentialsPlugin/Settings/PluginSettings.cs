@@ -84,7 +84,7 @@ namespace EssentialsPlugin
 		private int m_dynamicTurretTargetDistance;
 		private bool m_dynamicTurretAllowExemption;
 		private bool _dynamicBlockManagementEnabled;
-		private DynamicTurretManagementTypes m_dynamicTurretManagementType;
+		private DynamicTurretManagementMode _mDynamicTurretManagementMode;
 		
 		private bool m_dynamicConcealServerOnly;
 		private bool m_dynamicClientConcealEnabled;
@@ -627,13 +627,13 @@ namespace EssentialsPlugin
 			}
 		}
 
-		public DynamicTurretManagementTypes DynamicTurretManagementType
+		public DynamicTurretManagementMode DynamicTurretManagementMode
 		{
-			get { return m_dynamicTurretManagementType; }
+			get { return _mDynamicTurretManagementMode; }
 			set 
 			{ 
-				m_dynamicTurretManagementType = value;
-				//m_dynamicTurretManagementType = DynamicTurretManagementTypes.All;
+				_mDynamicTurretManagementMode = value;
+				//_mDynamicTurretManagementMode = DynamicTurretManagementMode.All;
 				Save();
 			}
 		}
@@ -1206,7 +1206,7 @@ namespace EssentialsPlugin
 		Origin
 	}
 
-	public enum DynamicTurretManagementTypes
+	public enum DynamicTurretManagementMode
 	{
 		All,
 		AllButOwner,
