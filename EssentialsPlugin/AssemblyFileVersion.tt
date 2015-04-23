@@ -29,5 +29,5 @@
 
 using System.Reflection;
 
-[assembly: AssemblyFileVersion("1.11.2.<#= revisionNumber #>")]
-[assembly: AssemblyVersion("1.11.2.<#= revisionNumber #>")]
+[assembly: AssemblyFileVersion("1.12.0.<#= revisionNumber #>")]
+[assembly: AssemblyVersion("1.12.0.<#= revisionNumber #>")]

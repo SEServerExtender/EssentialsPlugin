@@ -13,7 +13,6 @@ using Sandbox.Common.ObjectBuilders;
 using Sandbox.Common.ObjectBuilders.Definitions;
 
 using VRageMath;
-using VRage.Common.Utils;
 
 using SEModAPIInternal.API.Entity;
 using SEModAPIInternal.API.Entity.Sector.SectorObject;
@@ -21,18 +20,15 @@ using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
 using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
 
 using SEModAPIInternal.API.Common;
-using SEModAPIInternal.Support;
 
 using EssentialsPlugin.UtilityClasses;
 
 namespace EssentialsPlugin.Utility
 {
-	using NLog;
-	using VRage.Library.Utils;
+	using VRage.FileSystem;
 
 	public static class Player
 	{
-		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		public static MyObjectBuilder_Character FindCharacter( string userName )
 		{
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
@@ -147,7 +143,7 @@ namespace EssentialsPlugin.Utility
 			MyObjectBuilder_Character charEntity = FindCharacter(userName);
 			if(charEntity == null)
 			{
-				Log.Info(string.Format("Unable to find CharacterEntity of '{0}'", userName));
+				Essentials.Log.Info(string.Format("Unable to find CharacterEntity of '{0}'", userName));
 				return false;
 			}
 
@@ -187,7 +183,7 @@ namespace EssentialsPlugin.Utility
 
 			if (gridEntity.IsLoading)
 			{
-				Log.Info(string.Format("Failed to load cockpit entity: {0}", gridEntity.EntityId));
+				Essentials.Log.Info( "Failed to load cockpit entity: {0}", gridEntity.EntityId );
 				return false;
 			}
 
@@ -264,9 +260,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Log.Info( "Failed to invoke entity method '{0}' on type '{1}': {2}", methodName, gameEntity.GetType().FullName, ex.Message );
-
-				Log.Error(ex);
+				Essentials.Log.Error( ex );
 				return null;
 			}
 		}
@@ -299,9 +293,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Log.Info("Failed to get entity method '" + methodName + "': " + ex.Message);
-
-				Log.Error(ex);
+				Essentials.Log.Error(ex);
 				return null;
 			}
 		}
@@ -337,9 +329,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Log.Info( "Failed to get entity method '{0}': {1}", methodName, ex.Message );
-
-				Log.Error(ex);
+				Essentials.Log.Error(ex);
 				return null;
 			}
 		}
@@ -384,7 +374,6 @@ namespace EssentialsPlugin.Utility
 
 	public class Players
 	{
-		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		private static volatile bool m_checking = false;
 		private static Players m_instance;
 		public static Players Instance
@@ -432,7 +421,7 @@ namespace EssentialsPlugin.Utility
 			catch (Exception ex)
 			{
 				m_instance = new Players();
-				Log.Error( ex );
+				Essentials.Log.Error( ex );
 			}
 		}
 
@@ -459,7 +448,7 @@ namespace EssentialsPlugin.Utility
 			}
 			catch (Exception ex)
 			{
-				Log.Error( "Error saving player logins: {0}", ex );
+				Essentials.Log.Error( "Error saving player logins: {0}", ex );
 			}
 		}
 
@@ -580,7 +569,7 @@ namespace EssentialsPlugin.Utility
 					string[] files = Directory.GetFiles(logPath, "SpaceEngineersDedicated_*.log");
 					List<PlayerItem> playerItems = new List<PlayerItem>();
 
-					Log.Info(string.Format("Checking {0} log files for logins", files.Length));
+					Essentials.Log.Info("Checking {0} log files for logins", files.Length);
 					DateTime start = DateTime.Now;
 					Parallel.ForEach(files, currentFile =>
 					{
@@ -604,7 +593,7 @@ namespace EssentialsPlugin.Utility
 					});
 
 					Instance.UpdatePlayers(playerItems);
-					Log.Info( "Completed checking logs in {0}s: {2} ({1}) steamIds", (DateTime.Now - start).TotalSeconds, playerItems.Count, Instance.PlayerLogins.Count );
+					Essentials.Log.Info( "Completed checking logs in {0}s: {2} ({1}) steamIds", (DateTime.Now - start).TotalSeconds, playerItems.Count, Instance.PlayerLogins.Count );
 				}));
 			}
 			finally

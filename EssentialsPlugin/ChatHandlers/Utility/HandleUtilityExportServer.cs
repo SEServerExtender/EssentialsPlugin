@@ -15,6 +15,7 @@ using SEModAPIInternal.API.Common;
 
 namespace EssentialsPlugin.ChatHandlers
 {
+	using VRage.FileSystem;
 	using VRage.Library.Utils;
 
 	public class HandleUtilityExportServer : ChatHandlerBase

@@ -5,7 +5,6 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using VRage.Common.Utils;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -16,8 +15,7 @@ using EssentialsPlugin.GameModes;
 
 namespace EssentialsPlugin
 {
-	using NLog;
-	using VRage.Library.Utils;
+	using VRage.FileSystem;
 
 	[Serializable]
 	public class PluginSettings
