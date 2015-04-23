@@ -43,9 +43,7 @@
 			if (!PluginSettings.Instance.WaypointsEnabled)
 				return false;
 
-			string[] splits = General.SplitString(string.Join(" ", words));
-
-			if (splits.Count() != 1)
+			if (words.Count() != 1)
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());
 				return true;
@@ -61,39 +59,29 @@
 			}
 
 			List<WaypointItem> items = Waypoints.Instance.Get((ulong)faction.FactionId);
-			WaypointItem item = items.FirstOrDefault(x => x.Name.ToLower() == splits[0].ToLower());
+			WaypointItem item = items.FirstOrDefault(x => x.Name.ToLower() == words[0].ToLower());
 			if (item == null)
 			{
-				Communication.SendPrivateInformation(userId, string.Format("You do not have a faction waypoint with the name: {0}", splits[0]));
+				Communication.SendPrivateInformation(userId, string.Format("You do not have a faction waypoint with the name: {0}", words[0]));
 				return true;
 			}
 
 			if (item.Leader && !faction.IsLeader(playerId))
 			{
-				Communication.SendPrivateInformation(userId, string.Format("You must be a faction leader to remove the waypoint: {0}", splits[0]));
+				Communication.SendPrivateInformation(userId, string.Format("You must be a faction leader to remove the waypoint: {0}", words[0]));
 				return true;
 			}
 
-			Waypoints.Instance.Remove((ulong)faction.FactionId, splits[0]);
-
-			string remove = "";
-			foreach (string split in splits)
-			{
-				if (remove == "")
-					remove += split.ToLower();
-				else
-					remove += " " + split;
-			}
-
+			Waypoints.Instance.Remove((ulong)faction.FactionId, words[0]);
 			foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
 			{
 				if (Player.CheckPlayerSameFaction(userId, steamId))
 				{
-					Communication.SendClientMessage(steamId, string.Format("/waypoint remove {0}", remove));
+					Communication.SendClientMessage(steamId, string.Format("/waypoint remove '{0}'", words[0]));
 				}
 			}
 
-			Communication.SendFactionClientMessage(userId, string.Format("/message Server {0} has removed the waypoint: {1}", playerName, remove));
+			Communication.SendFactionClientMessage(userId, string.Format("/message Server {0} has removed the waypoint: '{1}'", playerName, words[0]));
 			return true;
 		}
 	}

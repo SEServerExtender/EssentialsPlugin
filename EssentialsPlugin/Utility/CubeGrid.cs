@@ -479,10 +479,8 @@ namespace EssentialsPlugin.Utility
 			return entitiesFound;
 		}
 
-		public static HashSet<IMyEntity> ScanGrids( ulong userId, string[ ] wordsOld )
+		public static HashSet<IMyEntity> ScanGrids( ulong userId, string[ ] words )
 		{
-			string line = string.Join( " ", wordsOld );
-			string[ ] words = General.SplitString( line );
 			Dictionary<string, string> options = new Dictionary<string, string>( );
 
 			// 0 - ignore 1 - no 2 - yes

@@ -38,26 +38,24 @@
 		{
 			if (!PluginSettings.Instance.WaypointsEnabled)
 				return false;
-			
-			string[] splits = General.SplitString(string.Join(" ", words));
 
-			if (splits.Length > 0 && !Waypoints.Instance.GroupExists(userId, splits[0]))
+			if (words.Length > 0 && !Waypoints.Instance.GroupExists(userId, words[0]))
 			{
-				Communication.SendPrivateInformation(userId, string.Format("Group '{0}' does not exist.  You can only toggle a valid group", splits[0]));
+				Communication.SendPrivateInformation(userId, string.Format("Group '{0}' does not exist.  You can only toggle a valid group", words[0]));
 				return true;
 			}
 
-			if (splits.Length < 1)
+			if (words.Length < 1)
 				Waypoints.Instance.Toggle(userId);
 			else
-				Waypoints.Instance.Toggle(userId, splits[0]);
+				Waypoints.Instance.Toggle(userId, words[0]);
 
 			Waypoints.SendClientWaypoints(userId);
 
-			if (splits.Length < 1)
+			if (words.Length < 1)
 				Communication.SendPrivateInformation(userId, string.Format("Toggled all waypoints"));
 			else
-				Communication.SendPrivateInformation(userId, string.Format("Toggled waypoint group '{0}'", splits[0]));
+				Communication.SendPrivateInformation(userId, string.Format("Toggled waypoint group '{0}'", words[0]));
 
 			return true;
 		}

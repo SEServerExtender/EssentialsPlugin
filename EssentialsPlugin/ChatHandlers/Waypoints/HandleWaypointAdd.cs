@@ -42,12 +42,9 @@
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
 			if (!PluginSettings.Instance.WaypointsEnabled)
-				if (!PluginSettings.Instance.WaypointsEnabled)
 				return false;
-			
-			string[] splits = General.SplitString(string.Join(" ", words));
 
-			if (splits.Length != 6 && splits.Length != 7 && splits.Length != 5 && splits.Length != 1)
+			if (words.Length != 1 && words.Length != 5 && words.Length != 6 && words.Length != 7)
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());
 				return true;
@@ -60,7 +57,7 @@
 				return true;
 			}
 
-			if (splits.Length == 1)
+			if (words.Length == 1)
 			{
 				long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(userId);
 				IMyEntity playerEntity = Player.FindControlledEntity(playerId);
@@ -71,9 +68,9 @@
 				}
 
 				Vector3D pos = playerEntity.GetPosition();
-				string name = splits[0];
+				string name = words[0];
 
-				Communication.SendClientMessage(userId, string.Format("/waypoint add \"{0}\" \"{0}\" Neutral {1} {2} {3}", name, Math.Floor(pos.X), Math.Floor(pos.Y), Math.Floor(pos.Z)));
+				Communication.SendClientMessage(userId, string.Format("/waypoint add '{0}' '{0}' Neutral {1} {2} {3}", name, Math.Floor(pos.X), Math.Floor(pos.Y), Math.Floor(pos.Z)));
 
 				WaypointItem item = new WaypointItem();
 				item.SteamId = userId;
@@ -83,53 +80,53 @@
 				item.WaypointType = WaypointTypes.Neutral;
 				Waypoints.Instance.Add(item);
 
-				Communication.SendPrivateInformation(userId, string.Format("Waypoint added: {0} at {1}", item.Name, General.Vector3DToString(item.Position)));
+				Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
 			}
 			else
 			{
 				int len = 5;
-				if (splits.Length > 5)
+				if (words.Length > 5)
 					len = 6;
 
 				for (int r = len - 3; r < len; r++)
 				{
 					double test = 0d;
-					if (!double.TryParse(splits[r], out test))
+					if (!double.TryParse(words[r], out test))
 					{
-						Communication.SendPrivateInformation(userId, string.Format("Invalid position information: {0} is invalid", splits[r]));
+						Communication.SendPrivateInformation(userId, string.Format("Invalid position information: {0} is invalid", words[r]));
 						return true;
 					}
 				}
 
 				string add = "";
-				foreach (string split in splits)
+				foreach (string word in words)
 				{
 					if (add == "")
-						add += split.ToLower();
+						add += word.ToLower();
 					else
-						add += " " + split;
+						add += " " + word;
 				}
 
 				Communication.SendClientMessage(userId, string.Format("/waypoint add {0}", add));
 
 				string group = "";
-				if (splits.Length == 7)
-					group = splits[7];
+				if (words.Length == 7)
+					group = words[7];
 
 				WaypointItem item = new WaypointItem();
 				item.SteamId = userId;
-				item.Name = splits[0];
+				item.Name = words[0];
 
-				int diff = splits.Length > 5 ? 1 : 0;
-				item.Text = splits[diff];
+				int diff = words.Length > 5 ? 1 : 0;
+				item.Text = words[diff];
 				WaypointTypes type = WaypointTypes.Neutral;
-				Enum.TryParse<WaypointTypes>(splits[diff + 1], true, out type);
+				Enum.TryParse<WaypointTypes>(words[diff + 1], true, out type);
 				item.WaypointType = type;
-				item.Position = new Vector3D(double.Parse(splits[diff + 2]), double.Parse(splits[diff + 3]), double.Parse(splits[diff + 4]));
+				item.Position = new Vector3D(double.Parse(words[diff + 2]), double.Parse(words[diff + 3]), double.Parse(words[diff + 4]));
 				item.Group = group;
 				Waypoints.Instance.Add(item);
 
-				Communication.SendPrivateInformation(userId, string.Format("Waypoint added: {0} at {1}", item.Name, General.Vector3DToString(item.Position)));
+				Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
 			}
 			return true;
 		}

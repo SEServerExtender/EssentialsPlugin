@@ -38,14 +38,13 @@ namespace EssentialsPlugin.ChatHandlers
 
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			string[] splits = General.SplitString(string.Join(" ", words));
-			if (splits.Count() != 1)
+			if (words.Count() != 1)
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());
 				return true;
 			}
 
-			string userName = splits[0];
+			string userName = words[0];
 			ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerName(userName, true);
 			if (steamId == 0)
 			{
