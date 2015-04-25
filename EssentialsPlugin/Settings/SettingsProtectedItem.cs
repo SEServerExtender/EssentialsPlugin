@@ -18,15 +18,5 @@ namespace EssentialsPlugin.Settings
 			get { return entityId; }
 			set { entityId = value; }
 		}
-
-		private int integrityIncrease;
-		public int IntegrityIncrease
-		{
-			get { return integrityIncrease; }
-			set 
-			{
-				integrityIncrease = Math.Max(value, 1);
-			}
-		}
 	}
 }
