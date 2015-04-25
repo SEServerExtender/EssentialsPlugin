@@ -35,7 +35,7 @@
 					}
 					catch
 					{
-						Log.Info(string.Format("StopRunaway(): Entities busy, skipping"));
+						Essentials.Log.Info( string.Format( "StopRunaway(): Entities busy, skipping" ) );
 						return;
 					}
 
@@ -70,12 +70,12 @@
 								                   {
 									                   grid.Physics.LinearVelocity = Vector3.Zero;
 									                   grid.Physics.AngularVelocity = Vector3.Zero;
-									                   Log.Info(string.Format("Stopping runaway spawnship: {0}", grid.EntityId));
+													   Essentials.Log.Info( "Stopping runaway spawnship: {0}", grid.EntityId );
 								                   }
 							                   }
 							                   catch (Exception ex)
 							                   {
-								                   Log.Info(string.Format("Error stopping spawnship: {0}", ex));
+												   Essentials.Log.Error( "Error stopping spawnship: {0}", ex );
 							                   }
 						                   });
 					}

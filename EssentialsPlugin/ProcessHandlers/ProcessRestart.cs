@@ -105,7 +105,7 @@
 
 		private void StopAllShips()
 		{
-			Log.Info("Stopping all ships");
+			Essentials.Log.Info("Stopping all ships");
 			int shipsStopped = 0;
 
 			Wrapper.GameAction(() =>
@@ -129,7 +129,7 @@
 				}
 			});
 
-			Log.Info(string.Format("{0} ships have been stopped", shipsStopped));
+			Essentials.Log.Info( "{0} ships have been stopped", shipsStopped );
 		}
 
 		private void SetRestartTime()
@@ -184,14 +184,14 @@
 
 				if (!are.WaitOne(120000))
 				{
-					Log.Info("Server unresponsive for 60 seconds, restarting in 5 seconds.");
+					Essentials.Log.Info("Server unresponsive for 60 seconds, restarting in 5 seconds.");
 					Thread.Sleep(5000);
 					DoRestart();
 					return;
 				}
 
 				if((DateTime.Now - start).TotalMilliseconds > 10000)
-					Log.Info(string.Format("Warning: Server Response Time: {0}ms", (DateTime.Now - start).TotalMilliseconds));
+					Essentials.Log.Info(string.Format("Warning: Server Response Time: {0}ms", (DateTime.Now - start).TotalMilliseconds));
 			});
 		}
 	}

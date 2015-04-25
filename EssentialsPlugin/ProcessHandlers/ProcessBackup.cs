@@ -67,7 +67,7 @@
 					FileInfo info = new FileInfo(file);
 					if(DateTime.Now - info.CreationTime >= TimeSpan.FromDays(PluginSettings.Instance.BackupCleanupTime))
 					{
-						Log.Info("Removed old backup: {0}", file);
+						Essentials.Log.Info( "Removed old backup: {0}", file );
 						File.Delete(file);
 						Directory.Delete(path);
 						break;
@@ -80,7 +80,7 @@
 				FileInfo info = new FileInfo(file);
 				if (DateTime.Now - info.CreationTime >= TimeSpan.FromDays(PluginSettings.Instance.BackupCleanupTime))
 				{
-					Log.Info("Removed old backup: {0}", file);
+					Essentials.Log.Info( "Removed old backup: {0}", file );
 					File.Delete(file);
 					continue;
 				}

@@ -69,7 +69,7 @@
 			EntityManagement.CheckAndRevealEntities();
 			m_lastRevealCheck = DateTime.Now;
 
-			Log.Info( "Check Reveal due to: {0}", remoteUserId );
+			Essentials.Log.Info( "Check Reveal due to: {0}", remoteUserId );
 
 			base.OnPlayerWorldSent(remoteUserId);
 		}

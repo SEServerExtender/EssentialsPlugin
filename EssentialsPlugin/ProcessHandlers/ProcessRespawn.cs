@@ -41,7 +41,7 @@
 						if (character.Health < 1 && !m_deathTracker.ContainsKey(entity.EntityId))
 						{
 							m_deathTracker.Add(entity.EntityId, DateTime.Now);
-							Log.Info(string.Format("Found a dead character"));
+							Essentials.Log.Info( "Found a dead character" );
 						}
 						else if (character.Health < 1 && m_deathTracker.ContainsKey(entity.EntityId) && !m_respawnShown.Contains(entity.EntityId) && (DateTime.Now - m_deathTracker[entity.EntityId]).TotalSeconds > 3)
 						{

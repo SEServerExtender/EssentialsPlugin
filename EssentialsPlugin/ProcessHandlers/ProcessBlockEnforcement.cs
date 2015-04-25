@@ -26,12 +26,12 @@
 				{
 					ScanForBlockItems( );
 					if ( ( DateTime.Now - start ).TotalMilliseconds > 2000 )
-						Log.Info( "Block Enforce Scan Time Elapsed: {0}ms", ( DateTime.Now - start ).TotalMilliseconds );
+						Essentials.Log.Info( "Block Enforce Scan Time Elapsed: {0}ms", ( DateTime.Now - start ).TotalMilliseconds );
 				}
 			}
 			catch ( Exception ex )
 			{
-				Log.Error( ex );
+				Essentials.Log.Error( ex );
 			}
 
 			base.Handle( );
@@ -47,7 +47,7 @@
 			}
 			catch ( Exception ex )
 			{
-				Log.Error( "Entity list busy, skipping scan.", ex );
+				Essentials.Log.Error( "Entity list busy, skipping scan.", ex );
 			}
 
 			foreach ( IMyEntity entity in entities )
@@ -75,12 +75,12 @@
 
 						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.BlockTypeId && string.IsNullOrEmpty( item.BlockTypeId ) )
 						{
-							Log.Warn( "Block Enforcement item for \"{0}\" is set to mode BlockTypeId but does not have BlockTypeId set." );
+							Essentials.Log.Warn( "Block Enforcement item for \"{0}\" is set to mode BlockTypeId but does not have BlockTypeId set." );
 							continue;
 						}
 						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.BlockSubtypeId && string.IsNullOrEmpty( item.BlockSubtypeId ) )
 						{
-							Log.Warn( "Block Enforcement item for \"{0}\" is set to mode BlockSubtypeId but does not have BlockSubtypeId set." );
+							Essentials.Log.Warn( "Block Enforcement item for \"{0}\" is set to mode BlockSubtypeId but does not have BlockSubtypeId set." );
 							continue;
 						}
 

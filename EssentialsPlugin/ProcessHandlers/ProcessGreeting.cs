@@ -69,7 +69,7 @@
 						}
 						catch (Exception ex)
 						{
-							Log.Error( ex );
+							Essentials.Log.Error( ex );
 						}
 					});
 
@@ -132,7 +132,7 @@
 				}
 				catch (Exception ex)
 				{
-					Log.Error( ex );
+					Essentials.Log.Error( ex );
 				}
 			}
 
@@ -147,12 +147,12 @@
 			item.Start = DateTime.Now;
 			item.IsNewUser = !PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Any();
 
-			Log.Info( "New User: {0}", remoteUserId );
+			Essentials.Log.Info( "New User: {0}", remoteUserId );
 
 			lock (m_greetingList)
 			{
 				m_greetingList.Add(item);
-				Log.Info( "Greeting Added => {0} (New user: {1})", remoteUserId, item.IsNewUser );
+				Essentials.Log.Info( "Greeting Added => {0} (New user: {1})", remoteUserId, item.IsNewUser );
 			}
 
 			base.OnPlayerJoined(remoteUserId);
@@ -164,7 +164,7 @@
 			{
 				if (m_greetingList.Find(x => x.SteamId == remoteUserId) != null)
 				{
-					Log.Info( "Greeting Removed => {0}", remoteUserId );
+					Essentials.Log.Info( "Greeting Removed => {0}", remoteUserId );
 					m_greetingList.RemoveAll(x => x.SteamId == remoteUserId);
 				}
 			}

@@ -92,7 +92,7 @@
 			}
 			catch(Exception ex)			
 			{
-				Log.Info(string.Format("CheckPlayerInDockingZone(): {0}", ex.ToString()));
+				Essentials.Log.Error( ex );
 				return;
 			}
 			

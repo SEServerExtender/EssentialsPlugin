@@ -48,7 +48,7 @@
 			}
 			catch
 			{
-				Log.Info(string.Format("ProcessCommunication: Problem getting entities, skipping update"));
+				Essentials.Log.Error( "ProcessCommunication: Problem getting entities, skipping update" );
 			}
 
 			if (!result)
@@ -65,7 +65,7 @@
 				}
 				catch(Exception ex)
 				{
-					Log.Info(string.Format("ExtractCommandFromEntity Error: {0}", ex.ToString()));
+					Essentials.Log.Error( ex );
 				}
 			}
 
@@ -89,7 +89,7 @@
 			if (gridBuilder == null)
 				return;
 			
-			string command = "";
+			string command = string.Empty;
 			foreach(MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
 			{
 				MyObjectBuilder_Beacon beacon = block as MyObjectBuilder_Beacon;
@@ -100,17 +100,17 @@
 				}
 			}
 
-			string player = entity.DisplayName.Replace("CommRelay", "");
+			string player = entity.DisplayName.Replace("CommRelay", string.Empty);
 			long playerId = long.Parse(player);
 			ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerId(playerId);
 
 			Wrapper.GameAction(() =>
 			{
-				entity.DisplayName = "";
+				entity.DisplayName = string.Empty;
 				BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
 			});
 
-			Log.Info(string.Format("COMMAND {1} - {2}: {0}", command, playerId, entity.EntityId));
+			Essentials.Log.Info( "COMMAND {1} - {2}: {0}", command, playerId, entity.EntityId );
 			if (!m_processedRelays.Contains(entity.EntityId))
 			{
 				m_processedRelays.Add(entity.EntityId);
@@ -118,7 +118,7 @@
 			}
 			else
 			{
-				Log.Info(string.Format("Ignoring repeat beacon: {0}", entity.EntityId));
+				Essentials.Log.Info( "Ignoring repeat beacon: {0}" );
 			}
 		}
 

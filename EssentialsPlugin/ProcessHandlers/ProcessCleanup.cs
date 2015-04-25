@@ -43,7 +43,7 @@
 			}
 			catch ( OverflowException ex )
 			{
-				Log.Info( string.Format( "ProcessCleanup.Handle(): {0}", ex ) );
+				Essentials.Log.Error( ex );
 			}
 
 			base.Handle( );

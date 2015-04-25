@@ -44,7 +44,7 @@
 				}
 				catch (Exception ex)
 				{
-					Log.Info(string.Format("Waypoints(): Unable to get player list: {0}", ex.ToString()));
+					Essentials.Log.Error( ex.ToString );
 				}
 			});
 
@@ -60,7 +60,7 @@
 					IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == steamId && x.Controller != null && x.Controller.ControlledEntity != null);
 					if (player != null)
 					{
-						Log.Info("Player in game, creating waypoints");
+						Essentials.Log.Info( "Player in game, creating waypoints" );
 						m_waypointAdd.Remove(steamId);
 
 						// Add defaults

@@ -1,13 +1,11 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
 	using System;
-	using NLog;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Entity.Sector.SectorObject;
 
 	public abstract class ProcessHandlerBase
 	{
-		protected static readonly Logger Log = Essentials.Log;
 		protected DateTime m_lastUpdate;
 		public DateTime LastUpdate
 		{
