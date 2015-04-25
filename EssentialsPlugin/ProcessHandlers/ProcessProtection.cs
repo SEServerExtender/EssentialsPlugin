@@ -1,88 +1,88 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
 	using System.Collections.Generic;
-	using System.Threading;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject;
 
 	public class ProcessProtection : ProcessHandlerBase
 	{
-		public ProcessProtection()
+		public ProcessProtection( )
 		{
 		}
 
-		public override int GetUpdateResolution()
+		public override int GetUpdateResolution( )
 		{
 			return 1000;
 		}
 
-		public override void Handle()
+		public override void Handle( )
 		{
-			if (!PluginSettings.Instance.ProtectedEnabled)
+			if ( !PluginSettings.Instance.ProtectedEnabled )
 				return;
 
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-			Wrapper.GameAction(() =>
+			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
+			Wrapper.GameAction( ( ) =>
 			{
-				MyAPIGateway.Entities.GetEntities(entities);
-			});
+				MyAPIGateway.Entities.GetEntities( entities );
+			} );
 
-			foreach(IMyEntity entity in entities)
+			foreach ( IMyEntity entity in entities )
 			{
-				if (!(entity is IMyCubeGrid))
+				if ( !( entity is IMyCubeGrid ) )
 					continue;
 
-				foreach(ProtectedItem item in PluginSettings.Instance.ProtectedItems)
+				foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
 				{
-					if (!item.Enabled)
+					if ( !item.Enabled )
 						continue;
 
-					if (entity.EntityId == item.EntityId)
+					if ( entity.EntityId == item.EntityId )
 					{
-						ProtectedEntity(entity, item);
+						ProtectedEntity( entity );
 					}
 				}
 			}
 
-			base.Handle();
+			base.Handle( );
 		}
 
-		private void ProtectedEntity(IMyEntity entity, ProtectedItem item)
+		private static void ProtectedEntity( IMyEntity entity )
 		{
-			//Log.Info(string.Format("Protecting: {0}", entity.EntityId));
-			//CubeGridEntity gridEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
-			CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(entity.EntityId);
-			MyObjectBuilder_CubeGrid grid = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder();
+			if ( !entity.InScene )
+				return;
+			Essentials.Log.Info( "Protecting: {0}", entity.EntityId );
+			IMyCubeGrid cubeGridEntity = entity as IMyCubeGrid;
+			if ( cubeGridEntity == null )
+				return;
 
-			int count = 0;
-			while (gridEntity.IsLoading)
-			{
-				if (count >= 20)
-					return;
-
-				Thread.Sleep(100);
-				count++;
-			}
-
+			List<IMySlimBlock> blocks = new List<IMySlimBlock>( );
+			cubeGridEntity.GetBlocks( blocks, block => true );
 			bool found = false;
-			/*
-			foreach(CubeBlockEntity block in gridEntity.CubeBlocks)
+			foreach ( IMySlimBlock block in blocks )
 			{
-				if (block.IntegrityPercent != item.IntegrityIncrease || block.BuildPercent != item.IntegrityIncrease || block.BoneDamage > 0f)
+				MyObjectBuilder_CubeBlock objectBuilderCubeBlock = block.GetObjectBuilder( );
+				if ( objectBuilderCubeBlock.BuildPercent < 1f )
 				{
 					found = true;
-					block.FixBones(0, 100);
-					block.IntegrityPercent = item.IntegrityIncrease;
-					block.BuildPercent = item.IntegrityIncrease;
+					objectBuilderCubeBlock.BuildPercent = 1f;
 				}
+				if ( objectBuilderCubeBlock.IntegrityPercent < 1f )
+				{
+					found = true;
+					objectBuilderCubeBlock.IntegrityPercent = 1f;
+				}
+				if ( objectBuilderCubeBlock.DeformationRatio > 0f )
+				{
+					found = true;
+					objectBuilderCubeBlock.DeformationRatio = 0;
+				}
+
 			}
-			*/
-			if(found)
-     			Log.Info(string.Format("Repaired Grid: {0}", gridEntity.EntityId));
+
+			if ( found )
+				Essentials.Log.Info( "Repaired Grid: {0}", entity.EntityId );
 		}
 	}
 }
