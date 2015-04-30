@@ -228,6 +228,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Release\SEModAPIInternal.dll</HintPath>
     </Reference>
+    <Reference Include="SpaceEngineers.Game, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SEServerExtender\GameLibraries\SpaceEngineers.Game.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
