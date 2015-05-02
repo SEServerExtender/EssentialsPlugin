@@ -6,7 +6,6 @@
 	using System.Threading;
 	using EssentialsPlugin.ProcessHandlers;
 	using EssentialsPlugin.Utility;
-	using NLog;
 	using Sandbox.Common;
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
@@ -444,7 +443,7 @@
 						IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
 						if ( newEntity == null )
 						{
-							Essentials.Log.Error( "Issue - CreateFromObjectBuilder failed: {0}", builder.EntityId );
+							Essentials.Log.Warn( "CreateFromObjectBuilder failed: {0}", builder.EntityId );
 							return;
 						}
 
@@ -788,7 +787,7 @@
 					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
 					if ( newEntity == null )
 					{
-						Essentials.Log.Warn( "CreateFromObjectBuilder failed: {0}", newEntity.EntityId );
+						Essentials.Log.Warn( "CreateFromObjectBuilder failed: {0}", builder.EntityId );
 						return;
 					}
 					
@@ -886,7 +885,7 @@
 					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
 					if (newEntity == null)
 					{
-						Essentials.Log.Info( "Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId );
+						Essentials.Log.Warn( "CreateFromObjectBuilder failed: {0}", builder.EntityId );
 						continue;
 					}
 
@@ -925,7 +924,7 @@
 				}
 				catch
 				{
-					Essentials.Log.Info("CheckAndConcealEntities(): Error getting entity list, skipping check");
+					Essentials.Log.Info( "Error getting entity list, skipping check" );
 					return false;
 				}
 
@@ -999,7 +998,7 @@
 			}
 			catch (Exception ex)
 			{
-				Essentials.Log.Info(string.Format("CheckAndConceal(): {0}", ex.ToString()));
+				Essentials.Log.Error( ex );
 			}
 			finally
 			{
