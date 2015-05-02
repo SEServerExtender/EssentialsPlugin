@@ -450,12 +450,14 @@
 						RemovedGrids.Add( entity.EntityId );
 						BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
 						MyAPIGateway.Entities.AddEntity( newEntity, false );
-						Essentials.Log.Info( "Concealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId );
+						if ( PluginSettings.Instance.DynamicShowMessages )
+							Essentials.Log.Info( "Concealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId );
 					}
 					else
 					{
 						entity.InScene = false;
-						Essentials.Log.Info( "Concealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId );
+						if ( PluginSettings.Instance.DynamicShowMessages )
+							Essentials.Log.Info( "Concealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId );
 					}
 				}
 			}
