@@ -784,6 +784,11 @@
 				if ( !PluginSettings.Instance.DynamicConcealServerOnly )
 				{
 					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
+					if ( newEntity == null )
+					{
+						Essentials.Log.Warn( "Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId );
+						return;
+					}
 					Essentials.Log.Info( "Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}",
 					                     entity.EntityId,
 					                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
@@ -791,11 +796,6 @@
 					                     ownerName,
 					                     newEntity.EntityId,
 					                     reason );
-					if ( newEntity == null )
-					{
-						Essentials.Log.Info( "Conceal", string.Format( "Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId ) );
-						return;
-					}
 
 					RemovedGrids.Add( entity.EntityId );
 					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
