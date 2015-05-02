@@ -129,7 +129,7 @@
     <Compile Include="ControlForm.Designer.cs">
       <DependentUpon>ControlForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core.cs" />
+    <Compile Include="Essentials.cs" />
     <Compile Include="EntityManagers\BlockManagement.cs" />
     <Compile Include="EntityManagers\TurretManagement.cs" />
     <Compile Include="GameModes\Conquest.cs" />
