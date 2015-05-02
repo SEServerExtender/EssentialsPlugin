@@ -21,88 +21,88 @@ namespace EssentialsPlugin
 	public class PluginSettings
 	{
 		#region Private Fields
-		private static PluginSettings m_instance;
-		private static bool m_loading = false;
-		private static DateTime m_start;
+		private static PluginSettings _instance;
+		private static bool _loading = false;
+		private static DateTime _start;
 
-		private string m_serverName;
-		private bool m_serverUtilityGridsShowCoords;
-		private bool m_serverRespawnMenuOverride;
+		private string _serverName;
+		private bool _serverUtilityGridsShowCoords;
+		private bool _serverRespawnMenuOverride;
 
-		private bool m_informationEnabled;
-		private MTObservableCollection<InformationItem> m_informationItems;
+		private bool _informationEnabled;
+		private MTObservableCollection<InformationItem> _informationItems;
 
-		private bool m_greetingEnabled;
-		private string m_greetingMessage;
-		private bool m_greetingPublic;
-		private SettingsGreetingDialogItem m_greetingItem;
-		private string m_greetingNewUserMessage;
-		private SettingsGreetingDialogItem m_greetingNewUserItem;
+		private bool _greetingEnabled;
+		private string _greetingMessage;
+		private bool _greetingPublic;
+		private SettingsGreetingDialogItem _greetingItem;
+		private string _greetingNewUserMessage;
+		private SettingsGreetingDialogItem _greetingNewUserItem;
 
-		private bool m_restartEnabled;
-		private MTObservableCollection<RestartNotificationItem> m_restartNotificationItems;
-		private MTObservableCollection<RestartTimeItem> m_restartTimeItems;
-		private string m_restartAddedProcesses;
-		private bool m_restartWhenUnresponsive;
+		private bool _restartEnabled;
+		private MTObservableCollection<RestartNotificationItem> _restartNotificationItems;
+		private MTObservableCollection<RestartTimeItem> _restartTimeItems;
+		private string _restartAddedProcesses;
+		private bool _restartWhenUnresponsive;
 
-		private bool m_backupEnabled;
-		private MTObservableCollection<BackupItem> m_backupItems;
-		private bool m_backupCreateSubDirectories;
-		private string m_backupBaseDirectory;
-		private bool m_backupCleanup;
-		private int m_backupCleanupTime;
-		private bool m_backupAsteroids;
-		private bool m_backupEssentials;
+		private bool _backupEnabled;
+		private MTObservableCollection<BackupItem> _backupItems;
+		private bool _backupCreateSubDirectories;
+		private string _backupBaseDirectory;
+		private bool _backupCleanup;
+		private int _backupCleanupTime;
+		private bool _backupAsteroids;
+		private bool _backupEssentials;
 
-		private bool m_newUserTransportEnabled;
-		private int m_newUserTransportDistance;
-		private bool m_newUserTransportMoveAllSpawnShips;
-		private int m_newUserTransportAsteroidDistance;
-		private NewUserTransportSpawnPoint m_newUserTransportSpawnType;
-		private string[] m_NewUserTransportSpawnShipNames = { };
-		private bool m_newUserTransportStopRunawaySpawnShips;
+		private bool _newUserTransportEnabled;
+		private int _newUserTransportDistance;
+		private bool _newUserTransportMoveAllSpawnShips;
+		private int _newUserTransportAsteroidDistance;
+		private NewUserTransportSpawnPoint _newUserTransportSpawnType;
+		private string[] _newUserTransportSpawnShipNames = { };
+		private bool _newUserTransportStopRunawaySpawnShips;
 
-		private bool m_loginEnabled;
-		private string[] m_loginEntityWhitelist = { };
-		private string[] m_loginPlayerIdWhitelist = { };
+		private bool _loginEnabled;
+		private string[] _loginEntityWhitelist = { };
+		private string[] _loginPlayerIdWhitelist = { };
 
-		private bool m_protectedEnabled;
-		private MTObservableCollection<ProtectedItem> m_protectedItems;
+		private bool _protectedEnabled;
+		private MTObservableCollection<ProtectedItem> _protectedItems;
 
-		private bool m_dockingEnabled;
-		private int m_dockingShipsPerZone;
+		private bool _dockingEnabled;
+		private int _dockingShipsPerZone;
 
-		private bool m_dynamicConcealEnabled;
-		private float m_dynamicConcealDistance;
-		private bool m_dynamicConcealIncludeLargeGrids;
-		private string[] m_dynamicConcealIgnoreSubTypeList = { };
-		private bool m_dynamicConcealIncludeMedBays;
-		private bool m_dynamicShowMessages;
-		private bool m_dynamicTurretManagementEnabled;
-		private int m_dynamicTurretTargetDistance;
-		private bool m_dynamicTurretAllowExemption;
+		private bool _dynamicConcealEnabled;
+		private float _dynamicConcealDistance;
+		private bool _dynamicConcealIncludeLargeGrids;
+		private string[] _dynamicConcealIgnoreSubTypeList = { };
+		private bool _dynamicConcealIncludeMedBays;
+		private bool _dynamicShowMessages;
+		private bool _dynamicTurretManagementEnabled;
+		private int _dynamicTurretTargetDistance;
+		private bool _dynamicTurretAllowExemption;
 		private bool _dynamicBlockManagementEnabled;
 		private DynamicTurretManagementMode _mDynamicTurretManagementMode;
 		
-		private bool m_dynamicConcealServerOnly;
-		private bool m_dynamicClientConcealEnabled;
-		private float m_dynamicClientConcealDistance;
+		private bool _dynamicConcealServerOnly;
+		private bool _dynamicClientConcealEnabled;
+		private float _dynamicClientConcealDistance;
 
-		private bool m_waypointsEnabled;
-		private int m_waypointsMaxPerPlayer;
-		private MTObservableCollection<ServerWaypointItem> m_waypointServerItems;
-		private MTObservableCollection<ServerWaypointItem> m_waypointDefaultItems;
-		private int m_waypointsMaxPerFaction;
+		private bool _waypointsEnabled;
+		private int _waypointsMaxPerPlayer;
+		private MTObservableCollection<ServerWaypointItem> _waypointServerItems;
+		private MTObservableCollection<ServerWaypointItem> _waypointDefaultItems;
+		private int _waypointsMaxPerFaction;
 
-		private bool m_cleanupEnabled;
-		private MTObservableCollection<SettingsCleanupTriggerItem> m_cleanupTriggerItems;
-		private MTObservableCollection<SettingsCleanupTimedItem> m_cleanupTimedItems;
-		private MTObservableCollection<SettingsCleanupNotificationItem> m_cleanupNotificationItems;
+		private bool _cleanupEnabled;
+		private MTObservableCollection<SettingsCleanupTriggerItem> _cleanupTriggerItems;
+		private MTObservableCollection<SettingsCleanupTimedItem> _cleanupTimedItems;
+		private MTObservableCollection<SettingsCleanupNotificationItem> _cleanupNotificationItems;
 
-		private bool m_blockEnforcementEnabled;
-		private MTObservableCollection<SettingsBlockEnforcementItem> m_blockEnforcementItems;
+		private bool _blockEnforcementEnabled;
+		private MTObservableCollection<SettingsBlockEnforcementItem> _blockEnforcementItems;
 
-		private bool m_gameModeConquestEnabled;
+		private bool _gameModeConquestEnabled;
 		#endregion
 
 		#region Static Properties
@@ -110,13 +110,13 @@ namespace EssentialsPlugin
 		{
 			get
 			{
-				return m_start;
+				return _start;
 			}
 		}
 
 		public static PluginSettings Instance
 		{
-			get { return m_instance ?? ( m_instance = new PluginSettings( ) ); }
+			get { return _instance ?? ( _instance = new PluginSettings( ) ); }
 		}
 		#endregion
 
@@ -125,30 +125,30 @@ namespace EssentialsPlugin
 		// General
 		public string ServerName
 		{
-			get { return m_serverName; }
+			get { return _serverName; }
 			set
 			{
-				m_serverName = value;
+				_serverName = value;
 				Save();
 			}
 		}
 
 		public bool ServerUtilityGridsShowCoords
 		{
-			get { return m_serverUtilityGridsShowCoords; }
+			get { return _serverUtilityGridsShowCoords; }
 			set 
 			{ 
-				m_serverUtilityGridsShowCoords = value;
+				_serverUtilityGridsShowCoords = value;
 				Save();
 			}
 		}
 
 		public bool ServerRespawnMenuOverride
 		{
-			get { return m_serverRespawnMenuOverride; }
+			get { return _serverRespawnMenuOverride; }
 			set 
 			{ 
-				m_serverRespawnMenuOverride = value;
+				_serverRespawnMenuOverride = value;
 				Save();
 			}
 		}
@@ -156,63 +156,63 @@ namespace EssentialsPlugin
 		// Information
 		public bool InformationEnabled
 		{
-			get { return m_informationEnabled; }
+			get { return _informationEnabled; }
 			set 
 			{ 
-				m_informationEnabled = value;
+				_informationEnabled = value;
 				Save();
 			}
 		}
 
 		public MTObservableCollection<InformationItem> InformationItems
 		{
-			get { return m_informationItems; }
+			get { return _informationItems; }
 		}
 
 		// Automated Restarts
 		public bool RestartEnabled
 		{
-			get { return m_restartEnabled; }
+			get { return _restartEnabled; }
 			set 
 			{
-				m_restartEnabled = value;
+				_restartEnabled = value;
 				Save();
 
-				if (m_restartEnabled && !m_loading)
+				if (_restartEnabled && !_loading)
 					Communication.SendPublicInformation("[NOTICE]: Automatic restarts have been enabled by the Administrator.  You will be notified in advance before a restart occurs.");
-				else if(!m_loading)
+				else if(!_loading)
 					Communication.SendPublicInformation("[NOTICE]: Automatic restarts have been disabled by the Administrator.");
 			}
 		}
 
 		public MTObservableCollection<RestartNotificationItem> RestartNotificationItems
 		{
-			get { return m_restartNotificationItems; }
-			set { m_restartNotificationItems = value; }
+			get { return _restartNotificationItems; }
+			set { _restartNotificationItems = value; }
 		}
 
 		public MTObservableCollection<RestartTimeItem> RestartTimeItems
 		{
-			get { return m_restartTimeItems; }
-			set { m_restartTimeItems = value; }
+			get { return _restartTimeItems; }
+			set { _restartTimeItems = value; }
 		}
 
 		public string RestartAddedProcesses
 		{
-			get { return m_restartAddedProcesses; }
+			get { return _restartAddedProcesses; }
 			set 
 			{ 
-				m_restartAddedProcesses = value;
+				_restartAddedProcesses = value;
 				Save();
 			}
 		}
 
 		public bool RestartWhenUnresponsive
 		{
-			get { return m_restartWhenUnresponsive; }
+			get { return _restartWhenUnresponsive; }
 			set 
 			{ 
-				m_restartWhenUnresponsive = value;
+				_restartWhenUnresponsive = value;
 				Save();
 			}
 		}
@@ -220,62 +220,62 @@ namespace EssentialsPlugin
 		// Greetings
 		public bool GreetingEnabled
 		{
-			get { return m_greetingEnabled; }
+			get { return _greetingEnabled; }
 			set 
 			{ 
-				m_greetingEnabled = value;
+				_greetingEnabled = value;
 				Save();
 			}
 		}
 
 		public string GreetingMessage
 		{
-			get { return m_greetingMessage; }
+			get { return _greetingMessage; }
 			set 
 			{ 
-				m_greetingMessage = value;
+				_greetingMessage = value;
 				Save();
 			}
 		}
 
 		public bool GreetingPublic
 		{
-			get { return m_greetingPublic; }
+			get { return _greetingPublic; }
 			set 
 			{ 
-				m_greetingPublic = value;
+				_greetingPublic = value;
 				Save();
 			}
 		}
 
 		public SettingsGreetingDialogItem GreetingItem
 		{
-			get { return m_greetingItem; }
+			get { return _greetingItem; }
 			set
 			{
-				m_greetingItem = value;
-				m_greetingItem.PropertyChanged += OnPropertyChanged;
+				_greetingItem = value;
+				_greetingItem.PropertyChanged += OnPropertyChanged;
 				Save();
 			}
 		}
 
 		public string GreetingNewUserMessage
 		{
-			get { return m_greetingNewUserMessage; }
+			get { return _greetingNewUserMessage; }
 			set
 			{
-				m_greetingNewUserMessage = value;
+				_greetingNewUserMessage = value;
 				Save();
 			}
 		}
 
 		public SettingsGreetingDialogItem GreetingNewUserItem
 		{
-			get { return m_greetingNewUserItem; }
+			get { return _greetingNewUserItem; }
 			set
 			{
-				m_greetingNewUserItem = value;
-				m_greetingNewUserItem.PropertyChanged += OnPropertyChanged; 
+				_greetingNewUserItem = value;
+				_greetingNewUserItem.PropertyChanged += OnPropertyChanged; 
 				Save();
 			}
 		}
@@ -283,41 +283,41 @@ namespace EssentialsPlugin
 		// Automated Backups
 		public bool BackupEnabled
 		{
-			get { return m_backupEnabled; }
+			get { return _backupEnabled; }
 			set 
 			{ 
-				m_backupEnabled = value;
+				_backupEnabled = value;
 				Save();
 			}
 		}
 
 		public MTObservableCollection<BackupItem> BackupItems
 		{
-			get { return m_backupItems; }
+			get { return _backupItems; }
 			set 
 			{ 
-				m_backupItems = value;
+				_backupItems = value;
 			}
 		}
 
 		public bool BackupCreateSubDirectories
 		{
-			get { return m_backupCreateSubDirectories; }
+			get { return _backupCreateSubDirectories; }
 			set 
 			{ 
-				m_backupCreateSubDirectories = value;
+				_backupCreateSubDirectories = value;
 				Save();
 			}
 		}
 
 		public string BackupBaseDirectory
 		{
-			get { return m_backupBaseDirectory; }
+			get { return _backupBaseDirectory; }
 			set
 			{
-				m_backupBaseDirectory = value;
-				if (m_backupBaseDirectory == "")
-					m_backupBaseDirectory = MyFileSystem.UserDataPath + "\\Backup";
+				_backupBaseDirectory = value;
+				if (_backupBaseDirectory == "")
+					_backupBaseDirectory = MyFileSystem.UserDataPath + "\\Backup";
 
 				Save();
 			}
@@ -325,121 +325,121 @@ namespace EssentialsPlugin
 
 		public bool BackupCleanup
 		{
-			get { return m_backupCleanup; }
+			get { return _backupCleanup; }
 			set
 			{
-				m_backupCleanup = value; 
+				_backupCleanup = value; 
 				Save();
 			}
 		}
 
 		public int BackupCleanupTime
 		{
-			get { return m_backupCleanupTime; }
+			get { return _backupCleanupTime; }
 			set
 			{
-				m_backupCleanupTime = value; 
+				_backupCleanupTime = value; 
 				Save();
 			}		
 		}
 
 		public bool BackupAsteroids
 		{
-			get { return m_backupAsteroids; }
+			get { return _backupAsteroids; }
 			set
 			{
-				m_backupAsteroids = value;
+				_backupAsteroids = value;
 				Save();
 			}
 		}
 
 		public bool BackupEssentials
 		{
-			get { return m_backupEssentials; }
+			get { return _backupEssentials; }
 			set 
 			{ 
-				m_backupEssentials = value;
+				_backupEssentials = value;
 				Save();
 			}
 		}
 
 		public bool NewUserTransportEnabled
 		{
-			get { return m_newUserTransportEnabled; }
+			get { return _newUserTransportEnabled; }
 			set
 			{
-				m_newUserTransportEnabled = value;
+				_newUserTransportEnabled = value;
 				Save();
 			}
 		}
 
 		public int NewUserTransportDistance
 		{
-			get { return m_newUserTransportDistance; }
+			get { return _newUserTransportDistance; }
 			set
 			{
-				m_newUserTransportDistance = Math.Max(500, value);
+				_newUserTransportDistance = Math.Max(500, value);
 				Save(); 
 			}
 		}
 
 		public int NewUserTransportAsteroidDistance
 		{
-			get { return m_newUserTransportAsteroidDistance; }
+			get { return _newUserTransportAsteroidDistance; }
 			set 
 			{
-				m_newUserTransportAsteroidDistance = value;
+				_newUserTransportAsteroidDistance = value;
 				Save();
 			}
 		}
 
 		public bool NewUserTransportMoveAllSpawnShips
 		{
-			get { return m_newUserTransportMoveAllSpawnShips; }
+			get { return _newUserTransportMoveAllSpawnShips; }
 			set 
 			{
-				m_newUserTransportMoveAllSpawnShips = value;
+				_newUserTransportMoveAllSpawnShips = value;
 				Save();
 			}
 		}
 
 		public NewUserTransportSpawnPoint NewUserTransportSpawnType
 		{
-			get { return m_newUserTransportSpawnType; }
+			get { return _newUserTransportSpawnType; }
 			set
 			{
-				m_newUserTransportSpawnType = value;
+				_newUserTransportSpawnType = value;
 				Save();
 			}
 		}
 
 		public string[] NewUserTransportSpawnShipNames
 		{
-			get { return m_NewUserTransportSpawnShipNames; }
+			get { return _newUserTransportSpawnShipNames; }
 			set 
 			{ 
-				m_NewUserTransportSpawnShipNames = value;
+				_newUserTransportSpawnShipNames = value;
 				Save();
 			}
 		}
 
 		public bool NewUserTransportStopRunawaySpawnShips
 		{
-			get { return m_newUserTransportStopRunawaySpawnShips; }
+			get { return _newUserTransportStopRunawaySpawnShips; }
 			set
 			{ 
-				m_newUserTransportStopRunawaySpawnShips = value;
+				_newUserTransportStopRunawaySpawnShips = value;
 				Save();
 			}
 		}
 
 		public bool LoginEnabled
 		{
-			get { return m_loginEnabled; }
+			get { return _loginEnabled; }
 			set 
 			{ 
-				m_loginEnabled = value;
-				if (value && !m_loading)
+				_loginEnabled = value;
+				if (value && !_loading)
 				{
 					if (!Players.Instance.PlayerLogins.Any())
 						Players.ProcessServerLogsForLogins(true);
@@ -450,177 +450,177 @@ namespace EssentialsPlugin
 
 		public string[] LoginEntityWhitelist
 		{
-			get { return m_loginEntityWhitelist; }
+			get { return _loginEntityWhitelist; }
 			set
 			{
-				m_loginEntityWhitelist = value; 
+				_loginEntityWhitelist = value; 
 				Save();
 			}
 		}
 
 		public string[] LoginPlayerIdWhitelist
 		{
-			get { return m_loginPlayerIdWhitelist; }
+			get { return _loginPlayerIdWhitelist; }
 			set
 			{
-				m_loginPlayerIdWhitelist = value; 
+				_loginPlayerIdWhitelist = value; 
 				Save();
 			}
 		}
 
 		public bool ProtectedEnabled
 		{
-			get { return m_protectedEnabled; }
+			get { return _protectedEnabled; }
 			set
 			{
-				m_protectedEnabled = value;
+				_protectedEnabled = value;
 				Save();
 			}
 		}
 
 		public MTObservableCollection<ProtectedItem> ProtectedItems
 		{
-			get { return m_protectedItems; }
-			set { m_protectedItems = value; }
+			get { return _protectedItems; }
+			set { _protectedItems = value; }
 		}
 
 
 		public bool DockingEnabled
 		{
-			get { return m_dockingEnabled; }
+			get { return _dockingEnabled; }
 			set 
 			{ 
-				m_dockingEnabled = value;
+				_dockingEnabled = value;
 				Save();
 			}
 		}
 
 		public int DockingShipsPerZone
 		{
-			get { return m_dockingShipsPerZone; }
+			get { return _dockingShipsPerZone; }
 			set 
 			{ 
-				m_dockingShipsPerZone = value;
+				_dockingShipsPerZone = value;
 				Save();
 			}
 		}
 
 		public bool DynamicConcealEnabled
 		{
-			get { return m_dynamicConcealEnabled; }
+			get { return _dynamicConcealEnabled; }
 			set
 			{
-				m_dynamicConcealEnabled = value;
+				_dynamicConcealEnabled = value;
 				Save();
 			}
 		}
 
 		public float DynamicConcealDistance
 		{
-			get { return m_dynamicConcealDistance; }
+			get { return _dynamicConcealDistance; }
 			set
 			{
-				m_dynamicConcealDistance = value;
+				_dynamicConcealDistance = value;
 				Save();
 			}
 		}
 
 		public bool ConcealIncludeLargeGrids
 		{
-			get { return m_dynamicConcealIncludeLargeGrids; }
+			get { return _dynamicConcealIncludeLargeGrids; }
 			set 
 			{ 
-				m_dynamicConcealIncludeLargeGrids = value;
+				_dynamicConcealIncludeLargeGrids = value;
 				Save();
 			}
 		}
 
 		public string[] DynamicConcealIgnoreSubTypeList
 		{
-			get { return m_dynamicConcealIgnoreSubTypeList; }
+			get { return _dynamicConcealIgnoreSubTypeList; }
 			set 
 			{ 
-				m_dynamicConcealIgnoreSubTypeList = value;
+				_dynamicConcealIgnoreSubTypeList = value;
 				Save();
 			}
 		}
 
 		public bool DynamicConcealIncludeMedBays
 		{
-			get { return m_dynamicConcealIncludeMedBays; }
+			get { return _dynamicConcealIncludeMedBays; }
 			set 
 			{ 
-				m_dynamicConcealIncludeMedBays = value;
+				_dynamicConcealIncludeMedBays = value;
 				Save();
 			}
 		}
 
 		public bool DynamicConcealServerOnly
 		{
-			get { return m_dynamicConcealServerOnly; }
+			get { return _dynamicConcealServerOnly; }
 			set 
 			{ 
-				m_dynamicConcealServerOnly = value;
+				_dynamicConcealServerOnly = value;
 				Save();
 			}
 		}
 
 		public bool DynamicClientConcealEnabled
 		{
-			get { return m_dynamicClientConcealEnabled; }
+			get { return _dynamicClientConcealEnabled; }
 			set 
 			{ 
-				m_dynamicClientConcealEnabled = value;
+				_dynamicClientConcealEnabled = value;
 				Save();
 			}
 		}
 
 		public float DynamicClientConcealDistance
 		{
-			get { return m_dynamicClientConcealDistance; }
+			get { return _dynamicClientConcealDistance; }
 			set 
 			{ 
-				m_dynamicClientConcealDistance = value;
+				_dynamicClientConcealDistance = value;
 				Save();
 			}
 		}
 		
 		public bool DynamicShowMessages
 		{
-			get { return m_dynamicShowMessages; }
+			get { return _dynamicShowMessages; }
 			set 
 			{ 
-				m_dynamicShowMessages = value;
+				_dynamicShowMessages = value;
 				Save();
 			}
 		}
 
 		public int DynamicTurretTargetDistance
 		{
-			get { return m_dynamicTurretTargetDistance; }
+			get { return _dynamicTurretTargetDistance; }
 			set 
 			{ 
-				m_dynamicTurretTargetDistance = value;
+				_dynamicTurretTargetDistance = value;
 				Save();
 			}
 		}
 
 		public bool DynamicTurretManagmentEnabled
 		{
-			get { return m_dynamicTurretManagementEnabled; }
+			get { return _dynamicTurretManagementEnabled; }
 			set 
 			{
-				m_dynamicTurretManagementEnabled = value;
+				_dynamicTurretManagementEnabled = value;
 				Save();
 			}
 		}
 
 		public bool DynamicTurretAllowExemption
 		{
-			get { return m_dynamicTurretAllowExemption; }
+			get { return _dynamicTurretAllowExemption; }
 			set 
 			{ 
-				m_dynamicTurretAllowExemption = value;
+				_dynamicTurretAllowExemption = value;
 				Save();
 			}
 		}
@@ -648,10 +648,10 @@ namespace EssentialsPlugin
 
 		public bool WaypointsEnabled
 		{
-			get { return m_waypointsEnabled; }
+			get { return _waypointsEnabled; }
 			set
 			{
-				m_waypointsEnabled = value;
+				_waypointsEnabled = value;
 				Save();
 			}
 		}
@@ -659,97 +659,97 @@ namespace EssentialsPlugin
 
 		public int WaypointsMaxPerPlayer
 		{
-			get { return m_waypointsMaxPerPlayer; }
+			get { return _waypointsMaxPerPlayer; }
 			set
 			{
-				m_waypointsMaxPerPlayer = value;
+				_waypointsMaxPerPlayer = value;
 				Save();
 			}
 		}
 
 		public MTObservableCollection<ServerWaypointItem> WaypointServerItems
 		{
-			get { return m_waypointServerItems; }
-			set { m_waypointServerItems = value; }
+			get { return _waypointServerItems; }
+			set { _waypointServerItems = value; }
 		}
 
 		public MTObservableCollection<ServerWaypointItem> WaypointDefaultItems
 		{
-			get { return m_waypointDefaultItems; }
-			set { m_waypointDefaultItems = value; }
+			get { return _waypointDefaultItems; }
+			set { _waypointDefaultItems = value; }
 		}
 
 		public int WaypointsMaxPerFaction
 		{
-			get { return m_waypointsMaxPerFaction; }
+			get { return _waypointsMaxPerFaction; }
 			set 
 			{ 
-				m_waypointsMaxPerFaction = value;
+				_waypointsMaxPerFaction = value;
 				Save();
 			}
 		}
 
 		public bool CleanupEnabled
 		{
-			get { return m_cleanupEnabled; }
+			get { return _cleanupEnabled; }
 			set 
 			{ 
-				m_cleanupEnabled = value;
+				_cleanupEnabled = value;
 				Save();
 			}
 		}
 
 		public MTObservableCollection<SettingsCleanupTriggerItem> CleanupTriggerItems
 		{
-			get { return m_cleanupTriggerItems; }
+			get { return _cleanupTriggerItems; }
 			set 
 			{
-				m_cleanupTriggerItems = value;
+				_cleanupTriggerItems = value;
 				Save();
 			}
 		}
 
 		public MTObservableCollection<SettingsCleanupTimedItem> CleanupTimedItems
 		{
-			get { return m_cleanupTimedItems; }
+			get { return _cleanupTimedItems; }
 			set 
 			{ 
-				m_cleanupTimedItems = value;
+				_cleanupTimedItems = value;
 				Save();
 			}
 		}
 
 		public MTObservableCollection<SettingsCleanupNotificationItem> CleanupNotificationItems
 		{
-			get { return m_cleanupNotificationItems; }
+			get { return _cleanupNotificationItems; }
 			set 
 			{ 
-				m_cleanupNotificationItems = value;
+				_cleanupNotificationItems = value;
 				Save();
 			}
 		}
 
 		public bool BlockEnforcementEnabled
 		{
-			get { return m_blockEnforcementEnabled; }
+			get { return _blockEnforcementEnabled; }
 			set 
 			{ 
-				m_blockEnforcementEnabled = value;
+				_blockEnforcementEnabled = value;
 				Save();
 			}
 		}
 
 		public MTObservableCollection<SettingsBlockEnforcementItem> BlockEnforcementItems
 		{
-			get { return m_blockEnforcementItems; }
+			get { return _blockEnforcementItems; }
 		}
 
 		public bool GameModeConquestEnabled
 		{
-			get { return m_gameModeConquestEnabled; }
+			get { return _gameModeConquestEnabled; }
 			set 
 			{ 
-				m_gameModeConquestEnabled = value;
+				_gameModeConquestEnabled = value;
 				Save();
 
 				if (value)
@@ -766,51 +766,51 @@ namespace EssentialsPlugin
 		public PluginSettings()
 		{
 			// Default is 12 hours
-			m_start = DateTime.Now;
-			m_newUserTransportDistance = 500;
-			m_backupAsteroids = true;
+			_start = DateTime.Now;
+			_newUserTransportDistance = 500;
+			_backupAsteroids = true;
 
-			m_greetingItem = new SettingsGreetingDialogItem();
-			m_greetingItem.PropertyChanged += OnPropertyChanged;
-			m_greetingNewUserItem = new SettingsGreetingDialogItem();
-			m_greetingNewUserItem.PropertyChanged += OnPropertyChanged;
+			_greetingItem = new SettingsGreetingDialogItem();
+			_greetingItem.PropertyChanged += OnPropertyChanged;
+			_greetingNewUserItem = new SettingsGreetingDialogItem();
+			_greetingNewUserItem.PropertyChanged += OnPropertyChanged;
 
-			m_informationItems = new MTObservableCollection<InformationItem>();
-			m_restartNotificationItems = new MTObservableCollection<RestartNotificationItem>();
-			m_restartTimeItems = new MTObservableCollection<RestartTimeItem>();
-			m_backupItems = new MTObservableCollection<BackupItem>();
-			m_protectedItems = new MTObservableCollection<ProtectedItem>();
-			m_informationItems.CollectionChanged += ItemsCollectionChanged;
-			m_restartNotificationItems.CollectionChanged += ItemsCollectionChanged;
-			m_restartTimeItems.CollectionChanged += ItemsCollectionChanged;
-			m_backupItems.CollectionChanged += ItemsCollectionChanged;
-			m_protectedItems.CollectionChanged += ItemsCollectionChanged;
+			_informationItems = new MTObservableCollection<InformationItem>();
+			_restartNotificationItems = new MTObservableCollection<RestartNotificationItem>();
+			_restartTimeItems = new MTObservableCollection<RestartTimeItem>();
+			_backupItems = new MTObservableCollection<BackupItem>();
+			_protectedItems = new MTObservableCollection<ProtectedItem>();
+			_informationItems.CollectionChanged += ItemsCollectionChanged;
+			_restartNotificationItems.CollectionChanged += ItemsCollectionChanged;
+			_restartTimeItems.CollectionChanged += ItemsCollectionChanged;
+			_backupItems.CollectionChanged += ItemsCollectionChanged;
+			_protectedItems.CollectionChanged += ItemsCollectionChanged;
 
-			m_greetingMessage = "";
+			_greetingMessage = "";
 
-			m_dynamicConcealDistance = 8000;
-			m_dynamicShowMessages = false;
-			m_dynamicTurretTargetDistance = 2000;
-			m_dynamicTurretManagementEnabled = false;
+			_dynamicConcealDistance = 8000;
+			_dynamicShowMessages = false;
+			_dynamicTurretTargetDistance = 2000;
+			_dynamicTurretManagementEnabled = false;
 
-			m_dockingShipsPerZone = 1;
+			_dockingShipsPerZone = 1;
 
-			m_newUserTransportAsteroidDistance = 0;
+			_newUserTransportAsteroidDistance = 0;
 
-			m_waypointServerItems = new MTObservableCollection<ServerWaypointItem>();
-			m_waypointServerItems.CollectionChanged += ItemsCollectionChanged;
-			m_waypointDefaultItems = new MTObservableCollection<ServerWaypointItem>();
-			m_waypointDefaultItems.CollectionChanged += ItemsCollectionChanged;
+			_waypointServerItems = new MTObservableCollection<ServerWaypointItem>();
+			_waypointServerItems.CollectionChanged += ItemsCollectionChanged;
+			_waypointDefaultItems = new MTObservableCollection<ServerWaypointItem>();
+			_waypointDefaultItems.CollectionChanged += ItemsCollectionChanged;
 
-			m_cleanupTriggerItems = new MTObservableCollection<SettingsCleanupTriggerItem>();
-			m_cleanupTriggerItems.CollectionChanged += ItemsCollectionChanged;
-			m_cleanupTimedItems = new MTObservableCollection<SettingsCleanupTimedItem>();
-			m_cleanupTimedItems.CollectionChanged += ItemsCollectionChanged;
-			m_cleanupNotificationItems = new MTObservableCollection<SettingsCleanupNotificationItem>();
-			m_cleanupNotificationItems.CollectionChanged += ItemsCollectionChanged;
+			_cleanupTriggerItems = new MTObservableCollection<SettingsCleanupTriggerItem>();
+			_cleanupTriggerItems.CollectionChanged += ItemsCollectionChanged;
+			_cleanupTimedItems = new MTObservableCollection<SettingsCleanupTimedItem>();
+			_cleanupTimedItems.CollectionChanged += ItemsCollectionChanged;
+			_cleanupNotificationItems = new MTObservableCollection<SettingsCleanupNotificationItem>();
+			_cleanupNotificationItems.CollectionChanged += ItemsCollectionChanged;
 
-			m_blockEnforcementItems = new MTObservableCollection<SettingsBlockEnforcementItem>();
-			m_blockEnforcementItems.CollectionChanged += ItemsCollectionChanged;
+			_blockEnforcementItems = new MTObservableCollection<SettingsBlockEnforcementItem>();
+			_blockEnforcementItems.CollectionChanged += ItemsCollectionChanged;
 		}
 
 
@@ -823,7 +823,7 @@ namespace EssentialsPlugin
 		/// </summary>
 		public void Load()
 		{
-			m_loading = true;
+			_loading = true;
 
 			try
 			{
@@ -838,7 +838,7 @@ namespace EssentialsPlugin
 							PluginSettings settings = (PluginSettings)x.Deserialize(reader);
 							reader.Close();
 
-							m_instance = settings;
+							_instance = settings;
 						}
 					}					
 				}
@@ -849,7 +849,7 @@ namespace EssentialsPlugin
 			}
 			finally
 			{
-				m_loading = false;
+				_loading = false;
 			}
 		}
 
@@ -858,7 +858,7 @@ namespace EssentialsPlugin
 		/// </summary>
 		public void Save()
 		{
-			if (m_loading)
+			if (_loading)
 				return;
 
 			try
@@ -869,7 +869,7 @@ namespace EssentialsPlugin
 					using (StreamWriter writer = new StreamWriter(fileName))
 					{
 						XmlSerializer x = new XmlSerializer(typeof(PluginSettings));
-						x.Serialize(writer, m_instance);
+						x.Serialize(writer, _instance);
 						writer.Close();
 					}					
 				}
@@ -951,7 +951,7 @@ namespace EssentialsPlugin
 					result += string.Format("Getting Value(s) For Setting: {0}\r\n", name == "" ? "root" : name);
 				}
 
-				result += ReflectObject(m_instance, name, null, so, newValue);
+				result += ReflectObject(_instance, name, null, so, newValue);
 			}
 			catch (Exception ex)
 			{
