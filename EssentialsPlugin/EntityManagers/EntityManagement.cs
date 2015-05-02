@@ -441,12 +441,12 @@
 						}
 						*/
 						IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
-						Essentials.Log.Debug( "Start Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId );
 						if ( newEntity == null )
 						{
-							Essentials.Log.Error( string.Format( "Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId ) );
+							Essentials.Log.Error( string.Format( "Issue - CreateFromObjectBuilder failed: {0}", builder.EntityId ) );
 							return;
 						}
+						Essentials.Log.Debug( "Start Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId );
 
 						RemovedGrids.Add( entity.EntityId );
 						BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
