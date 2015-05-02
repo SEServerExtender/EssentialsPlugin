@@ -862,12 +862,13 @@
 					//grid.CastShadows = true;
 					builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
 					MyAPIGateway.Entities.RemapObjectBuilder(builder);
-					Essentials.Log.Info("Conceal", string.Format("Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
+					if ( PluginSettings.Instance.DynamicShowMessages )
+						Essentials.Log.Info( "Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ), ownerId, ownerName, builder.EntityId );
 
 					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
 					if (newEntity == null)
 					{
-						Essentials.Log.Info("Conceal", string.Format("Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId));
+						Essentials.Log.Info( "Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId );
 						continue;
 					}
 
@@ -878,8 +879,8 @@
 					addList.Clear();
 				}
 			});
-
-			Essentials.Log.Info(string.Format("Revealed {0} grids", count));
+			if ( PluginSettings.Instance.DynamicShowMessages )
+				Essentials.Log.Info( "Revealed {0} grids", count );
 		}
 
 		public static bool ToggleMedbayGrids(ulong steamId)
