@@ -107,7 +107,7 @@
 					DateTime distStart = DateTime.Now;
 					foreach(IMyPlayer player in players)
 					{
-						double distance = 0f;
+						double distance;
 						if (Entity.GetDistanceBetweenGridAndPlayer(grid, player, out distance))
 						{
 							if (distance < PluginSettings.Instance.DynamicConcealDistance)
@@ -213,7 +213,7 @@
 
 					foreach(IMyPlayer player in players)
 					{
-						double distance = 0d;
+						double distance;
 						if(Entity.GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
 						{
 							if (distance < beacon.Radius)
@@ -241,7 +241,7 @@
 
 					foreach (IMyPlayer player in players)
 					{
-						double distance = 0d;
+						double distance;
 						if (Entity.GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
 						{
 							if (distance < antenna.Radius)
@@ -392,8 +392,8 @@
 
 				pos = 1;
 				IMyCubeGrid grid = (IMyCubeGrid) entity;
-				long ownerId = 0;
-				string ownerName = "";
+				long ownerId;
+				string ownerName = string.Empty;
 				if ( CubeGrids.GetOwner( builder, out ownerId ) )
 				{
 					//ownerId = grid.BigOwners.First();
@@ -419,7 +419,7 @@
 				pos = 3;
 				if ( RemovedGrids.Contains( entity.EntityId ) )
 				{
-					Essentials.Log.Info( "Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId );
+					Essentials.Log.Info( "Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName );
 					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
 				}
 				else
@@ -488,7 +488,6 @@
 				//});
 
 				Dictionary<IMyEntity, string> entitiesToReveal = new Dictionary<IMyEntity, string>();
-				string currentReason = "";
 				//HashSet<IMyEntity> entitiesToReveal = new HashSet<IMyEntity>();
 				foreach (IMyEntity entity in entities)
 				{
@@ -503,7 +502,7 @@
 
 					IMyCubeGrid grid = (IMyCubeGrid)entity;
 					bool found = false;
-					currentReason = "";
+					string currentReason = string.Empty;
 					foreach (IMyPlayer player in players)
 					{
 						double distance = 0f;
@@ -584,7 +583,7 @@
 					
 					foreach (IMyPlayer player in players)
 					{
-						double distance = 0d;
+						double distance;
 						if (Entity.GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
 						{
 							if (distance < beacon.Radius)
@@ -754,7 +753,7 @@
 
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				long ownerId = 0;
-				string ownerName = "";
+				string ownerName = string.Empty;
 				if (CubeGrids.GetBigOwners(builder).Count > 0)
 				{
 					ownerId = CubeGrids.GetBigOwners(builder).First();
@@ -793,7 +792,7 @@
 					
 					RemovedGrids.Add( entity.EntityId );
 					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
-					MyAPIGateway.Entities.AddEntity( newEntity, true );
+					MyAPIGateway.Entities.AddEntity( newEntity );
 
 					/*CC
 						if (PluginSettings.Instance.DynamicClientConcealEnabled)
@@ -890,7 +889,7 @@
 					}
 
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
-					MyAPIGateway.Entities.AddEntity(newEntity, true);
+					MyAPIGateway.Entities.AddEntity(newEntity);
 					addList.Add(newEntity.GetObjectBuilder());
 					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
 					addList.Clear();
