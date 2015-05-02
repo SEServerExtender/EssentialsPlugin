@@ -930,54 +930,7 @@
 				CubeGrids.GetGridsUnconnected(entitiesFound, entities);
 
 				HashSet<IMyEntity> entitiesToConceal = new HashSet<IMyEntity>();
-				foreach (IMyEntity entity in entitiesFound)
-				{
-					if (!(entity is IMyCubeGrid))
-						continue;
-
-					if (entity.DisplayName.Contains("CommRelay"))
-						continue;
-
-					if (!entity.InScene)
-						continue;
-
-					if (((IMyCubeGrid)entity).GridSizeEnum != MyCubeSize.Small && !PluginSettings.Instance.ConcealIncludeLargeGrids)
-						continue;
-
-					IMyCubeGrid grid = (IMyCubeGrid)entity;
-					long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(steamId);
-					if (!grid.BigOwners.Contains(playerId) && !grid.SmallOwners.Contains(playerId))
-						continue;
-
-					bool found = false;
-					// Check to see if grid is close to dock / shipyard
-					foreach (IMyCubeGrid checkGrid in ProcessDockingZone.ZoneCache)
-					{
-						try
-						{
-							if (Vector3D.Distance(checkGrid.GetPosition(), grid.GetPosition()) < 100d)
-							{
-								found = true;
-								break;
-							}
-						}
-						catch
-						{
-							continue;
-						}
-					}
-
-					if (!found)
-					{
-						// Check for block type rules
-
-					}
-
-					if (!found)
-					{
-						entitiesToConceal.Add(entity);
-					}
-				}
+				FilterEntitiesForMedbayCheck( steamId, entitiesFound, entitiesToConceal );
 
 				if (entitiesToConceal.Count > 0)
 				{
@@ -1006,6 +959,67 @@
 			}
 
 			return true;
+		}
+
+		private static void FilterEntitiesForMedbayCheck( ulong steamId, HashSet<IMyEntity> entitiesFound, HashSet<IMyEntity> entitiesToConceal )
+		{
+			foreach ( IMyEntity entity in entitiesFound )
+			{
+				if ( !( entity is IMyCubeGrid ) )
+				{
+					continue;
+				}
+
+				if ( entity.DisplayName.Contains( "CommRelay" ) )
+				{
+					continue;
+				}
+
+				if ( !entity.InScene )
+				{
+					continue;
+				}
+
+				if ( ( (IMyCubeGrid) entity ).GridSizeEnum != MyCubeSize.Small && !PluginSettings.Instance.ConcealIncludeLargeGrids )
+				{
+					continue;
+				}
+
+				IMyCubeGrid grid = (IMyCubeGrid) entity;
+				long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( steamId );
+				if ( !grid.BigOwners.Contains( playerId ) && !grid.SmallOwners.Contains( playerId ) )
+				{
+					continue;
+				}
+
+				bool found = false;
+				// Check to see if grid is close to dock / shipyard
+				foreach ( IMyCubeGrid checkGrid in ProcessDockingZone.ZoneCache )
+				{
+					try
+					{
+						if ( Vector3D.Distance( checkGrid.GetPosition( ), grid.GetPosition( ) ) < 100d )
+						{
+							found = true;
+							break;
+						}
+					}
+					catch
+					{
+						continue;
+					}
+				}
+
+				if ( !found )
+				{
+					// Check for block type rules
+				}
+
+				if ( !found )
+				{
+					entitiesToConceal.Add( entity );
+				}
+			}
 		}
 
 		public static void SetOnline(ulong steamId, bool online)
