@@ -162,7 +162,7 @@
 					ConcealEntities(entitiesToConceal);
 				co += (DateTime.Now - coStart).TotalMilliseconds;
 
-				if ((DateTime.Now - start).TotalMilliseconds > 2000)
+				if ((DateTime.Now - start).TotalMilliseconds > 2000 && PluginSettings.Instance.DynamicShowMessages)
 					Essentials.Log.Info( "Completed Conceal Check: {0}ms (gg: {3}, dc: {2} ms, br: {1}ms, co: {4}ms)", (DateTime.Now - start).TotalMilliseconds, blockRules, distCheck, getGrids, co );
 
 			}
@@ -375,7 +375,8 @@
 				}
 			});
 
-			Essentials.Log.Info(string.Format("Concealed {0} entities.", entitesToConceal.Count));
+			if ( PluginSettings.Instance.DynamicShowMessages )
+				Essentials.Log.Info( "Concealed {0} entities.", entitesToConceal.Count );
 		}
 
 		private static void ConcealEntity( IMyEntity entity )
@@ -538,7 +539,7 @@
 					RevealEntities(entitiesToReveal);
 				re += (DateTime.Now - reStart).TotalMilliseconds;
 
-				if ((DateTime.Now - start).TotalMilliseconds > 2000)
+				if ((DateTime.Now - start).TotalMilliseconds > 2000 && PluginSettings.Instance.DynamicShowMessages)
 					Essentials.Log.Info( "Completed Reveal Check: {0}ms (br: {1}ms, re: {2}ms)", (DateTime.Now - start).TotalMilliseconds, br, re );
 			}
 			catch (Exception ex)
@@ -738,7 +739,8 @@
 				}
 			});
 
-			Essentials.Log.Info(string.Format("Revealed {0} entities.", entitiesToReveal.Count));
+			if ( PluginSettings.Instance.DynamicShowMessages )
+				Essentials.Log.Info( "Revealed {0} entities.", entitiesToReveal.Count );
 		}
 
 		private static void RevealEntity(KeyValuePair<IMyEntity, string> item)
@@ -786,17 +788,10 @@
 					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
 					if ( newEntity == null )
 					{
-						Essentials.Log.Warn( "Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId );
+						Essentials.Log.Warn( "CreateFromObjectBuilder failed: {0}", newEntity.EntityId );
 						return;
 					}
-					Essentials.Log.Info( "Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}",
-					                     entity.EntityId,
-					                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
-					                     ownerId,
-					                     ownerName,
-					                     newEntity.EntityId,
-					                     reason );
-
+					
 					RemovedGrids.Add( entity.EntityId );
 					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
 					MyAPIGateway.Entities.AddEntity( newEntity, true );
@@ -812,7 +807,8 @@
 					List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>( );
 					addList.Add( newEntity.GetObjectBuilder( ) );
 					MyAPIGateway.Multiplayer.SendEntitiesCreated( addList );
-					Essentials.Log.Info( "End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}",
+					if ( PluginSettings.Instance.DynamicShowMessages )
+						Essentials.Log.Info( "Revealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}",
 					                     entity.EntityId,
 					                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
 					                     ownerId,
@@ -822,12 +818,6 @@
 				}
 				else
 				{
-					Essentials.Log.Info( "Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
-					                     entity.EntityId,
-					                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
-					                     ownerId,
-					                     ownerName,
-					                     reason );
 					entity.InScene = true;
 					// Send to users, client will remove if doesn't need - this solves login problem
 					/*CC
@@ -839,7 +829,8 @@
 					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
 						}
 						*/
-					Essentials.Log.Info( "End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
+					if ( PluginSettings.Instance.DynamicShowMessages )
+						Essentials.Log.Info( "Revealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
 					                     entity.EntityId,
 					                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
 					                     ownerId,
@@ -1003,8 +994,8 @@
 					//CheckAndRevealEntities();
 				}
 
-				if ((DateTime.Now - start).TotalMilliseconds > 2000)
-					Essentials.Log.Info(string.Format("Completed Toggle: {0}ms", (DateTime.Now - start).TotalMilliseconds));
+				if ((DateTime.Now - start).TotalMilliseconds > 2000 && PluginSettings.Instance.DynamicShowMessages)
+					Essentials.Log.Info( "Completed Toggle: {0}ms", (DateTime.Now - start).TotalMilliseconds );
 			}
 			catch (Exception ex)
 			{
