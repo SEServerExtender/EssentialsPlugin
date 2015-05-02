@@ -769,28 +769,39 @@
 				MyAPIGateway.Entities.RemapObjectBuilder(builder);
 				//builder.EntityId = 0;
 
-				if(RemovedGrids.Contains(entity.EntityId))
+			if ( RemovedGrids.Contains( entity.EntityId ) )
+			{
+				Essentials.Log.Info( "Revealing - Id: {0} DUPE FOUND Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
+				                     entity.EntityId,
+				                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
+				                     ownerId,
+				                     ownerName,
+				                     reason );
+				BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+			}
+			else
+			{
+				if ( !PluginSettings.Instance.DynamicConcealServerOnly )
 				{
-					Essentials.Log.Info( "Revealing - Id: {0} DUPE FOUND Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason );
-					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
-				}
-				else
-				{
-					if (!PluginSettings.Instance.DynamicConcealServerOnly)
+					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
+					Essentials.Log.Info( "Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}",
+					                     entity.EntityId,
+					                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
+					                     ownerId,
+					                     ownerName,
+					                     newEntity.EntityId,
+					                     reason );
+					if ( newEntity == null )
 					{
-						IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
-						Essentials.Log.Info( "Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, newEntity.EntityId, reason );
-					if (newEntity == null)
-					{
-						Essentials.Log.Info("Conceal", string.Format("Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId));
+						Essentials.Log.Info( "Conceal", string.Format( "Issue - CreateFromObjectBuilder failed: {0}", newEntity.EntityId ) );
 						return;
 					}
 
-					RemovedGrids.Add(entity.EntityId);
-					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
-						MyAPIGateway.Entities.AddEntity(newEntity, true);
+					RemovedGrids.Add( entity.EntityId );
+					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+					MyAPIGateway.Entities.AddEntity( newEntity, true );
 
-						/*CC
+					/*CC
 						if (PluginSettings.Instance.DynamicClientConcealEnabled)
 					{
 							ClientEntityManagement.AddEntityState(newEntity.EntityId);
@@ -798,17 +809,28 @@
 						*/
 
 					builder.EntityId = newEntity.EntityId;
-						List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>();
-						addList.Add(newEntity.GetObjectBuilder());
-						MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
-						Essentials.Log.Info( "End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, newEntity.EntityId, reason );
-					}
-					else
-					{
-						Essentials.Log.Info( "Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason );
-						entity.InScene = true;
-						// Send to users, client will remove if doesn't need - this solves login problem
-						/*CC
+					List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>( );
+					addList.Add( newEntity.GetObjectBuilder( ) );
+					MyAPIGateway.Multiplayer.SendEntitiesCreated( addList );
+					Essentials.Log.Info( "End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}",
+					                     entity.EntityId,
+					                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
+					                     ownerId,
+					                     ownerName,
+					                     newEntity.EntityId,
+					                     reason );
+				}
+				else
+				{
+					Essentials.Log.Info( "Start Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
+					                     entity.EntityId,
+					                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
+					                     ownerId,
+					                     ownerName,
+					                     reason );
+					entity.InScene = true;
+					// Send to users, client will remove if doesn't need - this solves login problem
+					/*CC
 						if (PluginSettings.Instance.DynamicClientConcealEnabled)
 						{
 							ClientEntityManagement.AddEntityState(entity.EntityId);
@@ -817,9 +839,14 @@
 					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
 						}
 						*/
-					Essentials.Log.Info( "End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, reason );
+					Essentials.Log.Info( "End Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
+					                     entity.EntityId,
+					                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
+					                     ownerId,
+					                     ownerName,
+					                     reason );
 				}
-				}
+			}
 			//});
 		}
 
