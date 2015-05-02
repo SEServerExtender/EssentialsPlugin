@@ -443,7 +443,7 @@
 						IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
 						if ( newEntity == null )
 						{
-							Essentials.Log.Error( string.Format( "Issue - CreateFromObjectBuilder failed: {0}", builder.EntityId ) );
+							Essentials.Log.Error( "Issue - CreateFromObjectBuilder failed: {0}", builder.EntityId );
 							return;
 						}
 
