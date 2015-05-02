@@ -446,18 +446,16 @@
 							Essentials.Log.Error( string.Format( "Issue - CreateFromObjectBuilder failed: {0}", builder.EntityId ) );
 							return;
 						}
-						Essentials.Log.Debug( "Start Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId );
 
 						RemovedGrids.Add( entity.EntityId );
 						BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
 						MyAPIGateway.Entities.AddEntity( newEntity, false );
-						Essentials.Log.Debug( "End Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId );
+						Essentials.Log.Info( "Concealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId );
 					}
 					else
 					{
-						Essentials.Log.Debug( "Start Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId );
 						entity.InScene = false;
-						Essentials.Log.Debug( "End Concealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId );
+						Essentials.Log.Info( "Concealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, builder.EntityId );
 					}
 				}
 			}
