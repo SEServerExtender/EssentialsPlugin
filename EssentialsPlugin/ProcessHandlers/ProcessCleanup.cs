@@ -55,7 +55,10 @@
 			_start = DateTime.Now; // this needs to be updated for each run so multi-day runtimes are handled properly
 
 			DateTime time = new DateTime( _start.Year, _start.Month, _start.Day, item.Restart.Hour, item.Restart.Minute, 0 );
-
+			if ( time - DateTime.Now < TimeSpan.FromSeconds( -20 ) )
+			{
+				time = new DateTime( _start.Year, _start.Month, _start.Day + 1, item.Restart.Hour, item.Restart.Minute, 0 );
+			}
 
 			if ( DateTime.Now - item.LastRan < TimeSpan.FromMinutes( 1 ) )
 				return;
