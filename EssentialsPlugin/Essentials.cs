@@ -518,6 +518,7 @@ namespace EssentialsPlugin
 		}
 
 		[Category( "Dynamic Entity Management" )]
+		[DisplayName( "Enabled")]
 		[Description( "Enable / Disable dynamic entity concealment.  This option will automatically 'hide' ships that players are not close to, meaning they won't be processed by the physics engine.  This should improve performance." )]
 		[Browsable( true )]
 		[ReadOnly( false )]
@@ -528,6 +529,7 @@ namespace EssentialsPlugin
 		}
 
 		[Category( "Dynamic Entity Management" )]
+		[DisplayName( "Conceal Distance")]
 		[Description( "The distance a player must be from a grid for it to be revealed due to distance.  The smaller this value is, the longer a grid will be hidden from sight.  Default is 8000m (max view distance)" )]
 		[Browsable( true )]
 		[ReadOnly( false )]
@@ -538,6 +540,7 @@ namespace EssentialsPlugin
 		}
 
 		[Category( "Dynamic Entity Management" )]
+		[DisplayName( "Include Large Grids")]
 		[Description( "Enable / Disable management of large block grids.  Large block grids require a different set of scans due to them having medical bays." )]
 		[Browsable( true )]
 		[ReadOnly( false )]
@@ -548,6 +551,7 @@ namespace EssentialsPlugin
 		}
 
 		[Category( "Dynamic Entity Management" )]
+		[DisplayName( "Block Subtype Ignore List")]
 		[Description( "The list of subtype blocks that will make the entity manager ignore a grid.  If a grid contains any of these block subtypes, it will automatically not include it when deciding whether to conceal the grid or not" )]
 		[Browsable( true )]
 		[ReadOnly( false )]
@@ -558,6 +562,7 @@ namespace EssentialsPlugin
 		}
 
 		[Category( "Dynamic Entity Management" )]
+		[DisplayName( "Include MedBays")]
 		[Description( "The list of subtype blocks that will make the entity manager ignore a grid.  If a grid contains any of these block subtypes, it will automatically not include it when deciding whether to conceal the grid or not" )]
 		[Browsable( true )]
 		[ReadOnly( false )]
@@ -609,6 +614,7 @@ namespace EssentialsPlugin
 		}
 		/**/
 		[Category( "Dynamic Entity Management" )]
+		[DisplayName( "Log Actions" )]
 		[Description( "Enable / Disable console messages that display whether an entity is concealed or revealed.  Should be off if you don't care about seeing how many entities get revealed/concealed." )]
 		[Browsable( true )]
 		[ReadOnly( false )]
@@ -622,6 +628,7 @@ namespace EssentialsPlugin
 		}
 
 		[Category( "Dynamic Turret Management" )]
+		[DisplayName( "Enabled" )]
 		[Description( "Enable / Disable dynamic management of turrets.  Turrets that do not have a valid target within their target range will be disabled.  This will improve sim speed." )]
 		[Browsable( true )]
 		[ReadOnly( false )]
@@ -635,6 +642,7 @@ namespace EssentialsPlugin
 		}
 
 		[Category( "Dynamic Turret Management" )]
+		[DisplayName( "Activation Distance" )]
 		[Description( "Distance from a grid that has a turret that a valid target must be before enabling.  Should be 2x or more than the scan distance of a turret." )]
 		[Browsable( true )]
 		[ReadOnly( false )]
@@ -648,6 +656,7 @@ namespace EssentialsPlugin
 		}
 
 		[Category( "Dynamic Turret Management" )]
+		[DisplayName( "Allow Exemption" )]
 		[Description( "Enable / Disable Allowing users to manually exempt their turrets from control with the [ManualControl] tag in custom name of turret." )]
 		[Browsable( true )]
 		[ReadOnly( false )]
