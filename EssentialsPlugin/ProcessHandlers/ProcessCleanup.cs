@@ -5,19 +5,17 @@
 	using System.Linq;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
-	using NLog;
 	using Sandbox.ModAPI;
 	using SEModAPI.API.Utility;
 
 	class ProcessCleanup : ProcessHandlerBase
 	{
 		private SettingsCleanupTriggerItem _triggerdItem;
-		private DateTime _start;
-
-		public ProcessCleanup( )
-		{
-			_start = DateTime.Now;
-		}
+		private DateTime _start = DateTime.Now;
+		private readonly TimeSpan _oneSecond = new TimeSpan( 0, 0, 1 );
+		private readonly TimeSpan _twentySeconds = new TimeSpan( 0, 0, 20 );
+		private readonly TimeSpan _oneMinute = new TimeSpan( 0, 1, 0 );
+		private readonly TimeSpan _fiveMinutes = new TimeSpan( 0, 5, 0 );
 
 		public override int GetUpdateResolution( )
 		{
@@ -54,18 +52,18 @@
 		{
 			_start = DateTime.Now; // this needs to be updated for each run so multi-day runtimes are handled properly
 
-			DateTime time = new DateTime( _start.Year, _start.Month, _start.Day, item.Restart.Hour, item.Restart.Minute, 0 );
-			if ( time - DateTime.Now < TimeSpan.FromSeconds( -20 ) )
+			DateTime itemTime = new DateTime( _start.Year, _start.Month, _start.Day, item.Restart.Hour, item.Restart.Minute, 0 );
+			if (  DateTime.Now - itemTime > _twentySeconds )
 			{
-				time = new DateTime( _start.Year, _start.Month, _start.Day + 1, item.Restart.Hour, item.Restart.Minute, 0 );
+				itemTime = itemTime.AddDays( 1 );
 			}
 
-			if ( DateTime.Now - item.LastRan < TimeSpan.FromMinutes( 1 ) )
+			if ( DateTime.Now - item.LastRan < _oneMinute )
 				return;
 
-			if ( time - DateTime.Now < TimeSpan.FromSeconds( 1 ) && DateTime.Now - item.LastRan > TimeSpan.FromMinutes( 1 ) )
+			if ( itemTime - DateTime.Now < _oneSecond && DateTime.Now - item.LastRan > _oneMinute )
 			{
-				string command = item.ScanCommand + " quiet";
+				string command = string.Format( "{0} quiet", item.ScanCommand );
 				HashSet<IMyEntity> entities = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
 				CubeGrids.DeleteGrids( entities );
 				Communication.SendPublicInformation( string.Format( "[NOTICE]: Timed cleanup has run.  {0} entities removed.  Have a nice day.", entities.Count ) );
@@ -79,11 +77,11 @@
 				if ( item.NotificationItemsRan.Contains( notifyItem ) )
 					continue;
 
-				if ( time - DateTime.Now < TimeSpan.FromMinutes( notifyItem.MinutesBeforeCleanup ) )
+				if ( itemTime - DateTime.Now < TimeSpan.FromMinutes( notifyItem.MinutesBeforeCleanup ) )
 				{
 					item.NotificationItemsRan.Add( notifyItem );
 
-					if ( DateTime.Now - notifyItem.lastRan > TimeSpan.FromMinutes( 1 ) )
+					if ( DateTime.Now - notifyItem.lastRan > _oneMinute )
 					{
 						notifyItem.lastRan = DateTime.Now;
 						string notification = notifyItem.Message.Replace( "%cleanup_reason%", item.Reason );
@@ -103,17 +101,16 @@
 			if ( _triggerdItem == null )
 			{
 				// Increase to 5 minutes
-				if ( DateTime.Now - item.LastRan > TimeSpan.FromMinutes( 5 ) )
+				if ( DateTime.Now - item.LastRan > _fiveMinutes )
 				{
 					item.LastRan = DateTime.Now;
 					string command = item.ScanCommand + " quiet";
-					HashSet<IMyEntity> entities = CubeGrids.ScanGrids(0, CommandParser.GetCommandParts( command ).ToArray( ) );
+					HashSet<IMyEntity> entities = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
 					if ( entities.Count >= item.MaxCapacity )
 					{
 						Communication.SendPublicInformation( string.Format( "[NOTICE]: Cleanup triggered.  ({0} of {1}) triggered grids found.  Cleanup will run in {2} minutes.  Reason: {3}", entities.Count, item.MaxCapacity, item.MinutesAfterCapacity, item.Reason ) );
 						item.NotificationItemsRan.Clear( );
 						_triggerdItem = item;
-						return;
 					}
 				}
 			}
@@ -122,7 +119,7 @@
 				if ( DateTime.Now - item.LastRan > TimeSpan.FromMinutes( item.MinutesAfterCapacity ) )
 				{
 					string command = item.ScanCommand + " quiet";
-					HashSet<IMyEntity> entities = CubeGrids.ScanGrids(0, CommandParser.GetCommandParts( command ).ToArray( ) );
+					HashSet<IMyEntity> entities = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
 					CubeGrids.DeleteGrids( entities );
 					Communication.SendPublicInformation( string.Format( "[NOTICE]: Triggered cleanup has run.  {0} entities removed.  Have a nice day.", entities.Count ) );
 					_triggerdItem = null;
