@@ -27,7 +27,7 @@
 
 		private void Init()
 		{
-			List<IMyVoxelMap> voxels = new List<IMyVoxelMap>();
+			List<IMyVoxelBase> voxels = new List<IMyVoxelBase>();
 			MyAPIGateway.Session.VoxelMaps.GetInstances(voxels);
 			Essentials.Log.Info(string.Format("Current Voxel Count: {0}", voxels.Count));
 
