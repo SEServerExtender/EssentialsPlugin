@@ -129,6 +129,7 @@
     <Compile Include="ControlForm.Designer.cs">
       <DependentUpon>ControlForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="EntityManagers\VoxelManagement.cs" />
     <Compile Include="Essentials.cs" />
     <Compile Include="EntityManagers\BlockManagement.cs" />
     <Compile Include="EntityManagers\TurretManagement.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="ProcessHandlers\ProcessConquest.cs" />
     <Compile Include="ProcessHandlers\ProcessLoginTracking.cs" />
     <Compile Include="ProcessHandlers\ProcessSpawnShipTracking.cs" />
+    <Compile Include="ProcessHandlers\ProcessVoxels.cs" />
     <Compile Include="ProcessHandlers\ProcessWaypoints.cs" />
     <Compile Include="ProcessHandlers\ProcessProtection.cs" />
     <Compile Include="Settings\PluginSettings.cs" />

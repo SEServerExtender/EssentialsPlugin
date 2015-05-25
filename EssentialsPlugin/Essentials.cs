@@ -683,6 +683,32 @@ namespace EssentialsPlugin
 			}
 		}
 
+        [Category("Dynamic Entity Management")]
+        [Description("Enable / Disable dynamic voxel management.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public bool DynamicVoxelManagementEnabled
+        {
+            get { return PluginSettings.Instance.DynamicVoxelManagementEnabled; }
+            set
+            {
+                PluginSettings.Instance.DynamicVoxelManagementEnabled = value;
+            }
+        }
+
+        [Category("Dynamic Entity Management")]
+        [Description("Sets the distance in which voxels are sent to the client")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public int DynamicVoxelDistance
+        {
+            get { return PluginSettings.Instance.DynamicVoxelDistance; }
+            set
+            {
+                PluginSettings.Instance.DynamicVoxelDistance = value;
+            }
+        }
+
 		/*
 		[Category("Dynamic Entity Management")]
 		[Description("Enable / Disable dynamic block management.  This manager disables blocks of ships that can't be concealed to further increase gamelogic savings.")]
