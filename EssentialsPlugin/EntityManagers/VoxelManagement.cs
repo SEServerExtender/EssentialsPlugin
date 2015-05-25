@@ -146,9 +146,6 @@ namespace EssentialsPlugin.EntityManagers
                 Logging.WriteLineAndConsole(string.Format("Sending Voxel Header Data: {0} / {1} - {2} ({3})", voxelData.Length, headerData.Length, steamId, voxel.GetPosition()));
                 Communication.SendDataMessage(steamId, 5001, headerData);
 
-                //if(RadarManagement.Instance.IsEnabled(steamId))
-                //	Communication.SendClientMessage(steamId, string.Format("/waypoint add \"{0}\" \"{1}\" Neutral {2} {3} {4} 30000", voxelMap.StorageName, "Asteroid", Math.Floor(header.Position.X), Math.Floor(header.Position.Y), Math.Floor(header.Position.Z)));
-
                 int blockSize = 4096;
                 for (ushort r = 0; r < (voxelData.Length / blockSize) + 1; r++)
                 {
