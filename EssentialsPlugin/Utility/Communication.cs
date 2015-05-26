@@ -105,5 +105,37 @@ namespace EssentialsPlugin.Utility
 		{
 			SendClientMessage(steamId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", header, subheader, " ", content.Replace("\r\n", "|"), buttonText));
 		}
+
+        public static void SendDataMessage(ulong steamId, long msgId, byte[] data)
+        {
+            string msgIdString = msgId.ToString();
+            byte[] newData = new byte[data.Length + msgIdString.Length + 1];
+            newData[0] = (byte)msgIdString.Length;
+            for (int r = 0; r < msgIdString.Length; r++)
+                newData[r + 1] = (byte)msgIdString[r];
+
+            Buffer.BlockCopy(data, 0, newData, msgIdString.Length + 1, data.Length);
+
+            ServerNetworkManager.SendDataMessage(9000, newData, steamId);
+        }
+
+        public static void BroadcastDataMessage(long msgId, byte[] data)
+        {
+            string msgIdString = msgId.ToString();
+            byte[] newData = new byte[data.Length + msgIdString.Length + 1];
+            newData[0] = (byte)msgIdString.Length;
+            for (int r = 0; r < msgIdString.Length; r++)
+                newData[r + 1] = (byte)msgIdString[r];
+
+            Buffer.BlockCopy(data, 0, newData, msgIdString.Length + 1, data.Length);
+
+            MyAPIGateway.Multiplayer.SendMessageToOthers(9000, newData);
+        }
+
+        public class ServerMessageItem
+        {
+            public string From { get; set; }
+            public string Message { get; set; }
+        }
 	}
 }
