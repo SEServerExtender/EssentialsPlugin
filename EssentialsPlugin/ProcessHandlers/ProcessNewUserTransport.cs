@@ -18,18 +18,18 @@
 		private readonly Random _random;
 		private bool _init;
 
-		public ProcessNewUserTransport()
+		public ProcessNewUserTransport( )
 		{
-			_random = new Random();
+			_random = new Random( );
 			_init = false;
-			_newUserList = new List<ulong>();
+			_newUserList = new List<ulong>( );
 		}
 
-		private void Init()
+		private void Init( )
 		{
-			List<IMyVoxelBase> voxels = new List<IMyVoxelBase>();
-			MyAPIGateway.Session.VoxelMaps.GetInstances(voxels);
-			Essentials.Log.Info(string.Format("Current Voxel Count: {0}", voxels.Count));
+			List<IMyVoxelBase> voxels = new List<IMyVoxelBase>( );
+			MyAPIGateway.Session.VoxelMaps.GetInstances( voxels );
+			Essentials.Log.Info( "Current Voxel Count: {0}", voxels.Count );
 
 			// Cache asteroids
 			/*
@@ -81,23 +81,23 @@
 
 				m_ready = true;
 			}));
-			 */ 
+			 */
 		}
 
-		public override int GetUpdateResolution()
+		public override int GetUpdateResolution( )
 		{
 			return 500;
 		}
 
-		public override void Handle()
+		public override void Handle( )
 		{
-			if (!PluginSettings.Instance.NewUserTransportEnabled)
+			if ( !PluginSettings.Instance.NewUserTransportEnabled )
 				return;
 
-			if (!_init)
-			{ 
+			if ( !_init )
+			{
 				_init = true;
-				Init();
+				Init( );
 			}
 
 			/*
@@ -191,198 +191,198 @@
 						SectorObjectManager.Instance.AddEntity(gridEntity);
 													    */
 
-						/*
-						Wrapper.GameAction(() =>
-						{
-							MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(cubeGrid);
-						});
-						*/
+			/*
+			Wrapper.GameAction(() =>
+			{
+				MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(cubeGrid);
+			});
+			*/
 
-						//Communication.SendPrivateInformation(steamId, string.Format("Welcome {0}.  We are moving you closer to an asteroid ... please stand by ...", PlayerMap.Instance.GetPlayerNameFromSteamId(steamId)));
+			//Communication.SendPrivateInformation(steamId, string.Format("Welcome {0}.  We are moving you closer to an asteroid ... please stand by ...", PlayerMap.Instance.GetPlayerNameFromSteamId(steamId)));
 
-						//CubeGridEntity grid = new CubeGridEntity((MyObjectBuilder_CubeGrid)entityToTransport.GetObjectBuilder(), entityToTransport);
-						//if (!CubeGrids.WaitForLoadingEntity(grid))
-						//	continue;
-						/*
-						foreach(CubeBlockEntity block in grid.CubeBlocks)
-						{
-							if(block is CockpitEntity)
-							{
-								block.IntegrityPercent = 0.1f;
-								Log.Info(string.Format("Removing User From Cockpit: {0}", steamId));
-							}
-						}
-						*/
+			//CubeGridEntity grid = new CubeGridEntity((MyObjectBuilder_CubeGrid)entityToTransport.GetObjectBuilder(), entityToTransport);
+			//if (!CubeGrids.WaitForLoadingEntity(grid))
+			//	continue;
+			/*
+			foreach(CubeBlockEntity block in grid.CubeBlocks)
+			{
+				if(block is CockpitEntity)
+				{
+					block.IntegrityPercent = 0.1f;
+					Log.Info(string.Format("Removing User From Cockpit: {0}", steamId));
+				}
+			}
+			*/
 
-						/*
+			/*
 
 //						Wrapper.GameAction(() =>
 //						{
-							// This should boot them out of their ship: it does not, it kills them :(
+				// This should boot them out of their ship: it does not, it kills them :(
 //							MyAPIGateway.Entities.RemoveEntity(entityToTransport);
-							MyAPIGateway.Entities.RemapObjectBuilder(cubeGrid);
+				MyAPIGateway.Entities.RemapObjectBuilder(cubeGrid);
 //						});
 
-						CubeGridEntity gridEntity = new CubeGridEntity(cubeGrid);
-						gridEntity.PositionAndOrientation = CubeGrids.CreatePositionAndOrientation(validPosition, asteroidPosition);
-						SectorObjectManager.Instance.AddEntity(gridEntity);
-						//Communication.SendPrivateInformation(steamId, string.Format("You have been moved!  You should be within {0} meters of an asteroid.", PluginSettings.Instance.NewUserTransportDistance));
-					}
-				}
-			}
-						 */ 
+			CubeGridEntity gridEntity = new CubeGridEntity(cubeGrid);
+			gridEntity.PositionAndOrientation = CubeGrids.CreatePositionAndOrientation(validPosition, asteroidPosition);
+			SectorObjectManager.Instance.AddEntity(gridEntity);
+			//Communication.SendPrivateInformation(steamId, string.Format("You have been moved!  You should be within {0} meters of an asteroid.", PluginSettings.Instance.NewUserTransportDistance));
+		}
+	}
+}
+			 */
 
-			base.Handle();
+			base.Handle( );
 		}
 
-		public override void OnPlayerJoined(ulong remoteUserId)
+		public override void OnPlayerJoined( ulong remoteUserId )
 		{
-			if (!PluginSettings.Instance.NewUserTransportEnabled)
+			if ( !PluginSettings.Instance.NewUserTransportEnabled )
 				return;
 
-			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId).Any() && !PluginSettings.Instance.NewUserTransportMoveAllSpawnShips)
+			if ( PlayerMap.Instance.GetPlayerIdsFromSteamId( remoteUserId ).Any( ) && !PluginSettings.Instance.NewUserTransportMoveAllSpawnShips )
 				return;
 
-			lock (_newUserList)
+			lock ( _newUserList )
 			{
-				_newUserList.Add(remoteUserId);
+				_newUserList.Add( remoteUserId );
 				Essentials.Log.Info( "New User Transport Queued: {0}", remoteUserId );
 			}
 
-			base.OnPlayerJoined(remoteUserId);
+			base.OnPlayerJoined( remoteUserId );
 		}
 
-		public override void OnPlayerLeft(ulong remoteUserId)
+		public override void OnPlayerLeft( ulong remoteUserId )
 		{
-			if (!PluginSettings.Instance.NewUserTransportEnabled)
+			if ( !PluginSettings.Instance.NewUserTransportEnabled )
 				return;
 
-			lock (_newUserList)
+			lock ( _newUserList )
 			{
-				if (_newUserList.Exists(x => x == remoteUserId))
+				if ( _newUserList.Exists( x => x == remoteUserId ) )
 				{
 					Essentials.Log.Info( "Queued Transport Removed: {0}", remoteUserId );
-					_newUserList.RemoveAll(x => x == remoteUserId);
+					_newUserList.RemoveAll( x => x == remoteUserId );
 				}
 			}
 
-			base.OnPlayerLeft(remoteUserId);
+			base.OnPlayerLeft( remoteUserId );
 		}
 
-		public override void OnEntityAdd(IMyEntity entity)
+		public override void OnEntityAdd( IMyEntity entity )
 		{
-			if (!PluginSettings.Instance.NewUserTransportEnabled)
+			if ( !PluginSettings.Instance.NewUserTransportEnabled )
 				return;
 
-			TransportPlayer(entity);
-			
-			base.OnEntityAdd(entity);
+			TransportPlayer( entity );
+
+			base.OnEntityAdd( entity );
 		}
 
-		private void TransportPlayer(IMyEntity entityToTransport)
+		private void TransportPlayer( IMyEntity entityToTransport )
 		{
-			if (entityToTransport is IMyCharacter)
+			if ( entityToTransport is IMyCharacter )
 			{
-				MyObjectBuilder_Character c = (MyObjectBuilder_Character)entityToTransport.GetObjectBuilder();
-				if (c.Health < 1)
+				MyObjectBuilder_Character c = (MyObjectBuilder_Character)entityToTransport.GetObjectBuilder( );
+				if ( c.Health < 1 )
 					return;
 
-				Thread.Sleep(50);
-				BoundingSphereD sphere = new BoundingSphereD(entityToTransport.GetTopMostParent().GetPosition(), 300);
-				List<IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
+				Thread.Sleep( 50 );
+				BoundingSphereD sphere = new BoundingSphereD( entityToTransport.GetTopMostParent( ).GetPosition( ), 300 );
+				List<IMyEntity> entities = MyAPIGateway.Entities.GetEntitiesInSphere( ref sphere );
 
 				bool found = entities.Any( testEntity => testEntity != entityToTransport );
 
-				if (found)
+				if ( found )
 					return;
 
-				MoveEntity(entityToTransport);
+				MoveEntity( entityToTransport );
 			}
-			else if (entityToTransport is IMyCubeGrid)
+			else if ( entityToTransport is IMyCubeGrid )
 			{
-				foreach (string name in PluginSettings.Instance.NewUserTransportSpawnShipNames)
+				foreach ( string name in PluginSettings.Instance.NewUserTransportSpawnShipNames )
 				{
-					if (entityToTransport.DisplayName.ToLower().Contains(name.ToLower()))
+					if ( entityToTransport.DisplayName.ToLower( ).Contains( name.ToLower( ) ) )
 					{
-						if (PluginSettings.Instance.DynamicClientConcealEnabled)
+						if ( PluginSettings.Instance.DynamicClientConcealEnabled )
 						{
 							//ClientEntityManagement.SyncFix.Add(entityToTransport.EntityId, DateTime.Now);
 						}
 
-						MoveEntity(entityToTransport);
+						MoveEntity( entityToTransport );
 						break;
 					}
 				}
 			}
 		}
 
-		private void MoveEntity(IMyEntity entity)
+		private void MoveEntity( IMyEntity entity )
 		{
-			Thread.Sleep(100);
+			Thread.Sleep( 100 );
 			Vector3D validPosition = Vector3D.Zero;
 			Vector3D asteroidPosition = Vector3D.Zero;
 
-			if (PluginSettings.Instance.NewUserTransportSpawnType == NewUserTransportSpawnPoint.Asteroids)
-				FindViableAsteroid(out validPosition, out asteroidPosition);
-			else if (PluginSettings.Instance.NewUserTransportSpawnType == NewUserTransportSpawnPoint.Origin)
-				validPosition = MathUtility.RandomPositionFromPoint(Vector3D.Zero, PluginSettings.Instance.NewUserTransportDistance);
+			if ( PluginSettings.Instance.NewUserTransportSpawnType == NewUserTransportSpawnPoint.Asteroids )
+				FindViableAsteroid( out validPosition, out asteroidPosition );
+			else if ( PluginSettings.Instance.NewUserTransportSpawnType == NewUserTransportSpawnPoint.Origin )
+				validPosition = MathUtility.RandomPositionFromPoint( Vector3D.Zero, PluginSettings.Instance.NewUserTransportDistance );
 
-			if (validPosition == Vector3D.Zero)
+			if ( validPosition == Vector3D.Zero )
 			{
 				Essentials.Log.Info( "Could not find a valid asteroid to drop off a new user." );
 				return;
 			}
 
 			//Log.Info(string.Format("Attempting to move a character to: {0}", General.Vector3DToString(validPosition)));
-			List<IMyPlayer> players = new List<IMyPlayer>();
-			MyAPIGateway.Players.GetPlayers(players);
+			List<IMyPlayer> players = new List<IMyPlayer>( );
+			MyAPIGateway.Players.GetPlayers( players );
 			IMyPlayer targetPlayer = null;
-			foreach(IMyPlayer player in players)
+			foreach ( IMyPlayer player in players )
 			{
-				if(player.Controller == null || player.Controller.ControlledEntity == null || player.Controller.ControlledEntity.Entity == null)
+				if ( player.Controller == null || player.Controller.ControlledEntity == null || player.Controller.ControlledEntity.Entity == null )
 					continue;
 
-				if(player.Controller.ControlledEntity.Entity.GetTopMostParent() == entity)
+				if ( player.Controller.ControlledEntity.Entity.GetTopMostParent( ) == entity )
 				{
 					targetPlayer = player;
 					break;
 				}
 			}
 
-			if(targetPlayer == null)
+			if ( targetPlayer == null )
 			{
 				//Log.Info(string.Format("Unable to find target player for entityToTransport"));
 				return;
 			}
 
-			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(targetPlayer.SteamUserId).Any() && !PluginSettings.Instance.NewUserTransportMoveAllSpawnShips)
+			if ( PlayerMap.Instance.GetPlayerIdsFromSteamId( targetPlayer.SteamUserId ).Any( ) && !PluginSettings.Instance.NewUserTransportMoveAllSpawnShips )
 			{
-				Essentials.Log.Info( string.Format( "Not a new user, skipping" ) );
+				Essentials.Log.Info( "Not a new user, skipping" );
 				return;
 			}
 
 			Essentials.Log.Info( "Moving player {0} to '{1}'", targetPlayer.DisplayName, validPosition );
-			Communication.SendClientMessage(targetPlayer.SteamUserId, string.Format("/move normal {0} {1} {2}", validPosition.X, validPosition.Y, validPosition.Z));
+			Communication.SendClientMessage( targetPlayer.SteamUserId, string.Format( "/move normal {0} {1} {2}", validPosition.X, validPosition.Y, validPosition.Z ) );
 		}
 
-		private void FindViableAsteroid(out Vector3D validPosition, out Vector3D asteroidPosition)
+		private void FindViableAsteroid( out Vector3D validPosition, out Vector3D asteroidPosition )
 		{
 			validPosition = Vector3D.Zero;
 			asteroidPosition = Vector3D.Zero;
 
-			List<VoxelMap> voxelMaps = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>();
-			for(int r = 0; r < voxelMaps.Count; r++)
+			List<VoxelMap> voxelMaps = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>( );
+			for ( int r = 0; r < voxelMaps.Count; r++ )
 			{
-				int choice = _random.Next(0, voxelMaps.Count - r);
-				VoxelMap voxelMap = voxelMaps[choice];
-				voxelMaps.RemoveAt(choice);
+				int choice = _random.Next( 0, voxelMaps.Count - r );
+				VoxelMap voxelMap = voxelMaps[ choice ];
+				voxelMaps.RemoveAt( choice );
 
-				if (PluginSettings.Instance.NewUserTransportAsteroidDistance > 0 && Vector3D.Distance(voxelMap.Position, Vector3D.Zero) > PluginSettings.Instance.NewUserTransportAsteroidDistance)
+				if ( PluginSettings.Instance.NewUserTransportAsteroidDistance > 0 && Vector3D.Distance( voxelMap.Position, Vector3D.Zero ) > PluginSettings.Instance.NewUserTransportAsteroidDistance )
 					continue;
 
 				Essentials.Log.Info( "Found asteroid with viable materials: {0} - {1}", voxelMap.Name, voxelMap.Materials.Count );
 				asteroidPosition = voxelMap.Position;
-				validPosition = MathUtility.RandomPositionFromPoint(asteroidPosition, PluginSettings.Instance.NewUserTransportDistance);
+				validPosition = MathUtility.RandomPositionFromPoint( asteroidPosition, PluginSettings.Instance.NewUserTransportDistance );
 				break;
 
 				/*
@@ -393,7 +393,7 @@
 					validPosition = MathUtility.RandomPositionFromPoint(asteroidPosition, PluginSettings.Instance.NewUserTransportDistance);
 					break;
 				}
-				 */ 
+				 */
 			}
 		}
 	}
