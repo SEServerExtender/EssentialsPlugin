@@ -13,6 +13,8 @@ using SEModAPIExtensions.API;
 namespace EssentialsPlugin.Utility
 {
 	using NLog;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Server;
 
 	public class Communication
 	{
