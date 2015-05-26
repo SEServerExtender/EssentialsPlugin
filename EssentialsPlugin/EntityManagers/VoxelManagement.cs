@@ -41,7 +41,7 @@ namespace EssentialsPlugin.EntityManagers
                 }
                 catch
                 {
-                    Logging.WriteLineAndConsole(string.Format("CheckAndSendVoxels(): Entity list busy, skipping check"));
+	                Essentials.Log.Info( "Entity list busy, skipping check" );
                     return;
                 }
 
@@ -83,11 +83,11 @@ namespace EssentialsPlugin.EntityManagers
                 }
 
                 if ((DateTime.Now - start).TotalSeconds > 1)
-                    Logging.WriteLineAndConsole(string.Format("CheckAndSendVoxels(): {0}ms", (DateTime.Now - start).TotalMilliseconds));
+                    Essentials.Log.Debug("CheckAndSendVoxels(): {0}ms", (DateTime.Now - start).TotalMilliseconds);
             }
             catch (Exception ex)
             {
-                Logging.WriteLineAndConsole(string.Format("CheckAndSendVoxels(): {0}", ex.ToString()));
+	            Essentials.Log.Error( "{0}", ex );
             }
             finally
             {
@@ -143,7 +143,7 @@ namespace EssentialsPlugin.EntityManagers
                 {
                     headerData[r + 2] = (byte)headerString[r];
                 }
-                Logging.WriteLineAndConsole(string.Format("Sending Voxel Header Data: {0} / {1} - {2} ({3})", voxelData.Length, headerData.Length, steamId, voxel.GetPosition()));
+                Essentials.Log.Debug("Sending Voxel Header Data: {0} / {1} - {2} ({3})", voxelData.Length, headerData.Length, steamId, voxel.GetPosition());
                 Communication.SendDataMessage(steamId, 5001, headerData);
 
                 int blockSize = 4096;
@@ -171,7 +171,7 @@ namespace EssentialsPlugin.EntityManagers
             }
             catch (Exception ex)
             {
-                Logging.WriteLineAndConsole(string.Format("SendVoxelData(): {0}", ex.ToString()));
+	            Essentials.Log.Error( "{0}", ex );
             }
         }
 
