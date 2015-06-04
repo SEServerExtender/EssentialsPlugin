@@ -5,6 +5,7 @@
 	using EssentialsPlugin.Utility;
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
+	using VRage.ModAPI;
 
 	public class ProcessProtection : ProcessHandlerBase
 	{

@@ -1,9 +1,9 @@
-﻿using System;
-using VRageMath;
-using Sandbox.ModAPI;
-
-namespace EssentialsPlugin.Utility
+﻿namespace EssentialsPlugin.Utility
 {
+	using System;
+	using Sandbox.ModAPI;
+	using VRageMath;
+
 	public static class MathUtility
 	{
 		private static Random m_random = new Random();

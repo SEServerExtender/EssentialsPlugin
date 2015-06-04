@@ -10,6 +10,8 @@
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity;
 	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+	using VRage;
+	using VRage.ModAPI;
 	using VRageMath;
 
 	public class ProcessCommunication : ProcessHandlerBase

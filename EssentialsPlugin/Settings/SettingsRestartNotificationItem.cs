@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace EssentialsPlugin.Settings
+﻿namespace EssentialsPlugin.Settings
 {
+	using System;
+
 	[Serializable]
 	public class RestartNotificationItem
 	{

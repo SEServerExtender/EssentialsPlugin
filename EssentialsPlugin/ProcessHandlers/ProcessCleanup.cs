@@ -5,8 +5,8 @@
 	using System.Linq;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
-	using Sandbox.ModAPI;
 	using SEModAPI.API.Utility;
+	using VRage.ModAPI;
 
 	class ProcessCleanup : ProcessHandlerBase
 	{

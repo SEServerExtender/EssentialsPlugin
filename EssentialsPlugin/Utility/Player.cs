@@ -1,31 +1,28 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.IO;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Reflection;
-
-using Sandbox.ModAPI;
-using Sandbox.Common.ObjectBuilders;
-using Sandbox.Common.ObjectBuilders.Definitions;
-
-using VRageMath;
-
-using SEModAPIInternal.API.Entity;
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-
-using SEModAPIInternal.API.Common;
-
-using EssentialsPlugin.UtilityClasses;
-
-namespace EssentialsPlugin.Utility
+﻿namespace EssentialsPlugin.Utility
 {
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Linq;
+	using System.Reflection;
+	using System.Text.RegularExpressions;
+	using System.Threading;
+	using System.Threading.Tasks;
+	using System.Xml.Serialization;
+	using EssentialsPlugin.UtilityClasses;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.Common.ObjectBuilders.Definitions;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.API.Entity;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+	using VRage;
 	using VRage.FileSystem;
+	using VRage.ModAPI;
+	using VRage.ObjectBuilders;
+	using VRageMath;
 
 	public static class Player
 	{

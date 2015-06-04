@@ -1,16 +1,17 @@
-﻿using System;
-using System.Windows.Forms.Design;
-using System.Drawing.Design;
-using System.Windows.Forms;
-
-namespace EssentialsPlugin.UtilityClasses
+﻿namespace EssentialsPlugin.UtilityClasses
 {
+	using System;
+	using System.ComponentModel;
+	using System.Drawing.Design;
+	using System.Windows.Forms;
+	using System.Windows.Forms.Design;
+
 	internal class TimePickerEditor : UITypeEditor
 	{
 		IWindowsFormsEditorService editorService;
 		string time;
 
-		public override object EditValue(System.ComponentModel.ITypeDescriptorContext context, IServiceProvider provider, object value)
+		public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
 		{
 			if (provider != null)
 			{
@@ -39,7 +40,7 @@ namespace EssentialsPlugin.UtilityClasses
 			return value;
 		}
 
-		public override UITypeEditorEditStyle GetEditStyle(System.ComponentModel.ITypeDescriptorContext context)
+		public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
 		{
 			return UITypeEditorEditStyle.DropDown;
 		}

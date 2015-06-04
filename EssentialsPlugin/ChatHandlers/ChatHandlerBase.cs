@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
-using SEModAPIInternal.API.Common;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
-	using System.IO;
+	using System;
+	using System.Linq;
 	using NLog;
-	using NLog.Layouts;
+	using SEModAPIInternal.API.Common;
 
 	public abstract class ChatHandlerBase
 	{

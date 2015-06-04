@@ -1,10 +1,10 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.ComponentModel.Design;
-
-namespace EssentialsPlugin.Settings
+﻿namespace EssentialsPlugin.Settings
 {
+	using System;
+	using System.ComponentModel;
+	using System.ComponentModel.Design;
+	using System.Drawing.Design;
+
 	[Serializable]
 	public class InformationItem
 	{

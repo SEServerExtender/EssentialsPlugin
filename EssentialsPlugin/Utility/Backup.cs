@@ -1,10 +1,10 @@
-﻿using System;
-using System.IO;
-using SEModAPIExtensions.API;
-using System.IO.Compression;
-
-namespace EssentialsPlugin.Utility
+﻿namespace EssentialsPlugin.Utility
 {
+	using System;
+	using System.IO;
+	using System.IO.Compression;
+	using SEModAPIExtensions.API;
+
 	static class Backup
 	{
 		static public void Create(string baseDirectory, bool createSubDirectories, bool backupAsteroids, bool backupSettings = false)

@@ -1,21 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-
-using VRageMath;
-
-using Sandbox.ModAPI;
-using Sandbox.Common.ObjectBuilders;
-using Sandbox.Common;
-
-using SEModAPIInternal.API.Entity;
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-using SEModAPIInternal.API.Common;
-
-namespace EssentialsPlugin.Utility
+﻿namespace EssentialsPlugin.Utility
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Threading;
 	using NLog;
+	using Sandbox.Common;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.API.Entity;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+	using VRage;
+	using VRage.ModAPI;
+	using VRageMath;
 
 	public enum RemoveGridTypes
 	{

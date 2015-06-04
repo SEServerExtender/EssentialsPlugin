@@ -6,6 +6,7 @@
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
+	using VRage.ModAPI;
 	using VRageMath;
 
 	public class ProcessSpawnShipTracking : ProcessHandlerBase

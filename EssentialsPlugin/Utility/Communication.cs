@@ -1,20 +1,19 @@
-﻿using System;
-using System.Linq;
-using System.IO;
-using Sandbox.Common.ObjectBuilders;
-using Sandbox.Common;
-using VRageMath;
-
-using SEModAPIInternal.API.Entity;
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-using SEModAPIInternal.API.Common;
-using SEModAPIExtensions.API;
-
-namespace EssentialsPlugin.Utility
+﻿namespace EssentialsPlugin.Utility
 {
+	using System;
+	using System.IO;
+	using System.Linq;
 	using NLog;
+	using Sandbox.Common;
+	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
+	using SEModAPIExtensions.API;
+	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.API.Entity;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject;
 	using SEModAPIInternal.API.Server;
+	using VRage;
+	using VRageMath;
 
 	public class Communication
 	{

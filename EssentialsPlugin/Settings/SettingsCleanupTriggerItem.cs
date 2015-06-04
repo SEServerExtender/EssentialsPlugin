@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace EssentialsPlugin.Settings
+﻿namespace EssentialsPlugin.Settings
 {
+	using System;
+	using System.Collections.Generic;
+
 	public class SettingsCleanupTriggerItem
 	{
 		public DateTime LastRan = DateTime.Now;

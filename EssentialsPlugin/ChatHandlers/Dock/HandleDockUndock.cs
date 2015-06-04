@@ -10,6 +10,8 @@
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity;
+	using VRage;
+	using VRage.ObjectBuilders;
 	using VRageMath;
 
 	public class HandleDockUndock: ChatHandlerBase

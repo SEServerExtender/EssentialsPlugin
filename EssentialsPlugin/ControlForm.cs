@@ -1,7 +1,7 @@
-﻿using System.Windows.Forms;
-
-namespace EssentialsPlugin
+﻿namespace EssentialsPlugin
 {
+	using System.Windows.Forms;
+
 	public partial class ControlForm : Form
 	{
 		public ControlForm()

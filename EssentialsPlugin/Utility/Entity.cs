@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using VRageMath;
-
-using Sandbox.Common.ObjectBuilders;
-using Sandbox.Definitions;
-using Sandbox.Common;
-using Sandbox.ModAPI;
-
-using EssentialsPlugin.UtilityClasses;
-
-namespace EssentialsPlugin.Utility
+﻿namespace EssentialsPlugin.Utility
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using EssentialsPlugin.UtilityClasses;
 	using NLog;
+	using Sandbox.Common;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.Definitions;
+	using Sandbox.ModAPI;
+	using VRage.ModAPI;
+	using VRageMath;
 
 	class Entity
 	{

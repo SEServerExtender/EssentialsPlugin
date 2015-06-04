@@ -1,11 +1,10 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing.Design;
-
-using EssentialsPlugin.UtilityClasses;
-
-namespace EssentialsPlugin.Settings
+﻿namespace EssentialsPlugin.Settings
 {
+	using System;
+	using System.ComponentModel;
+	using System.Drawing.Design;
+	using EssentialsPlugin.UtilityClasses;
+
 	[Serializable]
 	public class RestartTimeItem
 	{

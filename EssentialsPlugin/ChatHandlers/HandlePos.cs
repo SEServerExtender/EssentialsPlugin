@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Sandbox.ModAPI;
-using EssentialsPlugin.Utility;
-using VRageMath;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System.Collections.Generic;
+	using System.Linq;
+	using EssentialsPlugin.Utility;
+	using Sandbox.ModAPI;
+	using VRageMath;
+
 	public class HandlePos : ChatHandlerBase
 	{
 		public override string GetHelp()

@@ -1,28 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.IO;
-using System.Runtime.InteropServices;
-using Sandbox.ModAPI;
-
-using SEModAPIExtensions.API;
-using SEModAPIExtensions.API.Plugin;
-using SEModAPIExtensions.API.Plugin.Events;
-
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
-using SEModAPIInternal.API.Common;
-
-using EssentialsPlugin.Utility;
-using EssentialsPlugin.ChatHandlers;
-using EssentialsPlugin.UtilityClasses;
-using EssentialsPlugin.Settings;
-
-namespace EssentialsPlugin
+﻿namespace EssentialsPlugin
 {
+	using System;
+	using System.Collections.Generic;
+	using System.ComponentModel;
+	using System.ComponentModel.Design;
+	using System.Drawing.Design;
+	using System.IO;
+	using System.Linq;
+	using System.Reflection;
+	using System.Runtime.InteropServices;
+	using System.Threading;
+	using System.Windows.Forms.Design;
+	using EssentialsPlugin.ChatHandlers;
 	using EssentialsPlugin.ChatHandlers.Admin;
 	using EssentialsPlugin.ChatHandlers.AdminConceal;
 	using EssentialsPlugin.ChatHandlers.AdminDelete;
@@ -30,8 +19,19 @@ namespace EssentialsPlugin
 	using EssentialsPlugin.ChatHandlers.Dock;
 	using EssentialsPlugin.ChatHandlers.Waypoints;
 	using EssentialsPlugin.ProcessHandlers;
+	using EssentialsPlugin.Settings;
+	using EssentialsPlugin.Utility;
+	using EssentialsPlugin.UtilityClasses;
 	using NLog;
+	using Sandbox.ModAPI;
 	using SEModAPI.API.Utility;
+	using SEModAPIExtensions.API;
+	using SEModAPIExtensions.API.Plugin;
+	using SEModAPIExtensions.API.Plugin.Events;
+	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
+	using VRage.ModAPI;
 
 	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
 	{
@@ -189,7 +189,7 @@ namespace EssentialsPlugin
 		[Description( "Extra processes to run before the server is restarted.  Allows adding custom scripts during restart.  Each line is a seperate process." )]
 		[Browsable( true )]
 		[ReadOnly( false )]
-		[EditorAttribute( typeof( System.ComponentModel.Design.MultilineStringEditor ), typeof( System.Drawing.Design.UITypeEditor ) )]
+		[Editor( typeof( MultilineStringEditor ), typeof( UITypeEditor ) )]
 		public string RestartAddedProcesses
 		{
 			get
@@ -314,7 +314,7 @@ namespace EssentialsPlugin
 		[Description( "Base directory to put backups into" )]
 		[Browsable( true )]
 		[ReadOnly( false )]
-		[EditorAttribute( typeof( System.Windows.Forms.Design.FolderNameEditor ), typeof( System.Drawing.Design.UITypeEditor ) )]
+		[Editor( typeof( FolderNameEditor ), typeof( UITypeEditor ) )]
 		public string BackupBaseDirectory
 		{
 			get { return PluginSettings.Instance.BackupBaseDirectory; }

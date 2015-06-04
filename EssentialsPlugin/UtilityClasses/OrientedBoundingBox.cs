@@ -1,8 +1,8 @@
-﻿using System;
-using VRageMath;
-
-namespace EssentialsPlugin.UtilityClasses
+﻿namespace EssentialsPlugin.UtilityClasses
 {
+	using System;
+	using VRageMath;
+
 	public struct OrientedBoundingBox : IEquatable<OrientedBoundingBox>
 	{
 		#region Constants

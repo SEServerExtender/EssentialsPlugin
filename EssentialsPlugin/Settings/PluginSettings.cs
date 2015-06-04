@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Collections;
-using System.IO;
-using System.Linq;
-using System.Xml.Serialization;
-using System.ComponentModel;
-using System.Reflection;
-
-using EssentialsPlugin.Utility;
-using EssentialsPlugin.UtilityClasses;
-using EssentialsPlugin.Settings;
-using EssentialsPlugin.GameModes;
-
-namespace EssentialsPlugin
+﻿namespace EssentialsPlugin
 {
+	using System;
+	using System.Collections;
+	using System.Collections.Generic;
+	using System.Collections.Specialized;
+	using System.ComponentModel;
+	using System.IO;
+	using System.Linq;
+	using System.Reflection;
+	using System.Xml.Serialization;
+	using EssentialsPlugin.GameModes;
+	using EssentialsPlugin.Settings;
+	using EssentialsPlugin.Utility;
+	using EssentialsPlugin.UtilityClasses;
 	using VRage.FileSystem;
 
 	[Serializable]

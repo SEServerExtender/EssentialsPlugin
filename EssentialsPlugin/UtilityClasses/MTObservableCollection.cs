@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Specialized;
-using System.Collections.ObjectModel;
-using System.Windows.Threading;
-
-namespace EssentialsPlugin.UtilityClasses
+﻿namespace EssentialsPlugin.UtilityClasses
 {
+	using System;
+	using System.Collections.ObjectModel;
+	using System.Collections.Specialized;
+	using System.Windows.Threading;
+
 	public class MTObservableCollection<T> : ObservableCollection<T>
 	{
 		public override event NotifyCollectionChangedEventHandler CollectionChanged;

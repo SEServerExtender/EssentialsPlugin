@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Xml.Serialization;
-
-using EssentialsPlugin.Utility;
-
-using Sandbox.ModAPI;
-using Sandbox.Common.ObjectBuilders;
-
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-
-using EssentialsPlugin.UtilityClasses;
-
-
-namespace EssentialsPlugin.EntityManagers
+﻿namespace EssentialsPlugin.EntityManagers
 {
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Linq;
+	using System.Xml.Serialization;
+	using EssentialsPlugin.Utility;
+	using EssentialsPlugin.UtilityClasses;
 	using NLog;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+	using VRage.ModAPI;
 
 	public class BlockManagement
 	{
@@ -37,12 +32,12 @@ namespace EssentialsPlugin.EntityManagers
 		{
 			get
 			{
-				if (BlockManagement._instance == null)
+				if (_instance == null)
 				{
 					Load();
 				}
 
-				return BlockManagement._instance;
+				return _instance;
 			}
 		}
 
@@ -335,17 +330,17 @@ namespace EssentialsPlugin.EntityManagers
 					using (StreamReader reader = new StreamReader(fileName))
 					{
 						XmlSerializer x = new XmlSerializer(typeof(BlockManagement));
-						BlockManagement._instance = (BlockManagement)x.Deserialize(reader);
+						_instance = (BlockManagement)x.Deserialize(reader);
 						reader.Close();
 					}
 				}
 				else
-					BlockManagement._instance = new BlockManagement();
+					_instance = new BlockManagement();
 			}
 			catch (Exception ex)
 			{
 				Log.Info(string.Format("BlockManagement Load Error: {0}", ex.ToString()));
-				BlockManagement._instance = new BlockManagement();
+				_instance = new BlockManagement();
 			}
 		}
 

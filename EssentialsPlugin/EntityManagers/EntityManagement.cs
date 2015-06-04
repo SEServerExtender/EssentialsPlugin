@@ -12,6 +12,8 @@
 	using Sandbox.ModAPI.Ingame;
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity;
+	using VRage.ModAPI;
+	using VRage.ObjectBuilders;
 	using VRageMath;
 	using IMyCubeBlock = Sandbox.ModAPI.IMyCubeBlock;
 	using IMyCubeGrid = Sandbox.ModAPI.IMyCubeGrid;

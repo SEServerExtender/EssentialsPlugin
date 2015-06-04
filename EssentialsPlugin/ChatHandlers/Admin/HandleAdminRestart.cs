@@ -1,9 +1,8 @@
-﻿using System;
-using EssentialsPlugin.Utility;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System;
 	using EssentialsPlugin.ProcessHandlers;
+	using EssentialsPlugin.Utility;
 
 	public class HandleAdminRestart : ChatHandlerBase
 	{

@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using EssentialsPlugin.Utility;
-
-using Sandbox.ModAPI;
-using Sandbox.ModAPI.Interfaces;
-using Sandbox.Common.ObjectBuilders;
-
-using VRageMath;
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-using SEModAPIInternal.API.Common;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System;
+	using System.Collections.Generic;
+	using EssentialsPlugin.Utility;
+	using Sandbox.Common;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using Sandbox.ModAPI.Interfaces;
+	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+	using VRage.ModAPI;
+	using VRageMath;
+
 	public class HandleAdminTurrets : ChatHandlerBase
 	{
 		private Random m_random = new Random();
@@ -116,8 +116,8 @@ namespace EssentialsPlugin.ChatHandlers
 								{
 									foreach (long owner in testGrid.BigOwners)
 									{
-										if (block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies ||
-											block.FatBlock.GetUserRelationToOwner(owner) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Neutral)
+										if (block.FatBlock.GetUserRelationToOwner(owner) == MyRelationsBetweenPlayerAndBlock.Enemies ||
+											block.FatBlock.GetUserRelationToOwner(owner) == MyRelationsBetweenPlayerAndBlock.Neutral)
 										{
 											found = true;
 											keepOn++;
@@ -146,8 +146,8 @@ namespace EssentialsPlugin.ChatHandlers
 										if (playerId < 1)
 											continue;
 
-										if (block.FatBlock.GetUserRelationToOwner(playerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Enemies ||
-											block.FatBlock.GetUserRelationToOwner(playerId) == Sandbox.Common.MyRelationsBetweenPlayerAndBlock.Neutral)
+										if (block.FatBlock.GetUserRelationToOwner(playerId) == MyRelationsBetweenPlayerAndBlock.Enemies ||
+											block.FatBlock.GetUserRelationToOwner(playerId) == MyRelationsBetweenPlayerAndBlock.Neutral)
 										{
 											found = true;
 											keepOn++;

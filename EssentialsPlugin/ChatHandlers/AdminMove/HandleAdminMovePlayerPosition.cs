@@ -1,9 +1,9 @@
-﻿using System.Linq;
-using EssentialsPlugin.Utility;
-using VRageMath;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System.Linq;
+	using EssentialsPlugin.Utility;
+	using VRageMath;
+
 	public class HandleAdminMovePlayerPosition : ChatHandlerBase
 	{
 		public override string GetHelp()

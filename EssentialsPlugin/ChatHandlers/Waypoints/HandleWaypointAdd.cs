@@ -3,8 +3,8 @@
 	using System;
 	using System.Collections.Generic;
 	using EssentialsPlugin.Utility;
-	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
+	using VRage.ModAPI;
 	using VRageMath;
 
 	public class HandleWaypointAdd : ChatHandlerBase

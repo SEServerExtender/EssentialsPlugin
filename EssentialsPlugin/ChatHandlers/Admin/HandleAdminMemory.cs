@@ -1,8 +1,8 @@
-﻿using System;
-using EssentialsPlugin.Utility;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System;
+	using EssentialsPlugin.Utility;
+
 	public class HandleAdminMemory : ChatHandlerBase
 	{
 		public override string GetHelp()

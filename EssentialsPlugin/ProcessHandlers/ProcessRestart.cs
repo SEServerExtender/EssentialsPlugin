@@ -2,6 +2,7 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.IO;
 	using System.Threading;
 	using System.Windows.Forms;
@@ -10,6 +11,7 @@
 	using Sandbox.ModAPI;
 	using SEModAPIExtensions.API;
 	using SEModAPIInternal.API.Common;
+	using VRage.ModAPI;
 	using VRageMath;
 
 	class ProcessRestart : ProcessHandlerBase
@@ -97,7 +99,7 @@
 				restartText += Path.GetFileName(Application.ExecutablePath) + " " + Server.Instance.CommandLineArgs.Args + "\r\n";
 
 				File.WriteAllText("RestartApp.bat", restartText);
-				System.Diagnostics.Process.Start("RestartApp.bat");
+				Process.Start("RestartApp.bat");
 			}
 
 			Environment.Exit(1);

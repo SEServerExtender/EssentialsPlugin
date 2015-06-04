@@ -1,22 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Xml.Serialization;
-
-using EssentialsPlugin.Utility;
-
-using Sandbox.ModAPI;
-using Sandbox.Common.ObjectBuilders;
-using Sandbox.Common.ObjectBuilders.VRageData;
-
-using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-using SEModAPIInternal.API.Server;
-
-using EssentialsPlugin.UtilityClasses;
-
-namespace EssentialsPlugin.EntityManagers
+﻿namespace EssentialsPlugin.EntityManagers
 {
+	using System;
+	using System.Collections.Generic;
+	using EssentialsPlugin.Utility;
+	using Sandbox.ModAPI;
+	using VRage;
+	using VRage.ModAPI;
+
 	public class VoxelManagement
 	{
 		private static Dictionary<ulong, HashSet<long>> m_userVoxels = new Dictionary<ulong, HashSet<long>>( );

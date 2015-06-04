@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using EssentialsPlugin.Utility;
-using EssentialsPlugin.EntityManagers;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System.Collections.Generic;
+	using EssentialsPlugin.EntityManagers;
+	using EssentialsPlugin.Utility;
+
 	public class HandleUtilityGridsRefresh : ChatHandlerBase
 	{
 		private static HashSet<ulong> m_refreshTrack = new HashSet<ulong>();

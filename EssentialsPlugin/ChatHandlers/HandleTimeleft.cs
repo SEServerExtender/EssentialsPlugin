@@ -1,10 +1,9 @@
-﻿using System;
-using EssentialsPlugin.Utility;
-using EssentialsPlugin.Settings;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System;
 	using EssentialsPlugin.ProcessHandlers;
+	using EssentialsPlugin.Settings;
+	using EssentialsPlugin.Utility;
 
 	public class HandleTimeleft : ChatHandlerBase
 	{

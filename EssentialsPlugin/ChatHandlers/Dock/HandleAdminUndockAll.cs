@@ -8,6 +8,9 @@
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Entity;
+	using VRage;
+	using VRage.ModAPI;
+	using VRage.ObjectBuilders;
 	using VRageMath;
 
 	public class HandleAdminUndockAll : ChatHandlerBase

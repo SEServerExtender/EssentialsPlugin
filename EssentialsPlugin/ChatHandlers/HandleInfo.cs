@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using EssentialsPlugin.Utility;
-using SEModAPIInternal.API.Common;
-using EssentialsPlugin.Settings;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System;
+	using System.Linq;
+	using EssentialsPlugin.Settings;
+	using EssentialsPlugin.Utility;
+	using SEModAPIInternal.API.Common;
+
 	public class HandleInfo : ChatHandlerBase
 	{
 		public override string GetHelp()

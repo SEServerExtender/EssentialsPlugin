@@ -1,12 +1,11 @@
-﻿using System;
-using System.Linq;
-using EssentialsPlugin.Utility;
-
-using Sandbox.ModAPI;
-using VRageMath;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System;
+	using System.Linq;
+	using EssentialsPlugin.Utility;
+	using VRage.ModAPI;
+	using VRageMath;
+
 	public class HandleAdminMovePlayerTo : ChatHandlerBase
 	{
 		public override string GetHelp()

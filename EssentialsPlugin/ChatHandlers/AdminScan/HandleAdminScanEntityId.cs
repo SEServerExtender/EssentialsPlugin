@@ -1,10 +1,10 @@
-﻿using System.Linq;
-using EssentialsPlugin.Utility;
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-using SEModAPIInternal.API.Common;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System.Linq;
+	using EssentialsPlugin.Utility;
+	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+
 	public class HandleAdminScanEntityId : ChatHandlerBase
 	{
 		public override string GetHelp()

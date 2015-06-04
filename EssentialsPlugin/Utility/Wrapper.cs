@@ -1,12 +1,9 @@
-﻿using System;
-using SEModAPIInternal.API.Common;
-using System.Reflection;
-using SEModAPIInternal.Support;
-
-
-namespace EssentialsPlugin.Utility
+﻿namespace EssentialsPlugin.Utility
 {
+	using System;
+	using System.Reflection;
 	using NLog;
+	using SEModAPIInternal.API.Common;
 
 	public static class Wrapper
 	{

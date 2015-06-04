@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using System.Xml;
-using System.Xml.Serialization;
-
-namespace EssentialsPlugin.UtilityClasses
+﻿namespace EssentialsPlugin.UtilityClasses
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Runtime.Serialization;
+	using System.Xml;
+	using System.Xml.Schema;
+	using System.Xml.Serialization;
+
 	[Serializable()]
 	public class SerializableDictionary<TKey, TVal> : Dictionary<TKey, TVal>, IXmlSerializable, ISerializable
 	{
@@ -124,7 +125,7 @@ namespace EssentialsPlugin.UtilityClasses
 			reader.ReadEndElement(); // Read End Element to close Read of containing node
 		}
 
-		System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema()
+		XmlSchema IXmlSerializable.GetSchema()
 		{
 			return null;
 		}

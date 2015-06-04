@@ -1,10 +1,9 @@
-﻿using System.Linq;
-using EssentialsPlugin.Utility;
-using SEModAPIInternal.API.Common;
-
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System.Linq;
+	using EssentialsPlugin.Utility;
+	using SEModAPIInternal.API.Common;
+
 	public class HandleFactionF : ChatHandlerBase
 	{
 		public override string GetHelp()

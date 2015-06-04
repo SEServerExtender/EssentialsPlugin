@@ -246,6 +246,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.dll</HintPath>
     </Reference>
+    <Reference Include="VRage.Game">
+      <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Game.dll</HintPath>
+    </Reference>
     <Reference Include="VRage.Library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Library.dll</HintPath>

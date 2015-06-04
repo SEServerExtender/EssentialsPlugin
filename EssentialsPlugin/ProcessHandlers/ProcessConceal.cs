@@ -3,7 +3,6 @@
 	using System;
 	using EssentialsPlugin.ChatHandlers;
 	using EssentialsPlugin.EntityManagers;
-	using EssentialsPlugin.Utility;
 
 	public class ProcessConceal : ProcessHandlerBase
 	{

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Design;
-
-using EssentialsPlugin.UtilityClasses;
-
-namespace EssentialsPlugin.Settings
+﻿namespace EssentialsPlugin.Settings
 {
+	using System;
+	using System.Collections.Generic;
+	using System.ComponentModel;
+	using System.Drawing.Design;
+	using EssentialsPlugin.UtilityClasses;
+
 	public class SettingsCleanupTimedItem
 	{
 		public DateTime Restart;

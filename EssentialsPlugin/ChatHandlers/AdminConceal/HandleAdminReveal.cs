@@ -7,6 +7,8 @@
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity;
+	using VRage.ModAPI;
+	using VRage.ObjectBuilders;
 
 	public class HandleAdminReveal : ChatHandlerBase
 	{

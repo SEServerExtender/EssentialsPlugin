@@ -1,18 +1,17 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using EssentialsPlugin.Utility;
-
-using Sandbox.ModAPI;
-using Sandbox.Common.ObjectBuilders;
-
-using VRageMath;
-
-using SEModAPIInternal.API.Entity;
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System;
+	using System.Linq;
+	using System.Threading;
+	using EssentialsPlugin.Utility;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Entity;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+	using VRage;
+	using VRage.ModAPI;
+	using VRageMath;
+
 	public class HandleAdminMoveGridTo : ChatHandlerBase
 	{
 		public override string GetHelp()

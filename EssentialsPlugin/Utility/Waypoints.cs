@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Serialization;
-using System.IO;
-
-using Sandbox.ModAPI;
-
-using VRageMath;
-using SEModAPIInternal.API.Common;
-
-using EssentialsPlugin.Settings;
-
-namespace EssentialsPlugin.Utility
+﻿namespace EssentialsPlugin.Utility
 {
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Linq;
+	using System.Xml.Serialization;
+	using EssentialsPlugin.Settings;
 	using NLog;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
+	using VRageMath;
 
 	public class Waypoints
 	{

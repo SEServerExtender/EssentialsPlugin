@@ -1,15 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.IO;
-using SEModAPIInternal.Support;
-using VRageMath;
-using VRage.Common.Utils;
-
-namespace EssentialsPlugin.Utility
+﻿namespace EssentialsPlugin.Utility
 {
+	using System;
 	using System.Collections.Generic;
+	using System.Linq;
+	using VRageMath;
 
 	public static class General
 	{

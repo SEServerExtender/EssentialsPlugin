@@ -5,7 +5,12 @@
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
+	using Sandbox.ModAPI.Ingame;
 	using SEModAPIInternal.API.Common;
+	using VRage.ModAPI;
+	using VRageMath;
+	using IMyCubeGrid = Sandbox.ModAPI.IMyCubeGrid;
+	using IMyTerminalBlock = Sandbox.ModAPI.Ingame.IMyTerminalBlock;
 
 	class ProcessBlockEnforcement : ProcessHandlerBase
 	{
@@ -62,12 +67,12 @@
 					continue;
 
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				Sandbox.ModAPI.Ingame.IMyGridTerminalSystem gridTerminal = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid( grid );
+				IMyGridTerminalSystem gridTerminal = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid( grid );
 
 				Dictionary<SettingsBlockEnforcementItem, int> blocks = new Dictionary<SettingsBlockEnforcementItem, int>( );
-				foreach ( Sandbox.ModAPI.Ingame.IMyTerminalBlock myTerminalBlock in gridTerminal.Blocks )
+				foreach ( IMyTerminalBlock myTerminalBlock in gridTerminal.Blocks )
 				{
-					Sandbox.ModAPI.Ingame.IMyTerminalBlock block = myTerminalBlock;
+					IMyTerminalBlock block = myTerminalBlock;
 					foreach ( SettingsBlockEnforcementItem item in PluginSettings.Instance.BlockEnforcementItems )
 					{
 						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.Off )
@@ -161,12 +166,12 @@
 		private void DeleteReverse( SettingsBlockEnforcementItem blockEnforcementSetting, int remove, IMyCubeGrid grid )
 		{
 			int count = 0;
-			Sandbox.ModAPI.Ingame.IMyGridTerminalSystem gridTerminal = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid( grid );
+			IMyGridTerminalSystem gridTerminal = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid( grid );
 
-			List<IMyTerminalBlock> blocksToRemove = new List<IMyTerminalBlock>( );
+			List<Sandbox.ModAPI.IMyTerminalBlock> blocksToRemove = new List<Sandbox.ModAPI.IMyTerminalBlock>( );
 			for ( int r = gridTerminal.Blocks.Count - 1; r >= 0; r-- )
 			{
-				IMyTerminalBlock block = (IMyTerminalBlock)gridTerminal.Blocks[ r ];
+				Sandbox.ModAPI.IMyTerminalBlock block = (Sandbox.ModAPI.IMyTerminalBlock)gridTerminal.Blocks[ r ];
 				switch ( blockEnforcementSetting.Mode )
 				{
 					case SettingsBlockEnforcementItem.EnforcementMode.BlockSubtypeId:
@@ -208,8 +213,8 @@
 			if ( blocksToRemove.Count < 1 )
 				return;
 
-			List<VRageMath.Vector3I> razeList = new List<VRageMath.Vector3I>( );
-			foreach ( IMyTerminalBlock block in blocksToRemove )
+			List<Vector3I> razeList = new List<Vector3I>( );
+			foreach ( Sandbox.ModAPI.IMyTerminalBlock block in blocksToRemove )
 			{
 				razeList.Add( block.Min );
 			}

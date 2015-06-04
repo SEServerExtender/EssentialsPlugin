@@ -1,11 +1,14 @@
 ﻿namespace EssentialsPlugin
 {
+	using System.ComponentModel;
+	using System.Windows.Forms;
+
 	partial class ControlForm
 	{
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		private System.ComponentModel.IContainer components = null;
+		private IContainer components = null;
 
 		/// <summary>
 		/// Clean up any resources being used.
@@ -107,9 +110,9 @@
 
 		#endregion
 
-		private System.Windows.Forms.Panel panel1;
-		private System.Windows.Forms.SplitContainer splitContainer1;
-		private System.Windows.Forms.SplitContainer splitContainer2;
-		private System.Windows.Forms.ListView listView1;
+		private Panel panel1;
+		private SplitContainer splitContainer1;
+		private SplitContainer splitContainer2;
+		private ListView listView1;
 	}
 }

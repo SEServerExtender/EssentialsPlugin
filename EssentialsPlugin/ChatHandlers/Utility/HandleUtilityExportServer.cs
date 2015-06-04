@@ -1,22 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Text.RegularExpressions;
-
-using EssentialsPlugin.Utility;
-
-using Sandbox.ModAPI;
-using Sandbox.Common.ObjectBuilders;
-using Microsoft.Xml.Serialization.GeneratedAssembly;
-using VRage.Common.Utils;
-
-using SEModAPIInternal.API.Entity;
-using SEModAPIInternal.API.Common;
-
-namespace EssentialsPlugin.ChatHandlers
+﻿namespace EssentialsPlugin.ChatHandlers
 {
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Linq;
+	using System.Text.RegularExpressions;
+	using EssentialsPlugin.Utility;
+	using Microsoft.Xml.Serialization.GeneratedAssembly;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.API.Entity;
 	using VRage.FileSystem;
-	using VRage.Library.Utils;
+	using VRage.ModAPI;
 
 	public class HandleUtilityExportServer : ChatHandlerBase
 	{

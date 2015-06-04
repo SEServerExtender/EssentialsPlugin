@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Xml.Serialization;
-
-using VRageMath;
-
-using Sandbox.Common.ObjectBuilders;
-using Sandbox.Definitions;
-using Sandbox.Common;
-using Sandbox.ModAPI;
-
-using EssentialsPlugin.UtilityClasses;
-
-namespace EssentialsPlugin.Utility
+﻿namespace EssentialsPlugin.Utility
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using EssentialsPlugin.UtilityClasses;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using Sandbox.ModAPI.Ingame;
+	using VRage.ModAPI;
+	using VRageMath;
+	using IMyCubeBlock = Sandbox.ModAPI.IMyCubeBlock;
+	using IMyCubeGrid = Sandbox.ModAPI.IMyCubeGrid;
+	using IMySlimBlock = Sandbox.ModAPI.IMySlimBlock;
+	using IMyTerminalBlock = Sandbox.ModAPI.IMyTerminalBlock;
+
 	public static class DockingZone
 	{
 		private static List<DockingCooldownItem> m_cooldownItems = new List<DockingCooldownItem>();
@@ -57,10 +54,10 @@ namespace EssentialsPlugin.Utility
 
 				IMyCubeBlock cubeBlock = (IMyCubeBlock)entityBlock.FatBlock;
 
-				if (!(cubeBlock is Sandbox.ModAPI.Ingame.IMyBeacon))
+				if (!(cubeBlock is IMyBeacon))
 					continue;
 
-				Sandbox.ModAPI.Ingame.IMyBeacon beacon = (Sandbox.ModAPI.Ingame.IMyBeacon)cubeBlock;
+				IMyBeacon beacon = (IMyBeacon)cubeBlock;
 				if (beacon.CustomName == null || beacon.CustomName == "")
 					continue;
 
@@ -133,7 +130,7 @@ namespace EssentialsPlugin.Utility
 
 					IMyCubeBlock cubeBlock = (IMyCubeBlock)entityBlock.FatBlock;
 
-					if (!(cubeBlock is Sandbox.ModAPI.Ingame.IMyBeacon))
+					if (!(cubeBlock is IMyBeacon))
 						continue;
 
 					IMyTerminalBlock beacon = (IMyTerminalBlock)cubeBlock;

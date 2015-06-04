@@ -8,6 +8,7 @@
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+	using VRage.ModAPI;
 	using VRageMath;
 
 	public class TurretManagement

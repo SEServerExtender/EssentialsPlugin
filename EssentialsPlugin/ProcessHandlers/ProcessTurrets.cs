@@ -1,6 +1,6 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
-	﻿using System;
+	using System;
 	using EssentialsPlugin.EntityManagers;
 
 	public class ProcessTurrets : ProcessHandlerBase

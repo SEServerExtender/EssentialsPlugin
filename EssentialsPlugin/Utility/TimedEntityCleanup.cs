@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SEModAPIInternal.API.Entity.Sector.SectorObject;
-using Sandbox.ModAPI;
-using Sandbox.Common.ObjectBuilders;
-
-namespace EssentialsPlugin.Utility
+﻿namespace EssentialsPlugin.Utility
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 	using NLog;
+	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.ModAPI;
+	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+	using VRage.ModAPI;
 
 	public class TimedEntityCleanupItem
 	{
