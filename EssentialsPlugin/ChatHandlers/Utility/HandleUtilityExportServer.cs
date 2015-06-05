@@ -3,6 +3,7 @@
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Linq;
+	using System.Runtime.Serialization.Formatters;
 	using System.Text.RegularExpressions;
 	using EssentialsPlugin.Utility;
 	using Microsoft.Xml.Serialization.GeneratedAssembly;
@@ -12,6 +13,7 @@
 	using SEModAPIInternal.API.Entity;
 	using VRage.FileSystem;
 	using VRage.ModAPI;
+	using VRage.ObjectBuilders;
 
 	public class HandleUtilityExportServer : ChatHandlerBase
 	{
@@ -114,7 +116,7 @@
 					if (grid.BigOwners.Contains(playerId) || PlayerManager.Instance.IsUserAdmin(userId) || userId == 0)
 					{
 						string cleanShipName = rgx.Replace(shipName, "");
-						BaseObjectManager.SaveContentFile<MyObjectBuilder_CubeGrid, MyObjectBuilder_CubeGridSerializer>((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), new FileInfo(string.Format("{0}\\{1}.sbc", userExportPath, cleanShipName)));
+						MyObjectBuilderSerializer.SerializeXML( new FileInfo( string.Format( "{0}\\{1}.sbc", userExportPath, cleanShipName ) ).FullName, false, entity.GetObjectBuilder(  ) );
 						Communication.SendPrivateInformation(userId, string.Format("Exported the ship '{0}' to a file on the server.", shipName));
 						found = true;
 						break;
