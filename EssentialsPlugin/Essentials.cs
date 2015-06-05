@@ -985,7 +985,7 @@
 								}
 								catch ( Exception ex )
 								{
-									Log.Info( "Handler Problems: {0} - {1}", currentHandler.GetUpdateResolution( ), ex );
+									Log.Warn( "Handler Problems: {0} - {1}", currentHandler.GetUpdateResolution( ), ex );
 								}
 
 								// Let's make sure LastUpdate is set to now otherwise we may start processing too quickly
