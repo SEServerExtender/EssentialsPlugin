@@ -13,6 +13,7 @@
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity;
 	using VRage.ModAPI;
+	using VRage.ObjectBuilders;
 	using VRageMath;
 
 	public class HandleDockDock: ChatHandlerBase
@@ -228,7 +229,7 @@
 						Docking.Instance.Add(dockItem);
 
 						// Serialize and save ship to file
-						BaseObjectManager.WriteSpaceEngineersFile<MyObjectBuilder_CubeGrid, MyObjectBuilder_CubeGridSerializer>(gridBuilder, info.FullName);
+						MyObjectBuilderSerializer.SerializeXML( info.FullName, false, gridBuilder );
 						//BaseObjectManager.SaveContentFile<MyObjectBuilder_CubeGrid, MyObjectBuilder_CubeGridSerializer>(gridBuilder, info);
 						BaseEntityNetworkManager.BroadcastRemoveEntity(dockingEntity);
 						//dockingEntity.Close();
