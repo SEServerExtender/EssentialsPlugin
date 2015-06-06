@@ -8,6 +8,7 @@
 	using System.Windows.Forms;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
+	using Sandbox;
 	using Sandbox.ModAPI;
 	using SEModAPIExtensions.API;
 	using SEModAPIInternal.API.Common;
@@ -175,25 +176,22 @@
 
 		private void CheckResponse()	
 		{
-			ThreadPool.QueueUserWorkItem((object state) =>
+			ThreadPool.QueueUserWorkItem( state =>
 			{
 				DateTime start = DateTime.Now;
 				AutoResetEvent are = new AutoResetEvent(false);
-				SandboxGameAssemblyWrapper.Instance.EnqueueMainGameAction(() =>
-				{
-					are.Set();
-				});
+				MySandboxGame.Static.Invoke( ( ) => are.Set( ) );
 
-				if (!are.WaitOne(120000))
+				if (!are.WaitOne(60000))
 				{
-					Essentials.Log.Info("Server unresponsive for 60 seconds, restarting in 5 seconds.");
+					Essentials.Log.Warn("Server unresponsive for 60 seconds, restarting in 5 seconds.");
 					Thread.Sleep(5000);
 					DoRestart();
 					return;
 				}
 
 				if((DateTime.Now - start).TotalMilliseconds > 10000)
-					Essentials.Log.Info(string.Format("Warning: Server Response Time: {0}ms", (DateTime.Now - start).TotalMilliseconds));
+					Essentials.Log.Warn("Warning: Server Response Time: {0}ms", (DateTime.Now - start).TotalMilliseconds);
 			});
 		}
 	}
