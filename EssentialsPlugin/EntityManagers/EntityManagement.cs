@@ -24,9 +24,8 @@
 
 	public class EntityManagement
 	{
-		private static volatile bool _checkReveal = false;
-		private static volatile bool _checkConceal = false;
-		private static readonly HashSet<IMyEntity> ProcessedGrids = new HashSet<IMyEntity>( );
+		private static volatile bool _checkReveal;
+		private static volatile bool _checkConceal;
 		private static readonly List<long> RemovedGrids = new List<long>( );
 		private static readonly List<ulong> Online = new List<ulong>( );
 
@@ -44,7 +43,6 @@
 				double getGrids = 0d;
 				double co = 0f;
 
-				ProcessedGrids.Clear( );
 				List<IMyPlayer> players = new List<IMyPlayer>( );
 				HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
 				HashSet<IMyEntity> entitiesFiltered = new HashSet<IMyEntity>( );
