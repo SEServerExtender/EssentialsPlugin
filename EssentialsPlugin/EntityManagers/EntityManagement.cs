@@ -26,15 +26,15 @@
 	{
 		private static volatile bool _checkReveal = false;
 		private static volatile bool _checkConceal = false;
-		private static readonly HashSet<IMyEntity> ProcessedGrids = new HashSet<IMyEntity>();
-		private static readonly List<long> RemovedGrids = new List<long>();
-		private static readonly List<ulong> Online = new List<ulong>();
+		private static readonly HashSet<IMyEntity> ProcessedGrids = new HashSet<IMyEntity>( );
+		private static readonly List<long> RemovedGrids = new List<long>( );
+		private static readonly List<ulong> Online = new List<ulong>( );
 
-		public static void CheckAndConcealEntities()
+		public static void CheckAndConcealEntities( )
 		{
-			if (_checkConceal)
+			if ( _checkConceal )
 				return;
-			
+
 			_checkConceal = true;
 			try
 			{
@@ -44,17 +44,17 @@
 				double getGrids = 0d;
 				double co = 0f;
 
-				ProcessedGrids.Clear();
-				List<IMyPlayer> players = new List<IMyPlayer>();
-				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-				HashSet<IMyEntity> entitiesFiltered = new HashSet<IMyEntity>();
-				HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>();
+				ProcessedGrids.Clear( );
+				List<IMyPlayer> players = new List<IMyPlayer>( );
+				HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
+				HashSet<IMyEntity> entitiesFiltered = new HashSet<IMyEntity>( );
+				HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>( );
 
 				try
 				{
-					MyAPIGateway.Players.GetPlayers(players);
+					MyAPIGateway.Players.GetPlayers( players );
 				}
-				catch(Exception ex)
+				catch ( Exception ex )
 				{
 					Essentials.Log.Error( "Error getting players list.  Check and Conceal failed: {0}", ex );
 					return;
@@ -70,69 +70,69 @@
 					return;
 				}
 
-				foreach (IMyEntity entity in entities)
+				foreach ( IMyEntity entity in entities )
 				{
-					if (!(entity is IMyCubeGrid))
+					if ( !( entity is IMyCubeGrid ) )
 						continue;
 
-					if (!entity.InScene)
+					if ( !entity.InScene )
 						continue;
 
-					entitiesFiltered.Add(entity);
+					entitiesFiltered.Add( entity );
 				}
-				
+
 				DateTime getGridsStart = DateTime.Now;
-				CubeGrids.GetGridsUnconnected(entitiesFound, entitiesFiltered);
-				getGrids += (DateTime.Now - getGridsStart).TotalMilliseconds;
+				CubeGrids.GetGridsUnconnected( entitiesFound, entitiesFiltered );
+				getGrids += ( DateTime.Now - getGridsStart ).TotalMilliseconds;
 
-				HashSet<IMyEntity> entitiesToConceal = new HashSet<IMyEntity>();
-				foreach (IMyEntity entity in entitiesFound)
+				HashSet<IMyEntity> entitiesToConceal = new HashSet<IMyEntity>( );
+				foreach ( IMyEntity entity in entitiesFound )
 				{
-					if(!(entity is IMyCubeGrid))
+					if ( !( entity is IMyCubeGrid ) )
 						continue;
 
-					if (entity.DisplayName.Contains("CommRelay"))
+					if ( entity.DisplayName.Contains( "CommRelay" ) )
 						continue;
 
-					if (entity.Physics == null) // Projection
+					if ( entity.Physics == null ) // Projection
 						continue;
 
-					if(!entity.InScene)
+					if ( !entity.InScene )
 						continue;
 
-					if(((IMyCubeGrid)entity).GridSizeEnum != MyCubeSize.Small && !PluginSettings.Instance.ConcealIncludeLargeGrids)
+					if ( ( (IMyCubeGrid)entity ).GridSizeEnum != MyCubeSize.Small && !PluginSettings.Instance.ConcealIncludeLargeGrids )
 						continue;
 
 					IMyCubeGrid grid = (IMyCubeGrid)entity;
 
 					bool found = false;
 					DateTime distStart = DateTime.Now;
-					foreach(IMyPlayer player in players)
+					foreach ( IMyPlayer player in players )
 					{
 						double distance;
-						if (Entity.GetDistanceBetweenGridAndPlayer(grid, player, out distance))
+						if ( Entity.GetDistanceBetweenGridAndPlayer( grid, player, out distance ) )
 						{
-							if (distance < PluginSettings.Instance.DynamicConcealDistance)
+							if ( distance < PluginSettings.Instance.DynamicConcealDistance )
 							{
 								found = true;
 							}
 						}
 					}
-					distCheck += (DateTime.Now - distStart).TotalMilliseconds;
+					distCheck += ( DateTime.Now - distStart ).TotalMilliseconds;
 
-					if(!found)
+					if ( !found )
 					{
 						// Check to see if grid is close to dock / shipyard
-						foreach (IMyCubeGrid checkGrid in ProcessDockingZone.ZoneCache)
+						foreach ( IMyCubeGrid checkGrid in ProcessDockingZone.ZoneCache )
 						{
 							try
 							{
-								if(Vector3D.Distance(checkGrid.GetPosition(), grid.GetPosition()) < 100d)
+								if ( Vector3D.Distance( checkGrid.GetPosition( ), grid.GetPosition( ) ) < 100d )
 								{
 									found = true;
 									break;
 								}
-							}	
+							}
 							catch
 							{
 								continue;
@@ -140,34 +140,34 @@
 						}
 					}
 
-					if(!found)
+					if ( !found )
 					{
 						// Check for block type rules
 						DateTime blockStart = DateTime.Now;
-						if (CheckConcealBlockRules(grid, players))
+						if ( CheckConcealBlockRules( grid, players ) )
 						{
 							found = true;
 						}
 
-						blockRules += (DateTime.Now - blockStart).TotalMilliseconds;
+						blockRules += ( DateTime.Now - blockStart ).TotalMilliseconds;
 					}
 
-					if(!found)
+					if ( !found )
 					{
-						entitiesToConceal.Add(entity);
+						entitiesToConceal.Add( entity );
 					}
 				}
 
 				DateTime coStart = DateTime.Now;
-				if(entitiesToConceal.Count > 0)
-					ConcealEntities(entitiesToConceal);
-				co += (DateTime.Now - coStart).TotalMilliseconds;
+				if ( entitiesToConceal.Count > 0 )
+					ConcealEntities( entitiesToConceal );
+				co += ( DateTime.Now - coStart ).TotalMilliseconds;
 
-				if ((DateTime.Now - start).TotalMilliseconds > 2000 && PluginSettings.Instance.DynamicShowMessages)
-					Essentials.Log.Info( "Completed Conceal Check: {0}ms (gg: {3}, dc: {2} ms, br: {1}ms, co: {4}ms)", (DateTime.Now - start).TotalMilliseconds, blockRules, distCheck, getGrids, co );
+				if ( ( DateTime.Now - start ).TotalMilliseconds > 2000 && PluginSettings.Instance.DynamicShowMessages )
+					Essentials.Log.Info( "Completed Conceal Check: {0}ms (gg: {3}, dc: {2} ms, br: {1}ms, co: {4}ms)", ( DateTime.Now - start ).TotalMilliseconds, blockRules, distCheck, getGrids, co );
 
 			}
-			catch (Exception ex)
+			catch ( Exception ex )
 			{
 				Essentials.Log.Error( ex );
 			}
@@ -177,50 +177,50 @@
 			}
 		}
 
-		private static bool CheckConcealBlockRules(IMyCubeGrid grid, List<IMyPlayer> players)
+		private static bool CheckConcealBlockRules( IMyCubeGrid grid, List<IMyPlayer> players )
 		{
-			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
+			List<IMySlimBlock> blocks = new List<IMySlimBlock>( );
 
 			// Live dangerously
-			grid.GetBlocks(blocks, x => x.FatBlock != null);
+			grid.GetBlocks( blocks, x => x.FatBlock != null );
 			//CubeGrids.GetAllConnectedBlocks(_processedGrids, grid, blocks, x => x.FatBlock != null);
 
 			int beaconCount = 0;
 			//bool found = false;
 			//bool powered = false;
-			foreach (IMySlimBlock block in blocks)
+			foreach ( IMySlimBlock block in blocks )
 			{
 				IMyCubeBlock cubeBlock = block.FatBlock;
 
-				if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_Beacon))
+				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_Beacon ) )
 				{
-					IMyBeacon beacon = (IMyBeacon)cubeBlock;					
+					IMyBeacon beacon = (IMyBeacon)cubeBlock;
 					//MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)cubeBlock.GetObjectBuilderCubeBlock();
 					beaconCount++;
 					// Keep this return here, as 4 beacons always means true
-					if(beaconCount >= 4)
+					if ( beaconCount >= 4 )
 					{
 						return true;
 					}
 
-					if (!beacon.Enabled)
+					if ( !beacon.Enabled )
 						continue;
 
 					IMyTerminalBlock terminalBlock = (IMyTerminalBlock)cubeBlock;
-//					Console.WriteLine("Found: {0} {1} {2}", beacon.BroadcastRadius, terminalBlock.IsWorking, terminalBlock.IsFunctional);
+					//					Console.WriteLine("Found: {0} {1} {2}", beacon.BroadcastRadius, terminalBlock.IsWorking, terminalBlock.IsFunctional);
 					//if (!terminalBlock.IsWorking)
 					//{
-//						continue;
+					//						continue;
 					//}
 
-					foreach(IMyPlayer player in players)
+					foreach ( IMyPlayer player in players )
 					{
 						double distance;
-						if(Entity.GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
+						if ( Entity.GetDistanceBetweenPointAndPlayer( grid.GetPosition( ), player, out distance ) )
 						{
-							if (distance < beacon.Radius)
+							if ( distance < beacon.Radius )
 							{
-//								Console.WriteLine("Not concealed due to broadcast radius");
+								//								Console.WriteLine("Not concealed due to broadcast radius");
 								//found = true;
 								//break;
 								return true;
@@ -229,26 +229,26 @@
 					}
 				}
 
-				if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_RadioAntenna))
+				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_RadioAntenna ) )
 				{
 					//MyObjectBuilder_RadioAntenna antenna = (MyObjectBuilder_RadioAntenna)cubeBlock.GetObjectBuilderCubeBlock();
 					IMyRadioAntenna antenna = (IMyRadioAntenna)cubeBlock;
 
-					if (!antenna.Enabled)
+					if ( !antenna.Enabled )
 						continue;
 
 					IMyTerminalBlock terminalBlock = (IMyTerminalBlock)cubeBlock;
 					//if (!terminalBlock.IsWorking)
 					//	continue;
 
-					foreach (IMyPlayer player in players)
+					foreach ( IMyPlayer player in players )
 					{
 						double distance;
-						if (Entity.GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
+						if ( Entity.GetDistanceBetweenPointAndPlayer( grid.GetPosition( ), player, out distance ) )
 						{
-							if (distance < antenna.Radius)
+							if ( distance < antenna.Radius )
 							{
-//								Console.WriteLine("Not concealed due to antenna broadcast radius");
+								//								Console.WriteLine("Not concealed due to antenna broadcast radius");
 								//found = true;
 								//break;
 								return true;
@@ -257,31 +257,31 @@
 					}
 				}
 
-				if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MedicalRoom))
+				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_MedicalRoom ) )
 				{
 					//MyObjectBuilder_MedicalRoom medical = (MyObjectBuilder_MedicalRoom)cubeBlock.GetObjectBuilderCubeBlock();
 					IMyMedicalRoom medical = (IMyMedicalRoom)cubeBlock;
-					
-					if (!medical.Enabled)
+
+					if ( !medical.Enabled )
 						continue;
 
 					IMyFunctionalBlock functionalBlock = (IMyFunctionalBlock)cubeBlock;
 					//if (!terminalBlock.IsWorking)
 					//	continue;
 
-					if(PluginSettings.Instance.DynamicConcealIncludeMedBays)
+					if ( PluginSettings.Instance.DynamicConcealIncludeMedBays )
 					{
-						lock (Online)
+						lock ( Online )
 						{
-							foreach (ulong connectedPlayer in Online)
+							foreach ( ulong connectedPlayer in Online )
 							{
 								//if (PlayerMap.Instance.GetPlayerIdsFromSteamId(connectedPlayer).Count < 1)
 								//continue;
 
 								//long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(connectedPlayer).First();
-								long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(connectedPlayer);
+								long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( connectedPlayer );
 
-								if (functionalBlock.OwnerId == playerId || (functionalBlock.GetUserRelationToOwner(playerId) == MyRelationsBetweenPlayerAndBlock.FactionShare))
+								if ( functionalBlock.OwnerId == playerId || ( functionalBlock.GetUserRelationToOwner( playerId ) == MyRelationsBetweenPlayerAndBlock.FactionShare ) )
 								//if (functionalBlock.Owner == playerId || (functionalBlock.ShareMode == MyOwnershipShareModeEnum.Faction && Player.CheckPlayerSameFaction(functionalBlock.Owner, playerId)))
 								//if (medical.HasPlayerAccess(playerId))
 								{
@@ -304,7 +304,7 @@
 								return true;
 							}
 						}
-						 */ 
+						 */
 					}
 					else
 					{
@@ -312,22 +312,22 @@
 					}
 				}
 
-				if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_Refinery) || cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_Assembler))
+				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_Refinery ) || cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_Assembler ) )
 				{
 					//MyObjectBuilder_ProductionBlock production = (MyObjectBuilder_ProductionBlock)cubeBlock.GetObjectBuilderCubeBlock();
 					IMyProductionBlock production = (IMyProductionBlock)cubeBlock;
-					if (!production.Enabled)
+					if ( !production.Enabled )
 						continue;
 
-					if (production.IsProducing)
+					if ( production.IsProducing )
 						return true;
 				}
 
-				foreach(string subType in PluginSettings.Instance.DynamicConcealIgnoreSubTypeList)
+				foreach ( string subType in PluginSettings.Instance.DynamicConcealIgnoreSubTypeList )
 				{
-					if (cubeBlock.BlockDefinition.SubtypeName.Contains(subType))
+					if ( cubeBlock.BlockDefinition.SubtypeName.Contains( subType ) )
 					{
-//						Console.WriteLine("Not concealed due subtype");
+						//						Console.WriteLine("Not concealed due subtype");
 						//found = true;
 						return true;
 					}
@@ -337,26 +337,26 @@
 			return false;
 		}
 
-		private static bool CheckConcealForce(IMyCubeGrid grid, ulong steamId)
+		private static bool CheckConcealForce( IMyCubeGrid grid, ulong steamId )
 		{
-			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
+			List<IMySlimBlock> blocks = new List<IMySlimBlock>( );
 
 			// Live dangerously
-			grid.GetBlocks(blocks, x => x.FatBlock != null);
-			foreach (IMySlimBlock block in blocks)
+			grid.GetBlocks( blocks, x => x.FatBlock != null );
+			foreach ( IMySlimBlock block in blocks )
 			{
 				IMyCubeBlock cubeBlock = block.FatBlock;
 
-				if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MedicalRoom))
+				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_MedicalRoom ) )
 				{
-					MyObjectBuilder_MedicalRoom medical = (MyObjectBuilder_MedicalRoom)cubeBlock.GetObjectBuilderCubeBlock();
+					MyObjectBuilder_MedicalRoom medical = (MyObjectBuilder_MedicalRoom)cubeBlock.GetObjectBuilderCubeBlock( );
 
-					if (!medical.Enabled)
+					if ( !medical.Enabled )
 						continue;
 
 					IMyTerminalBlock terminalBlock = (IMyTerminalBlock)cubeBlock;
-					long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(steamId);
-					if (medical.Owner == playerId || (medical.ShareMode == MyOwnershipShareModeEnum.Faction && Player.CheckPlayerSameFaction(medical.Owner, playerId)))
+					long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( steamId );
+					if ( medical.Owner == playerId || ( medical.ShareMode == MyOwnershipShareModeEnum.Faction && Player.CheckPlayerSameFaction( medical.Owner, playerId ) ) )
 					{
 						return true;
 					}
@@ -366,15 +366,15 @@
 			return false;
 		}
 
-		private static void ConcealEntities(HashSet<IMyEntity> entitesToConceal)
+		private static void ConcealEntities( HashSet<IMyEntity> entitesToConceal )
 		{
-			Wrapper.GameAction(() =>
+			Wrapper.GameAction( ( ) =>
 			{
-				foreach (IMyEntity entity in entitesToConceal)
+				foreach ( IMyEntity entity in entitesToConceal )
 				{
-					ConcealEntity(entity);
+					ConcealEntity( entity );
 				}
-			});
+			} );
 
 			if ( PluginSettings.Instance.DynamicShowMessages )
 				Essentials.Log.Info( "Concealed {0} entities.", entitesToConceal.Count );
@@ -388,12 +388,12 @@
 				if ( !entity.InScene )
 					return;
 
-				MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid) entity );
+				MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
 				if ( builder == null )
 					return;
 
 				pos = 1;
-				IMyCubeGrid grid = (IMyCubeGrid) entity;
+				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				long ownerId;
 				string ownerName = string.Empty;
 				if ( CubeGrids.GetOwner( builder, out ownerId ) )
@@ -469,9 +469,9 @@
 			}
 		}
 
-		public static void CheckAndRevealEntities()
+		public static void CheckAndRevealEntities( )
 		{
-			if(_checkReveal)
+			if ( _checkReveal )
 				return;
 
 			_checkReveal = true;
@@ -481,66 +481,66 @@
 				double br = 0f;
 				double re = 0f;
 
-				List<IMyPlayer> players = new List<IMyPlayer>();
-				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+				List<IMyPlayer> players = new List<IMyPlayer>( );
+				HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
 				//Wrapper.GameAction(() =>
 				//{
-				MyAPIGateway.Players.GetPlayers(players);
-				MyAPIGateway.Entities.GetEntities(entities);
+				MyAPIGateway.Players.GetPlayers( players );
+				MyAPIGateway.Entities.GetEntities( entities );
 				//});
 
-				Dictionary<IMyEntity, string> entitiesToReveal = new Dictionary<IMyEntity, string>();
+				Dictionary<IMyEntity, string> entitiesToReveal = new Dictionary<IMyEntity, string>( );
 				//HashSet<IMyEntity> entitiesToReveal = new HashSet<IMyEntity>();
-				foreach (IMyEntity entity in entities)
+				foreach ( IMyEntity entity in entities )
 				{
-					if (entity.MarkedForClose)
+					if ( entity.MarkedForClose )
 						continue;
 
-					if (!(entity is IMyCubeGrid))
+					if ( !( entity is IMyCubeGrid ) )
 						continue;
 
-					if (entity.InScene)
+					if ( entity.InScene )
 						continue;
 
 					IMyCubeGrid grid = (IMyCubeGrid)entity;
 					bool found = false;
 					string currentReason = string.Empty;
-					foreach (IMyPlayer player in players)
+					foreach ( IMyPlayer player in players )
 					{
 						double distance = 0f;
-						if (Entity.GetDistanceBetweenGridAndPlayer(grid, player, out distance))
+						if ( Entity.GetDistanceBetweenGridAndPlayer( grid, player, out distance ) )
 						{
-							if (distance < PluginSettings.Instance.DynamicConcealDistance)
+							if ( distance < PluginSettings.Instance.DynamicConcealDistance )
 							{
 								found = true;
-								currentReason = string.Format("{0} distance to grid: {1}", player.DisplayName, distance);
+								currentReason = string.Format( "{0} distance to grid: {1}", player.DisplayName, distance );
 							}
 						}
 					}
 
-					if (!found)
+					if ( !found )
 					{
 						DateTime brStart = DateTime.Now;
-						if (CheckRevealBlockRules(grid, players, out currentReason))
+						if ( CheckRevealBlockRules( grid, players, out currentReason ) )
 						{
 							found = true;
 						}
-						br += (DateTime.Now - brStart).TotalMilliseconds;
+						br += ( DateTime.Now - brStart ).TotalMilliseconds;
 					}
 
-					if (found)
+					if ( found )
 					{
-						entitiesToReveal.Add(entity, currentReason);
+						entitiesToReveal.Add( entity, currentReason );
 					}
 				}
 
 				DateTime reStart = DateTime.Now;
-				if (entitiesToReveal.Count > 0)
-					RevealEntities(entitiesToReveal);
-				re += (DateTime.Now - reStart).TotalMilliseconds;
+				if ( entitiesToReveal.Count > 0 )
+					RevealEntities( entitiesToReveal );
+				re += ( DateTime.Now - reStart ).TotalMilliseconds;
 
-				if ((DateTime.Now - start).TotalMilliseconds > 2000 && PluginSettings.Instance.DynamicShowMessages)
-					Essentials.Log.Info( "Completed Reveal Check: {0}ms (br: {1}ms, re: {2}ms)", (DateTime.Now - start).TotalMilliseconds, br, re );
+				if ( ( DateTime.Now - start ).TotalMilliseconds > 2000 && PluginSettings.Instance.DynamicShowMessages )
+					Essentials.Log.Info( "Completed Reveal Check: {0}ms (br: {1}ms, re: {2}ms)", ( DateTime.Now - start ).TotalMilliseconds, br, re );
 			}
 			catch ( InvalidOperationException ex )
 			{
@@ -557,26 +557,26 @@
 			}
 		}
 
-		private static bool CheckRevealBlockRules(IMyCubeGrid grid, List<IMyPlayer> players, out string reason)
+		private static bool CheckRevealBlockRules( IMyCubeGrid grid, List<IMyPlayer> players, out string reason )
 		{
-			reason = "";			
+			reason = "";
 			// This is actually faster, but doesn't include power checks
-			
+
 			// Live dangerously
-			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
-			grid.GetBlocks(blocks, x => x.FatBlock != null);
+			List<IMySlimBlock> blocks = new List<IMySlimBlock>( );
+			grid.GetBlocks( blocks, x => x.FatBlock != null );
 			//CubeGrids.GetAllConnectedBlocks(_processedGrids, grid, blocks, x => x.FatBlock != null);
 			//bool found = false;
 			//bool powered = false;
-			foreach (IMySlimBlock block in blocks)
+			foreach ( IMySlimBlock block in blocks )
 			{
 				IMyCubeBlock cubeBlock = block.FatBlock;
 
-				if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_Beacon))
+				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_Beacon ) )
 				{
 					//MyObjectBuilder_Beacon beacon = (MyObjectBuilder_Beacon)cubeBlock.GetObjectBuilderCubeBlock();
 					IMyBeacon beacon = (IMyBeacon)cubeBlock;
-					if (!beacon.Enabled)
+					if ( !beacon.Enabled )
 						continue;
 
 					//Sandbox.ModAPI.Ingame.IMyFunctionalBlock functionalBlock = (Sandbox.ModAPI.Ingame.IMyFunctionalBlock)cubeBlock;
@@ -587,82 +587,82 @@
 					//if (!terminalBlock.IsWorking)
 					//	continue;
 
-					
-					foreach (IMyPlayer player in players)
+
+					foreach ( IMyPlayer player in players )
 					{
 						double distance;
-						if (Entity.GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
+						if ( Entity.GetDistanceBetweenPointAndPlayer( grid.GetPosition( ), player, out distance ) )
 						{
-							if (distance < beacon.Radius)
+							if ( distance < beacon.Radius )
 							{
 								//found = true;
 								//break;
-								reason = string.Format("{0} distance to beacon broadcast: {1}", player.DisplayName, distance);
-								return true;
-							}
-						}
-					}				
-				}
-
-				if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_RadioAntenna))
-				{
-					//MyObjectBuilder_RadioAntenna antenna = (MyObjectBuilder_RadioAntenna)cubeBlock.GetObjectBuilderCubeBlock();
-					IMyRadioAntenna antenna = (IMyRadioAntenna)cubeBlock;
-
-					if (!antenna.Enabled)
-						continue;
-
-					//Sandbox.ModAPI.Ingame.IMyFunctionalBlock functionalBlock = (Sandbox.ModAPI.Ingame.IMyFunctionalBlock)cubeBlock;
-					//if (!functionalBlock.Enabled)
-					//	continue;
-
-					foreach (IMyPlayer player in players)
-					{
-						double distance = 0d;
-						if (Entity.GetDistanceBetweenPointAndPlayer(grid.GetPosition(), player, out distance))
-						{
-							if (distance < antenna.Radius)
-							{
-								//found = true;
-								//break;
-								reason = string.Format("{0} distance to antenna broadcast: {1}", player.DisplayName, distance);
+								reason = string.Format( "{0} distance to beacon broadcast: {1}", player.DisplayName, distance );
 								return true;
 							}
 						}
 					}
 				}
 
-				if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MedicalRoom))
+				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_RadioAntenna ) )
+				{
+					//MyObjectBuilder_RadioAntenna antenna = (MyObjectBuilder_RadioAntenna)cubeBlock.GetObjectBuilderCubeBlock();
+					IMyRadioAntenna antenna = (IMyRadioAntenna)cubeBlock;
+
+					if ( !antenna.Enabled )
+						continue;
+
+					//Sandbox.ModAPI.Ingame.IMyFunctionalBlock functionalBlock = (Sandbox.ModAPI.Ingame.IMyFunctionalBlock)cubeBlock;
+					//if (!functionalBlock.Enabled)
+					//	continue;
+
+					foreach ( IMyPlayer player in players )
+					{
+						double distance = 0d;
+						if ( Entity.GetDistanceBetweenPointAndPlayer( grid.GetPosition( ), player, out distance ) )
+						{
+							if ( distance < antenna.Radius )
+							{
+								//found = true;
+								//break;
+								reason = string.Format( "{0} distance to antenna broadcast: {1}", player.DisplayName, distance );
+								return true;
+							}
+						}
+					}
+				}
+
+				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_MedicalRoom ) )
 				{
 					//MyObjectBuilder_MedicalRoom medical = (MyObjectBuilder_MedicalRoom)cubeBlock.GetObjectBuilderCubeBlock();
 					IMyMedicalRoom medical = (IMyMedicalRoom)cubeBlock;
-					if (!medical.Enabled)
+					if ( !medical.Enabled )
 						continue;
 
 					IMyFunctionalBlock functionalBlock = (IMyFunctionalBlock)cubeBlock;
-					if (!functionalBlock.IsFunctional)
+					if ( !functionalBlock.IsFunctional )
 						continue;
 
 					//if (!functionalBlock.Enabled)
 					//	continue;
-					
-					if (PluginSettings.Instance.DynamicConcealIncludeMedBays)
+
+					if ( PluginSettings.Instance.DynamicConcealIncludeMedBays )
 					{
-						lock (Online)
+						lock ( Online )
 						{
-							foreach (ulong connectedPlayer in Online)
+							foreach ( ulong connectedPlayer in Online )
 							{
-								long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(connectedPlayer);
+								long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( connectedPlayer );
 								//if (medical.Owner == playerId || (medical.ShareMode == MyOwnershipShareModeEnum.Faction && Player.CheckPlayerSameFaction(medical.Owner, playerId)))
-								if (functionalBlock.OwnerId == playerId)
+								if ( functionalBlock.OwnerId == playerId )
 								{
-									reason = string.Format("Grid has medbay and player is logged in - playerid: {0}", playerId);
+									reason = string.Format( "Grid has medbay and player is logged in - playerid: {0}", playerId );
 									return true;
 								}
 
-								if(functionalBlock.GetUserRelationToOwner(playerId) == MyRelationsBetweenPlayerAndBlock.FactionShare)
+								if ( functionalBlock.GetUserRelationToOwner( playerId ) == MyRelationsBetweenPlayerAndBlock.FactionShare )
 								{
-									reason = string.Format("Grid has medbay and player is factionshare - playerid: {0}", playerId);
+									reason = string.Format( "Grid has medbay and player is factionshare - playerid: {0}", playerId );
 									return true;
 								}
 							}
@@ -680,25 +680,25 @@
 								return true;
 							}
 						}
-						 */ 
+						 */
 					}
 					else
 					{
-						reason = string.Format("Grid has medbay and conceal can not include medbays");
+						reason = string.Format( "Grid has medbay and conceal can not include medbays" );
 						return true;
 					}
 				}
 
-				if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_ProductionBlock))
+				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_ProductionBlock ) )
 				{
-					MyObjectBuilder_ProductionBlock production = (MyObjectBuilder_ProductionBlock)cubeBlock.GetObjectBuilderCubeBlock();
-					if (!production.Enabled)
+					MyObjectBuilder_ProductionBlock production = (MyObjectBuilder_ProductionBlock)cubeBlock.GetObjectBuilderCubeBlock( );
+					if ( !production.Enabled )
 						continue;
 
 					IMyProductionBlock productionBlock = (IMyProductionBlock)cubeBlock;
-					if (production.Queue.Length > 0)
+					if ( production.Queue.Length > 0 )
 					{
-						reason = string.Format("Grid has production facility that has a queue");
+						reason = string.Format( "Grid has production facility that has a queue" );
 						return true;
 					}
 				}
@@ -707,24 +707,24 @@
 			return false;
 		}
 
-		private static bool CheckRevealMedbay(IMyCubeGrid grid, ulong steamId)
+		private static bool CheckRevealMedbay( IMyCubeGrid grid, ulong steamId )
 		{
 			// Live dangerously
-			List<IMySlimBlock> blocks = new List<IMySlimBlock>();
-			grid.GetBlocks(blocks, x => x.FatBlock != null);
-			foreach (IMySlimBlock block in blocks)
+			List<IMySlimBlock> blocks = new List<IMySlimBlock>( );
+			grid.GetBlocks( blocks, x => x.FatBlock != null );
+			foreach ( IMySlimBlock block in blocks )
 			{
 				IMyCubeBlock cubeBlock = block.FatBlock;
 
-				if (cubeBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MedicalRoom))
+				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_MedicalRoom ) )
 				{
 					IMyMedicalRoom medical = (IMyMedicalRoom)cubeBlock;
-					if (!medical.Enabled)
+					if ( !medical.Enabled )
 						continue;
 
-					long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(steamId);
+					long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( steamId );
 					//if (medical.Owner == playerId || (medical.ShareMode == MyOwnershipShareModeEnum.Faction && Player.CheckPlayerSameFaction(medical.Owner, playerId)))
-					if(medical.HasPlayerAccess(playerId))
+					if ( medical.HasPlayerAccess( playerId ) )
 					{
 						return true;
 					}
@@ -734,56 +734,56 @@
 			return false;
 		}
 
-		private static void RevealEntities(Dictionary<IMyEntity, string> entitiesToReveal)
+		private static void RevealEntities( Dictionary<IMyEntity, string> entitiesToReveal )
 		{
-			Wrapper.GameAction(() =>
+			Wrapper.GameAction( ( ) =>
 			{
-				foreach (KeyValuePair<IMyEntity, string> entity in entitiesToReveal)
+				foreach ( KeyValuePair<IMyEntity, string> entity in entitiesToReveal )
 				{
-					RevealEntity(entity);
+					RevealEntity( entity );
 				}
-			});
+			} );
 
 			if ( PluginSettings.Instance.DynamicShowMessages )
 				Essentials.Log.Info( "Revealed {0} entities.", entitiesToReveal.Count );
 		}
 
-		private static void RevealEntity(KeyValuePair<IMyEntity, string> item)
+		private static void RevealEntity( KeyValuePair<IMyEntity, string> item )
 		{
 			IMyEntity entity = item.Key;
 			string reason = item.Value;
 			//Wrapper.GameAction(() =>
 			//{
-				MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
-				if (builder == null)
-					return;
+			MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
+			if ( builder == null )
+				return;
 
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				long ownerId = 0;
-				string ownerName = string.Empty;
-				if (CubeGrids.GetBigOwners(builder).Count > 0)
-				{
-					ownerId = CubeGrids.GetBigOwners(builder).First();
-					ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
-				}
-				/*
-				entity.InScene = true;
-				entity.CastShadows = true;
-				entity.Visible = true;
-				*/
+			IMyCubeGrid grid = (IMyCubeGrid)entity;
+			long ownerId = 0;
+			string ownerName = string.Empty;
+			if ( CubeGrids.GetBigOwners( builder ).Count > 0 )
+			{
+				ownerId = CubeGrids.GetBigOwners( builder ).First( );
+				ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
+			}
+			/*
+			entity.InScene = true;
+			entity.CastShadows = true;
+			entity.Visible = true;
+			*/
 
-				builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
-				MyAPIGateway.Entities.RemapObjectBuilder(builder);
-				//builder.EntityId = 0;
+			builder.PersistentFlags = ( MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows );
+			MyAPIGateway.Entities.RemapObjectBuilder( builder );
+			//builder.EntityId = 0;
 
 			if ( RemovedGrids.Contains( entity.EntityId ) )
 			{
 				Essentials.Log.Info( "Revealing - Id: {0} DUPE FOUND Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
-				                     entity.EntityId,
-				                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
-				                     ownerId,
-				                     ownerName,
-				                     reason );
+									 entity.EntityId,
+									 entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
+									 ownerId,
+									 ownerName,
+									 reason );
 				BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
 			}
 			else
@@ -796,7 +796,7 @@
 						Essentials.Log.Warn( "CreateFromObjectBuilder failed: {0}", builder.EntityId );
 						return;
 					}
-					
+
 					RemovedGrids.Add( entity.EntityId );
 					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
 					MyAPIGateway.Entities.AddEntity( newEntity );
@@ -814,12 +814,12 @@
 					MyAPIGateway.Multiplayer.SendEntitiesCreated( addList );
 					if ( PluginSettings.Instance.DynamicShowMessages )
 						Essentials.Log.Info( "Revealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}",
-					                     entity.EntityId,
-					                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
-					                     ownerId,
-					                     ownerName,
-					                     newEntity.EntityId,
-					                     reason );
+										 entity.EntityId,
+										 entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
+										 ownerId,
+										 ownerName,
+										 newEntity.EntityId,
+										 reason );
 				}
 				else
 				{
@@ -836,81 +836,81 @@
 						*/
 					if ( PluginSettings.Instance.DynamicShowMessages )
 						Essentials.Log.Info( "Revealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
-					                     entity.EntityId,
-					                     entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
-					                     ownerId,
-					                     ownerName,
-					                     reason );
+										 entity.EntityId,
+										 entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
+										 ownerId,
+										 ownerName,
+										 reason );
 				}
 			}
 			//});
 		}
 
-		static public void RevealAll()
+		static public void RevealAll( )
 		{
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-			Wrapper.GameAction(() =>
+			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
+			Wrapper.GameAction( ( ) =>
 			{
-				MyAPIGateway.Entities.GetEntities(entities);
-			});
+				MyAPIGateway.Entities.GetEntities( entities );
+			} );
 
-			List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>();
+			List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>( );
 			int count = 0;
-			Wrapper.GameAction(() =>
+			Wrapper.GameAction( ( ) =>
 			{
-				foreach (IMyEntity entity in entities)
+				foreach ( IMyEntity entity in entities )
 				{
-					if (entity.InScene)
+					if ( entity.InScene )
 						continue;
 
-					if (!(entity is IMyCubeGrid))
+					if ( !( entity is IMyCubeGrid ) )
 						continue;
 
-					MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
-					if (builder == null)
+					MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
+					if ( builder == null )
 						continue;
 
 					count++;
 					IMyCubeGrid grid = (IMyCubeGrid)entity;
 					long ownerId = 0;
 					string ownerName = "";
-					if (CubeGrids.GetBigOwners(builder).Count > 0)
+					if ( CubeGrids.GetBigOwners( builder ).Count > 0 )
 					{
-						ownerId = CubeGrids.GetBigOwners(builder).First();
-						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
+						ownerId = CubeGrids.GetBigOwners( builder ).First( );
+						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
 					}
 
 					//grid.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
 					//grid.InScene = true;
 					//grid.CastShadows = true;
-					builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
-					MyAPIGateway.Entities.RemapObjectBuilder(builder);
+					builder.PersistentFlags = ( MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows );
+					MyAPIGateway.Entities.RemapObjectBuilder( builder );
 					if ( PluginSettings.Instance.DynamicShowMessages )
 						Essentials.Log.Info( "Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ), ownerId, ownerName, builder.EntityId );
 
-					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder(builder);
-					if (newEntity == null)
+					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
+					if ( newEntity == null )
 					{
 						Essentials.Log.Warn( "CreateFromObjectBuilder failed: {0}", builder.EntityId );
 						continue;
 					}
 
-					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, false);
-					MyAPIGateway.Entities.AddEntity(newEntity);
-					addList.Add(newEntity.GetObjectBuilder());
-					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
-					addList.Clear();
+					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+					MyAPIGateway.Entities.AddEntity( newEntity );
+					addList.Add( newEntity.GetObjectBuilder( ) );
+					MyAPIGateway.Multiplayer.SendEntitiesCreated( addList );
+					addList.Clear( );
 				}
-			});
+			} );
 			if ( PluginSettings.Instance.DynamicShowMessages )
 				Essentials.Log.Info( "Revealed {0} grids", count );
 		}
 
-		public static bool ToggleMedbayGrids(ulong steamId)
+		public static bool ToggleMedbayGrids( ulong steamId )
 		{
-			if (_checkConceal || _checkReveal)
+			if ( _checkConceal || _checkReveal )
 			{
-				Communication.SendPrivateInformation(steamId, "Server busy");
+				Communication.SendPrivateInformation( steamId, "Server busy" );
 				return false;
 			}
 
@@ -921,12 +921,12 @@
 				DateTime start = DateTime.Now;
 
 				// Toggle off
-				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-				HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>();
+				HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
+				HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>( );
 
 				try
 				{
-					MyAPIGateway.Entities.GetEntities(entities);
+					MyAPIGateway.Entities.GetEntities( entities );
 				}
 				catch
 				{
@@ -934,28 +934,28 @@
 					return false;
 				}
 
-				CubeGrids.GetGridsUnconnected(entitiesFound, entities);
+				CubeGrids.GetGridsUnconnected( entitiesFound, entities );
 
-				HashSet<IMyEntity> entitiesToConceal = new HashSet<IMyEntity>();
+				HashSet<IMyEntity> entitiesToConceal = new HashSet<IMyEntity>( );
 				FilterEntitiesForMedbayCheck( steamId, entitiesFound, entitiesToConceal );
 
-				if (entitiesToConceal.Count > 0)
+				if ( entitiesToConceal.Count > 0 )
 				{
 					//if (PluginSettings.Instance.DynamicClientConcealEnabled)
 					//{
 					//ClientEntityManagement.Refresh(steamId);
 					//}
 
-					Communication.SendClientMessage(steamId, string.Format("/conceal {0}", string.Join(",", entitiesToConceal.Select(x => x.EntityId.ToString() + ":" + ((MyObjectBuilder_CubeGrid)x.GetObjectBuilder()).CubeBlocks.Count.ToString() + ":" + x.DisplayName).ToArray())));
-					Thread.Sleep(1500);
-					ConcealEntities(entitiesToConceal);
+					Communication.SendClientMessage( steamId, string.Format( "/conceal {0}", string.Join( ",", entitiesToConceal.Select( x => x.EntityId.ToString( ) + ":" + ( (MyObjectBuilder_CubeGrid)x.GetObjectBuilder( ) ).CubeBlocks.Count.ToString( ) + ":" + x.DisplayName ).ToArray( ) ) ) );
+					Thread.Sleep( 1500 );
+					ConcealEntities( entitiesToConceal );
 					//CheckAndRevealEntities();
 				}
 
-				if ((DateTime.Now - start).TotalMilliseconds > 2000 && PluginSettings.Instance.DynamicShowMessages)
-					Essentials.Log.Info( "Completed Toggle: {0}ms", (DateTime.Now - start).TotalMilliseconds );
+				if ( ( DateTime.Now - start ).TotalMilliseconds > 2000 && PluginSettings.Instance.DynamicShowMessages )
+					Essentials.Log.Info( "Completed Toggle: {0}ms", ( DateTime.Now - start ).TotalMilliseconds );
 			}
-			catch (Exception ex)
+			catch ( Exception ex )
 			{
 				Essentials.Log.Error( ex );
 			}
@@ -987,12 +987,12 @@
 					continue;
 				}
 
-				if ( ( (IMyCubeGrid) entity ).GridSizeEnum != MyCubeSize.Small && !PluginSettings.Instance.ConcealIncludeLargeGrids )
+				if ( ( (IMyCubeGrid)entity ).GridSizeEnum != MyCubeSize.Small && !PluginSettings.Instance.ConcealIncludeLargeGrids )
 				{
 					continue;
 				}
 
-				IMyCubeGrid grid = (IMyCubeGrid) entity;
+				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( steamId );
 				if ( !grid.BigOwners.Contains( playerId ) && !grid.SmallOwners.Contains( playerId ) )
 				{
@@ -1029,22 +1029,22 @@
 			}
 		}
 
-		public static void SetOnline(ulong steamId, bool online)
+		public static void SetOnline( ulong steamId, bool online )
 		{
-			lock (Online)
+			lock ( Online )
 			{
-				if (online)
+				if ( online )
 				{
-					if (!Online.Contains(steamId))
+					if ( !Online.Contains( steamId ) )
 					{
-						Online.Add(steamId);
+						Online.Add( steamId );
 					}
 				}
 				else
 				{
-					if (Online.Contains(steamId))
+					if ( Online.Contains( steamId ) )
 					{
-						Online.Remove(steamId);
+						Online.Remove( steamId );
 					}
 				}
 			}
