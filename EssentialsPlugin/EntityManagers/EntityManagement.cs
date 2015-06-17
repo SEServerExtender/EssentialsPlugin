@@ -542,7 +542,12 @@
 				if ((DateTime.Now - start).TotalMilliseconds > 2000 && PluginSettings.Instance.DynamicShowMessages)
 					Essentials.Log.Info( "Completed Reveal Check: {0}ms (br: {1}ms, re: {2}ms)", (DateTime.Now - start).TotalMilliseconds, br, re );
 			}
-			catch (Exception ex)
+			catch ( InvalidOperationException ex )
+			{
+				if ( ex.Message.StartsWith( "Collection was modified" ) )
+					Essentials.Log.Trace( ex );
+			}
+			catch ( Exception ex )
 			{
 				Essentials.Log.Error( ex );
 			}
