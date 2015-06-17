@@ -1037,6 +1037,10 @@
 				*/
 
 			}
+			catch ( ThreadAbortException ex )
+			{
+				Log.Trace( ex );
+			}
 			catch ( Exception ex )
 			{
 				Log.Error( ex );
