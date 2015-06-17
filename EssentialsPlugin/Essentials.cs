@@ -877,7 +877,8 @@
 				                   new ProcessWaypoints( ),
 				                   new ProcessCleanup( ),
 				                   new ProcessBlockEnforcement( ),
-				                   new ProcessSpawnShipTracking( )
+				                   new ProcessSpawnShipTracking( ),
+								   new ProcessVoxels(  )
 			                   };
 
 			// Setup chat handlers
