@@ -70,7 +70,9 @@
 				IMyGridTerminalSystem gridTerminal = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid( grid );
 
 				Dictionary<SettingsBlockEnforcementItem, int> blocks = new Dictionary<SettingsBlockEnforcementItem, int>( );
-				foreach ( IMyTerminalBlock myTerminalBlock in gridTerminal.Blocks )
+				List<IMyTerminalBlock> blockstoProcess = new List<IMyTerminalBlock>( );
+				gridTerminal.GetBlocksOfType<IMyTerminalBlock>( blockstoProcess );
+				foreach ( IMyTerminalBlock myTerminalBlock in blockstoProcess )
 				{
 					IMyTerminalBlock block = myTerminalBlock;
 					foreach ( SettingsBlockEnforcementItem item in PluginSettings.Instance.BlockEnforcementItems )
@@ -169,9 +171,11 @@
 			IMyGridTerminalSystem gridTerminal = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid( grid );
 
 			List<Sandbox.ModAPI.IMyTerminalBlock> blocksToRemove = new List<Sandbox.ModAPI.IMyTerminalBlock>( );
-			for ( int r = gridTerminal.Blocks.Count - 1; r >= 0; r-- )
+			List<IMyTerminalBlock> blockstoProcess = new List<IMyTerminalBlock>();
+			gridTerminal.GetBlocksOfType<IMyTerminalBlock>( blockstoProcess );
+			for ( int r = blockstoProcess.Count - 1; r >= 0; r-- )
 			{
-				Sandbox.ModAPI.IMyTerminalBlock block = (Sandbox.ModAPI.IMyTerminalBlock)gridTerminal.Blocks[ r ];
+				Sandbox.ModAPI.IMyTerminalBlock block = (Sandbox.ModAPI.IMyTerminalBlock)blockstoProcess[ r ];
 				switch ( blockEnforcementSetting.Mode )
 				{
 					case SettingsBlockEnforcementItem.EnforcementMode.BlockSubtypeId:

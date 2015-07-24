@@ -61,7 +61,8 @@
 					}
 
 //					FileInfo fileInfo = new FileInfo(dockedShipFileName);
-					MyObjectBuilder_CubeGrid cubeGrid = BaseObjectManager.ReadSpaceEngineersFile<MyObjectBuilder_CubeGrid, MyObjectBuilder_CubeGridSerializer>(dockedShipFileName);
+					MyObjectBuilder_CubeGrid cubeGrid;
+					MyObjectBuilderSerializer.DeserializeXML( dockedShipFileName, out cubeGrid );
 
 					if (entity != null)
 					{

@@ -141,7 +141,8 @@
 					FileInfo fileInfo = new FileInfo( dockedShipFileName );
 					//CubeGridEntity cubeGrid = new CubeGridEntity(fileInfo);
 
-					MyObjectBuilder_CubeGrid cubeGrid = BaseObjectManager.ReadSpaceEngineersFile<MyObjectBuilder_CubeGrid, MyObjectBuilder_CubeGridSerializer>( dockedShipFileName );
+					MyObjectBuilder_CubeGrid cubeGrid;
+					MyObjectBuilderSerializer.DeserializeXML( dockedShipFileName, out cubeGrid );
 
 					// Rotate our ship relative to our saved rotation and the new carrier rotation                
 					cubeGrid.PositionAndOrientation =
