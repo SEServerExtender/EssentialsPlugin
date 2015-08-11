@@ -29,16 +29,8 @@
 							continue;
 
 						// On the minute
-						if (item.Hour == -1)
-						{
-							if (item.Minute == DateTime.Now.Minute)
-								Backup.Create(PluginSettings.Instance.BackupBaseDirectory, PluginSettings.Instance.BackupCreateSubDirectories, PluginSettings.Instance.BackupAsteroids, PluginSettings.Instance.BackupEssentials);
-						}
-						else
-						{
-							if (item.Hour == DateTime.Now.Hour && item.Minute == DateTime.Now.Minute)
-								Backup.Create(PluginSettings.Instance.BackupBaseDirectory, PluginSettings.Instance.BackupCreateSubDirectories, PluginSettings.Instance.BackupAsteroids, PluginSettings.Instance.BackupEssentials);
-						}
+						if (item.Minute == DateTime.Now.Minute && (item.Hour == -1 || item.Hour == DateTime.Now.Hour))
+								Backup.Create(PluginSettings.Instance.BackupBaseDirectory, PluginSettings.Instance.BackupCreateSubDirectories, PluginSettings.Instance.BackupDateFormat, PluginSettings.Instance.BackupDateFormatSubDirectory, PluginSettings.Instance.BackupAsteroids, PluginSettings.Instance.BackupEssentials);
 					}
 
 					// Cleanup Backups

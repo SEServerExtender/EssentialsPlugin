@@ -331,6 +331,26 @@
 			set { PluginSettings.Instance.BackupCreateSubDirectories = value; }
 		}
 
+		[Category("Automated Backup")]
+		[Description("Date format to use for the backup file")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public string BackupDateFormat
+		{
+			get { return PluginSettings.Instance.BackupDateFormat; }
+			set { PluginSettings.Instance.BackupDateFormat = value; }
+		}
+
+		[Category("Automated Backup")]
+		[Description("Date format to use for the subdirectory")]
+		[Browsable(true)]
+		[ReadOnly(false)]
+		public string BackupDateFormatSubDirectory
+		{
+			get { return PluginSettings.Instance.BackupDateFormatSubDirectory; }
+			set { PluginSettings.Instance.BackupDateFormatSubDirectory = value; }
+		}
+
 		[Category( "Automated Backup" )]
 		[Description( "Should backups be cleaned up after a certain period of time?" )]
 		[Browsable( true )]
