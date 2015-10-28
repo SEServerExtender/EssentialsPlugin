@@ -76,13 +76,13 @@
 							                   }
 							                   catch (Exception ex)
 							                   {
-												   Essentials.Log.Error( "Error stopping spawnship: {0}", ex );
+												   Essentials.Log.Error( ex, "Error stopping spawnship: {0}", ex );
 							                   }
 						                   });
 					}
 				}
 			}
-
+			
 			base.Handle();
 		}
 	}

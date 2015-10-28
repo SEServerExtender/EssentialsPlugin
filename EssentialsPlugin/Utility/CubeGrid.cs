@@ -128,7 +128,7 @@
 						if ( stator.RotorEntityId != 0 )
 						{
 							IMyEntity connectedEntity;
-							MyAPIGateway.Entities.TryGetEntityById( stator.RotorEntityId, out connectedEntity );
+							MyAPIGateway.Entities.TryGetEntityById( (long) stator.RotorEntityId, out connectedEntity );
 
 							if ( connectedEntity != null )
 							{
@@ -150,7 +150,7 @@
 						if ( stator.RotorEntityId != 0 )
 						{
 							IMyEntity connectedEntity;
-							MyAPIGateway.Entities.TryGetEntityById( stator.RotorEntityId, out connectedEntity );
+							MyAPIGateway.Entities.TryGetEntityById( (long) stator.RotorEntityId, out connectedEntity );
 
 							if ( connectedEntity != null )
 							{
@@ -1595,7 +1595,7 @@
 					{
 						MyObjectBuilder_MotorAdvancedStator stator = (MyObjectBuilder_MotorAdvancedStator)cubeBlock.GetObjectBuilderCubeBlock( );
 						IMyEntity connectedEntity;
-						if ( MyAPIGateway.Entities.TryGetEntityById( stator.RotorEntityId, out connectedEntity ) )
+						if ( MyAPIGateway.Entities.TryGetEntityById( (long) stator.RotorEntityId, out connectedEntity ) )
 						{
 							IMyCubeGrid parent = (IMyCubeGrid)connectedEntity.Parent;
 							if ( !checkedGrids.Contains( parent ) )
