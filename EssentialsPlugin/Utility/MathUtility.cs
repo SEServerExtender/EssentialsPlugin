@@ -41,9 +41,12 @@
 
 		public static Vector3 GenerateRandomEdgeVector()
 		{
-			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent() - 1000;
-			if (halfExtent == 0f)
-				halfExtent = 900000f;
+			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent();
+            if (halfExtent == 0f)
+                halfExtent = 900000f;
+                //if world size is infinite, put the relay 900km away from center to prevent it spawning inside a planet
+            else
+                halfExtent -= 1000;
 
 			return new Vector3(GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent));
 		}
