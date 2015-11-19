@@ -48,6 +48,8 @@
 		private MTObservableCollection<BackupItem> _backupItems;
 		private bool _backupCreateSubDirectories;
 		private string _backupBaseDirectory;
+		private string _backupDateFormat;
+		private string _backupDateFormatSubDirectory;
 		private bool _backupCleanup;
 		private int _backupCleanupTime;
 		private bool _backupAsteroids;
@@ -330,6 +332,26 @@
 				if (_backupBaseDirectory == "")
 					_backupBaseDirectory = MyFileSystem.UserDataPath + "\\Backup";
 
+				Save();
+			}
+		}
+
+		public string BackupDateFormat
+		{
+			get { return _backupDateFormat; }
+			set
+			{
+				_backupDateFormat = value;
+				Save();
+			}
+		}
+
+		public string BackupDateFormatSubDirectory
+		{
+			get { return _backupDateFormatSubDirectory; }
+			set
+			{
+				_backupDateFormatSubDirectory = value;
 				Save();
 			}
 		}
@@ -816,6 +838,9 @@
 			_restartTimeItems.CollectionChanged += ItemsCollectionChanged;
 			_backupItems.CollectionChanged += ItemsCollectionChanged;
 			_protectedItems.CollectionChanged += ItemsCollectionChanged;
+
+			_backupDateFormat = "yyyy-MM-dd_HH-mm";
+			_backupDateFormatSubDirectory = "yyyy-MM-dd";
 
 			_greetingMessage = "";
 
