@@ -26,6 +26,7 @@
 		private string _serverName;
 		private bool _serverUtilityGridsShowCoords;
 		private bool _serverRespawnMenuOverride;
+        private bool _stopShipsOnStart;
 
 		private bool _informationEnabled;
 		private MTObservableCollection<InformationItem> _informationItems;
@@ -152,6 +153,16 @@
 				Save();
 			}
 		}
+
+        public bool StopShipsOnStart
+        {
+            get { return _stopShipsOnStart; }
+            set
+            {
+                _stopShipsOnStart = value;
+                Save();
+            }
+        }
 
 		// Information
 		public bool InformationEnabled

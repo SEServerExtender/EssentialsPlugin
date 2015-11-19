@@ -115,6 +115,19 @@
 			}
 		}
 
+        [Category("General")]
+        [Description("Enable / Disable stopping all ships when server starts")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public bool StopShipsOnStart
+        {
+            get { return PluginSettings.Instance.StopShipsOnStart; }
+            set
+            {
+                PluginSettings.Instance.StopShipsOnStart = value;
+            }
+        }
+
 		[Category( "Information" )]
 		[Description( "Enabled / Disable Information Commands" )]
 		[Browsable( true )]
@@ -847,7 +860,7 @@
 				PluginSettings.Instance.GameModeConquestEnabled = value;
 			}
 		}
-		*/
+        */
 		#endregion
 
 		#region Constructors and Initializers
@@ -1099,7 +1112,7 @@
 		}
 
 		public void HandleChatMessage( ulong steamId, string message )
-		{
+		{          
 			// Parse chat message
 			ulong remoteUserId = steamId;
 			List<string> commandParts = CommandParser.GetCommandParts( message );
@@ -1115,23 +1128,23 @@
 			bool handled = false;
 			foreach ( ChatHandlerBase chatHandler in _chatHandlers )
 			{
-				int commandCount = 0;
-				if ( remoteUserId == 0 && !chatHandler.AllowedInConsole( ) )
-					continue;
+                int commandCount = 0;
+                if (remoteUserId == 0 && !chatHandler.AllowedInConsole())
+                    continue;
 
-				if ( chatHandler.CanHandle( remoteUserId, commandParts.ToArray( ), ref commandCount ) )
-				{
-					try
-					{
-						chatHandler.HandleCommand( remoteUserId, commandParts.Skip( commandCount ).ToArray( ) );
-					}
-					catch ( Exception ex )
-					{
-						Log.Info( string.Format( "ChatHandler Error: {0}", ex ) );
-					}
+                if (chatHandler.CanHandle(remoteUserId, commandParts.ToArray(), ref commandCount))
+                {
+                    try
+                    {
+                        chatHandler.HandleCommand(remoteUserId, commandParts.Skip(commandCount).ToArray());
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Info(string.Format("ChatHandler Error: {0}", ex));
+                    }
 
-					handled = true;
-				}
+                    handled = true;
+                }
 			}
 
 			if ( !handled )

@@ -108,6 +108,9 @@
 
 		private void StopAllShips()
 		{
+            if (!PluginSettings.Instance.StopShipsOnStart)
+                return;
+
 			Essentials.Log.Info("Stopping all ships");
 			int shipsStopped = 0;
 
