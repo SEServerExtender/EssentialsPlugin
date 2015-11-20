@@ -4,6 +4,7 @@
 	using Sandbox.ModAPI;
 	using VRageMath;
 
+
 	public static class MathUtility
 	{
 		private static Random m_random = new Random();
@@ -41,16 +42,19 @@
 
 		public static Vector3 GenerateRandomEdgeVector()
 		{
-			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent() - 1000;
-			if (halfExtent == 0f)
-				halfExtent = 900000f;
+			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent();
+            if (halfExtent == 0f)
+                halfExtent = 900000f;
+                //if world size is infinite, put the relay 900km away from center to prevent it spawning inside a planet
+            else
+                halfExtent -= 1000;
 
 			return new Vector3(GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent));
 		}
 
 		public static float GenerateRandomCoord(float halfExtent)
 		{
-			float result = (m_random.Next(200) + halfExtent) * (m_random.Next(2) == 0 ? -1 : 1);
+			float result = (m_random.Next(1000) + halfExtent) * (m_random.Next(2) == 0 ? -1 : 1);
 			return result;
 		}
 	}

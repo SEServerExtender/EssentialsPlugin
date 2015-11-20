@@ -7,7 +7,7 @@
 
 	static class Backup
 	{
-		static public void Create(string baseDirectory, bool createSubDirectories, bool backupAsteroids, bool backupSettings = false)
+		static public void Create(string baseDirectory, bool createSubDirectories, string dateFormat, string dateFormatSubDirectory, bool backupAsteroids, bool backupSettings = false)
 		{
 			Essentials.Log.Info( "Creating backup ..." );
 			//string baseDirectory = PluginSettings.Instance.BackupBaseDirectory;
@@ -22,7 +22,7 @@
 			//if (PluginSettings.Instance.BackupCreateSubDirectories)
 			if(createSubDirectories)
 			{
-				string subDirectory = string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-HH-mm"));
+				string subDirectory = string.Format("Backup_{0}", DateTime.Now.ToString(dateFormatSubDirectory));
 				if (!Directory.Exists(baseDirectory + "\\" + subDirectory))
 					Directory.CreateDirectory(baseDirectory + "\\" + subDirectory);
 
@@ -64,14 +64,12 @@
 				}
 			}
 
-			ZipFile.CreateFromDirectory(tempDirectory, finalDirectory + "\\" + string.Format("Backup-{0}", DateTime.Now.ToString("d-M-yyyy-HH-mm")) + ".zip");
+			string fileName = string.Format("Backup_{0}.zip", DateTime.Now.ToString(dateFormat));
+			ZipFile.CreateFromDirectory(tempDirectory, finalDirectory + "\\" + fileName);
 
-			foreach (string file in Directory.GetFiles(tempDirectory))
-			{
-				File.Delete(file);
-			}
+			Directory.Delete(tempDirectory, true);
 
-			Essentials.Log.Info( "Backup created: {0}\\" + "Backup-{1}.zip", finalDirectory, DateTime.Now.ToString( "d-M-yyyy-hh-mm" ) );
+			Essentials.Log.Info( "Backup created: {0}\\{1}", finalDirectory, fileName );
 		}
 	}
 }
