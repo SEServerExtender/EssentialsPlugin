@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<MyObjectBuilder_CubeGrid xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <EntityId>72318420046098654</EntityId>
+  <PersistentFlags>CastShadows InScene</PersistentFlags>
+  <PositionAndOrientation>
+    <Position x="2.60075045" y="-189.02005" z="-6.02326441" />
+    <Forward x="-0" y="-0" z="-1" />
+    <Up x="0" y="1" z="0" />
+  </PositionAndOrientation>
+  <GridSizeEnum>Small</GridSizeEnum>
+  <CubeBlocks>
+    <MyObjectBuilder_CubeBlock xsi:type="MyObjectBuilder_Cockpit">
+      <SubtypeName>SmallBlockCockpit</SubtypeName>
+      <EntityId>72172363029537543</EntityId>
+      <Min x="-1" y="2" z="0" />
+      <BlockOrientation Forward="Forward" Up="Up" />
+      <ColorMaskHSV x="0" y="-1" z="0" />
+      <ShareMode>None</ShareMode>
+      <DeformationRatio>0</DeformationRatio>
+      <ShowOnHUD>false</ShowOnHUD>
+      <SelectedGunType xsi:nil="true" />
+      <UseSingleWeaponMode>false</UseSingleWeaponMode>
+      <Toolbar>
+        <ToolbarType>Character</ToolbarType>
+        <SelectedSlot xsi:nil="true" />
+        <Slots />
+        <ColorMaskHSVList>
+          <Vector3>
+            <X>0</X>
+            <Y>-1</Y>
+            <Z>0</Z>
+          </Vector3>
+          <Vector3>
+            <X>0</X>
+            <Y>0</Y>
+            <Z>0.05</Z>
+          </Vector3>
+          <Vector3>
+            <X>0.333333343</X>
+            <Y>-0.48</Y>
+            <Z>-0.25</Z>
+          </Vector3>
+          <Vector3>
+            <X>0.575</X>
+            <Y>0</Y>
+            <Z>0</Z>
+          </Vector3>
+          <Vector3>
+            <X>0.127777785</X>
+            <Y>-0.16</Y>
+            <Z>0.44</Z>
+          </Vector3>
+          <Vector3>
+            <X>0</X>
+            <Y>-0.95</Y>
+            <Z>0.4</Z>
+          </Vector3>
+          <Vector3>
+            <X>0</X>
+            <Y>-0.96</Y>
+            <Z>-0.5</Z>
+          </Vector3>
+          <Vector3>
+            <X>0</X>
+            <Y>-0.85</Y>
+            <Z>0.2</Z>
+          </Vector3>
+          <Vector3>
+            <X>0</X>
+            <Y>0.15</Y>
+            <Z>0.25</Z>
+          </Vector3>
+          <Vector3>
+            <X>0.333333343</X>
+            <Y>-0.329999983</Y>
+            <Z>-0.049999997</Z>
+          </Vector3>
+          <Vector3>
+            <X>0.575</X>
+            <Y>0.15</Y>
+            <Z>0.2</Z>
+          </Vector3>
+          <Vector3>
+            <X>0.122222222</X>
+            <Y>0.87</Y>
+            <Z>0.29</Z>
+          </Vector3>
+          <Vector3>
+            <X>0</X>
+            <Y>-0.8</Y>
+            <Z>0.6</Z>
+          </Vector3>
+          <Vector3>
+            <X>0</X>
+            <Y>-0.809999943</Y>
+            <Z>-0.3</Z>
+          </Vector3>
+        </ColorMaskHSVList>
+      </Toolbar>
+      <SelectedGunId xsi:nil="true" />
+      <PilotRelativeWorld>
+        <Position x="-2.73299217" y="-1.49801636" z="0.5597544" />
+        <Forward x="0.9558232" y="0.08240081" z="-0.2821564" />
+        <Up x="-0.103535" y="0.9927655" z="-0.06080481" />
+      </PilotRelativeWorld>
+      <PilotGunDefinition>
+        <TypeId>MyObjectBuilder_CubePlacer</TypeId>
+        <SubtypeId />
+      </PilotGunDefinition>
+      <IsInFirstPersonView>true</IsInFirstPersonView>
+    </MyObjectBuilder_CubeBlock>
+  </CubeBlocks>
+  <IsStatic>false</IsStatic>
+  <Skeleton />
+  <LinearVelocity x="0" y="0" z="0" />
+  <AngularVelocity x="0" y="0" z="0" />
+  <XMirroxPlane xsi:nil="true" />
+  <YMirroxPlane xsi:nil="true" />
+  <ZMirroxPlane xsi:nil="true" />
+  <ConveyorLines />
+  <BlockGroups />
+  <Handbrake>false</Handbrake>
+  <DisplayName>MovementShip</DisplayName>
+  <OxygenAmount>
+    <float>1</float>
+    <float>1</float>
+  </OxygenAmount>
+  <CreatePhysics>true</CreatePhysics>
+  <EnableSmallToLargeConnections>false</EnableSmallToLargeConnections>
+</MyObjectBuilder_CubeGrid>
