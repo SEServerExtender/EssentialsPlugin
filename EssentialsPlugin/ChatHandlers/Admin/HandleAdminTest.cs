@@ -121,7 +121,7 @@
 
 			 */
 
-			ServerNetworkManager.ShowRespawnMenu(userId);
+			//ServerNetworkManager.ShowRespawnMenu(userId);
 			return true;
 		}
 	}

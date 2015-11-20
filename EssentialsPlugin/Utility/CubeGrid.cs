@@ -823,6 +823,10 @@
 				if ( !( entity is IMyCubeGrid ) )
 					continue;
 
+                if (entity.DisplayName.Contains("CommRelay"))
+                    continue;
+                //this should make CommRelays immune to chat scan/delete commands
+
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				MyObjectBuilder_CubeGrid gridBuilder;
 				try
