@@ -4,6 +4,7 @@
 	using Sandbox.ModAPI;
 	using VRageMath;
 
+
 	public static class MathUtility
 	{
 		private static Random m_random = new Random();
@@ -53,7 +54,7 @@
 
 		public static float GenerateRandomCoord(float halfExtent)
 		{
-			float result = (m_random.Next(200) + halfExtent) * (m_random.Next(2) == 0 ? -1 : 1);
+			float result = (m_random.Next(1000) + halfExtent) * (m_random.Next(2) == 0 ? -1 : 1);
 			return result;
 		}
 	}
