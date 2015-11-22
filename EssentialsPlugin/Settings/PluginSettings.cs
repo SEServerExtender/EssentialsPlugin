@@ -839,8 +839,10 @@
 			_backupItems.CollectionChanged += ItemsCollectionChanged;
 			_protectedItems.CollectionChanged += ItemsCollectionChanged;
 
-			_backupDateFormat = "yyyy-MM-dd_HH-mm";
-			_backupDateFormatSubDirectory = "yyyy-MM-dd";
+            _stopShipsOnStart = false;
+
+            _backupDateFormat = "MM-dd-yyyy_HH-mm";
+			_backupDateFormatSubDirectory = "MM-dd-yyyy";
 
 			_greetingMessage = "";
 

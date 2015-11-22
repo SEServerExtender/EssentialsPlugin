@@ -14,6 +14,8 @@
 	using VRage;
 	using VRage.ModAPI;
 	using VRageMath;
+    using Sandbox.Game.Entities;
+    using VRage.Groups;
 
 	public enum RemoveGridTypes
 	{
@@ -1439,21 +1441,6 @@
 			return grid.CubeBlocks.Any( DoesBlockSupplyPower );
 		}
 
-		public static bool DoesGridHaveFourBeacons( MyObjectBuilder_CubeGrid grid )
-		{
-			int count = 0;
-			foreach ( MyObjectBuilder_CubeBlock block in grid.CubeBlocks )
-			{
-				if ( block is MyObjectBuilder_Beacon )
-					count++;
-
-				if ( count >= 4 )
-					return true;
-			}
-
-			return false;
-		}
-
 		public static MyObjectBuilder_CubeGrid SafeGetObjectBuilder( IMyCubeGrid grid )
 		{
 			MyObjectBuilder_CubeGrid gridBuilder = null;
@@ -1511,7 +1498,7 @@
 		{
 			List<IMySlimBlock> currentBlocks = new List<IMySlimBlock>( );
 			List<IMyCubeGrid> connectedGrids = new List<IMyCubeGrid>( );
-
+            
 			connectedGrids.Add( grid );
 			while ( connectedGrids.Count > 0 )
 			{
@@ -1519,12 +1506,13 @@
 				connectedGrids.Remove( currentGrid );
 				if ( gridsProcessed.Contains( currentGrid ) )
 					continue;
-
+                
 				gridsProcessed.Add( currentGrid );
 
 				GetGridBlocks( currentGrid, currentBlocks );
 				connectedGrids.AddRange( GetConnectedGridList( gridsProcessed, currentBlocks ) );
-
+                ///
+                
 				allBlocks.AddRange( collect != null ? currentBlocks.FindAll( s => collect( s ) ) : currentBlocks );
 			}
 		}

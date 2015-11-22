@@ -44,8 +44,12 @@
 
 		public static Vector3 GenerateRandomEdgeVector()
 		{
-			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent();
-            
+            float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent( );
+            int testRadius = (halfExtent == 0 ? 10000 : 3000);
+
+            return (Vector3)MyAPIGateway.Entities.FindFreePlace( Vector3D.Zero, testRadius, 30, 5, 0.25f );
+
+            /* leaving this just in case
             halfExtent += (halfExtent == 0 ? 900000 : -1000);
             //if world is infinite (halfExtent == 0) set a bound of 900km. Else, set a bound of halfExtent -1000 so position isn't too close to world edge
 
@@ -68,7 +72,8 @@
             }
             ApplicationLog.BaseLog.Debug("Position valid, continuing.");
             return vectorPosition;
-		}
+            */
+        }
 
 		public static float GenerateRandomCoord(float halfExtent)
 		{
