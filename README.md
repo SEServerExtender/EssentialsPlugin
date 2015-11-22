@@ -2,13 +2,13 @@ Dedicated Server Essentials - Plugin
 ====================================
 Requirements
 ------------
-This plugin requires SEServerExtender v1.85.08 or above.  Please download and install that first from https://github.com/SEServerExtender/SEServerExtender/releases. 
+This plugin requires SEServerExtender v1.85.08 or above.  Please download and install that first from https://github.com/rexxar-tc/SEServerExtender. 
 
-This plugin requires a workshop mod.  This mod acts as a gateway between the client and server and is required for some functionality to work (private messaging, faction messaging, command hiding): http://steamcommunity.com/sharedfiles/filedetails/?id=340095691
+This plugin requires a workshop mod.  This mod acts as a gateway between the client and server and is required for some functionality to work (private messaging, faction messaging, command hiding): http://steamcommunity.com/sharedfiles/filedetails/?id=559202083
 
-This plugin is available at github at: https://github.com/SEServerExtender/EssentialsPlugin/releases
+This plugin is available at github at: https://github.com/rexxar-tc/EssentialsPlugin/releases
 
-Please post issues you have with the plugin at: https://github.com/SEServerExtender/EssentialsPlugin/issues
+Please post issues you have with the plugin at: https://github.com/rexxar-tc/EssentialsPlugin/issues
 
 Overview
 --------
@@ -22,7 +22,7 @@ If you're just using the archive provided, just unzip the archive into it's own 
 
 If you want to compile the source provided.  Compile and copy the .dll created after compiling of this project into it's own sub directory of your Mods directory of your instance.  Also move the .sbc files included the .zip archive of any of the releases into that directory as well.
 
-Please make sure to add the associated workshop mod as well.  It is ID: 340095691.  Just add this mod in extender Mods section of the configuration and it will install automatically on restart!
+Please make sure to add the associated workshop mod as well.  It is ID: 559202083.  Just add this mod in extender Mods section of the configuration and it will install automatically on restart!
 
 It's that easy!
 
