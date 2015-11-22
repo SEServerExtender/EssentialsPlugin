@@ -9,6 +9,7 @@
 	using SEModAPIInternal.API.Common;
 	using VRage.ModAPI;
 	using VRageMath;
+    using Sandbox.Game;
 
 	public class HandleUtilityGridsList : ChatHandlerBase
 	{
@@ -81,9 +82,9 @@
 						result += "\r\n";
 
 					if(CubeGrids.IsFullOwner(gridBuilder, playerId, player) && !dialog)
-						result += string.Format("Grid '{0}' at {2}", grid.DisplayName, grid.EntityId, ShowCoordinates(grid.GetPosition()));
+						result += string.Format("Grid '{0}' at {2}", grid.DisplayName, grid.EntityId, ShowCoordinates(entity.GetPosition()));
 					else if (CubeGrids.IsFullOwner(gridBuilder, playerId, player) && dialog)
-						result += string.Format("{0} - {1} - {2}bl - {3}", grid.DisplayName, ShowCoordinates(grid.GetPosition()), gridBuilder.CubeBlocks.Count, gridBuilder.GridSizeEnum);
+						result += string.Format("{0} - {1} - {2}bl - {3}", grid.DisplayName, ShowCoordinates(entity.GetPosition()), gridBuilder.CubeBlocks.Count, gridBuilder.GridSizeEnum);
 					else
 						result += string.Format("Grid '{0}'", grid.DisplayName, grid.EntityId);
 
@@ -116,7 +117,7 @@
 			Communication.SendPrivateInformation(userId, output);
 
 			Communication.SendPrivateInformation(userId, string.Format("Displaying page {0} of {1} - {2} grids", page, pages, count));
-			return true;
+            return true;
 		}
 
 		private string ShowCoordinates(Vector3D pos)
