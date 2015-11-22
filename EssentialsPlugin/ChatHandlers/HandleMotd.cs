@@ -13,7 +13,7 @@
 
 		public override string GetHelp()
 		{
-			return "Shows the time remaining until the Automated Restart.";
+			return "Shows the message of the day.";
 		}
 
 		public override string GetCommandText()

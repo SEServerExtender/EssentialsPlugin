@@ -3,6 +3,7 @@
 	using System;
 	using Sandbox.ModAPI;
 	using VRageMath;
+    using SEModAPIInternal.Support;
 
 
 	public static class MathUtility
@@ -46,19 +47,26 @@
 			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent();
             
             halfExtent += (halfExtent == 0 ? 900000 : -1000);
-            //if world is infinite (halfExtent == 0) set a bound of 900km. Else, set a bound of halfExtend -1000
+            //if world is infinite (halfExtent == 0) set a bound of 900km. Else, set a bound of halfExtent -1000 so position isn't too close to world edge
 
             Vector3 vectorPosition = new Vector3(GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent)); ;
             //get a new random position vector
-            BoundingSphereD positionSphere = new BoundingSphereD(vectorPosition, 10000);
+
+            int boundRadius = (halfExtent < 10000 ? 3000 : 10000);
+            //if we're in a world less than 20km large, drop the radius to 3km, otherwise there are no valid positions
+
+            BoundingSphereD positionSphere = new BoundingSphereD(vectorPosition, boundRadius);
             //create a sphere around the position with a radius of 10km
 
+            ApplicationLog.BaseLog.Debug("Trying first generated position...");
             while (MyAPIGateway.Entities.GetIntersectionWithSphere(ref positionSphere) != null)
             {
                 vectorPosition = new Vector3(GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent));
-                positionSphere = new BoundingSphereD(vectorPosition, 10000);
+                positionSphere = new BoundingSphereD(vectorPosition, boundRadius);
                 //make sure there is nothing within 10km of position
+                ApplicationLog.BaseLog.Debug("Position failed, retrying new position...");
             }
+            ApplicationLog.BaseLog.Debug("Position valid, continuing.");
             return vectorPosition;
 		}
 
