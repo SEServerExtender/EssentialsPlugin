@@ -45,7 +45,7 @@
 			}
 
 			CubeGridEntity entity = new CubeGridEntity( new FileInfo( Essentials.PluginPath + "CommRelay.sbc" ) );
-			long entityId = BaseEntity.GenerateEntityId( );
+            long entityId = BaseEntity.GenerateEntityId( );
 			entity.EntityId = entityId;
 			entity.DisplayName = string.Format( "CommRelayOutput{0}", PlayerMap.Instance.GetPlayerIdsFromSteamId( steamId ).First( ) );
 			entity.PositionAndOrientation = new MyPositionAndOrientation( MathUtility.GenerateRandomEdgeVector( ), Vector3.Forward, Vector3.Up );
@@ -59,7 +59,7 @@
 				}
 			}
 
-			SectorObjectManager.Instance.AddEntity( entity );
+            SectorObjectManager.Instance.AddEntity( entity );
 			//TimedEntityCleanup.Instance.Add( entityId );
 		}
 
@@ -81,7 +81,7 @@
 			}
 
 			SectorObjectManager.Instance.AddEntity( entity );
-			TimedEntityCleanup.Instance.Add( entityId );
+			//TimedEntityCleanup.Instance.Add( entityId );
 		}
 
 		public static void SendFactionClientMessage( ulong playerSteamId, String message )

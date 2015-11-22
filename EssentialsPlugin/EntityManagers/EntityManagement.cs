@@ -89,8 +89,8 @@
 					if ( !( entity is IMyCubeGrid ) )
 						continue;
 
-					if ( entity.DisplayName.Contains( "CommRelay" ) )
-						continue;
+					//if ( entity.DisplayName.Contains( "CommRelay" ) )
+						//continue;
 
 					if ( entity.Physics == null ) // Projection
 						continue;

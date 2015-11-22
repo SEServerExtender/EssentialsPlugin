@@ -7,6 +7,7 @@
 
 	public static class MathUtility
 	{
+
 		private static Random m_random = new Random();
 
 		public static Quaternion GetRotation(Vector3 source, Vector3 dest, Vector3 up)
@@ -43,19 +44,30 @@
 		public static Vector3 GenerateRandomEdgeVector()
 		{
 			float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent();
-            if (halfExtent == 0f)
-                halfExtent = 900000f;
-                //if world size is infinite, put the relay 900km away from center to prevent it spawning inside a planet
-            else
-                halfExtent -= 1000;
+            
+            halfExtent += (halfExtent == 0 ? 900000 : -1000);
+            //if world is infinite (halfExtent == 0) set a bound of 900km. Else, set a bound of halfExtend -1000
 
-			return new Vector3(GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent));
+            Vector3 vectorPosition = new Vector3(GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent)); ;
+            //get a new random position vector
+            BoundingSphereD positionSphere = new BoundingSphereD(vectorPosition, 10000);
+            //create a sphere around the position with a radius of 10km
+
+            while (MyAPIGateway.Entities.GetIntersectionWithSphere(ref positionSphere) != null)
+            {
+                vectorPosition = new Vector3(GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent), GenerateRandomCoord(halfExtent));
+                positionSphere = new BoundingSphereD(vectorPosition, 10000);
+                //make sure there is nothing within 10km of position
+            }
+            return vectorPosition;
 		}
 
 		public static float GenerateRandomCoord(float halfExtent)
 		{
-			float result = (m_random.Next(1000) + halfExtent) * (m_random.Next(2) == 0 ? -1 : 1);
+            float result = (m_random.Next((int)halfExtent)) * (m_random.Next(2) == 0 ? -1 : 1);
+            //return a random distance between origin and +/- halfExtent
 			return result;
+            
 		}
 	}
 }
