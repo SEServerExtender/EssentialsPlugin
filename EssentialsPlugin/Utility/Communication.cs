@@ -7,6 +7,7 @@
 	using Sandbox.Common;
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
+    using System.Collections.Generic;
 	using SEModAPIExtensions.API;
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity;
@@ -36,7 +37,25 @@
 			ChatManager.Instance.SendPrivateChatMessage( playerId, infoText );
 		}
 
-		public static void SendClientMessage( ulong steamId, string message )
+        public static Vector3D getPos(ulong userId)
+        {
+            Vector3D position = Vector3D.Zero;
+            Wrapper.GameAction(() =>
+            {
+                List<IMyPlayer> players = new List<IMyPlayer>();
+                MyAPIGateway.Players.GetPlayers(players, x => x.SteamUserId == userId);
+
+                if (players.Count > 0)
+                {
+                    IMyPlayer player = players.First();
+                    position = player.GetPosition();
+                }
+            });
+
+            return position;
+        }
+
+        public static void SendClientMessage( ulong steamId, string message )
 		{
 			if ( PlayerMap.Instance.GetPlayerIdsFromSteamId( steamId ).Count < 1 )
 			{
@@ -48,7 +67,7 @@
             long entityId = BaseEntity.GenerateEntityId( );
 			entity.EntityId = entityId;
 			entity.DisplayName = string.Format( "CommRelayOutput{0}", PlayerMap.Instance.GetPlayerIdsFromSteamId( steamId ).First( ) );
-			entity.PositionAndOrientation = new MyPositionAndOrientation( MathUtility.GenerateRandomEdgeVector( ), Vector3.Forward, Vector3.Up );
+			entity.PositionAndOrientation = new MyPositionAndOrientation( MathUtility.GenerateRandomEdgeVector( getPos(steamId) ), Vector3.Forward, Vector3.Up );
 
 			foreach ( MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks )
 			{
@@ -60,7 +79,7 @@
 			}
 
             SectorObjectManager.Instance.AddEntity( entity );
-			TimedEntityCleanup.Instance.Add( entityId );
+			//TimedEntityCleanup.Instance.Add( entityId );
 		}
 
 		public static void SendBroadcastMessage( string message )

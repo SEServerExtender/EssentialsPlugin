@@ -1,24 +1,12 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
-    using System;
-    using System.IO;
     using System.Linq;
-    using NLog;
-    using Sandbox.Common;
-    using Sandbox.Common.ObjectBuilders;
     using Sandbox.ModAPI;
-    using SEModAPIExtensions.API;
-    using SEModAPIInternal.API.Common;
-    using SEModAPIInternal.API.Entity;
-    using SEModAPIInternal.API.Entity.Sector.SectorObject;
-    using SEModAPIInternal.API.Server;
-    using VRage;
     using VRageMath;
-    using VRage.ModAPI;
-    using VRage.Serialization;
-    using Sandbox.Common.ObjectBuilders.ComponentSystem;
+    using Utility;
+    using System.Collections.Generic;
 
-	public class HandleAdminTest : ChatHandlerBase
+    public class HandleAdminTest : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{
@@ -141,7 +129,7 @@
 
                 //ServerNetworkManager.ShowRespawnMenu(userId);
             }
-
+            /*
             CubeGridEntity entity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "Platform.sbc"));
             //IMyEntity entity = new IMyEntities(new FileInfo(Essentials.PluginPath + "Platform.sbc"));
             long entityId = BaseEntity.GenerateEntityId();
@@ -152,9 +140,25 @@
 
             //MyAPIGateway.Entities.AddEntity (entity, true);
             //IMyPlayer.AddGrid(entityId);
+            */
 
+            Vector3D position = Vector3D.Zero;
+            Wrapper.GameAction(() =>
+            {
+                List<IMyPlayer> players = new List<IMyPlayer>();
+                MyAPIGateway.Players.GetPlayers(players, x => x.SteamUserId == userId);
 
-			return true;
+                if (players.Count > 0)
+                {
+                    IMyPlayer player = players.First();
+                    position = player.GetPosition();
+                }
+            });
+
+            //return position;
+
+            Communication.SendPrivateInformation(userId, string.Format("Position - X:{0:F2} Y:{1:F2} Z:{2:F2}", position.X, position.Y, position.Z));
+            return true;
 		}
 
 	}
