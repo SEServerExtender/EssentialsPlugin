@@ -75,8 +75,8 @@
 					grid.CastShadows = true;
 					builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
 					MyAPIGateway.Entities.RemapObjectBuilder(builder);
-					Log.Info("Conceal", string.Format("Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
-
+                    //Log.Info("Conceal", string.Format("Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
+                    Log.Info("Revealing");
 					/*
 					entity.InScene = true;
 					entity.CastShadows = true;
@@ -86,10 +86,10 @@
 					//CubeGridEntity newEntity = new CubeGridEntity(builder);
 					//SectorObjectManager.Instance.AddEntity(newEntity);
 
-					BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
+					//BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
 					MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(builder);
 					addList.Add(builder);
-					MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
+					//MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
 					addList.Clear();
 				}
 			});

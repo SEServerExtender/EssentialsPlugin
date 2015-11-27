@@ -40,10 +40,10 @@
 			if (showConcealed)
 			{
 				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-				Wrapper.GameAction(() =>
-				{
+				//Wrapper.GameAction(() =>
+				//{
 					MyAPIGateway.Entities.GetEntities(entities);
-				});
+				//});
 
 				Communication.SendPrivateInformation(userId, "==== Concealed Entities ===");
 				int count = 0;

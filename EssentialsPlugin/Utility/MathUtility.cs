@@ -4,6 +4,8 @@
 	using Sandbox.ModAPI;
 	using VRageMath;
     using SEModAPIInternal.Support;
+    using EssentialsPlugin;
+    using NLog;
 
 
 	public static class MathUtility
@@ -42,14 +44,30 @@
 			return directionNormal;
 		}
 
-		public static Vector3 GenerateRandomEdgeVector()
+		public static Vector3D GenerateRandomEdgeVector()
 		{
             float halfExtent = MyAPIGateway.Entities.WorldSafeHalfExtent( );
+            /*
             int testRadius = (halfExtent == 0 ? 10000 : 3000);
 
-            return (Vector3)MyAPIGateway.Entities.FindFreePlace( Vector3D.Zero, testRadius, 30, 5, 0.25f );
+            Vector3D? freePlace = MyAPIGateway.Entities.FindFreePlace(new Vector3D(0,0,0), testRadius, 30, 5, 0.25f);
 
-            /* leaving this just in case
+            //FindFreePlace crashes the server for some reason. Reverting to the old method until I can figure out why.
+
+            if (freePlace != null)
+            {
+                ApplicationLog.BaseLog.Debug("freePlace is not null");
+                return (Vector3D)freePlace;
+            }
+
+            else
+            {
+                ApplicationLog.BaseLog.Debug("freePlace is null");
+                return new Vector3D(4000, 4000, 4000);
+            }*/                      
+            
+            //We should fail if we pass too many iterations, but whatever
+
             halfExtent += (halfExtent == 0 ? 900000 : -1000);
             //if world is infinite (halfExtent == 0) set a bound of 900km. Else, set a bound of halfExtent -1000 so position isn't too close to world edge
 
@@ -72,7 +90,7 @@
             }
             ApplicationLog.BaseLog.Debug("Position valid, continuing.");
             return vectorPosition;
-            */
+            
         }
 
 		public static float GenerateRandomCoord(float halfExtent)

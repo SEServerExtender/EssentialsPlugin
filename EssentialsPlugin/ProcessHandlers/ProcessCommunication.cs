@@ -1,20 +1,21 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
-	using System;
-	using System.Collections.Generic;
-	using System.IO;
-	using EssentialsPlugin.ChatHandlers;
-	using EssentialsPlugin.Utility;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.ModAPI;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject;
-	using VRage;
-	using VRage.ModAPI;
-	using VRageMath;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using EssentialsPlugin.ChatHandlers;
+    using EssentialsPlugin.Utility;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.ModAPI;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Entity;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject;
+    using VRage;
+    using VRage.ModAPI;
+    using VRageMath;
+    using SEModAPIInternal.Support;
 
-	public class ProcessCommunication : ProcessHandlerBase
+    public class ProcessCommunication : ProcessHandlerBase
 	{
 		#region Private Fields
 		private HashSet<long> m_processedRelays;
@@ -166,7 +167,8 @@
 			CubeGridEntity entity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "CommRelay.sbc"));
 			entity.EntityId = BaseEntity.GenerateEntityId();
 			entity.DisplayName = "CommRelayGlobal";
-			entity.PositionAndOrientation = new MyPositionAndOrientation(MathUtility.GenerateRandomEdgeVector(), Vector3.Forward, Vector3.Up);
+            ApplicationLog.BaseLog.Debug("Attempting to place global relay");
+            entity.PositionAndOrientation = new MyPositionAndOrientation(MathUtility.GenerateRandomEdgeVector(), Vector3.Forward, Vector3.Up);
 
 			List<string> commands = new List<string>();
 			// Give a list of commands

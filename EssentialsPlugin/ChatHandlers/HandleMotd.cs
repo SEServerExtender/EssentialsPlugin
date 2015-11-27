@@ -13,7 +13,7 @@
 
 		public override string GetHelp()
 		{
-			return "Shows the message of the day.";
+			return "Shows the message of the day. Usage: /motd";
 		}
 
 		public override string GetCommandText()

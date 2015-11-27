@@ -60,7 +60,7 @@
 			}
 
             SectorObjectManager.Instance.AddEntity( entity );
-			//TimedEntityCleanup.Instance.Add( entityId );
+			TimedEntityCleanup.Instance.Add( entityId );
 		}
 
 		public static void SendBroadcastMessage( string message )
@@ -69,7 +69,7 @@
 			long entityId = BaseEntity.GenerateEntityId( );
 			entity.EntityId = entityId;
 			entity.DisplayName = string.Format( "CommRelayBroadcast{0}", m_random.Next( 1, 10000 ) );
-			entity.PositionAndOrientation = new MyPositionAndOrientation( Vector3D.Zero, Vector3.Forward, Vector3.Up );
+			entity.PositionAndOrientation = new MyPositionAndOrientation( MathUtility.GenerateRandomEdgeVector(), Vector3.Forward, Vector3.Up );
 
 			foreach ( MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks )
 			{
@@ -81,7 +81,7 @@
 			}
 
 			SectorObjectManager.Instance.AddEntity( entity );
-			//TimedEntityCleanup.Instance.Add( entityId );
+			TimedEntityCleanup.Instance.Add( entityId );
 		}
 
 		public static void SendFactionClientMessage( ulong playerSteamId, String message )

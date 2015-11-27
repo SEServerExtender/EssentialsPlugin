@@ -18,6 +18,7 @@
 	using EssentialsPlugin.ChatHandlers.AdminScan;
 	using EssentialsPlugin.ChatHandlers.Dock;
 	using EssentialsPlugin.ChatHandlers.Waypoints;
+    using EssentialsPlugin.ChatHandlers.Settings;
 	using EssentialsPlugin.ProcessHandlers;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
@@ -867,7 +868,7 @@
 			get { return PluginSettings.Instance.BlockEnforcementItems; }
 		}
 
-		/*
+        /*
 		[Category("Game Modes")]
 		[Description("Conquest Game Mode - This mode tracks asteroid owners by counting owned blocks near an asteroid to determine the owner.  Includes a leaderboard")]
 		[Browsable(true)]
@@ -881,111 +882,137 @@
 			}
 		}
         */
-		#endregion
+        #endregion
 
-		#region Constructors and Initializers
+        #region Constructors and Initializers
 
-		private void DoInit( string path )
-		{
-			Instance = this;
-			//controlForm.Text = "Testing";
-			_pluginPath = path;
+        private void DoInit(string path)
+        {
+            Instance = this;
+            //controlForm.Text = "Testing";
+            _pluginPath = path;
 
-			// Load our settings
-			PluginSettings.Instance.Load( );
+            // Load our settings
+            PluginSettings.Instance.Load();
 
-			// Setup process handlers
-			_processHandlers = new List<ProcessHandlerBase>
-			                   {
-				                   new ProcessNewUserTransport( ),
-				                   new ProcessGreeting( ),
-				                   new ProcessRestart( ),
-				                   new ProcessInfo( ),
-				                   new ProcessCommunication( ),
-				                   new ProcessBackup( ),
-				                   new ProcessLoginTracking( ),
-				                   new ProcessProtection( ),
-				                   new ProcessDockingZone( ),
-				                   new ProcessConceal( ),
-				                   new ProcessWaypoints( ),
-				                   new ProcessCleanup( ),
-				                   new ProcessBlockEnforcement( ),
-				                   new ProcessSpawnShipTracking( ),
-								   new ProcessVoxels(  )
-			                   };
+            // Setup process handlers
+            _processHandlers = new List<ProcessHandlerBase>
+                               {
+                                   new ProcessNewUserTransport( ),
+                                   new ProcessGreeting( ),
+                                   new ProcessRestart( ),
+                                   new ProcessInfo( ),
+                                   new ProcessCommunication( ),
+                                   new ProcessBackup( ),
+                                   new ProcessLoginTracking( ),
+                                   new ProcessProtection( ),
+                                   new ProcessDockingZone( ),
+                                   new ProcessConceal( ),
+                                   new ProcessWaypoints( ),
+                                   new ProcessCleanup( ),
+                                   new ProcessBlockEnforcement( ),
+                                   new ProcessSpawnShipTracking( ),
+                                   new ProcessVoxels(  )
+                               };
 
-			// Setup chat handlers
-			_chatHandlers = new List<ChatHandlerBase>
-			                {
-				                new HandleInfo( ),
-				                new HandleTimeleft( ),
-				                new HandlePos( ),
-				                new HandleMsg( ),
-				                new HandleFaction( ),
-				                new HandleFactionF( ),
-				                new HandleMotd( ),
+            // Setup chat handlers
+            _chatHandlers = new List<ChatHandlerBase>
+                            {
 
+                                //Admin Commands
+                                new HandleAdminBackup( ),
+                                new HandleAdminMemory( ),
+                                new HandleAdminNotify( ),
+                                new HandleAdminOwnershipChange( ),
+                                new HandleAdminRestart( ),
+                                new HandleAdminTest( ),
+                                new HandleAdminVersion( ),
+
+
+                                //Admin Scan
 				                new HandleAdminScanAreaAt( ),
-				                new HandleAdminScanAreaTowards( ),
-				                new HandleAdminScanNoBeacon( ),
-				                new HandleAdminScanInactive( ),
-				                new HandleAdminScanEntityId( ),
-				                new HandleAdminScanCleanup( ),
-				                new HandleAdminScanOverlimit( ),
-				                new HandleAdminScanGrids( ),
+                                new HandleAdminScanAreaTowards( ),
+                                new HandleAdminScanCleanup( ),
+                                new HandleAdminScanEntityId( ),
+                                new HandleAdminScanGrids( ),
+                                new HandleAdminScanInactive( ),
+                                new HandleAdminScanNoBeacon( ),
+                                new HandleAdminScanOverlimit( ),
+                
 
+                                //Admin Delete
+                                new HandleAdminDeleteCleanup( ),
+                                new HandleAdminDeleteGrids( ),
+                                new HandleAdminDeleteGridsArea( ),
+                                new HandleAdminDeleteInactive( ),
+                                new HandleAdminDeleteNoBeacon( ),
+                                new HandleAdminDeleteShipsArea( ),
+                                new HandleAdminDeleteStationsArea( ),
+               
+
+                                //Admin Move
 				                new HandleAdminMoveAreaToPosition( ),
-				                new HandleAdminMoveAreaTowards( ),
-				                new HandleAdminMovePlayerTo( ),
-				                new HandleAdminMovePlayerPosition( ),
-				                new HandleAdminMoveGridTo( ),
+                                new HandleAdminMoveAreaTowards( ),
+                                new HandleAdminMoveGridTo( ),
+                                new HandleAdminMovePlayerPosition( ),
+                                new HandleAdminMovePlayerTo( ),
+                
 
-				                new HandleAdminDeleteGridsArea( ),
-				                new HandleAdminDeleteShipsArea( ),
-				                new HandleAdminDeleteStationsArea( ),
-				                new HandleAdminDeleteNoBeacon( ),
-				                new HandleAdminDeleteInactive( ),
-				                new HandleAdminDeleteCleanup( ),
-				                new HandleAdminDeleteGrids( ),
-
-				                new HandleAdminSettings( ),
-				                new HandleAdminNotify( ),
-				                new HandleAdminBackup( ),
-				                new HandleAdminRestart( ),
-				                new HandleAdminMemory( ),
-
-				                new HandleAdminOwnershipChange( ),
-
-				                new HandleAdminPlayerListActive( ),
-				                new HandleAdminPlayerListInactive( ),
-
+                                //Admin Conceal
 				                new HandleAdminConceal( ),
-				                new HandleAdminReveal( ),
+                                new HandleAdminReveal( ),
 
-				                new HandleDockValidate( ),
-				                new HandleDockDock( ),
-				                new HandleDockUndock( ),
-				                new HandleDockList( ),
 
-				                new HandleWaypointAdd( ),
-				                new HandleWaypointRemove( ),
-				                new HandleWaypointList( ),
-				                new HandleWaypointGroupAdd( ),
-				                new HandleWaypointGroupRemove( ),
-				                new HandleWaypointToggle( ),
-				                new HandleWaypointRefresh( ),
-				                new HandleWaypointFactionAdd( ),
-				                new HandleWaypointFactionRemove( ),
+                                //Admin Player
+                                new HandleAdminPlayerListActive( ),
+                                new HandleAdminPlayerListInactive( ),
 
+
+                                //Admin Settings
+                                new HandleAdminSettings( ),
+
+                                
+                                //Settings
+                                new HandleSettingsSetBlockEnforcement( ),
+                                new HandleSettingsSetMOTD( ),
+                                
+
+                                //Dock
+                                new HandleDockValidate( ),
+                                new HandleDockDock( ),
+                                new HandleDockUndock( ),
+                                new HandleDockList( ),
+
+
+                                //Waypoints
+                                new HandleWaypointAdd( ),
+                                new HandleWaypointRemove( ),
+                                new HandleWaypointList( ),
+                                new HandleWaypointGroupAdd( ),
+                                new HandleWaypointGroupRemove( ),
+                                new HandleWaypointToggle( ),
+                                new HandleWaypointRefresh( ),
+                                new HandleWaypointFactionAdd( ),
+                                new HandleWaypointFactionRemove( ),
+                                                                
+
+                                //Utility
 				                new HandleUtilityExportServer( ),
-				                new HandleUtilityGridsList( ),
-				                new HandleUtilityGridsRefresh( ),
-				                new HandleUtilityGridsCompare( ),
+                                new HandleUtilityGridsList( ),
+                                new HandleUtilityGridsRefresh( ),
+                                new HandleUtilityGridsCompare( ),
 
-				                new HandleAdminTest( )
-			                };
+                                //Misc
+                                new HandleInfo( ),
+                                new HandleTimeleft( ),
+                                new HandlePos( ),
+                                new HandleMsg( ),
+                                new HandleFaction( ),
+                                new HandleFactionF( ),
+                                new HandleMotd( )
+                            };
 
-			_processThreads = new List<Thread>( );
+            _processThreads = new List<Thread>( );
 			_processThread = new Thread( PluginProcessing );
 			_processThread.Start( );
 

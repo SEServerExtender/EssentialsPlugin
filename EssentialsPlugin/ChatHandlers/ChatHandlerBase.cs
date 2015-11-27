@@ -10,7 +10,7 @@
 		protected static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		public ChatHandlerBase( )
 		{
-			//Log.Info(string.Format("Added chat handler: {0}", GetCommandText()));
+			Log.Info(string.Format("Added chat handler: {0}", GetCommandText()));
 		}
 
 		public virtual Boolean CanHandle(ulong steamId, String[] words, ref int commandCount)
@@ -18,9 +18,12 @@
 			// Administrator Command
 			if (IsAdminCommand())
 			{
-				if (!PlayerManager.Instance.IsUserAdmin(steamId) && steamId != 0)
+
+
+                if (!PlayerManager.Instance.IsUserAdmin(steamId) && steamId != 0)
 					return false;
-			}
+
+            }
 
 			// Check if this command has multiple commands that do the same thing
 			if (GetMultipleCommandText().Length < 1)
