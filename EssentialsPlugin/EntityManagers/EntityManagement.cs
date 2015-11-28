@@ -89,8 +89,8 @@
 					if ( !( entity is IMyCubeGrid ) )
 						continue;
 
-					//if ( entity.DisplayName.Contains( "CommRelay" ) )
-						//continue;
+					if ( entity.DisplayName.Contains( "CommRelay" ) )
+						continue;
 
 					if ( entity.Physics == null ) // Projection
 						continue;
@@ -892,12 +892,18 @@
 						Essentials.Log.Warn( "CreateFromObjectBuilder failed: {0}", builder.EntityId );
 						continue;
 					}
-
+                    //these methods no longer exist.
+                    //KEEEEEEEEN!
+                    
 					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+                    /*
 					MyAPIGateway.Entities.AddEntity( newEntity );
 					addList.Add( newEntity.GetObjectBuilder( ) );
 					MyAPIGateway.Multiplayer.SendEntitiesCreated( addList );
 					addList.Clear( );
+                    */
+                    MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(newEntity.GetObjectBuilder());
+                    
 				}
 			} );
 			if ( PluginSettings.Instance.DynamicShowMessages )

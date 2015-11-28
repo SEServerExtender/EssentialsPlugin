@@ -12,6 +12,7 @@
         }
         public override string GetCommandText( )
         {
+            return "/settings setblockenforcement";
         }
         /*
         public override string GetHelpDialog( )

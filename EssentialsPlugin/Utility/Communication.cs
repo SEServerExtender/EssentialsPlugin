@@ -79,7 +79,7 @@
 			}
 
             SectorObjectManager.Instance.AddEntity( entity );
-			//TimedEntityCleanup.Instance.Add( entityId );
+			TimedEntityCleanup.Instance.Add( entityId );
 		}
 
 		public static void SendBroadcastMessage( string message )
