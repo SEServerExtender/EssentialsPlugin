@@ -1,8 +1,9 @@
 ﻿namespace EssentialsPlugin.ChatHandlers
 {
-	using EssentialsPlugin.Utility;
+    using System;
+    using EssentialsPlugin.Utility;
 
-	public class HandleAdminBackup : ChatHandlerBase
+    public class HandleAdminBackup : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{
@@ -14,7 +15,15 @@
 			return "/admin backup";
 		}
 
-		public override bool IsAdminCommand()
+        public override string GetHelpDialog()
+        {
+            string longMessage =
+                "/dialog \"Help\" \"\" \"\"" +
+                "\"Sorry, there's nothing here yet :(\" \"close\" ";
+            return longMessage;
+        }
+
+        public override bool IsAdminCommand()
 		{
 			return true;
 		}

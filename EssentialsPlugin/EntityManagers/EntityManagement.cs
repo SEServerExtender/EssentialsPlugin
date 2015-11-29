@@ -895,7 +895,7 @@
                     //these methods no longer exist.
                     //KEEEEEEEEN!
                     
-					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+					//BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
                     /*
 					MyAPIGateway.Entities.AddEntity( newEntity );
 					addList.Add( newEntity.GetObjectBuilder( ) );

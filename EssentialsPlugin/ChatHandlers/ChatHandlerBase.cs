@@ -54,7 +54,9 @@
 
 		public abstract string GetHelp();
 
-		public virtual String GetCommandText()
+        public abstract string GetHelpDialog();
+
+        public virtual String GetCommandText()
 		{
 			return "";
 		}

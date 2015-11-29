@@ -24,7 +24,15 @@
 			return new string[] { "/waypoint add", "/wp add" };
 		}
 
-		public override bool IsAdminCommand()
+        public override string GetHelpDialog()
+        {
+            string longMessage =
+                "/dialog \"Help\" \"\" \"\"" +
+                "\"Sorry, there's nothing here yet :(\" \"close\" ";
+            return longMessage;
+        }
+
+        public override bool IsAdminCommand()
 		{
 			return false;
 		}

@@ -795,6 +795,11 @@
 		public MTObservableCollection<SettingsBlockEnforcementItem> BlockEnforcementItems
 		{
 			get { return _blockEnforcementItems; }
+            set
+            {
+                _blockEnforcementItems = value;
+                Save();
+            }
 		}
 
 		public bool GameModeConquestEnabled

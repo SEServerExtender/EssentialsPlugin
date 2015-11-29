@@ -151,6 +151,9 @@
 					if (entity.DisplayName.StartsWith("CommRelay"))
 					{
 						entitiesToRemove.Add(entity);
+                        Random _mRandom = new Random();
+                        entity.DisplayName = "JunkRelay" + _mRandom.Next(10000).ToString();                        
+                        //sometimes the relays don't go away for clients, rename them so the mod can delete them
 					}
 				}
 

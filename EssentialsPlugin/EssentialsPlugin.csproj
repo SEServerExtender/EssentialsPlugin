@@ -76,6 +76,9 @@
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanCleanup.cs" />
     <Compile Include="ChatHandlers\AdminSettings\HandleAdminSettings.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminVersion.cs" />
+    <Compile Include="ChatHandlers\Settings\HandleSettingsEnableBlockEnforcement.cs" />
+    <Compile Include="ChatHandlers\Settings\HandleSettingsGetBlockEnforcement.cs" />
+    <Compile Include="ChatHandlers\Settings\HandleSettingsRemoveBlockEnforcement.cs" />
     <Compile Include="ChatHandlers\Settings\HandleSettingsSetBlockEnforcement.cs" />
     <Compile Include="ChatHandlers\Settings\HandleSettingsSetMOTD.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminStatistics.cs" />

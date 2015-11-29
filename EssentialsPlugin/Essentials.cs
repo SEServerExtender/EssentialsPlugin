@@ -973,6 +973,9 @@
 
                                 
                                 //Settings
+                                new HandleSettingsEnableBlockEnforcement( ),
+                                new HandleSettingsRemoveBlockEnforcement( ),
+                                new HandleSettingsGetBlockEnforcement( ),
                                 new HandleSettingsSetBlockEnforcement( ),
                                 new HandleSettingsSetMOTD( ),
                                 
@@ -1164,15 +1167,20 @@
 			ulong remoteUserId = steamId;
 			List<string> commandParts = CommandParser.GetCommandParts( message );
 
-			// User wants some help
-			if ( commandParts[ 0 ].ToLower( ) == "/help" )
+            // User wants some help
+            if (commandParts[0].ToLower() == "/help" && commandParts[1].ToLower() != "dialog")
 			{
 				HandleHelpCommand( remoteUserId, commandParts );
 				return;
 			}
+            else if (commandParts[0].ToLower() == "/help" && commandParts[1].ToLower() == "dialog")
+            {
+                HandleHelpDialog(remoteUserId, commandParts);
+                return;
+            }
 
-			// See if we have any valid handlers
-			bool handled = false;
+                // See if we have any valid handlers
+                bool handled = false;
 			foreach ( ChatHandlerBase chatHandler in _chatHandlers )
 			{
                 int commandCount = 0;
@@ -1305,12 +1313,119 @@
 			}
 		}
 
-		/// <summary>
-		/// Displays the available commands for the command entered
+        /// <summary>
+		/// This function displays available help for all the functionality of this plugin in a dialog window
 		/// </summary>
 		/// <param name="remoteUserId"></param>
-		/// <param name="recvMessage"></param>
-		private void DisplayAvailableCommands( ulong remoteUserId, string recvMessage )
+		/// <param name="commandParts"></param>
+		private void HandleHelpDialog(ulong remoteUserId, IReadOnlyCollection<string> commandParts)
+        {
+            if (commandParts.Count == 2)
+            {
+                List<string> commands = new List<string>();
+                foreach (ChatHandlerBase handler in _chatHandlers)
+                {
+                    // We should replace this to just have the handler return a string[] of base commands
+                    if (handler.GetMultipleCommandText().Length < 1)
+                    {
+                        string commandBase = handler.GetCommandText().Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
+                        if (!commands.Contains(commandBase) && (!handler.IsClientOnly()) && (!handler.IsAdminCommand() || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
+                        {
+                            commands.Add(commandBase);
+                        }
+                    }
+                    else
+                    {
+                        foreach (string cmd in handler.GetMultipleCommandText())
+                        {
+                            string commandBase = cmd.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).First();
+                            if (!commands.Contains(commandBase) && (!handler.IsClientOnly()) && (!handler.IsAdminCommand() || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
+                            {
+                                commands.Add(commandBase);
+                            }
+                        }
+                    }
+                }
+
+                string commandList = string.Join(", ", commands);
+                commandList = commandList.Replace(", ", "|");
+                //take our list of commands, put line breaks between all the entries and stuff it into a dialog winow
+
+                Communication.SendClientMessage(remoteUserId, string.Format("/dialog \"Help\" \"Available commands\" \"\" \"{0}||Type '/help dialog <command>' for more info.\" \"close\"", commandList));
+            }
+            else
+            {
+                string helpTarget = string.Join(" ", commandParts.Skip(2).ToArray());
+                bool found = false;
+                foreach (ChatHandlerBase handler in _chatHandlers)
+                {
+                    // Again, we should get handler to just return string[] of command Text
+                    if (handler.GetMultipleCommandText().Length < 1)
+                    {
+                        if (String.Equals(handler.GetCommandText(), helpTarget, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            Communication.SendClientMessage(remoteUserId, handler.GetHelpDialog());
+                            found = true;
+                        }
+                    }
+                    else
+                    {
+                        foreach (string cmd in handler.GetMultipleCommandText())
+                        {
+                            if (String.Equals(cmd, helpTarget, StringComparison.CurrentCultureIgnoreCase))
+                            {
+                                Communication.SendClientMessage(remoteUserId, handler.GetHelpDialog());
+                                found = true;
+                            }
+                        }
+                    }
+                }
+
+                if (!found)
+                {
+                    List<string> helpTopics = new List<string>();
+
+                    foreach (ChatHandlerBase handler in _chatHandlers)
+                    {
+                        // Again, cleanup to one function
+                        string[] multipleCommandText = handler.GetMultipleCommandText();
+                        if (multipleCommandText.Length == 0)
+                        {
+                            if (handler.GetCommandText().ToLower().StartsWith(helpTarget.ToLower()) && ((!handler.IsAdminCommand()) || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
+                            {
+                                helpTopics.Add(handler.GetCommandText().ToLower().Replace(helpTarget.ToLower(), string.Empty));
+                            }
+                        }
+                        else
+                        {
+                            foreach (string cmd in multipleCommandText)
+                            {
+                                if (cmd.ToLower().StartsWith(helpTarget.ToLower()) && ((!handler.IsAdminCommand()) || (handler.IsAdminCommand() && (PlayerManager.Instance.IsUserAdmin(remoteUserId) || remoteUserId == 0))))
+                                {
+                                    helpTopics.Add(cmd.ToLower().Replace(helpTarget.ToLower(), string.Empty));
+                                }
+                            }
+                        }
+                    }
+
+                    if (helpTopics.Any())
+                    {
+                        Communication.SendPrivateInformation(remoteUserId, string.Format("Help topics for command '{0}': {1}", helpTarget.ToLower(), string.Join(",", helpTopics.ToArray())));
+                        found = true;
+                    }
+                }
+
+                if (!found)
+                    Communication.SendPrivateInformation(remoteUserId, "Unknown command");
+            }
+        }
+
+        /// <summary>
+        /// Displays the available commands for the command entered
+        /// </summary>
+        /// <param name="remoteUserId"></param>
+        /// <param name="recvMessage"></param>
+        private void DisplayAvailableCommands( ulong remoteUserId, string recvMessage )
 		{
 			string message = recvMessage.ToLower( ).Trim( );
 			List<string> availableCommands = new List<string>( );

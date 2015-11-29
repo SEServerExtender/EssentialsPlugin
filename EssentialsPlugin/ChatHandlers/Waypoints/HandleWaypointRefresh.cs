@@ -24,7 +24,15 @@
 			return false;
 		}
 
-		public override bool AllowedInConsole()
+        public override string GetHelpDialog()
+        {
+            string longMessage =
+                "/dialog \"Help\" \"\" \"\"" +
+                "\"Sorry, there's nothing here yet :(\" \"close\" ";
+            return longMessage;
+        }
+
+        public override bool AllowedInConsole()
 		{
 			return false;
 		}
