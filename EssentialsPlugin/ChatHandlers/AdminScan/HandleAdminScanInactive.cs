@@ -42,6 +42,8 @@
 		// admin nobeacon scan
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
+            int counter = 0;
+
 			if(words.Count() > 3)
 				return false;
 
@@ -87,6 +89,9 @@
 				if (!(entity is IMyCubeGrid))
 					continue;
 
+                if (entity.DisplayName.Contains("CommRelay)"))
+                    continue;
+
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(grid.EntityId);
 				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
@@ -104,8 +109,11 @@
 					continue;					
 				}
 
-				foreach (long player in CubeGrids.GetBigOwners(gridBuilder))
+                int countlength = CubeGrids.GetBigOwners(gridBuilder).Count;
+                foreach (long player in CubeGrids.GetBigOwners(gridBuilder))
 				{
+                    if (counter >= countlength)
+                        break;
 					// This playerId is protected by whitelist
 					if (PluginSettings.Instance.LoginPlayerIdWhitelist.Length > 0 && PluginSettings.Instance.LoginPlayerIdWhitelist.Contains(player.ToString()))
 						continue;
@@ -135,7 +143,7 @@
 				}
 			}
 
-			Communication.SendPrivateInformation(userId, string.Format("Found {0} grids owned by inactive users", entitiesFound.Count));
+			Communication.SendPrivateInformation(userId, string.Format("Found {0} grids owned by inactive users", entitiesFound.Count()));
 			return true;
 		}
 	}

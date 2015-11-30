@@ -88,6 +88,9 @@
 				if (!(entity is IMyCubeGrid))
 					continue;
 
+                if (entity.DisplayName.Contains("CommRelay"))
+                    continue;
+
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(grid.EntityId);
 				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
@@ -146,8 +149,7 @@
 				CubeGridEntity gridEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
 				gridEntity.Dispose();
 			}
-
-			Communication.SendPrivateInformation(userId, string.Format("Removed {0} grids owned by inactive users", entitiesFound.Count));
+			Communication.SendPrivateInformation(userId, string.Format("Removed {0} grids owned by inactive users", entitiesFound.Count()));
 			return true;
 		}
 	}
