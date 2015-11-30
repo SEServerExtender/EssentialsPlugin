@@ -89,7 +89,7 @@
 				if (!(entity is IMyCubeGrid))
 					continue;
 
-                if (entity.DisplayName.Contains("CommRelay)"))
+                if (entity.DisplayName.Contains("CommRelay"))
                     continue;
 
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
