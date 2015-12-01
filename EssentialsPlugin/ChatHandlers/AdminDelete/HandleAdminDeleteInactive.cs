@@ -1,4 +1,4 @@
-﻿namespace EssentialsPlugin.ChatHandlers.AdminDelete
+namespace EssentialsPlugin.ChatHandlers.AdminDelete
 {
 	using System;
 	using System.Collections.Generic;
