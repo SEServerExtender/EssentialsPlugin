@@ -91,7 +91,10 @@ namespace EssentialsPlugin.ChatHandlers.AdminDelete
                 if (entity.DisplayName.Contains("CommRelay"))
                     continue;
 
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
+                if (entity.DisplayName.Contains("CommRelay"))
+                    continue;
+
+                IMyCubeGrid grid = (IMyCubeGrid)entity;
 				CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(grid.EntityId);
 				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
 				if (gridBuilder == null)
@@ -123,7 +126,7 @@ namespace EssentialsPlugin.ChatHandlers.AdminDelete
 					}
 
 					PlayerItem item = Players.Instance.GetPlayerById(player);
-					if (item == null)
+                    if (item == null)
 					{
 						if (removeNoLoginInformation)
 						{
