@@ -131,7 +131,7 @@ namespace EssentialsPlugin.ChatHandlers
 					{
 						if (removeNoLoginInformation)
 						{
-							Communication.SendPrivateInformation(userId, string.Format("Found entity owned by a player with no login info: {2}", entity.DisplayName, entity.EntityId, checkItem.Name));
+							Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) owned by a player with no login info: {2}", entity.DisplayName, entity.EntityId, checkItem.Name));
 							entitiesFound.Add(entity);
 						}
 					}
