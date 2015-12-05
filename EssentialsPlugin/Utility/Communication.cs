@@ -1,27 +1,34 @@
 ﻿namespace EssentialsPlugin.Utility
 {
-	using System;
-	using System.IO;
-	using System.Linq;
-	using NLog;
-	using Sandbox.Common;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.ModAPI;
+    using System;
+    using System.IO;
+    using System.Linq;
+    using NLog;
+    using Sandbox.Common;
+    using Sandbox.ModAPI.Ingame;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.ModAPI;
     using System.Collections.Generic;
-	using SEModAPIExtensions.API;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject;
-	using SEModAPIInternal.API.Server;
-	using VRage;
-	using VRageMath;
+    using SEModAPIExtensions.API;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Entity;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject;
+    using SEModAPIInternal.API.Server;
+    using VRage;
+    using VRageMath;
+    using Sandbox.Engine.Multiplayer;
+    using Sandbox.Game.Replication;
+    using VRage.Network;
+    using SEModAPI.API.Definitions;
 
-	public class Communication
+    public class Communication
 	{
 		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		private static Random m_random = new Random( );
+        private static readonly DedicatedConfigDefinition m_configList;
 
-		public static void SendPublicInformation( String infoText )
+
+        public static void SendPublicInformation( String infoText )
 		{
 			if ( infoText == "" )
 				return;
@@ -55,21 +62,48 @@
             return position;
         }
 
+
         public static void SendClientMessage( ulong steamId, string message )
 		{
 			if ( PlayerMap.Instance.GetPlayerIdsFromSteamId( steamId ).Count < 1 )
 			{
 				Log.Info( string.Format( "Unable to locate playerId for user with steamId: {0}", steamId ) );
 				return;
-			}
+			}                       
 
-			CubeGridEntity entity = new CubeGridEntity( new FileInfo( Essentials.PluginPath + "CommRelay.sbc" ) );
+            //workshop mod IDs
+            string pubEssentials = "559202083";
+            string testEssentials = "558596580";
+            string midspaceMod = "316190120";
+
+            //make sure we have either the public or testing version of Essentials mod and we don't have Midspace's admin mod
+
+            if ( m_configList.Mods.Any(midspaceMod.Contains) && m_configList.Administrators.Contains(steamId.ToString()) )
+            {
+                Communication.SendClientMessage(steamId, "Midspace's Admin Helper Commands mod is incompatible with Essentials. MOTD and some other functions are disabled.");
+                return;
+            }
+            else if( !(m_configList.Mods.Any(pubEssentials.Contains) || m_configList.Mods.Any(testEssentials.Contains)) && m_configList.Administrators.Contains(steamId.ToString()))
+            {
+                Communication.SendClientMessage(steamId, "No Essentials client mod installed. MOTD and some other functions are disabled.");
+                return;
+            }
+            else if( !(m_configList.Mods.Any(pubEssentials.Contains) || m_configList.Mods.Any(testEssentials.Contains)) || m_configList.Mods.Any(midspaceMod.Contains))
+            {
+                //if any failure condition is true and the user isn't admin, don't bother them with a message, just fail quietly
+                return;
+            }
+
+            //if mod requirements are met, carry on
+
+            CubeGridEntity entity = new CubeGridEntity( new FileInfo( Essentials.PluginPath + "CommRelay.sbc" ) );
             long entityId = BaseEntity.GenerateEntityId( );
 			entity.EntityId = entityId;
 			entity.DisplayName = string.Format( "CommRelayOutput{0}", PlayerMap.Instance.GetPlayerIdsFromSteamId( steamId ).First( ) );
-			entity.PositionAndOrientation = new MyPositionAndOrientation( MathUtility.GenerateRandomEdgeVector( getPos(steamId) ), Vector3.Forward, Vector3.Up );
+            //entity.PositionAndOrientation = new MyPositionAndOrientation(MathUtility.GenerateRandomEdgeVector(getPos(steamId)), Vector3.Forward, Vector3.Up);
+            entity.PositionAndOrientation = new MyPositionAndOrientation(new Vector3(0,0,0), Vector3.Forward, Vector3.Up);
 
-			foreach ( MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks )
+            foreach ( MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks )
 			{
 				MyObjectBuilder_Beacon beacon = block as MyObjectBuilder_Beacon;
 				if ( beacon != null )
@@ -78,13 +112,36 @@
 				}
 			}
 
-            SectorObjectManager.Instance.AddEntity( entity );
-			TimedEntityCleanup.Instance.Add( entityId );
+
+            //IMyReplicable reprelay = (IMyReplicable)entity.
+            //MyReplicationServer repServ = (MyReplicationServer)MyMultiplayer.Static.ReplicationLayer;
+            //repServ.ForceEverything(new EndpointId(steamId));
+
+            //Sandbox.ModAPI.Ingame.IMyCubeGrid
+            
+            SectorObjectManager.Instance.AddEntity(entity);
+            TimedEntityCleanup.Instance.Add( entityId );
 		}
 
 		public static void SendBroadcastMessage( string message )
 		{
-			CubeGridEntity entity = new CubeGridEntity( new FileInfo( Essentials.PluginPath + "CommRelay.sbc" ) );
+
+            //workshop mod IDs
+            string pubEssentials = "559202083";
+            string testEssentials = "558596580";
+            string midspaceMod = "316190120";
+
+            //make sure we have either the public or testing version of Essentials mod and we don't have Midspace's admin mod
+
+            if (!(m_configList.Mods.Any(pubEssentials.Contains) || m_configList.Mods.Any(testEssentials.Contains)) || m_configList.Mods.Any(midspaceMod.Contains))
+            {
+                //we don't have an incoming ID to send a message to, so let's just fail quietly
+                return;
+            }
+
+            //if mod requirements are met, carry on
+
+            CubeGridEntity entity = new CubeGridEntity( new FileInfo( Essentials.PluginPath + "CommRelay.sbc" ) );
 			long entityId = BaseEntity.GenerateEntityId( );
 			entity.EntityId = entityId;
 			entity.DisplayName = string.Format( "CommRelayBroadcast{0}", m_random.Next( 1, 10000 ) );
@@ -100,7 +157,7 @@
 			}
 
 			SectorObjectManager.Instance.AddEntity( entity );
-			TimedEntityCleanup.Instance.Add( entityId );
+            TimedEntityCleanup.Instance.Add( entityId );
 		}
 
 		public static void SendFactionClientMessage( ulong playerSteamId, String message )

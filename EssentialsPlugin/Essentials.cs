@@ -1162,27 +1162,28 @@
 		}
 
 		public void HandleChatMessage( ulong steamId, string message )
-		{          
-			// Parse chat message
-			ulong remoteUserId = steamId;
-			List<string> commandParts = CommandParser.GetCommandParts( message );
+        {
+            // Parse chat message
+            ulong remoteUserId = steamId;
+            List<string> commandParts = CommandParser.GetCommandParts(message);
 
-            // User wants some help
-            if (commandParts[0].ToLower() == "/help" && commandParts[1].ToLower() != "dialog")
-			{
-				HandleHelpCommand( remoteUserId, commandParts );
-				return;
-			}
-            else if (commandParts[0].ToLower() == "/help" && commandParts[1].ToLower() == "dialog")
+            if (commandParts[0].ToLower() == "/help")
             {
-                HandleHelpDialog(remoteUserId, commandParts);
+                //user wants some help
+                if (commandParts.Count > 1 && commandParts[1].ToLower() == "dialog")
+                    HandleHelpDialog(remoteUserId, commandParts);
+                //do we want help in a dialog window?
+
+                else
+                    HandleHelpCommand(remoteUserId, commandParts);
+
                 return;
             }
 
-                // See if we have any valid handlers
-                bool handled = false;
-			foreach ( ChatHandlerBase chatHandler in _chatHandlers )
-			{
+            // See if we have any valid handlers
+            bool handled = false;
+            foreach (ChatHandlerBase chatHandler in _chatHandlers)
+            {
                 int commandCount = 0;
                 if (remoteUserId == 0 && !chatHandler.AllowedInConsole())
                     continue;
@@ -1200,20 +1201,20 @@
 
                     handled = true;
                 }
-			}
+            }
 
-			if ( !handled )
-			{
-				DisplayAvailableCommands( remoteUserId, message );
-			}
-		}
+            if (!handled)
+            {
+                DisplayAvailableCommands(remoteUserId, message);
+            }
+        }
 
-		/// <summary>
-		/// This function displays available help for all the functionality of this plugin
-		/// </summary>
-		/// <param name="remoteUserId"></param>
-		/// <param name="commandParts"></param>
-		private void HandleHelpCommand( ulong remoteUserId, IReadOnlyCollection<string> commandParts )
+        /// <summary>
+        /// This function displays available help for all the functionality of this plugin
+        /// </summary>
+        /// <param name="remoteUserId"></param>
+        /// <param name="commandParts"></param>
+        private void HandleHelpCommand( ulong remoteUserId, IReadOnlyCollection<string> commandParts )
 		{
 			if ( commandParts.Count == 1 )
 			{
