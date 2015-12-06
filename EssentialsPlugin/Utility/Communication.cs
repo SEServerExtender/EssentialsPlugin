@@ -5,7 +5,6 @@
     using System.Linq;
     using NLog;
     using Sandbox.Common;
-    using Sandbox.ModAPI.Ingame;
     using Sandbox.Common.ObjectBuilders;
     using Sandbox.ModAPI;
     using System.Collections.Generic;
@@ -16,16 +15,18 @@
     using SEModAPIInternal.API.Server;
     using VRage;
     using VRageMath;
-    using Sandbox.Engine.Multiplayer;
-    using Sandbox.Game.Replication;
-    using VRage.Network;
     using SEModAPI.API.Definitions;
 
     public class Communication
 	{
 		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		private static Random m_random = new Random( );
-        private static readonly DedicatedConfigDefinition m_configList;
+        private static int modStatus = 0;
+        
+        //workshop mod IDs
+        private static string pubEssentials = "559202083";
+        private static string testEssentials = "558596580";
+        private static string midspaceMod = "316190120";
 
 
         public static void SendPublicInformation( String infoText )
@@ -69,39 +70,45 @@
 			{
 				Log.Info( string.Format( "Unable to locate playerId for user with steamId: {0}", steamId ) );
 				return;
-			}                       
+			}
 
-            //workshop mod IDs
-            string pubEssentials = "559202083";
-            string testEssentials = "558596580";
-            string midspaceMod = "316190120";
+            ulong playerId = (ulong)PlayerMap.Instance.GetPlayerIdsFromSteamId( steamId )[0];
 
-            //make sure we have either the public or testing version of Essentials mod and we don't have Midspace's admin mod
-
-            if ( m_configList.Mods.Any(midspaceMod.Contains) && m_configList.Administrators.Contains(steamId.ToString()) )
+            //let's make sure we have the right mods installed for the client to use CommRelays.
+            if ( PlayerManager.Instance.IsUserAdmin( steamId ) )
             {
-                Communication.SendClientMessage(steamId, "Midspace's Admin Helper Commands mod is incompatible with Essentials. MOTD and some other functions are disabled.");
-                return;
+                switch ( CheckMods( ) )
+                {
+                    case 0:
+                        //couldn't read modslist. should we do something?
+                        break;
+                    case 1:
+                        SendPrivateInformation( steamId, "Midspace's Admin Helper Commands mod is incompatible with Essentials. " +
+                            "MOTD and some other features are disabled." );
+                        return;
+                    case 2:
+                        SendPrivateInformation( steamId, "No Essentials mod detected. " +
+                            "MOTD and some other features are disabled." );
+                        return;
+                    case 3:
+                        //all good
+                        break;
+                }
             }
-            else if( !(m_configList.Mods.Any(pubEssentials.Contains) || m_configList.Mods.Any(testEssentials.Contains)) && m_configList.Administrators.Contains(steamId.ToString()))
+            else
             {
-                Communication.SendClientMessage(steamId, "No Essentials client mod installed. MOTD and some other functions are disabled.");
-                return;
-            }
-            else if( !(m_configList.Mods.Any(pubEssentials.Contains) || m_configList.Mods.Any(testEssentials.Contains)) || m_configList.Mods.Any(midspaceMod.Contains))
-            {
-                //if any failure condition is true and the user isn't admin, don't bother them with a message, just fail quietly
-                return;
+                if ( CheckMods( ) == 1 || CheckMods( ) == 2 )
+                    return;
+                //if mod conditions aren't met and user isn't admin, fail quietly
             }
 
-            //if mod requirements are met, carry on
 
             CubeGridEntity entity = new CubeGridEntity( new FileInfo( Essentials.PluginPath + "CommRelay.sbc" ) );
             long entityId = BaseEntity.GenerateEntityId( );
 			entity.EntityId = entityId;
 			entity.DisplayName = string.Format( "CommRelayOutput{0}", PlayerMap.Instance.GetPlayerIdsFromSteamId( steamId ).First( ) );
             //entity.PositionAndOrientation = new MyPositionAndOrientation(MathUtility.GenerateRandomEdgeVector(getPos(steamId)), Vector3.Forward, Vector3.Up);
-            entity.PositionAndOrientation = new MyPositionAndOrientation(new Vector3(0,0,0), Vector3.Forward, Vector3.Up);
+            entity.PositionAndOrientation = new MyPositionAndOrientation( MathUtility.GenerateRandomEdgeVector( ), Vector3.Forward, Vector3.Up );
 
             foreach ( MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks )
 			{
@@ -125,21 +132,9 @@
 
 		public static void SendBroadcastMessage( string message )
 		{
-
-            //workshop mod IDs
-            string pubEssentials = "559202083";
-            string testEssentials = "558596580";
-            string midspaceMod = "316190120";
-
-            //make sure we have either the public or testing version of Essentials mod and we don't have Midspace's admin mod
-
-            if (!(m_configList.Mods.Any(pubEssentials.Contains) || m_configList.Mods.Any(testEssentials.Contains)) || m_configList.Mods.Any(midspaceMod.Contains))
-            {
-                //we don't have an incoming ID to send a message to, so let's just fail quietly
+            //let's make sure we have the right mods installed for the client to use CommRelays.
+            if ( CheckMods( ) == 1 || CheckMods( ) == 2 )
                 return;
-            }
-
-            //if mod requirements are met, carry on
 
             CubeGridEntity entity = new CubeGridEntity( new FileInfo( Essentials.PluginPath + "CommRelay.sbc" ) );
 			long entityId = BaseEntity.GenerateEntityId( );
@@ -209,7 +204,48 @@
 			MyAPIGateway.Multiplayer.SendMessageToOthers( 9000, newData );
 		}
 
-		public class ServerMessageItem
+
+        //<summary>
+        //Midspace's Admin Helper Commands mod can totally break the Essentials client mod
+        //so we need to see if we have it installed, and disable some Essentials features.
+        //While we're here, might as well check for missing Essentials mods.
+        //this is a temporary measure (I hope)
+        //0 = uninitialized
+        //1 = incompatible mod (only Midspace's at the moment)
+        //2 = missing Essentials mod
+        //3 = mod requirements okay
+        //</summary>
+        public static int CheckMods( )
+        {
+            if ( modStatus == 0 )
+            {
+                if ( File.Exists( Path.Combine( Server.Instance.Path, "SpaceEngineers-Dedicated.cfg" ) ) )
+                {
+                    DedicatedConfigDefinition m_configList;
+                    MyConfigDedicatedData<MyObjectBuilder_SessionSettings> config = DedicatedConfigDefinition.Load( new FileInfo( Path.Combine( Server.Instance.Path, "SpaceEngineers-Dedicated.cfg" ) ) );
+                    m_configList = new DedicatedConfigDefinition( config );
+
+                    if ( m_configList.Mods.Contains( midspaceMod ) )
+                    {
+                        modStatus = 1;
+                        return modStatus;
+                    }
+                    else if ( !(m_configList.Mods.Contains( pubEssentials ) || m_configList.Mods.Contains( testEssentials )) )
+                    {
+                        modStatus = 2;
+                        return modStatus;
+                    }
+                    else
+                    {
+                        modStatus = 3;
+                        return modStatus;
+                    }
+                }
+            }
+            return modStatus;
+        }
+
+        public class ServerMessageItem
 		{
 			public string From { get; set; }
 			public string Message { get; set; }

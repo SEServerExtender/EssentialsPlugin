@@ -16,6 +16,8 @@
 	using VRageMath;
     using Sandbox.Game.Entities;
     using VRage.Groups;
+    using Sandbox.Game.GameSystems;
+    using Sandbox.Game.Entities.Cube;
 
 	public enum RemoveGridTypes
 	{
@@ -507,6 +509,7 @@
 			bool debug = false;
 			bool isOwnedBy = false;
 			bool quiet = false;
+            bool safeMode = true;
 			bool requireBlockCount = false;
 			bool requireBlockCountLess = false;
 			bool isBlockSize = false;
@@ -535,6 +538,12 @@
 					options.Add( "Quiet", "true" );
 					quiet = true;
 				}
+
+                if ( words.FirstOrDefault( x => x.ToLower( ) == "unsafe") != null )
+                {
+                    options.Add( "Unsafe", "true" );
+                    safeMode = false;
+                }
 
 				if ( words.SingleOrDefault( x => x.ToLower( ) == "ownership" ) != null )
 				{
@@ -812,12 +821,13 @@
 				Communication.SendPrivateInformation( userId, string.Format( "Scanning for ships with options: {0}", GetOptionsText( options ) ) );
 
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
-			Wrapper.GameAction( ( ) =>
-			{
-				MyAPIGateway.Entities.GetEntities( entities, x => x is IMyCubeGrid );
-			} );
+            Wrapper.GameAction( ( ) =>
+            {
+            	MyAPIGateway.Entities.GetEntities( entities, x => x is IMyCubeGrid );
+            } );
+            
 
-			HashSet<IMyEntity> entitiesToConfirm = new HashSet<IMyEntity>( );
+            HashSet<IMyEntity> entitiesToConfirm = new HashSet<IMyEntity>( );
 			HashSet<IMyEntity> entitiesUnconnected = new HashSet<IMyEntity>( );
 			HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>( );
 			foreach ( IMyEntity entity in entities )
@@ -825,7 +835,7 @@
 				if ( !( entity is IMyCubeGrid ) )
 					continue;
 
-                if (entity.DisplayName.Contains("CommRelay"))
+                if (entity.DisplayName.Contains("CommRelayGlobal"))
                     continue;
                 //this should make CommRelays immune to chat scan/delete commands
 
@@ -877,19 +887,28 @@
 					entitiesToConfirm.Add( entity );
 				}
 			}
-
 			Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
 			Dictionary<string, int> typeDict = new Dictionary<string, int>( );
 			List<string> checkList = new List<string>( );
-			GetGridsUnconnected( entitiesUnconnected, entitiesToConfirm );
-			//int blocks = 0;
-			foreach ( IMyEntity entity in entitiesUnconnected )
-			{
-				subTypeDict.Clear( );
+
+            //this is an ugly workaround to not being able to combine grids on pistons/rotors with the main grid
+            //with safe mode on we remove any grid with a piston or rotor from the list of grids to process
+
+            if (safeMode)
+                GetGridsUnconnected(entitiesUnconnected, entitiesToConfirm);
+            else
+                entitiesUnconnected = entitiesToConfirm;
+            
+            //int blocks = 0;
+            
+
+            foreach(IMyEntity entity in entitiesUnconnected)
+            {
+                subTypeDict.Clear( );
 				typeDict.Clear( );
 				checkList.Clear( );
 				MyObjectBuilder_CubeGrid grid = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( );
-
+                
 				if ( online == 1 ) // notonline
 				{
 					bool foundOnline = false;
@@ -1461,13 +1480,15 @@
 		/// </summary>
 		/// <param name="grids"></param>
 		/// <param name="collect"></param>
-		public static void GetConnectedGrids( HashSet<IMyEntity> grids, Func<IMyEntity, bool> collect = null )
+		public static void GetConnectedGrids( HashSet<IMyEntity> grids, Func<IMyEntity, bool> collect = null)
 		{
 			List<IMySlimBlock> currentBlocks = new List<IMySlimBlock>( );
 			HashSet<IMyEntity> gridsProcessed = new HashSet<IMyEntity>( );
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
 
-			MyAPIGateway.Entities.GetEntities( entities, collect );
+  
+                MyAPIGateway.Entities.GetEntities(entities, collect);
+
 			foreach ( IMyEntity entity in entities )
 			{
 				if ( !( entity is IMyCubeGrid ) )

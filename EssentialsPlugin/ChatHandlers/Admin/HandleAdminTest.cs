@@ -5,10 +5,43 @@
     using VRageMath;
     using Utility;
     using System.Collections.Generic;
+    using Sandbox.Common.ObjectBuilders;
+    using SEModAPI.API.Definitions;
+    using System.IO;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Runtime.ExceptionServices;
+    using System.Runtime.Serialization;
+    using System.Security;
+    using System.Threading;
+    using System.Windows.Forms;
+    using NLog;
+    using NLog.Targets;
+    using Sandbox;
+    using Sandbox.Common.ObjectBuilders;
+    using SEModAPI.API;
+    using SEModAPI.API.Definitions;
+    using SEModAPI.API.Sandbox;
+    using SEModAPI.API.Utility;
+    using SEModAPIInternal.API.Chat;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Server;
+    using SEModAPIInternal.Support;
+    using Timer = System.Timers.Timer;
+    using SEModAPIExtensions.API;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject;
+    using SEModAPIInternal.API.Entity;
+    using VRage;
 
     public class HandleAdminTest : ChatHandlerBase
 	{
-		public override string GetHelp()
+
+        private DedicatedConfigDefinition _dedicatedConfigDefinition;
+
+    public override string GetHelp()
 		{
 			return "For testing.";
 		}
@@ -21,8 +54,8 @@
         public override string GetHelpDialog()
         {
             string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\"Sorry, there's nothing here yet :(\" \"close\" ";
+                "/dialog \"Help\" \"Admin Test\" \"\"" +
+                "\"For development testing.\" \"close\" ";
             return longMessage;
         }
 
@@ -137,19 +170,21 @@
 
                 //ServerNetworkManager.ShowRespawnMenu(userId);
             }
-            /*
+            
             CubeGridEntity entity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "Platform.sbc"));
             //IMyEntity entity = new IMyEntities(new FileInfo(Essentials.PluginPath + "Platform.sbc"));
             long entityId = BaseEntity.GenerateEntityId();
             entity.EntityId = entityId;
             entity.PositionAndOrientation = new MyPositionAndOrientation((new Vector3(0,0,0)), Vector3.Forward, Vector3.Up);
             SectorObjectManager.Instance.AddEntity(entity);
+            return true;
+
             //TimedEntityCleanup.Instance.Add( entityId );
 
             //MyAPIGateway.Entities.AddEntity (entity, true);
             //IMyPlayer.AddGrid(entityId);
-            */
-
+            
+            /*
             Vector3D position = Vector3D.Zero;
             Wrapper.GameAction(() =>
             {
@@ -167,7 +202,22 @@
 
             Communication.SendPrivateInformation(userId, string.Format("Position - X:{0:F2} Y:{1:F2} Z:{2:F2}", position.X, position.Y, position.Z));
             return true;
-		}
+            
+            
+
+            if (File.Exists(System.IO.Path.Combine(Server.Instance.Path, "SpaceEngineers-Dedicated.cfg")))
+            {
+                MyConfigDedicatedData<MyObjectBuilder_SessionSettings> config = DedicatedConfigDefinition.Load(new FileInfo(System.IO.Path.Combine(Server.Instance.Path, "SpaceEngineers-Dedicated.cfg")));
+                _dedicatedConfigDefinition = new DedicatedConfigDefinition(config);
+            }
+
+            foreach (string moditem in _dedicatedConfigDefinition.Mods)
+            {
+                Communication.SendPrivateInformation(userId, moditem);
+            }
+            return true;
+            */
+        }
 
 	}
 
