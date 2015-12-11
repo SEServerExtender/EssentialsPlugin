@@ -1,28 +1,30 @@
 ﻿namespace EssentialsPlugin.EntityManagers
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Threading;
-	using EssentialsPlugin.ProcessHandlers;
-	using EssentialsPlugin.Utility;
-	using Sandbox.Common;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.ModAPI;
-	using Sandbox.ModAPI.Ingame;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity;
-	using VRage.ModAPI;
-	using VRage.ObjectBuilders;
-	using VRageMath;
-	using IMyCubeBlock = Sandbox.ModAPI.IMyCubeBlock;
-	using IMyCubeGrid = Sandbox.ModAPI.IMyCubeGrid;
-	using IMyFunctionalBlock = Sandbox.ModAPI.Ingame.IMyFunctionalBlock;
-	using IMyProductionBlock = Sandbox.ModAPI.Ingame.IMyProductionBlock;
-	using IMySlimBlock = Sandbox.ModAPI.IMySlimBlock;
-	using IMyTerminalBlock = Sandbox.ModAPI.Ingame.IMyTerminalBlock;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+    using EssentialsPlugin.ProcessHandlers;
+    using EssentialsPlugin.Utility;
+    using Sandbox.Common;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.ModAPI;
+    using Sandbox.ModAPI.Ingame;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Entity;
+    using VRage.ModAPI;
+    using VRage.ObjectBuilders;
+    using VRageMath;
+    using IMyCubeBlock = Sandbox.ModAPI.IMyCubeBlock;
+    using IMyCubeGrid = Sandbox.ModAPI.IMyCubeGrid;
+    using IMyFunctionalBlock = Sandbox.ModAPI.Ingame.IMyFunctionalBlock;
+    using IMyProductionBlock = Sandbox.ModAPI.Ingame.IMyProductionBlock;
+    using IMySlimBlock = Sandbox.ModAPI.IMySlimBlock;
+    using IMyTerminalBlock = Sandbox.ModAPI.Ingame.IMyTerminalBlock;
+    using Sandbox.Engine.Multiplayer;
+    using Sandbox.Game.Replication;
 
-	public class EntityManagement
+    public class EntityManagement
 	{
 		private static volatile bool _checkReveal;
 		private static volatile bool _checkConceal;
@@ -421,7 +423,8 @@
 				{
 					Essentials.Log.Info( "Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName );
 					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
-				}
+                    MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( entity ) );
+                }
 				else
 				{
 					if ( !PluginSettings.Instance.DynamicConcealServerOnly )
@@ -450,7 +453,9 @@
 						RemovedGrids.Add( entity.EntityId );
 						BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
 						MyAPIGateway.Entities.AddEntity( newEntity, false );
-						if ( PluginSettings.Instance.DynamicShowMessages )
+                        MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
+
+                        if ( PluginSettings.Instance.DynamicShowMessages )
 							Essentials.Log.Info( "Concealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName, newEntity.EntityId );
 					}
 					else
@@ -783,7 +788,8 @@
 									 ownerName,
 									 reason );
 				BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
-			}
+                MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( entity ) );
+            }
 			else
 			{
 				if ( !PluginSettings.Instance.DynamicConcealServerOnly )
@@ -798,19 +804,9 @@
 					RemovedGrids.Add( entity.EntityId );
 					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
 					MyAPIGateway.Entities.AddEntity( newEntity );
+                    MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
 
-					/*CC
-						if (PluginSettings.Instance.DynamicClientConcealEnabled)
-					{
-							ClientEntityManagement.AddEntityState(newEntity.EntityId);
-					}
-						*/
-
-					builder.EntityId = newEntity.EntityId;
-					List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>( );
-					addList.Add( newEntity.GetObjectBuilder( ) );
-					MyAPIGateway.Multiplayer.SendEntitiesCreated( addList );
-					if ( PluginSettings.Instance.DynamicShowMessages )
+                    if ( PluginSettings.Instance.DynamicShowMessages )
 						Essentials.Log.Info( "Revealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}",
 										 entity.EntityId,
 										 entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ),
@@ -895,10 +891,8 @@
 
 					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
 					MyAPIGateway.Entities.AddEntity( newEntity );
-					addList.Add( newEntity.GetObjectBuilder( ) );
-					MyAPIGateway.Multiplayer.SendEntitiesCreated( addList );
-					addList.Clear( );
-				}
+                    MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
+                }
 			} );
 			if ( PluginSettings.Instance.DynamicShowMessages )
 				Essentials.Log.Info( "Revealed {0} grids", count );
