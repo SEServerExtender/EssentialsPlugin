@@ -42,14 +42,12 @@
 
         public override bool HandleCommand(ulong userId, string[] words)
         {
-            string enabled = words[0].ToLower();
-            string message = words[1];
-            string title = words[2];
-            string header = words[3];
-            string button = words[4];
+            string enabled = null;
+            string message = null;
+            string title = null;
+            string header = null;
+            string button = null;
 
-
-            //var _greetingItem = new SettingsGreetingDialogItem( );
             SettingsGreetingDialogItem _greetingItem = PluginSettings.Instance.GreetingItem;
             if (words.Length < 1)
             {
@@ -63,11 +61,23 @@
                 Communication.SendPrivateInformation(userId, "Too many arguments detected. Did you forget to put quotations around something?");
                 return true;
             }
+            
+            //let's make sure we only read elements that exist
+            if ( words.Length >= 1 )
+                enabled = words[0].ToLower( );
+            if ( words.Length >= 2 )
+                message = words[1];
+            if ( words.Length >= 3 )
+                title = words[2];
+            if ( words.Length >= 4 )
+                header = words[3];
+            if ( words.Length >= 5 )
+                button = words[4];
 
-            _greetingItem.Enabled = string.Equals(enabled, "true");
             //enabled is the only required argument
+            _greetingItem.Enabled = string.Equals(enabled, "true");
 
-            //evaluate each argument; if it's null, exit so we don't overwrite existing data
+            //evaluate each argument; if it's null, don't change existing data
             if (message != null)
                 _greetingItem.Contents = message;
 

@@ -98,8 +98,11 @@
             else
             {
                 if ( CheckMods( ) == 1 || CheckMods( ) == 2 )
+                {
+                    Log.Debug( string.Format( "Mod requirements not met, not creating CommRelay. Mod status: {0}", CheckMods( ) ) );
                     return;
-                //if mod conditions aren't met and user isn't admin, fail quietly
+                }
+                //if mod conditions aren't met and user isn't admin, print to debug log
             }
 
 
@@ -134,7 +137,10 @@
 		{
             //let's make sure we have the right mods installed for the client to use CommRelays.
             if ( CheckMods( ) == 1 || CheckMods( ) == 2 )
+            {
+                Log.Debug( string.Format( "Mod requirements not met, not creating CommRelay. Mod status: {0}", CheckMods( ) ) );
                 return;
+            }
 
             CubeGridEntity entity = new CubeGridEntity( new FileInfo( Essentials.PluginPath + "CommRelay.sbc" ) );
 			long entityId = BaseEntity.GenerateEntityId( );
