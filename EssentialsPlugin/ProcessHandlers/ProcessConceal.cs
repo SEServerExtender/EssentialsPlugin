@@ -1,10 +1,11 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
-	using System;
-	using EssentialsPlugin.ChatHandlers;
-	using EssentialsPlugin.EntityManagers;
+    using System;
+    using EssentialsPlugin.ChatHandlers;
+    using EssentialsPlugin.EntityManagers;
+    using SEModAPIInternal.API.Common;
 
-	public class ProcessConceal : ProcessHandlerBase
+    public class ProcessConceal : ProcessHandlerBase
 	{
 		private static DateTime m_lastConcealCheck;
 		private static DateTime m_lastRevealCheck;
@@ -55,11 +56,22 @@
 			if (HandleUtilityGridsRefresh.RefreshTrack.Contains(remoteUserId))
 				HandleUtilityGridsRefresh.RefreshTrack.Remove(remoteUserId);
 
-			base.OnPlayerJoined(remoteUserId);
+            EntityManagement.SetOnline( remoteUserId, true );
+
+            if ( !PluginSettings.Instance.DynamicConcealEnabled )
+                return;
+
+            EntityManagement.CheckAndRevealEntities( );
+            m_lastRevealCheck = DateTime.Now;
+            
+            Essentials.Log.Info( "Check Reveal due to: {0}", remoteUserId );
+
+            base.OnPlayerJoined(remoteUserId);
 		}
 
 		public override void OnPlayerWorldSent(ulong remoteUserId)
 		{
+            //OnPlayerWorldSent doesn't seem to exist anymore. Doesn't hurt to leave this, though.
 			EntityManagement.SetOnline(remoteUserId, true);
 
 			if (!PluginSettings.Instance.DynamicConcealEnabled)
