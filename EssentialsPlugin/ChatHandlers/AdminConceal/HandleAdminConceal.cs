@@ -1,19 +1,20 @@
 ﻿namespace EssentialsPlugin.ChatHandlers
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using EssentialsPlugin.Utility;
-	using Sandbox.ModAPI;
-	using SEModAPIInternal.API.Common;
-	using VRage.ModAPI;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using EssentialsPlugin.Utility;
+    using Sandbox.ModAPI;
+    using SEModAPIInternal.API.Common;
+    using VRage.ModAPI;
+    using EntityManagers;
 
-	public class HandleAdminConceal : ChatHandlerBase
+    public class HandleAdminConceal : ChatHandlerBase
 	{
 		private Random m_random = new Random();
 		public override string GetHelp()
 		{
-			return "This command gives you a list of concealed grids.  Usage: /admin conceal";
+			return "This command gives you a list of concealed grids.  Usage: /admin conceal (force) - Using 'force' forces Essentials to check grids to conceal immediately.";
 		}
 
 		public override string GetCommandText()
@@ -24,8 +25,10 @@
         public override string GetHelpDialog()
         {
             string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\"Sorry, there's nothing here yet :(\" \"close\" ";
+                "/dialog \"Help\" \"Admin Conceal\" \"\"" +
+                "\"This command gives you a list of concealed grids.|" +
+                "Use the force argument to force Essentials to process grids to conceal immediately.||" +
+                "Usage: /admin conceal <force>\" \"close\" ";
             return longMessage;
         }
 
@@ -45,7 +48,21 @@
 			if (words.Length > 0 && words[0].ToLower() == "revealed")
 				showConcealed = false;
 
-			if (showConcealed)
+            if ( words.Length > 0 && words[0].ToLower( ) == "force" )
+            {
+                EntityManagement.CheckAndConcealEntities( );
+                return true;
+            }
+
+            /*
+            if ( words.Length > 0 && words[0].ToLower( ) == "dialog" )
+            {
+                //TODO: present entity list in a dialog
+                return true;
+            }
+            */
+
+            if (showConcealed)
 			{
 				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 				//Wrapper.GameAction(() =>

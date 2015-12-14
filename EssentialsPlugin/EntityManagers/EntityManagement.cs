@@ -25,13 +25,68 @@
     using Sandbox.Game.Replication;
 
     public class EntityManagement
-	{
-		private static volatile bool _checkReveal;
-		private static volatile bool _checkConceal;
-		private static readonly List<long> RemovedGrids = new List<long>( );
-		private static readonly List<ulong> Online = new List<ulong>( );
+    {
+        private static volatile bool _checkReveal;
+        private static volatile bool _checkConceal;
+        private static readonly List<long> RemovedGrids = new List<long>( );
+        private static readonly List<ulong> Online = new List<ulong>( );
+        private static Queue<ConcealItem> ConcealQueue = new Queue<ConcealItem>( );
+        private static Queue<ConcealItem> MedbayQueue = new Queue<ConcealItem>( );
 
-		public static void CheckAndConcealEntities( )
+        struct ConcealItem
+        {
+            public ConcealItem( ref IMyEntity _entity, string _reason, bool _conceal )
+            {
+                this.entity = _entity;
+                this.reason = _reason;
+                this.conceal = _conceal;
+            }
+
+            public IMyEntity entity;
+            public string reason;
+            public bool conceal;
+        };
+
+        public static void ProcessConcealment( )
+        {
+            try
+            {
+            if ( MedbayQueue.Any( ) )
+            {
+                ConcealItem MedbayToProcess = MedbayQueue.Dequeue( );
+                if ( MedbayToProcess.conceal == true )
+                {
+                    RevealEntity( new KeyValuePair<IMyEntity, string>( MedbayToProcess.entity, MedbayToProcess.reason ) );
+                }
+                else
+                {
+                    ConcealEntity( MedbayToProcess.entity );
+                }
+                return;
+            }
+            if ( !MedbayQueue.Any( ) && ConcealQueue.Any( ) )
+            {
+                ConcealItem EntityToProcess = ConcealQueue.Dequeue( );
+                if ( EntityToProcess.conceal == true )
+                {
+                    RevealEntity( new KeyValuePair<IMyEntity, string>( EntityToProcess.entity, EntityToProcess.reason ) );
+                }
+                else
+                {
+                    ConcealEntity( EntityToProcess.entity );
+                }
+                return;
+            }
+            }
+            catch ( Exception ex )
+            {
+                Essentials.Log.Warn( "fail processing conceal", ex );
+            }
+            return;
+        }
+
+
+        public static void CheckAndConcealEntities( )
 		{
 			if ( _checkConceal )
 				return;
@@ -372,8 +427,10 @@
 			{
 				foreach ( IMyEntity entity in entitesToConceal )
 				{
-					ConcealEntity( entity );
-				}
+                    //ConcealEntity( entity );
+                    IMyEntity newEnt = entity;
+                    ConcealQueue.Enqueue( new ConcealItem(ref newEnt, "", false) );
+                }
 			} );
 
 			if ( PluginSettings.Instance.DynamicShowMessages )
@@ -660,18 +717,30 @@
 								if ( functionalBlock.OwnerId == playerId )
 								{
 									reason = string.Format( "Grid has medbay and player is logged in - playerid: {0}", playerId );
-									return true;
-								}
+                                    //return true;
+
+                                    //medbay is up for reveal, put it into the medbay queue to be revealed before other grids
+                                    IMyEntity newEnt = (IMyEntity)grid;
+                                    MedbayQueue.Enqueue( new ConcealItem( ref newEnt, reason, true ) );
+                                    //return false so this grid doesn't get duplicated in the regular queue
+                                    return false;
+                                }
 
 								if ( functionalBlock.GetUserRelationToOwner( playerId ) == MyRelationsBetweenPlayerAndBlock.FactionShare )
 								{
 									reason = string.Format( "Grid has medbay and player is factionshare - playerid: {0}", playerId );
-									return true;
-								}
+                                    //return true;
+
+                                    //medbay is up for reveal, put it into the medbay queue to be revealed before other grids
+                                    IMyEntity newEnt = (IMyEntity)grid;
+                                    MedbayQueue.Enqueue( new ConcealItem( ref newEnt, reason, true ) );
+                                    //return false so this grid doesn't get duplicated in the regular queue
+                                    return false;
+                                }
 							}
 						}
 
-						/*
+                        /*
 						foreach (ulong connectedPlayer in PlayerManager.Instance.ConnectedPlayers)
 						{
 							long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(connectedPlayer);
@@ -684,12 +753,18 @@
 							}
 						}
 						 */
-					}
+                    }
 					else
 					{
 						reason = string.Format( "Grid has medbay and conceal can not include medbays" );
-						return true;
-					}
+                        //return true;
+
+                        //medbay is up for reveal, put it into the medbay queue to be revealed before other grids
+                        IMyEntity newEnt = (IMyEntity)grid;
+                        MedbayQueue.Enqueue( new ConcealItem( ref newEnt, reason, true ) );
+                        //return false so this grid doesn't get duplicated in the regular queue
+                        return false;
+                    }
 				}
 
 				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_ProductionBlock ) )
@@ -743,7 +818,9 @@
 			{
 				foreach ( KeyValuePair<IMyEntity, string> entity in entitiesToReveal )
 				{
-					RevealEntity( entity );
+                    //RevealEntity( entity );
+                    IMyEntity newEnt = entity.Key;
+                    ConcealQueue.Enqueue( new ConcealItem (ref newEnt, entity.Value, true ) );
 				}
 			} );
 
@@ -865,7 +942,12 @@
 						continue;
 
 					count++;
-					IMyCubeGrid grid = (IMyCubeGrid)entity;
+
+                    IMyEntity newEnt = entity;
+                    ConcealQueue.Enqueue( new ConcealItem( ref newEnt, "" , true ) );
+
+                    /* why the hell is this even in here? This is just a copy of RevealEntity
+                    IMyCubeGrid grid = (IMyCubeGrid)entity;
 					long ownerId = 0;
 					string ownerName = "";
 					if ( CubeGrids.GetBigOwners( builder ).Count > 0 )
@@ -889,9 +971,10 @@
 						continue;
 					}
 
-					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
-					MyAPIGateway.Entities.AddEntity( newEntity );
+                    BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+                    MyAPIGateway.Entities.AddEntity( newEntity );
                     MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
+                    */
                 }
 			} );
 			if ( PluginSettings.Instance.DynamicShowMessages )
@@ -940,9 +1023,9 @@
 
 					Communication.SendClientMessage( steamId, string.Format( "/conceal {0}", string.Join( ",", entitiesToConceal.Select( x => x.EntityId.ToString( ) + ":" + ( (MyObjectBuilder_CubeGrid)x.GetObjectBuilder( ) ).CubeBlocks.Count.ToString( ) + ":" + x.DisplayName ).ToArray( ) ) ) );
 					Thread.Sleep( 1500 );
-					ConcealEntities( entitiesToConceal );
-					//CheckAndRevealEntities();
-				}
+                    ConcealEntities( entitiesToConceal );
+                    //CheckAndRevealEntities();
+                }
 
 				if ( ( DateTime.Now - start ).TotalMilliseconds > 2000 && PluginSettings.Instance.DynamicShowMessages )
 					Essentials.Log.Info( "Completed Toggle: {0}ms", ( DateTime.Now - start ).TotalMilliseconds );

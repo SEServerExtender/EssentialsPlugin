@@ -1144,9 +1144,14 @@
 
 		}
 
-		#endregion
+        #endregion
 
-		#region IChatEventHandler Members
+        #region IChatEventHandler Members
+
+        public void OnMessageReceived( )
+        {
+
+        }
 
 		/// <summary>
 		/// Raised when a chat messages are received.

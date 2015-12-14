@@ -35,7 +35,7 @@
         {
             string longMessage =
                 "/dialog \"Help\" \"\" \"\"" +
-                "\"Sorry, there's nothing here yet :(\" \"close\" ";
+                "\""+GetHelp()+"\" \"close\" ";
             return longMessage;
         }
 

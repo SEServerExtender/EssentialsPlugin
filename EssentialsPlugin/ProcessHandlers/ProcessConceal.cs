@@ -4,11 +4,13 @@
     using EssentialsPlugin.ChatHandlers;
     using EssentialsPlugin.EntityManagers;
     using SEModAPIInternal.API.Common;
+    using EssentialsPlugin;
 
     public class ProcessConceal : ProcessHandlerBase
 	{
 		private static DateTime m_lastConcealCheck;
 		private static DateTime m_lastRevealCheck;
+        private static DateTime m_lastConcealProcess;
 
 		public static DateTime LastRevealCheck
 		{
@@ -44,6 +46,13 @@
 				EntityManagement.CheckAndRevealEntities();
 				m_lastRevealCheck = DateTime.Now;
 			}
+
+            if ( DateTime.Now - m_lastConcealProcess > TimeSpan.FromMilliseconds( 500 ) )
+            {
+                //Essentials.Log.Info( "Process concalment" );
+                EntityManagement.ProcessConcealment( );
+                m_lastConcealProcess = DateTime.Now;
+            }
 
 			base.Handle();
 		}
