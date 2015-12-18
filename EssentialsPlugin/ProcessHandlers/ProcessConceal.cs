@@ -11,7 +11,7 @@
 		private static DateTime m_lastConcealCheck;
 		private static DateTime m_lastRevealCheck;
         private static DateTime m_lastConcealProcess;
-        private static int updateSpeed = PluginSettings.Instance.DynamicConcealUpdateSpeed;
+        //private static int updateSpeed = PluginSettings.Instance.DynamicConcealUpdateSpeed;
 
 
         public static DateTime LastRevealCheck
@@ -26,12 +26,17 @@
 		}
 
 		public override int GetUpdateResolution()
-		{
-			return 1000;
-		}
+        {
+            int updateSpeed = PluginSettings.Instance.DynamicConcealUpdateSpeed;
+            if ( updateSpeed < 1000 )
+                return updateSpeed;
+
+            return 1000;
+        }
 
 		public override void Handle()
 		{
+            int updateSpeed = PluginSettings.Instance.DynamicConcealUpdateSpeed;
 			if (!PluginSettings.Instance.DynamicConcealEnabled)
 				return;
 

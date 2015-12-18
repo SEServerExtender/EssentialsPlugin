@@ -567,6 +567,7 @@
                 PluginSettings.Instance.DynamicConcealEnabled = value;
             }
         }
+
         [Category( "Dynamic Entity Management" )]
         [DisplayName( "UpdateTime" )]
         [Description( "How often, in milliseconds, Essentials will process the list of entities to be concealed or revealed." )]
@@ -581,6 +582,23 @@
             set
             {
                 PluginSettings.Instance.DynamicConcealUpdateSpeed = value;
+            }
+        }
+
+        [Category( "Dynamic Entity Management" )]
+        [DisplayName( "ConcealPirates" )]
+        [Description( "Concealing grids owned by pirates can cause problems with drones and cargo ships." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool DynamicConcealPirates
+        {
+            get
+            {
+                return PluginSettings.Instance.DynamicConcealPirates;
+            }
+            set
+            {
+                PluginSettings.Instance.DynamicConcealPirates = value;
             }
         }
 

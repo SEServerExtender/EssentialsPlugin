@@ -80,7 +80,8 @@
 		private string[] _dynamicConcealIgnoreSubTypeList = { };
 		private bool _dynamicConcealIncludeMedBays;
 		private bool _dynamicShowMessages;
-		private bool _dynamicTurretManagementEnabled;
+        private bool _dynamicConcealPirates;
+        private bool _dynamicTurretManagementEnabled;
 		private int _dynamicTurretTargetDistance;
 		private bool _dynamicTurretAllowExemption;
 		private bool _dynamicBlockManagementEnabled;
@@ -565,6 +566,19 @@
             }
         }
 
+        public bool DynamicConcealPirates
+        {
+            get
+            {
+                return _dynamicConcealPirates;
+            }
+            set
+            {
+                _dynamicConcealPirates = value;
+                Save( );
+            }
+        }
+
         public float DynamicConcealDistance
 		{
 			get { return _dynamicConcealDistance; }
@@ -870,7 +884,8 @@
 
             _dynamicConcealUpdateSpeed = 500;
 			_dynamicConcealDistance = 8000;
-			_dynamicShowMessages = false;
+            _dynamicConcealPirates = false;
+            _dynamicShowMessages = false;
 			_dynamicTurretTargetDistance = 2000;
 			_dynamicTurretManagementEnabled = false;
             _dynamicVoxelManagementEnabled = false;

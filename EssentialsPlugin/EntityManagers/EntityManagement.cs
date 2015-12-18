@@ -1,6 +1,7 @@
 ﻿namespace EssentialsPlugin.EntityManagers
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
@@ -24,15 +25,21 @@
     using Sandbox.Engine.Multiplayer;
     using Sandbox.Game.Replication;
     using Sandbox.Game.Entities;
-
+    using Sandbox.Game.Multiplayer;
+    using Sandbox.Game.World;
+    using VRage.Collections;
+    using Sandbox.Game.Entities.Blocks;
+    using Sandbox.Game.Entities.Character;
     public class EntityManagement
     {
         private static volatile bool _checkReveal;
         private static volatile bool _checkConceal;
         private static readonly List<long> RemovedGrids = new List<long>( );
         private static readonly List<ulong> Online = new List<ulong>( );
-        private static Queue<ConcealItem> ConcealQueue = new Queue<ConcealItem>( );
-        private static Queue<ConcealItem> MedbayQueue = new Queue<ConcealItem>( );
+        //private static Queue<ConcealItem> ConcealQueue = new Queue<ConcealItem>( );
+        //private static Queue<ConcealItem> MedbayQueue = new Queue<ConcealItem>( );
+        private static SortedList<long, ConcealItem> ConcealQueue = new SortedList<long, ConcealItem>( );
+        private static SortedList<long, ConcealItem> MedbayQueue = new SortedList<long, ConcealItem>( );
 
         struct ConcealItem
         {
@@ -58,7 +65,10 @@
                     if ( PluginSettings.Instance.DynamicShowMessages )
                         Essentials.Log.Info( "Processing concealment: {0} medbays in concealment queue.", MedbayQueue.Count );
 
-                    ConcealItem MedbayToProcess = MedbayQueue.Dequeue( );
+                    //ConcealItem MedbayToProcess = MedbayQueue.Dequeue( );
+                    ConcealItem MedbayToProcess = MedbayQueue.First().Value;
+                    MedbayQueue.RemoveAt( 0 );
+
                     if ( MedbayToProcess.conceal == true )
                     {
                         RevealEntity( new KeyValuePair<IMyEntity, string>( MedbayToProcess.entity, MedbayToProcess.reason ) );
@@ -74,7 +84,10 @@
                     if ( PluginSettings.Instance.DynamicShowMessages )
                         Essentials.Log.Info( "Processing concealment: {0} grids in concealment queue.", ConcealQueue.Count );
 
-                    ConcealItem EntityToProcess = ConcealQueue.Dequeue( );
+                    //ConcealItem EntityToProcess = ConcealQueue.Dequeue( );
+                    ConcealItem EntityToProcess = ConcealQueue.First( ).Value;
+                    ConcealQueue.RemoveAt( 0 );
+
                     if ( EntityToProcess.entity == null )
                     {
                         Essentials.Log.Info( "null entity" );
@@ -156,13 +169,13 @@
 					if ( !( entity is IMyCubeGrid ) )
 						continue;
 
-					if ( entity.DisplayName.Contains( "CommRelay" ) )
-						continue;
-
 					if ( entity.Physics == null ) // Projection
 						continue;
 
 					if ( !entity.InScene )
+						continue;
+                    
+					if ( entity.DisplayName.Contains( "CommRelay" ) )
 						continue;
 
 					if ( ( (IMyCubeGrid)entity ).GridSizeEnum != MyCubeSize.Small && !PluginSettings.Instance.ConcealIncludeLargeGrids )
@@ -220,7 +233,7 @@
 					if ( !found )
 					{
 						entitiesToConceal.Add( entity );
-					}
+                    }
 				}
 
 				DateTime coStart = DateTime.Now;
@@ -245,6 +258,11 @@
 		private static bool CheckConcealBlockRules( IMyCubeGrid grid, List<IMyPlayer> players )
 		{
 			List<IMySlimBlock> blocks = new List<IMySlimBlock>( );
+
+            if ( grid.DisplayName.Contains( "CommRelay" ))
+                return true;
+
+            
 
 			// Live dangerously
 			grid.GetBlocks( blocks, x => x.FatBlock != null );
@@ -377,7 +395,15 @@
 					}
 				}
 
-				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_Refinery ) || cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_Assembler ) )
+                if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_CryoChamber ) )
+                {
+                    MyCryoChamber cryo = (MyCryoChamber)cubeBlock;
+                    
+                    if ( cryo.Pilot != null )
+                        return true;
+                }            
+
+                if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_Refinery ) || cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_Assembler ) )
 				{
 					//MyObjectBuilder_ProductionBlock production = (MyObjectBuilder_ProductionBlock)cubeBlock.GetObjectBuilderCubeBlock();
 					IMyProductionBlock production = (IMyProductionBlock)cubeBlock;
@@ -433,19 +459,32 @@
 
 		private static void ConcealEntities( HashSet<IMyEntity> entitesToConceal )
 		{
-				foreach ( IMyEntity entity in entitesToConceal )
-				{
+            Wrapper.GameAction( ( ) =>
+            {
+                foreach ( IMyEntity entity in entitesToConceal )
+            {
+                
                     //ConcealEntity( entity );
-                    ConcealQueue.Enqueue( new ConcealItem( entity, "", false ) );
-                }
+                    //if ( ConcealQueue.Count >= 50 )
+                    //    continue;
 
-			if ( PluginSettings.Instance.DynamicShowMessages )
+                    ConcealItem item = new ConcealItem( entity, "", false );
+
+                    if ( ConcealQueue.ContainsKey( entity.EntityId ) )
+                        continue;
+                    //if this entity is already in the queue, skip it so we don't get dupes
+
+                    ConcealQueue.Add( entity.EntityId, item );
+                }
+                });
+            if ( PluginSettings.Instance.DynamicShowMessages )
 				Essentials.Log.Info( "Queued {0} entities for conceal.", entitesToConceal.Count );
 		}
 
 		private static void ConcealEntity( IMyEntity entity )
 		{
 			int pos = 0;
+            //RemovedGrids.Clear( );
             try
 			{
 				if ( !entity.InScene )
@@ -463,7 +502,17 @@
                 {
                     //ownerId = grid.BigOwners.First();
                     ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
-				}
+
+                    if ( !PluginSettings.Instance.DynamicConcealPirates )
+                    {
+                        if ( ownerName.Contains( "Space Pirate" ) )
+                        {
+                            if ( PluginSettings.Instance.DynamicShowMessages )
+                                Essentials.Log.Info( "Not concealing pirate owned grid {0} -> {1}.", grid.EntityId, grid.DisplayName );
+                            return;
+                        }
+                    }
+                }
                 Essentials.Log.Info( grid.EntityId.ToString() + " " + ownerId.ToString() + " " + ownerName );
 
 				pos = 2;
@@ -486,7 +535,7 @@
                 if ( RemovedGrids.Contains( entity.EntityId ) )
 				{
 					Essentials.Log.Info( "Concealing - Id: {0} DUPE FOUND - Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName );
-					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+                    BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
                     MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( entity ) );
                 pos = 4;
                 }
@@ -519,6 +568,8 @@
 
                         pos = 6;
                         RemovedGrids.Add( entity.EntityId );
+                        entity.InScene = false;
+                        entity.OnRemovedFromScene( entity );
 						BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
 						MyAPIGateway.Entities.AddEntity( newEntity, false );
                         MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
@@ -774,9 +825,63 @@
                         //return false so this grid doesn't get duplicated in the regular queue
                         return false;
                     }
-				}
+                }
 
-				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_ProductionBlock ) )
+                if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_CryoChamber) )
+                {
+                        MyCryoChamber cryo = (MyCryoChamber)cubeBlock;
+                        if ( cryo.Pilot == null )
+                            continue;
+                        
+                    if ( !cryo.IsFunctional )
+                        continue;                    
+
+                    if ( PluginSettings.Instance.DynamicConcealIncludeMedBays )
+                    {
+                        lock ( Online )
+                        {
+                            foreach ( ulong connectedPlayer in Online )
+                            {
+                                long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( connectedPlayer );
+                                IMyPlayer cryoUser = (IMyPlayer) cryo.Pilot;
+
+                                if ( cryoUser.PlayerID == playerId )
+                                {
+                                    reason = string.Format( "Grid has cryopod and player is inside - playerid: {0}", playerId );
+                                    //return true;
+
+                                    //medbay is up for reveal, put it into the medbay queue to be revealed before other grids
+                                    RevealMedbays( (IMyEntity)grid, reason );
+                                    //return false so this grid doesn't get duplicated in the regular queue
+                                    return false;
+                                }
+
+                                if ( cryo.HasPlayerAccess( playerId ) )
+                                {
+                                    reason = string.Format( "Grid has cryopod and player can use - playerid: {0}", playerId );
+                                    //return true;
+
+                                    //medbay is up for reveal, put it into the medbay queue to be revealed before other grids
+                                    RevealMedbays( (IMyEntity)grid, reason );
+                                    //return false so this grid doesn't get duplicated in the regular queue
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        reason = string.Format( "Grid has cryopod and conceal can not include cryopods" );
+                        //return true;
+
+                        //medbay is up for reveal, put it into the medbay queue to be revealed before other grids
+                        RevealMedbays( (IMyEntity)grid, reason );
+                        //return false so this grid doesn't get duplicated in the regular queue
+                        return false;
+                    }
+                }
+
+                if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_ProductionBlock ) )
 				{
 					MyObjectBuilder_ProductionBlock production = (MyObjectBuilder_ProductionBlock)cubeBlock.GetObjectBuilderCubeBlock( );
 					if ( !production.Enabled )
@@ -799,49 +904,88 @@
 			// Live dangerously
 			List<IMySlimBlock> blocks = new List<IMySlimBlock>( );
 			grid.GetBlocks( blocks, x => x.FatBlock != null );
+                        long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( steamId );
 			foreach ( IMySlimBlock block in blocks )
 			{
 				IMyCubeBlock cubeBlock = block.FatBlock;
 
-				if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_MedicalRoom ) )
-				{
-					IMyMedicalRoom medical = (IMyMedicalRoom)cubeBlock;
-					if ( !medical.Enabled )
-						continue;
+                if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_MedicalRoom ) )
+                {
+                    IMyMedicalRoom medical = (IMyMedicalRoom)cubeBlock;
+                    if ( !medical.Enabled )
+                        continue;
 
-					long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( steamId );
-					//if (medical.Owner == playerId || (medical.ShareMode == MyOwnershipShareModeEnum.Faction && Player.CheckPlayerSameFaction(medical.Owner, playerId)))
-					if ( medical.HasPlayerAccess( playerId ) )
-					{
-						return true;
-					}
-				}
-			}
+                    //if (medical.Owner == playerId || (medical.ShareMode == MyOwnershipShareModeEnum.Faction && Player.CheckPlayerSameFaction(medical.Owner, playerId)))
+                    if ( medical.HasPlayerAccess( playerId ) )
+                    {
+                        return true;
+                    }
+                }
 
-			return false;
+                if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_CryoChamber ) )
+                {
+                    MyCryoChamber cryo = (MyCryoChamber)cubeBlock;
+                    if ( cryo.Pilot == null )
+                        continue;
+
+                    if ( cryo.HasPlayerAccess( playerId ) )
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
 		}
 
-		private static void RevealEntities( Dictionary<IMyEntity, string> entitiesToReveal )
-		{
-				foreach ( KeyValuePair<IMyEntity, string> entity in entitiesToReveal )
-				{
+        private static void RevealEntities( Dictionary<IMyEntity, string> entitiesToReveal )
+        {
+            Wrapper.GameAction( ( ) =>
+            {
+                foreach ( KeyValuePair<IMyEntity, string> entity in entitiesToReveal )
+                {
+
                     //RevealEntity( entity );
-                    ConcealQueue.Enqueue( new ConcealItem (entity.Key, entity.Value, true ) );
-				}
+                    //if ( ConcealQueue.Count >= 50 )
+                    //    continue;
+                    IMyEntity processEntity = entity.Key;
+                    ConcealItem item = new ConcealItem( processEntity, entity.Value, true );
 
-			if ( PluginSettings.Instance.DynamicShowMessages )
-				Essentials.Log.Info( "Queued {0} entities for reveal.", entitiesToReveal.Count );
-		}
+                    if ( ConcealQueue.ContainsKey( processEntity.EntityId ) )
+                    {
+                        //if this entity is in the queue, we want to replace it
+                        ConcealQueue.Remove( processEntity.EntityId );
+                    }
+
+                    ConcealQueue.Add( processEntity.EntityId, item );
+                }
+            } );
+            if ( PluginSettings.Instance.DynamicShowMessages )
+                Essentials.Log.Info( "Queued {0} entities for reveal.", entitiesToReveal.Count );
+        }
 
         private static void RevealMedbays( IMyEntity entity, string reason )
         {
-                    MedbayQueue.Enqueue( new ConcealItem( entity, reason, true ) );
+            Wrapper.GameAction( ( ) =>
+            {
+                ConcealItem item = new ConcealItem( entity, reason, true );
 
+                if ( ConcealQueue.ContainsKey( entity.EntityId ) )
+                {
+                    //if this entity is in the concealment queue, remove it
+                    ConcealQueue.Remove( entity.EntityId );
+                }
+
+                if ( MedbayQueue.ContainsKey( entity.EntityId ) )
+                    return;
+
+                MedbayQueue.Add( entity.EntityId, item );
+            } );
             if ( PluginSettings.Instance.DynamicShowMessages )
-                Essentials.Log.Info( "{0} medbays queued for reveal.", MedbayQueue.Count() );
+                Essentials.Log.Info( "{0} medbays queued for reveal.", MedbayQueue.Count( ) );
         }
 
-		private static void RevealEntity( KeyValuePair<IMyEntity, string> item )
+        private static void RevealEntity( KeyValuePair<IMyEntity, string> item )
 		{
 			IMyEntity entity = item.Key;
 			string reason = item.Value;
@@ -850,6 +994,9 @@
 			MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
 			if ( builder == null )
 				return;
+
+            if ( entity.InScene )
+                return;
 
 			IMyCubeGrid grid = (IMyCubeGrid)entity;
 			long ownerId = 0;
@@ -892,8 +1039,10 @@
 					}
 
 					RemovedGrids.Add( entity.EntityId );
-					BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
-					MyAPIGateway.Entities.AddEntity( newEntity );
+                    entity.InScene = true;
+                    entity.OnAddedToScene( entity );
+                    BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+                    MyAPIGateway.Entities.AddEntity( newEntity );
                     MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
 
                     if ( PluginSettings.Instance.DynamicShowMessages )
@@ -953,39 +1102,46 @@
 						continue;
 
 					count++;
-                    
-                        ConcealQueue.Enqueue( new ConcealItem( entity, "Force reveal", true ) );
 
-                    /* This is just a copy of RevealEntity, it doesn't really need to be here.
-                    IMyCubeGrid grid = (IMyCubeGrid)entity;
-					long ownerId = 0;
-					string ownerName = "";
-					if ( CubeGrids.GetBigOwners( builder ).Count > 0 )
-					{
-						ownerId = CubeGrids.GetBigOwners( builder ).First( );
-						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
-					}
-
-					//grid.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
-					//grid.InScene = true;
-					//grid.CastShadows = true;
-					builder.PersistentFlags = ( MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows );
-					MyAPIGateway.Entities.RemapObjectBuilder( builder );
-					if ( PluginSettings.Instance.DynamicShowMessages )
-						Essentials.Log.Info( "Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ), ownerId, ownerName, builder.EntityId );
-
-					IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
-					if ( newEntity == null )
-					{
-						Essentials.Log.Warn( "CreateFromObjectBuilder failed: {0}", builder.EntityId );
-						continue;
-					}
-
-                    BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
-                    MyAPIGateway.Entities.AddEntity( newEntity );
-                    MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
-                    */
+                ConcealItem item = new ConcealItem( entity, "Force reveal", true );
+                if ( ConcealQueue.ContainsKey( entity.EntityId ) )
+                {
+                    //if this entity is in the queue, we want to replace it
+                    ConcealQueue.Remove( entity.EntityId );
                 }
+
+                ConcealQueue.Add( entity.EntityId, item );
+
+                /* This is just a copy of RevealEntity, it doesn't really need to be here.
+                IMyCubeGrid grid = (IMyCubeGrid)entity;
+                long ownerId = 0;
+                string ownerName = "";
+                if ( CubeGrids.GetBigOwners( builder ).Count > 0 )
+                {
+                    ownerId = CubeGrids.GetBigOwners( builder ).First( );
+                    ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
+                }
+
+                //grid.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
+                //grid.InScene = true;
+                //grid.CastShadows = true;
+                builder.PersistentFlags = ( MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows );
+                MyAPIGateway.Entities.RemapObjectBuilder( builder );
+                if ( PluginSettings.Instance.DynamicShowMessages )
+                    Essentials.Log.Info( "Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ), ownerId, ownerName, builder.EntityId );
+
+                IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
+                if ( newEntity == null )
+                {
+                    Essentials.Log.Warn( "CreateFromObjectBuilder failed: {0}", builder.EntityId );
+                    continue;
+                }
+
+                BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+                MyAPIGateway.Entities.AddEntity( newEntity );
+                MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
+                */
+            }
 
 			if ( PluginSettings.Instance.DynamicShowMessages )
 				Essentials.Log.Info( "Queued {0} grids for force reveal.", count );
