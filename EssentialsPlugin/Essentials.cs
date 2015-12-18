@@ -551,18 +551,40 @@
 			set { PluginSettings.Instance.DockingShipsPerZone = value; }
 		}
 
-		[Category( "Dynamic Entity Management" )]
-		[DisplayName( "Enabled")]
-		[Description( "Enable / Disable dynamic entity concealment.  This option will automatically 'hide' ships that players are not close to, meaning they won't be processed by the physics engine.  This should improve performance." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool DynamicConcealEnabled
-		{
-			get { return PluginSettings.Instance.DynamicConcealEnabled; }
-			set { PluginSettings.Instance.DynamicConcealEnabled = value; }
-		}
+        [Category( "Dynamic Entity Management" )]
+        [DisplayName( "Enabled" )]
+        [Description( "Enable / Disable dynamic entity concealment.  This option will automatically 'hide' ships that players are not close to, meaning they won't be processed by the physics engine.  This should improve performance." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool DynamicConcealEnabled
+        {
+            get
+            {
+                return PluginSettings.Instance.DynamicConcealEnabled;
+            }
+            set
+            {
+                PluginSettings.Instance.DynamicConcealEnabled = value;
+            }
+        }
+        [Category( "Dynamic Entity Management" )]
+        [DisplayName( "UpdateTime" )]
+        [Description( "How often, in milliseconds, Essentials will process the list of entities to be concealed or revealed." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public int DynamicConcealUpdateSpeed
+        {
+            get
+            {
+                return PluginSettings.Instance.DynamicConcealUpdateSpeed;
+            }
+            set
+            {
+                PluginSettings.Instance.DynamicConcealUpdateSpeed = value;
+            }
+        }
 
-		[Category( "Dynamic Entity Management" )]
+        [Category( "Dynamic Entity Management" )]
 		[DisplayName( "Conceal Distance")]
 		[Description( "The distance a player must be from a grid for it to be revealed due to distance.  The smaller this value is, the longer a grid will be hidden from sight.  Default is 8000m (max view distance)" )]
 		[Browsable( true )]

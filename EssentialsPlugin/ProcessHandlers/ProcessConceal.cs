@@ -11,8 +11,10 @@
 		private static DateTime m_lastConcealCheck;
 		private static DateTime m_lastRevealCheck;
         private static DateTime m_lastConcealProcess;
+        private static int updateSpeed = PluginSettings.Instance.DynamicConcealUpdateSpeed;
 
-		public static DateTime LastRevealCheck
+
+        public static DateTime LastRevealCheck
 		{
 			get { return m_lastRevealCheck; }
 			set { m_lastRevealCheck = value; }
@@ -35,21 +37,21 @@
 
 			if (DateTime.Now - m_lastConcealCheck > TimeSpan.FromSeconds(30))
 			{
-				//Log.Info("CheckAndConcealEntities");
+				//Essentials.Log.Info("CheckAndConcealEntities");
 				EntityManagement.CheckAndConcealEntities();
 				m_lastConcealCheck = DateTime.Now;
 			}
 
 			if (DateTime.Now - m_lastRevealCheck > TimeSpan.FromSeconds(5))
 			{
-				//Log.Info("CheckAndRevealEntities");
+				//Essentials.Log.Info("CheckAndRevealEntities");
 				EntityManagement.CheckAndRevealEntities();
 				m_lastRevealCheck = DateTime.Now;
 			}
 
-            if ( DateTime.Now - m_lastConcealProcess > TimeSpan.FromMilliseconds( 500 ) )
+            if ( DateTime.Now - m_lastConcealProcess > TimeSpan.FromMilliseconds( updateSpeed ) )
             {
-                //Essentials.Log.Info( "Process concalment" );
+                //Essentials.Log.Info( "Process concealment" );
                 EntityManagement.ProcessConcealment( );
                 m_lastConcealProcess = DateTime.Now;
             }
@@ -70,8 +72,11 @@
             if ( !PluginSettings.Instance.DynamicConcealEnabled )
                 return;
 
-            EntityManagement.CheckAndRevealEntities( );
-            m_lastRevealCheck = DateTime.Now;
+            if ( DateTime.Now - m_lastRevealCheck > TimeSpan.FromSeconds( 2 ) )
+            {
+                EntityManagement.CheckAndRevealEntities( );
+                m_lastRevealCheck = DateTime.Now;
+            }
             
             Essentials.Log.Info( "Check Reveal due to: {0}", remoteUserId );
 
@@ -86,10 +91,13 @@
 			if (!PluginSettings.Instance.DynamicConcealEnabled)
 				return;
 
-			EntityManagement.CheckAndRevealEntities();
-			m_lastRevealCheck = DateTime.Now;
+            if ( DateTime.Now - m_lastRevealCheck > TimeSpan.FromSeconds( 2 ) )
+            {
+                EntityManagement.CheckAndRevealEntities( );
+                m_lastRevealCheck = DateTime.Now;
+            }
 
-			Essentials.Log.Info( "Check Reveal due to: {0}", remoteUserId );
+            Essentials.Log.Info( "Check Reveal due to: {0}", remoteUserId );
 
 			base.OnPlayerWorldSent(remoteUserId);
 		}

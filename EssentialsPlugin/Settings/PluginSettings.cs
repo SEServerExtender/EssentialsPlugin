@@ -74,6 +74,7 @@
 		private int _dockingShipsPerZone;
 
 		private bool _dynamicConcealEnabled;
+        private int _dynamicConcealUpdateSpeed;
 		private float _dynamicConcealDistance;
 		private bool _dynamicConcealIncludeLargeGrids;
 		private string[] _dynamicConcealIgnoreSubTypeList = { };
@@ -538,17 +539,33 @@
 			}
 		}
 
-		public bool DynamicConcealEnabled
-		{
-			get { return _dynamicConcealEnabled; }
-			set
-			{
-				_dynamicConcealEnabled = value;
-				Save();
-			}
-		}
+        public bool DynamicConcealEnabled
+        {
+            get
+            {
+                return _dynamicConcealEnabled;
+            }
+            set
+            {
+                _dynamicConcealEnabled = value;
+                Save( );
+            }
+        }
 
-		public float DynamicConcealDistance
+        public int DynamicConcealUpdateSpeed
+        {
+            get
+            {
+                return _dynamicConcealUpdateSpeed;
+            }
+            set
+            {
+                _dynamicConcealUpdateSpeed = value;
+                Save( );
+            }
+        }
+
+        public float DynamicConcealDistance
 		{
 			get { return _dynamicConcealDistance; }
 			set
@@ -851,6 +868,7 @@
 
 			_greetingMessage = "";
 
+            _dynamicConcealUpdateSpeed = 500;
 			_dynamicConcealDistance = 8000;
 			_dynamicShowMessages = false;
 			_dynamicTurretTargetDistance = 2000;
