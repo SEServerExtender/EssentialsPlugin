@@ -1,10 +1,9 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
     using System;
+    using EssentialsPlugin;
     using EssentialsPlugin.ChatHandlers;
     using EssentialsPlugin.EntityManagers;
-    using SEModAPIInternal.API.Common;
-    using EssentialsPlugin;
 
     public class ProcessConceal : ProcessHandlerBase
 	{
@@ -12,7 +11,7 @@
 		private static DateTime m_lastRevealCheck;
         private static DateTime m_lastConcealProcess;
         //private static int updateSpeed = PluginSettings.Instance.DynamicConcealUpdateSpeed;
-
+        public static bool ForceReveal = false;
 
         public static DateTime LastRevealCheck
 		{
@@ -28,16 +27,26 @@
 		public override int GetUpdateResolution()
         {
             int updateSpeed = PluginSettings.Instance.DynamicConcealUpdateSpeed;
+
             if ( updateSpeed < 1000 )
                 return updateSpeed;
-
-            return 1000;
+            else
+                return 1000;
         }
 
 		public override void Handle()
 		{
             int updateSpeed = PluginSettings.Instance.DynamicConcealUpdateSpeed;
-			if (!PluginSettings.Instance.DynamicConcealEnabled)
+
+            //force reveal bypasses the plugin setting. useful to recover grids after you turn it off
+            if ( ForceReveal && DateTime.Now - m_lastConcealProcess > TimeSpan.FromMilliseconds( updateSpeed ) )
+            {
+                //Essentials.Log.Info( "Process force reveal" );
+                EntityManagement.ProcessConcealment( true );
+                m_lastConcealProcess = DateTime.Now;
+            }
+
+            if (!PluginSettings.Instance.DynamicConcealEnabled )
 				return;
 
 			if (DateTime.Now - m_lastConcealCheck > TimeSpan.FromSeconds(30))

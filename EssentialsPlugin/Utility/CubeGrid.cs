@@ -835,7 +835,7 @@
 				if ( !( entity is IMyCubeGrid ) )
 					continue;
 
-                if (entity.DisplayName.Contains("CommRelayGlobal"))
+                if (entity.DisplayName.Contains("CommRelay"))
                     continue;
                 //this should make CommRelays immune to chat scan/delete commands
 

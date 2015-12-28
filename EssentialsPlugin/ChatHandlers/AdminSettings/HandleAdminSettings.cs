@@ -16,8 +16,11 @@
         public override string GetHelpDialog()
         {
             string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\""+GetHelp()+"\" \"close\" ";
+                "/dialog \"Help\" \"Admin Settings\" \"\"" +
+                "\" Allows you to configure settings in Essentials.|" +
+                "Type /admin settings to get a list of available settings.|" +
+                "Using the command without a set argument will return the current setting for that item." +
+                "\" \"close\" ";
             return longMessage;
         }
 
@@ -35,8 +38,12 @@
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
 			string results = PluginSettings.Instance.GetOrSetSettings(string.Join(" ", words));
-			Communication.SendPrivateInformation(userId, results);
-			return true;
+            //Communication.SendPrivateInformation(userId, results);
+            string longMessage =
+                "/dialog \"Help\" \"Admin Settings\" \"\"" +
+                "\"" + results + "\" \"close\" ";
+            Communication.SendClientMessage( userId, longMessage );
+            return true;
 		}
 	}
 }

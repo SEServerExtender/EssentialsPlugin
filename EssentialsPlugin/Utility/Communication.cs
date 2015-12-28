@@ -231,12 +231,13 @@
                     MyConfigDedicatedData<MyObjectBuilder_SessionSettings> config = DedicatedConfigDefinition.Load( new FileInfo( Path.Combine( Server.Instance.Path, "SpaceEngineers-Dedicated.cfg" ) ) );
                     m_configList = new DedicatedConfigDefinition( config );
 
-                    if ( m_configList.Mods.Contains( midspaceMod ) )
-                    {
-                        modStatus = 1;
-                        return modStatus;
-                    }
-                    else if ( !(m_configList.Mods.Contains( pubEssentials ) || m_configList.Mods.Contains( testEssentials )) )
+                    //Midspace said she fixed this, so let's try
+                    //if ( m_configList.Mods.Contains( midspaceMod ) )
+                    //{
+                    //    modStatus = 1;
+                    //    return modStatus;
+                    //}
+                    if ( !(m_configList.Mods.Contains( pubEssentials ) || m_configList.Mods.Contains( testEssentials )) )
                     {
                         modStatus = 2;
                         return modStatus;

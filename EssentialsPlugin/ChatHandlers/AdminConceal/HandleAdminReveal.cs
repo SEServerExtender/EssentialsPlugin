@@ -1,16 +1,15 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.AdminConceal
 {
-	using System.Collections.Generic;
-	using System.Linq;
-	using EssentialsPlugin.Utility;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.ModAPI;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity;
-	using VRage.ModAPI;
-	using VRage.ObjectBuilders;
+    using System.Collections.Generic;
+    using System.Linq;
+    using EntityManagers;
+    using EssentialsPlugin.Utility;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.ModAPI;
+    using VRage.ModAPI;
+    using VRage.ObjectBuilders;
 
-	public class HandleAdminReveal : ChatHandlerBase
+    public class HandleAdminReveal : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{
@@ -26,7 +25,10 @@
         {
             string longMessage =
                 "/dialog \"Help\" \"\" \"\"" +
-                "\""+GetHelp()+"\" \"close\" ";
+                "\" This command allows you to reveal concealed grids.|" +
+                "Usage: /admin reveal (force) - this command without 'force' only show you how many grids would be revealed.||" +
+                "This command will run when concealment is disabled, and respects the update time setting." +
+                "\"\" \"close\" ";
             return longMessage;
         }
 
@@ -44,67 +46,36 @@
 		{
 			bool force = words.FirstOrDefault(x => x.ToLower() == "force") != null;
 
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-			Wrapper.GameAction(() => MyAPIGateway.Entities.GetEntities(entities) );
+            if ( force )
+                EntityManagement.RevealAll( );
+            else
+            {
+                HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
+                Wrapper.GameAction( ( ) => MyAPIGateway.Entities.GetEntities( entities ) );
 
-			List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>();
-			int count = 0;
-			Wrapper.GameAction(() =>
-			{
-				foreach (IMyEntity entity in entities)
-				{
-					if (entity.InScene)
-						continue;
+                List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>( );
+                int count = 0;
+                Wrapper.GameAction( ( ) =>
+                 {
+                     foreach ( IMyEntity entity in entities )
+                     {
+                         if ( entity.InScene )
+                             continue;
 
-					if (!(entity is IMyCubeGrid))
-						continue;
+                         if ( !(entity is IMyCubeGrid) )
+                             continue;
 
-					MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
-					if (builder == null)
-						continue;
+                         MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
+                         if ( builder == null )
+                             continue;
 
-					count++;
-					if (!force)
-					{
-						continue;
-					}
+                         count++;
+                     }
+                 } );
 
-					IMyCubeGrid grid = (IMyCubeGrid)entity;
-					long ownerId = 0;
-					string ownerName = "";
-					if (grid.BigOwners.Count > 0)
-					{
-						ownerId = grid.BigOwners.First();
-						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
-					}
-
-					grid.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
-					grid.InScene = true;
-					grid.CastShadows = true;
-					builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
-					MyAPIGateway.Entities.RemapObjectBuilder(builder);
-                    //Log.Info("Conceal", string.Format("Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
-                    Log.Info("Revealing");
-					/*
-					entity.InScene = true;
-					entity.CastShadows = true;
-					entity.Visible = true;
-					*/
-				
-					//CubeGridEntity newEntity = new CubeGridEntity(builder);
-					//SectorObjectManager.Instance.AddEntity(newEntity);
-
-					//BaseEntityNetworkManager.BroadcastRemoveEntity(entity);
-					MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(builder);
-					addList.Add(builder);
-					//MyAPIGateway.Multiplayer.SendEntitiesCreated(addList);
-					addList.Clear();
-				}
-			});
-
-			Log.Info( !force ? string.Format( "Command would Reveal {0} grids.  Type /admin reveal force to reveal them.", count ) : string.Format( "Command Revealed {0} grids", count ) );
-
-			return true;
+                Log.Info( string.Format( "Command would Reveal {0} grids.  Type /admin reveal force to reveal them.", count ) );
+            }
+            return true;
 		}
 	}
 }

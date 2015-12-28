@@ -945,7 +945,6 @@
                                    new ProcessCommunication( ),
                                    new ProcessBackup( ),
                                    new ProcessLoginTracking( ),
-                                   new ProcessProtection( ),
                                    new ProcessDockingZone( ),
                                    new ProcessConceal( ),
                                    new ProcessWaypoints( ),
@@ -1161,13 +1160,17 @@
 		{
 			Log.Debug( "Initializing Essentials plugin at path {0}\\", Path.GetDirectoryName( Assembly.GetExecutingAssembly( ).Location ) );
 			DoInit( Path.GetDirectoryName( Assembly.GetExecutingAssembly( ).Location ) + "\\" );
-		}
+            if ( PluginSettings.Instance.ProtectedEnabled )
+                Protection.Init( );
+        }
 
 		public void InitWithPath( String modPath )
 		{
 			Log.Debug( "Initializing Essentials plugin at path {0}\\", Path.GetDirectoryName( modPath ) );
-			DoInit( Path.GetDirectoryName( modPath ) + "\\" );
-		}
+            DoInit( Path.GetDirectoryName( modPath ) + "\\" );
+            if ( PluginSettings.Instance.ProtectedEnabled )
+                Protection.Init( );
+        }
 
 		public void Shutdown( )
 		{
@@ -1193,12 +1196,12 @@
 
         }
 
-		/// <summary>
-		/// Raised when a chat messages are received.
-		/// NOTE: This is raised on a different thread
-		/// </summary>
-		/// <param name="obj"></param>
-		public void OnChatReceived( ChatManager.ChatEvent obj )
+        /// <summary>
+        /// Raised when a chat messages are received.
+        /// NOTE: This is raised on a different thread
+        /// </summary>
+        /// <param name="obj"></param>
+        public void OnChatReceived( ChatManager.ChatEvent obj )
 		{
 			if ( obj.Message[ 0 ] != '/' )
 				return;

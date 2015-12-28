@@ -39,77 +39,83 @@
         //private static Queue<ConcealItem> ConcealQueue = new Queue<ConcealItem>( );
         //private static Queue<ConcealItem> MedbayQueue = new Queue<ConcealItem>( );
         private static SortedList<long, ConcealItem> ConcealQueue = new SortedList<long, ConcealItem>( );
+        private static SortedList<long, ConcealItem> RevealQueue = new SortedList<long, ConcealItem>( );
         private static SortedList<long, ConcealItem> MedbayQueue = new SortedList<long, ConcealItem>( );
+        private static bool ConcealTick;
 
+
+        //I probably don't need this struct if we don't want the bool, but eh. Easier to compare a long than an entity. Probably.
         struct ConcealItem
         {
-            public ConcealItem( IMyEntity _entity, string _reason, bool _conceal )
+            public ConcealItem( IMyEntity _entity, string _reason )
             {
                 this.entity = _entity;
                 this.reason = _reason;
-                this.conceal = _conceal;
+                //this.conceal = _conceal;
             }
 
             public IMyEntity entity;
             public string reason;
-            public bool conceal;
+            //public bool conceal;
         };
 
-        public static void ProcessConcealment( )
+        public static void ProcessConcealment( bool force = false )
         {
+            //if ( !MedbayQueue.Any( ) && !RevealQueue.Any( ) && !ConcealQueue.Any( ) )
+            //    return;
+            //let's not enter the game thread if we don't have to. The poor thing is taxed enough as it is
 
             Wrapper.GameAction( ( ) =>
             {
+            ConcealTick = true;
+            ProcessConceal.ForceReveal = ((force && RevealQueue.Any( )) ? true : false);
+            //if we are sent the force flag but there's nothing in reveal queue, set the flag back to false
+            string forceString = (force ? "force reveal" : "concealment");
+            //just so our debug messages can be pretty
+
+                //we want medbay reveal to have highest priority, even above force reveal
                 if ( MedbayQueue.Any( ) )
                 {
                     if ( PluginSettings.Instance.DynamicShowMessages )
-                        Essentials.Log.Info( "Processing concealment: {0} medbays in concealment queue.", MedbayQueue.Count );
+                        Essentials.Log.Info( "Processing concealment: {0} medbays in reveal queue.", MedbayQueue.Count );
 
-                    //ConcealItem MedbayToProcess = MedbayQueue.Dequeue( );
-                    ConcealItem MedbayToProcess = MedbayQueue.First().Value;
+                    ConcealItem MedbayToProcess = MedbayQueue.First( ).Value;
                     MedbayQueue.RemoveAt( 0 );
 
-                    if ( MedbayToProcess.conceal == true )
-                    {
-                        RevealEntity( new KeyValuePair<IMyEntity, string>( MedbayToProcess.entity, MedbayToProcess.reason ) );
-                    }
-                    else
-                    {
-                        ConcealEntity( MedbayToProcess.entity );
-                    }
+                    RevealEntity( new KeyValuePair<IMyEntity, string>( MedbayToProcess.entity, MedbayToProcess.reason ) );
                     return;
                 }
-                if ( !MedbayQueue.Any( ) && ConcealQueue.Any( ) )
+
+                if ( RevealQueue.Any( ) )
+                {
+                    if ( PluginSettings.Instance.DynamicShowMessages )
+                        Essentials.Log.Info( "Processing {0}: {1} grids in reveal queue.", forceString, RevealQueue.Count );
+
+                    ConcealItem EntityToProcess = RevealQueue.First( ).Value;
+                    RevealQueue.RemoveAt( 0 );
+
+                    RevealEntity( new KeyValuePair<IMyEntity, string>( EntityToProcess.entity, EntityToProcess.reason ) );
+                    return;
+                }
+                //conceal gets bottom priority, it's more important that players have their grids
+                if ( ConcealQueue.Any( ) )
                 {
                     if ( PluginSettings.Instance.DynamicShowMessages )
                         Essentials.Log.Info( "Processing concealment: {0} grids in concealment queue.", ConcealQueue.Count );
 
-                    //ConcealItem EntityToProcess = ConcealQueue.Dequeue( );
                     ConcealItem EntityToProcess = ConcealQueue.First( ).Value;
                     ConcealQueue.RemoveAt( 0 );
 
-                    if ( EntityToProcess.entity == null )
-                    {
-                        Essentials.Log.Info( "null entity" );
-                        return;
-                    }
-                    if ( EntityToProcess.conceal == true )
-                    {
-                        RevealEntity( new KeyValuePair<IMyEntity, string>( EntityToProcess.entity, EntityToProcess.reason ) );
-                    }
-                    else
-                    {
-                        ConcealEntity( EntityToProcess.entity );
-                    }
+                    ConcealEntity( EntityToProcess.entity );
                     return;
                 }
 
             } );
             return;
         }
-    
 
-    public static void CheckAndConcealEntities( )
+
+        public static void CheckAndConcealEntities( )
 		{
 			if ( _checkConceal )
 				return;
@@ -459,26 +465,26 @@
 
 		private static void ConcealEntities( HashSet<IMyEntity> entitesToConceal )
 		{
-            Wrapper.GameAction( ( ) =>
+            int ConcealCount = 0;
+            foreach ( IMyEntity entity in entitesToConceal )
             {
-                foreach ( IMyEntity entity in entitesToConceal )
-            {
-                
-                    //ConcealEntity( entity );
-                    //if ( ConcealQueue.Count >= 50 )
-                    //    continue;
+                ConcealItem item = new ConcealItem( entity, "" );
+                long itemId = entity.EntityId;
 
-                    ConcealItem item = new ConcealItem( entity, "", false );
+                if ( ConcealQueue.ContainsKey( itemId ) || MedbayQueue.ContainsKey( itemId ) || RevealQueue.ContainsKey( itemId ) )
+                    continue;
+                //If this entity is already queued, continue so we don't get dupes or interfere with reveal
 
-                    if ( ConcealQueue.ContainsKey( entity.EntityId ) )
-                        continue;
-                    //if this entity is already in the queue, skip it so we don't get dupes
+                ConcealQueue.Add( entity.EntityId, item );
+                ++ConcealCount;
+            }
 
-                    ConcealQueue.Add( entity.EntityId, item );
-                }
-                });
             if ( PluginSettings.Instance.DynamicShowMessages )
-				Essentials.Log.Info( "Queued {0} entities for conceal.", entitesToConceal.Count );
+                if ( ConcealTick )
+                {
+                    Essentials.Log.Info( "Queued {0} entities for conceal.", ConcealCount );
+                    ConcealTick = false;
+                }
 		}
 
 		private static void ConcealEntity( IMyEntity entity )
@@ -489,6 +495,9 @@
 			{
 				if ( !entity.InScene )
 					return;
+
+                if ( entity.DisplayName.Contains( "CommRelay" ) )
+                    return;
 
 				MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
 				if ( builder == null )
@@ -594,6 +603,10 @@
 
 		public static void CheckAndRevealEntities( )
 		{
+            if ( ProcessConceal.ForceReveal )
+                RevealQueue.Clear( );
+            //force reveal queue can take a long time. let's refresh it in case some grids were removed since first scan
+
 			if ( _checkReveal )
 				return;
 
@@ -940,49 +953,63 @@
 
         private static void RevealEntities( Dictionary<IMyEntity, string> entitiesToReveal )
         {
-            Wrapper.GameAction( ( ) =>
+            int RevealCount = 0;
+            foreach ( KeyValuePair<IMyEntity, string> entity in entitiesToReveal )
             {
-                foreach ( KeyValuePair<IMyEntity, string> entity in entitiesToReveal )
+
+                //RevealEntity( entity );
+                if ( ConcealQueue.Count >= 50 )
+                    continue;
+                IMyEntity processEntity = entity.Key;
+                ConcealItem item = new ConcealItem( processEntity, entity.Value );
+
+                if ( ConcealQueue.ContainsKey( processEntity.EntityId ) )
                 {
-
-                    //RevealEntity( entity );
-                    //if ( ConcealQueue.Count >= 50 )
-                    //    continue;
-                    IMyEntity processEntity = entity.Key;
-                    ConcealItem item = new ConcealItem( processEntity, entity.Value, true );
-
-                    if ( ConcealQueue.ContainsKey( processEntity.EntityId ) )
-                    {
-                        //if this entity is in the queue, we want to replace it
-                        ConcealQueue.Remove( processEntity.EntityId );
-                    }
-
-                    ConcealQueue.Add( processEntity.EntityId, item );
+                    //if this entity is in the queue, we want to replace it
+                    ConcealQueue.Remove( processEntity.EntityId );
                 }
-            } );
-            if ( PluginSettings.Instance.DynamicShowMessages )
-                Essentials.Log.Info( "Queued {0} entities for reveal.", entitiesToReveal.Count );
+
+                if ( MedbayQueue.ContainsKey( processEntity.EntityId ) )
+                    continue;
+                //skip this entity if it's already in the medbay queue, since it has a higher priority
+
+                ConcealQueue.Add( processEntity.EntityId, item );
+                ++RevealCount;
+            }
+
+            //no message if we're refreshing the queue
+            if ( PluginSettings.Instance.DynamicShowMessages && !ProcessConceal.ForceReveal )
+                if ( ConcealTick )
+                {
+                    Essentials.Log.Info( "Queued {0} entities for reveal.", RevealCount );
+                    ConcealTick = false;
+                }
         }
 
         private static void RevealMedbays( IMyEntity entity, string reason )
         {
-            Wrapper.GameAction( ( ) =>
-            {
-                ConcealItem item = new ConcealItem( entity, reason, true );
+            ConcealItem item = new ConcealItem( entity, reason );
 
-                if ( ConcealQueue.ContainsKey( entity.EntityId ) )
-                {
-                    //if this entity is in the concealment queue, remove it
-                    ConcealQueue.Remove( entity.EntityId );
-                }
+            if ( ConcealQueue.ContainsKey( entity.EntityId ) )
+                ConcealQueue.Remove( entity.EntityId );
+            //if this entity is in the concealment queue, remove it
 
-                if ( MedbayQueue.ContainsKey( entity.EntityId ) )
-                    return;
+            if ( RevealQueue.ContainsKey( entity.EntityId ) )
+                RevealQueue.Remove( entity.EntityId );
+            //if this entity is in reveal queue, remove it. medbay is priority 0
 
-                MedbayQueue.Add( entity.EntityId, item );
-            } );
+            if ( MedbayQueue.ContainsKey( entity.EntityId ) )
+                return;
+            //we don't want dupes in the queue
+
+            MedbayQueue.Add( entity.EntityId, item );
+
             if ( PluginSettings.Instance.DynamicShowMessages )
-                Essentials.Log.Info( "{0} medbays queued for reveal.", MedbayQueue.Count( ) );
+                if ( ConcealTick )
+                {
+                    Essentials.Log.Info( "Queued {0} entities for reveal.", MedbayQueue.Count );
+                    ConcealTick = false;
+                }
         }
 
         private static void RevealEntity( KeyValuePair<IMyEntity, string> item )
@@ -1043,6 +1070,8 @@
                     entity.OnAddedToScene( entity );
                     BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
                     MyAPIGateway.Entities.AddEntity( newEntity );
+                    entity.Physics.LinearVelocity = Vector3.Zero;
+                    entity.Physics.AngularVelocity = Vector3.Zero;
                     MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
 
                     if ( PluginSettings.Instance.DynamicShowMessages )
@@ -1081,6 +1110,10 @@
 
 		static public void RevealAll( )
 		{
+            ConcealQueue.Clear( );
+            ProcessConceal.ForceReveal = true;
+            //set the force flag
+
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
 			Wrapper.GameAction( ( ) =>
 			{
@@ -1088,62 +1121,30 @@
 			} );
 
 			List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>( );
-			int count = 0;
-				foreach ( IMyEntity entity in entities )
-				{
-					if ( entity.InScene )
-						continue;
-
-					if ( !( entity is IMyCubeGrid ) )
-						continue;
-
-					MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
-					if ( builder == null )
-						continue;
-
-					count++;
-
-                ConcealItem item = new ConcealItem( entity, "Force reveal", true );
-                if ( ConcealQueue.ContainsKey( entity.EntityId ) )
-                {
-                    //if this entity is in the queue, we want to replace it
-                    ConcealQueue.Remove( entity.EntityId );
-                }
-
-                ConcealQueue.Add( entity.EntityId, item );
-
-                /* This is just a copy of RevealEntity, it doesn't really need to be here.
-                IMyCubeGrid grid = (IMyCubeGrid)entity;
-                long ownerId = 0;
-                string ownerName = "";
-                if ( CubeGrids.GetBigOwners( builder ).Count > 0 )
-                {
-                    ownerId = CubeGrids.GetBigOwners( builder ).First( );
-                    ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
-                }
-
-                //grid.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
-                //grid.InScene = true;
-                //grid.CastShadows = true;
-                builder.PersistentFlags = ( MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows );
-                MyAPIGateway.Entities.RemapObjectBuilder( builder );
-                if ( PluginSettings.Instance.DynamicShowMessages )
-                    Essentials.Log.Info( "Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace( "\r", "" ).Replace( "\n", "" ), ownerId, ownerName, builder.EntityId );
-
-                IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
-                if ( newEntity == null )
-                {
-                    Essentials.Log.Warn( "CreateFromObjectBuilder failed: {0}", builder.EntityId );
+            int count = 0;
+            foreach ( IMyEntity entity in entities )
+            {
+                if ( entity.InScene )
                     continue;
-                }
 
-                BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
-                MyAPIGateway.Entities.AddEntity( newEntity );
-                MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
-                */
+                if ( !(entity is IMyCubeGrid) )
+                    continue;
+
+                MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
+                if ( builder == null )
+                    continue;
+
+                count++;
+
+                long itemId = entity.EntityId;
+                ConcealItem item = new ConcealItem( entity, "Force reveal" );
+                if ( MedbayQueue.ContainsKey( itemId ) || RevealQueue.ContainsKey( itemId ) )
+                    continue;
+
+                RevealQueue.Add( entity.EntityId, item );
             }
 
-			if ( PluginSettings.Instance.DynamicShowMessages )
+            if ( PluginSettings.Instance.DynamicShowMessages )
 				Essentials.Log.Info( "Queued {0} grids for force reveal.", count );
 		}
 
