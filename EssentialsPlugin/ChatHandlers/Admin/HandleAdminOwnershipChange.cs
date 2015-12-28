@@ -1,13 +1,15 @@
 ﻿namespace EssentialsPlugin.ChatHandlers
 {
-	using System.Linq;
-	using EssentialsPlugin.Utility;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-
-	public class HandleAdminOwnershipChange : ChatHandlerBase
+    using System.Collections.Generic;
+    using System.Linq;
+    using EssentialsPlugin.Utility;
+    using Sandbox.ModAPI;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+    using VRage.ModAPI;
+    public class HandleAdminOwnershipChange : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{
@@ -42,15 +44,30 @@
 			string name = words[0].ToLower();
 			long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(PlayerMap.Instance.GetSteamIdFromPlayerName(name, true)).First();
 			string gridId = words[1].ToLower();
-
 			long gridEntityId = 0;
+            HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+            bool found = false;
+
 			if (!long.TryParse(gridId, out gridEntityId))
 			{
-				Communication.SendPrivateInformation(userId, string.Format("Invalid EntityID entered: {0}", gridId));
-				return true;
+                MyAPIGateway.Entities.GetEntities( entities );
+                foreach ( IMyEntity entity in entities )
+                {
+                    if ( entity.DisplayName.ToLower( ) == gridId.ToLower( ) )
+                    {
+                        found = true;
+                        gridEntityId = entity.EntityId;
+                        break;
+                    }
+                }
+                if ( !found )
+                {
+                    Communication.SendPrivateInformation( userId, string.Format("Could not find entity with id {0}", gridId ) );
+                    return true;
+                }
 			}
-
-			CubeGridEntity grid = (CubeGridEntity)GameEntityManager.GetEntity(gridEntityId);
+            
+			    CubeGridEntity grid = (CubeGridEntity)GameEntityManager.GetEntity(gridEntityId);
 
 			for (int r = 0; r < grid.CubeBlocks.Count; r++)
 			{

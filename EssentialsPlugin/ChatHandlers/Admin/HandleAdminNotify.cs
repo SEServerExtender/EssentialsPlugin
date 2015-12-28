@@ -19,9 +19,13 @@
 
         public override string GetHelpDialog()
         {
+            string fontList = GetFontList( ).Replace( ",", "|" );
             string longMessage =
                 "/dialog \"Help\" \"\" \"\"" +
-                "\""+GetHelp()+"\" \"close\" ";
+                "\"This will broadcast a notification to all users.|" +
+                "Usage: /admin notify <color> <time> <message>|" +
+                "Message will be displayed for the number of seconds given in the <time> argument.||" +
+                "Colors:| " + fontList + "\" \"close\" ";
             return longMessage;
         }
 
