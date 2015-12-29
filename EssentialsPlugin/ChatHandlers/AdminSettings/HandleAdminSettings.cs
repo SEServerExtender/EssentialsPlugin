@@ -15,7 +15,7 @@
 
         public override string GetHelpDialog()
         {
-            string results = PluginSettings.Instance.GetOrSetSettings( "" ).Replace( ",", "|" );
+            string results = PluginSettings.Instance.GetOrSetSettings( "" ).Replace( "\r\n", "| " );
             string longMessage =
                 "/dialog \"Help\" \"Admin Settings\" \"\"" +
                 "\" Allows you to configure settings in Essentials.|" +
@@ -44,9 +44,10 @@
             {
                 string longMessage =
                     "/dialog \"Help\" \"Admin Settings\" \"\"" +
-                    "\"" + results.Replace( ",", "|" ) + "\" \"close\" ";
+                    "\"" + results.Replace( "\r\n", "| " ) + "\" \"close\" ";
                 Communication.SendClientMessage( userId, longMessage );
             }
+            else
             Communication.SendPrivateInformation(userId, results);
             return true;
 		}

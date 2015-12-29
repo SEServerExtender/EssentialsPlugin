@@ -140,7 +140,13 @@ namespace EssentialsPlugin.ChatHandlers
 						Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) owned by inactive player: {2}", entity.DisplayName, entity.EntityId, PlayerMap.Instance.GetPlayerItemFromPlayerId(player).Name));
 						entitiesFound.Add(entity);
 					}
-				}
+                    else if ( item.LastLogin >= DateTime.Now.AddDays( days * -1 ) )
+                    {
+                        if ( entitiesFound.Contains( entity ) )
+                            entitiesFound.Remove( entity );
+                        break;
+                    }
+                }
 			}
 
 			Communication.SendPrivateInformation(userId, string.Format("Found {0} grids owned by inactive users", entitiesFound.Count()));

@@ -41,6 +41,12 @@
 		// /admin ownership change name gridId
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
+            if ( words.Length < 2 )
+            {
+                Communication.SendPrivateInformation( userId, GetHelp( ) );
+                return true;
+            }
+
 			string name = words[0].ToLower();
 			long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(PlayerMap.Instance.GetSteamIdFromPlayerName(name, true)).First();
 			string gridId = words[1].ToLower();
@@ -48,11 +54,17 @@
             HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
             bool found = false;
 
-			if (!long.TryParse(gridId, out gridEntityId))
-			{
+            if ( !long.TryParse( gridId, out gridEntityId ) )
+            {
                 MyAPIGateway.Entities.GetEntities( entities );
                 foreach ( IMyEntity entity in entities )
                 {
+                    if ( entity == null )
+                        continue;
+
+                    if ( !(entity is IMyCubeGrid) )
+                        continue;
+
                     if ( entity.DisplayName.ToLower( ) == gridId.ToLower( ) )
                     {
                         found = true;

@@ -185,7 +185,13 @@
 				MyAPIGateway.Entities.GetEntities( entities, x => x is IMyCubeGrid );
 			} );
 
-			return entities.FirstOrDefault( entity => entity.DisplayName.ToLower( ).Contains( displayName.ToLower( ) ) );
+            //return entities.FirstOrDefault( entity => entity.DisplayName.ToLower( ).Contains( displayName.ToLower( ) ) );
+            foreach ( IMyEntity entity in entities )
+            {
+                if ( entity.DisplayName.ToLower( ).Contains( displayName.ToLower( ) ) )
+                    return entity;
+            }
+            return null;
 		}
 
 		public static bool WaitForLoadingEntity( CubeGridEntity grid )

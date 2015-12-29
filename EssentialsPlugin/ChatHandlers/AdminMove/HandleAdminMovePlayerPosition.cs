@@ -1,10 +1,11 @@
 ﻿namespace EssentialsPlugin.ChatHandlers
 {
-	using System.Linq;
-	using EssentialsPlugin.Utility;
-	using VRageMath;
+    using System.Linq;
+    using EssentialsPlugin.Utility;
+    using Sandbox.ModAPI;
+    using VRageMath;
 
-	public class HandleAdminMovePlayerPosition : ChatHandlerBase
+    public class HandleAdminMovePlayerPosition : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{
@@ -58,7 +59,17 @@
 
 			string userName = words[0];
 			Vector3D startPosition = new Vector3D(double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]));
-			if(!Player.Move(userName, startPosition))
+
+            //make sure we aren't moving the player inside a planet or something
+            BoundingSphereD positionSphere = new BoundingSphereD( );
+            positionSphere = new BoundingSphereD( startPosition, 5 );
+            if ( MyAPIGateway.Entities.GetIntersectionWithSphere( ref positionSphere ) != null )
+            {
+                Communication.SendPrivateInformation( userId, string.Format( "Could not move player: {0}. Position is not empty, try another.", userName ) );
+                return true;
+            }
+
+                if (!Player.Move(userName, startPosition))
 			{
 				Communication.SendPrivateInformation(userId, string.Format("Unable to move player: {0}", userName));
 			}

@@ -1012,7 +1012,7 @@
                 }
         }
 
-        private static void RevealEntity( KeyValuePair<IMyEntity, string> item )
+        public static void RevealEntity( KeyValuePair<IMyEntity, string> item )
 		{
 			IMyEntity entity = item.Key;
 			string reason = item.Value;
@@ -1070,9 +1070,9 @@
                     entity.OnAddedToScene( entity );
                     BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
                     MyAPIGateway.Entities.AddEntity( newEntity );
+                    MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
                     entity.Physics.LinearVelocity = Vector3.Zero;
                     entity.Physics.AngularVelocity = Vector3.Zero;
-                    MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
 
                     if ( PluginSettings.Instance.DynamicShowMessages )
 						Essentials.Log.Info( "Revealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}",

@@ -5,10 +5,14 @@
     using EntityManagers;
     using EssentialsPlugin.Utility;
     using Sandbox.Common.ObjectBuilders;
+    using Sandbox.Engine.Multiplayer;
+    using Sandbox.Game.Replication;
     using Sandbox.ModAPI;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Entity;
     using VRage.ModAPI;
     using VRage.ObjectBuilders;
-
+    using VRageMath;
     public class HandleAdminReveal : ChatHandlerBase
 	{
 		public override string GetHelp()
@@ -43,11 +47,15 @@
 		}
 
 		public override bool HandleCommand(ulong userId, string[] words)
-		{
-			bool force = words.FirstOrDefault(x => x.ToLower() == "force") != null;
+        {
+            bool force = words.FirstOrDefault( x => x.ToLower( ) == "force" ) != null;
+            bool now = false;
+            if ( words.Count( ) > 1 && words[1] == "now" )
+                now = true;
 
-            if ( force )
+            if ( force && !now )
                 EntityManagement.RevealAll( );
+
             else
             {
                 HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
@@ -55,6 +63,7 @@
 
                 List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>( );
                 int count = 0;
+                
                 Wrapper.GameAction( ( ) =>
                  {
                      foreach ( IMyEntity entity in entities )
@@ -69,13 +78,68 @@
                          if ( builder == null )
                              continue;
 
+                         if ( now )
+                             EntityManagement.RevealEntity( new KeyValuePair<IMyEntity, string>( entity, "Immediate force reveal" ) );
+
                          count++;
                      }
                  } );
+                
+                /*
+                Wrapper.GameAction( ( ) =>
+                {
+                    foreach ( IMyEntity entity in entities )
+                    {
+                        if ( entity.InScene )
+                            continue;
 
-                Log.Info( string.Format( "Command would Reveal {0} grids.  Type /admin reveal force to reveal them.", count ) );
+                        if ( !(entity is IMyCubeGrid) )
+                            continue;
+
+                        MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
+                        if ( builder == null )
+                            continue;
+
+                        count++;
+                        if ( !now )
+                        {
+                            continue;
+                        }
+
+                        IMyCubeGrid grid = (IMyCubeGrid)entity;
+                        long ownerId = 0;
+                        string ownerName = "";
+                        if ( grid.BigOwners.Count > 0 )
+                        {
+                            ownerId = grid.BigOwners.First( );
+                            ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
+                        }
+
+
+                        builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
+                        MyAPIGateway.Entities.RemapObjectBuilder( builder );
+
+                        //Log.Info("Conceal", string.Format("Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
+                        Log.Info( "Revealing" );
+
+                        IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
+                        entity.InScene = true;
+                        entity.OnAddedToScene( entity );
+                        BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+                        MyAPIGateway.Entities.AddEntity( newEntity );
+                        entity.Physics.LinearVelocity = Vector3.Zero;
+                        entity.Physics.AngularVelocity = Vector3.Zero;
+                        MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
+                    }
+                } );
+                */
+                if ( !now )
+                    Log.Info( string.Format( "Command would reveal {0} grids.  Type /admin reveal force to reveal them.", count ) );
+
+                else
+                    Log.Info( string.Format( "Command revealed {0} grids.", count ) );
             }
             return true;
-		}
+        }
 	}
 }

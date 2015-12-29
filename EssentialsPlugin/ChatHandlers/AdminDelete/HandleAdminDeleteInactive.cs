@@ -123,19 +123,25 @@ namespace EssentialsPlugin.ChatHandlers.AdminDelete
 					}
 
 					PlayerItem item = Players.Instance.GetPlayerById(player);
-                    if (item == null)
-					{
-						if (removeNoLoginInformation)
-						{
-							Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) owned by a player with no login info: {2}", entity.DisplayName, entity.EntityId, checkItem.Name));
-							entitiesFound.Add(entity);
-						}
-					}
-					else if (item.LastLogin < DateTime.Now.AddDays(days * -1))
-					{
-						Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) owned by inactive player: {2}", entity.DisplayName, entity.EntityId, PlayerMap.Instance.GetPlayerItemFromPlayerId(player).Name));
-						entitiesFound.Add(entity);
-					}
+                    if ( item == null )
+                    {
+                        if ( removeNoLoginInformation )
+                        {
+                            Communication.SendPrivateInformation( userId, string.Format( "Found entity '{0}' ({1}) owned by a player with no login info: {2}", entity.DisplayName, entity.EntityId, checkItem.Name ) );
+                            entitiesFound.Add( entity );
+                        }
+                    }
+                    else if ( item.LastLogin < DateTime.Now.AddDays( days * -1 ) )
+                    {
+                        Communication.SendPrivateInformation( userId, string.Format( "Found entity '{0}' ({1}) owned by inactive player: {2}", entity.DisplayName, entity.EntityId, PlayerMap.Instance.GetPlayerItemFromPlayerId( player ).Name ) );
+                        entitiesFound.Add( entity );
+                    }
+                    else if ( item.LastLogin >= DateTime.Now.AddDays( days * -1 ) )
+                    {
+                        if ( entitiesFound.Contains( entity ) )
+                            entitiesFound.Remove( entity );
+                        break;
+                    }
 				}
 			}
 

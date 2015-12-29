@@ -1,30 +1,32 @@
 ﻿namespace EssentialsPlugin.Utility
 {
-	using System;
-	using System.Collections.Generic;
-	using System.IO;
-	using System.Linq;
-	using System.Reflection;
-	using System.Text.RegularExpressions;
-	using System.Threading;
-	using System.Threading.Tasks;
-	using System.Xml.Serialization;
-	using EssentialsPlugin.UtilityClasses;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.Common.ObjectBuilders.Definitions;
-	using Sandbox.ModAPI;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-	using VRage;
-	using VRage.FileSystem;
-	using VRage.ModAPI;
-	using VRage.ObjectBuilders;
-	using VRageMath;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text.RegularExpressions;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Xml.Serialization;
+    using EssentialsPlugin.UtilityClasses;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.Common.ObjectBuilders.Definitions;
+    using Sandbox.Engine.Multiplayer;
+    using Sandbox.Game.Replication;
+    using Sandbox.ModAPI;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Entity;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+    using VRage;
+    using VRage.FileSystem;
+    using VRage.ModAPI;
+    using VRage.ObjectBuilders;
+    using VRageMath;
 
-	public static class Player
+    public static class Player
 	{
 		public static MyObjectBuilder_Character FindCharacter( string userName )
 		{
@@ -166,24 +168,25 @@
 				Type someManager = SandboxGameAssemblyWrapper.Instance.GetAssemblyType(SectorObjectManager.EntityBaseNetManagerNamespace, SectorObjectManager.EntityBaseNetManagerClass);
 				Wrapper.InvokeStaticMethod(someManager, SectorObjectManager.EntityBaseNetManagerSendEntity, new object[] { entity.GetObjectBuilder() });
 				gridEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
-			});
 
+                MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( entity ) );
+            } );
 
-			int count = 0;
+            
+            DateTime _loadTime = DateTime.Now;
 			while (gridEntity.IsLoading)
 			{
-				Thread.Sleep(100);
-				count++;
-				if (count > 40)
-					break;
-			}
+                if ( DateTime.Now - _loadTime > TimeSpan.FromSeconds( 20 ) )
+                    break;
+
+            }
 
 			if (gridEntity.IsLoading)
 			{
 				Essentials.Log.Info( "Failed to load cockpit entity: {0}", gridEntity.EntityId );
 				return false;
 			}
-
+            
 			foreach (CubeBlockEntity block in gridEntity.CubeBlocks)
 			{
 				if (block is CockpitEntity)
@@ -192,8 +195,9 @@
 				}
 			}
 
-			gridEntity.Dispose();
-			return true;
+            gridEntity.Dispose();
+            MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( gridEntity ) );
+            return true;
 		}
 
 		public static Boolean CheckPlayerSameFaction(long playerId, long compareId)
