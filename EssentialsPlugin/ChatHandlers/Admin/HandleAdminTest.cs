@@ -36,7 +36,9 @@
     using SEModAPIInternal.API.Entity;
     using VRage;
     using EssentialsPlugin.Utility;
-
+    using VRage.ModAPI;
+    using Sandbox.Game.Replication;
+    using Sandbox.Engine.Multiplayer;
     public class HandleAdminTest : ChatHandlerBase
 	{
 
@@ -70,14 +72,13 @@
 			return true;
 		}
 
-		public override bool HandleCommand(ulong userId, string[] words)
-		{
+        public override bool HandleCommand( ulong userId, string[ ] words )
+        {
             Communication.ServerMessageItem message = new Communication.ServerMessageItem( );
             message.From = "Server";
             message.Message = "Hello world!";
 
-            string messageString = MyAPIGateway.Utilities.SerializeToXML<Communication.ServerMessageItem>(message);
-            Essentials.Log.Debug( messageString );
+            string messageString = MyAPIGateway.Utilities.SerializeToXML<Communication.ServerMessageItem>( message );
             byte[ ] data = new byte[messageString.Length];
 
             for ( int r = 0; r < messageString.Length; r++ )
@@ -86,6 +87,24 @@
             }
 
             Communication.SendDataMessage( userId, 5003, data );
+
+            try
+            {
+                Essentials.Log.Info( "test" );
+                IMyEntity entity = MyAPIGateway.Entities.GetEntityById( PlayerMap.Instance.GetPlayerEntityId( userId ) );
+                Vector3D position = new Vector3D( 100000,100000,100000 );
+                Wrapper.GameAction( ( ) =>
+                {
+                    entity.SetPosition( position );
+                    MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( entity ) );
+                } );
+            }
+            catch ( Exception ex )
+            {
+                Essentials.Log.Info( ex, "test fail" );
+            }
+           
+
             return true;
         }
 

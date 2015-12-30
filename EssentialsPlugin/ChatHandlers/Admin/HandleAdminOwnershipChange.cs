@@ -10,49 +10,49 @@
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
     using VRage.ModAPI;
     public class HandleAdminOwnershipChange : ChatHandlerBase
-	{
-		public override string GetHelp()
-		{
-			return "This command allows you to change the ownership of a ship.  Usage: /admin ownership change <entityId> <PlayerName>";
-		}
-		public override string GetCommandText()
-		{
-			return "/admin ownership change";
-		}
+    {
+        public override string GetHelp( )
+        {
+            return "This command allows you to change the ownership of a ship.  Usage: /admin ownership change <entityId> <PlayerName>";
+        }
+        public override string GetCommandText( )
+        {
+            return "/admin ownership change";
+        }
 
-        public override string GetHelpDialog()
+        public override string GetHelpDialog( )
         {
             string longMessage =
                 "/dialog \"Help\" \"\" \"\"" +
-                "\""+GetHelp()+"\" \"close\" ";
+                "\"" + GetHelp( ) + "\" \"close\" ";
             return longMessage;
         }
 
-        public override bool IsAdminCommand()
-		{
-			return true;
-		}
+        public override bool IsAdminCommand( )
+        {
+            return true;
+        }
 
-		public override bool AllowedInConsole()
-		{
-			return true;
-		}
+        public override bool AllowedInConsole( )
+        {
+            return true;
+        }
 
-		// /admin ownership change name gridId
-		public override bool HandleCommand(ulong userId, string[] words)
-		{
+        // /admin ownership change name gridId
+        public override bool HandleCommand( ulong userId, string[ ] words )
+        {
             if ( words.Length < 2 )
             {
                 Communication.SendPrivateInformation( userId, GetHelp( ) );
                 return true;
             }
 
-			string name = words[0].ToLower();
-			long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(PlayerMap.Instance.GetSteamIdFromPlayerName(name, true)).First();
-			string gridId = words[1].ToLower();
-			long gridEntityId = 0;
+            string name = words[0].ToLower( );
+            long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId( PlayerMap.Instance.GetSteamIdFromPlayerName( name, true ) ).First( );
+            string gridId = words[1].ToLower( );
+            long gridEntityId = 0;
             IMyCubeGrid grid = null;
-            HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+            HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
             bool found = false;
 
             if ( !long.TryParse( gridId, out gridEntityId ) )
@@ -78,10 +78,10 @@
                 }
                 if ( !found )
                 {
-                    Communication.SendPrivateInformation( userId, string.Format("Could not find entity with name {0}", gridId ) );
+                    Communication.SendPrivateInformation( userId, string.Format( "Could not find entity with name {0}", gridId ) );
                     return true;
                 }
-			}
+            }
 
             if ( !found )
             {
@@ -100,9 +100,9 @@
                 Communication.SendPrivateInformation( userId, string.Format( "Could not find entity with id {0}.", gridId ) );
                 return true;
             }
-                grid.ChangeGridOwnership( playerId, Sandbox.Common.ObjectBuilders.MyOwnershipShareModeEnum.Faction );
-
-                return true;
-		}
-	}
+            grid.ChangeGridOwnership( playerId, Sandbox.Common.ObjectBuilders.MyOwnershipShareModeEnum.Faction );
+            Communication.SendPrivateInformation( userId, string.Format( "Ownership changed to player {0}", name ) );
+            return true;
+        }
+    }
 }
