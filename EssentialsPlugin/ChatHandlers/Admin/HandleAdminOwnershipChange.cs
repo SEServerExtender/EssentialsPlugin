@@ -51,12 +51,16 @@
 			long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(PlayerMap.Instance.GetSteamIdFromPlayerName(name, true)).First();
 			string gridId = words[1].ToLower();
 			long gridEntityId = 0;
+            IMyCubeGrid grid = null;
             HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
             bool found = false;
 
             if ( !long.TryParse( gridId, out gridEntityId ) )
             {
-                MyAPIGateway.Entities.GetEntities( entities );
+                Wrapper.GameAction( ( ) =>
+                {
+                    MyAPIGateway.Entities.GetEntities( entities );
+                } );
                 foreach ( IMyEntity entity in entities )
                 {
                     if ( entity == null )
@@ -68,34 +72,37 @@
                     if ( entity.DisplayName.ToLower( ) == gridId.ToLower( ) )
                     {
                         found = true;
-                        gridEntityId = entity.EntityId;
+                        grid = (IMyCubeGrid)entity;
                         break;
                     }
                 }
                 if ( !found )
                 {
-                    Communication.SendPrivateInformation( userId, string.Format("Could not find entity with id {0}", gridId ) );
+                    Communication.SendPrivateInformation( userId, string.Format("Could not find entity with name {0}", gridId ) );
                     return true;
                 }
 			}
-            
-			    CubeGridEntity grid = (CubeGridEntity)GameEntityManager.GetEntity(gridEntityId);
 
-			for (int r = 0; r < grid.CubeBlocks.Count; r++)
-			{
-				CubeBlockEntity block = (CubeBlockEntity)grid.CubeBlocks[r];
+            if ( !found )
+            {
+                IMyEntity tmpEntity;
 
-				if (block is TerminalBlockEntity)
-				{
-					if (block.Owner != playerId && block.Owner != 0)
-					{
-						Communication.SendPrivateInformation(userId, string.Format("Changing ownership of {0} - {1}", block.Name, playerId));
-						block.Owner = playerId;
-					}
-				}
-			}
+                if ( !MyAPIGateway.Entities.TryGetEntityById( gridEntityId, out tmpEntity ) )
+                {
+                    Communication.SendPrivateInformation( userId, string.Format( "Could not find entity with id {0}", gridId ) );
+                    return true;
+                }
+                grid = (IMyCubeGrid)tmpEntity;
+            }
 
-			return true;
+            if ( grid == null )
+            {
+                Communication.SendPrivateInformation( userId, string.Format( "Could not find entity with id {0}.", gridId ) );
+                return true;
+            }
+                grid.ChangeGridOwnership( playerId, Sandbox.Common.ObjectBuilders.MyOwnershipShareModeEnum.Faction );
+
+                return true;
 		}
 	}
 }
