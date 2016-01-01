@@ -76,9 +76,10 @@
         {
             Communication.ServerMessageItem message = new Communication.ServerMessageItem( );
             message.From = "Server";
-            message.Message = "Hello world!";
+            message.Message = "Hello world2!";
 
-            string messageString = MyAPIGateway.Utilities.SerializeToXML<Communication.ServerMessageItem>( message );
+            //string messageString = MyAPIGateway.Utilities.SerializeToXML<Communication.ServerMessageItem>( message );
+            string messageString = "Hello world1!";
             byte[ ] data = new byte[messageString.Length];
 
             for ( int r = 0; r < messageString.Length; r++ )
@@ -86,8 +87,8 @@
                 data[r] = (byte)messageString[r];
             }
 
-            Communication.SendDataMessage( userId, 5003, data );
-
+            Communication.SendDataMessage( userId, 5000, data );
+            /*
             try
             {
                 Essentials.Log.Info( "test" );
@@ -103,7 +104,7 @@
             {
                 Essentials.Log.Info( ex, "test fail" );
             }
-           
+           */
 
             return true;
         }

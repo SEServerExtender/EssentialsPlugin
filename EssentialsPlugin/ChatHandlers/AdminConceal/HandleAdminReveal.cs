@@ -63,76 +63,77 @@
 
                 List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>( );
                 int count = 0;
-                
-                Wrapper.GameAction( ( ) =>
-                 {
-                     foreach ( IMyEntity entity in entities )
+
+                if ( !now )
+                {
+                    Wrapper.GameAction( ( ) =>
                      {
-                         if ( entity.InScene )
-                             continue;
+                         foreach ( IMyEntity entity in entities )
+                         {
+                             if ( entity.InScene )
+                                 continue;
 
-                         if ( !(entity is IMyCubeGrid) )
-                             continue;
+                             if ( !(entity is IMyCubeGrid) )
+                                 continue;
 
-                         MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
-                         if ( builder == null )
-                             continue;
+                             MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
+                             if ( builder == null )
+                                 continue;
 
-                         if ( now )
-                             EntityManagement.RevealEntity( new KeyValuePair<IMyEntity, string>( entity, "Immediate force reveal" ) );
+                         //if ( now )
+                         //    EntityManagement.RevealEntity( new KeyValuePair<IMyEntity, string>( entity, "Immediate force reveal" ) );
 
                          count++;
-                     }
-                 } );
-                
-                /*
-                Wrapper.GameAction( ( ) =>
+                         }
+                     } );
+                }
+
+                if ( now )
                 {
-                    foreach ( IMyEntity entity in entities )
+                    Wrapper.GameAction( ( ) =>
                     {
-                        if ( entity.InScene )
-                            continue;
-
-                        if ( !(entity is IMyCubeGrid) )
-                            continue;
-
-                        MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
-                        if ( builder == null )
-                            continue;
-
-                        count++;
-                        if ( !now )
+                        foreach ( IMyEntity entity in entities )
                         {
-                            continue;
-                        }
+                            if ( entity.InScene )
+                                continue;
 
-                        IMyCubeGrid grid = (IMyCubeGrid)entity;
-                        long ownerId = 0;
-                        string ownerName = "";
-                        if ( grid.BigOwners.Count > 0 )
-                        {
-                            ownerId = grid.BigOwners.First( );
-                            ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
-                        }
+                            if ( !(entity is IMyCubeGrid) )
+                                continue;
+
+                            MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
+                            if ( builder == null )
+                                continue;
+
+                            count++;
+
+                            IMyCubeGrid grid = (IMyCubeGrid)entity;
+                            long ownerId = 0;
+                            string ownerName = "";
+                            if ( grid.BigOwners.Count > 0 )
+                            {
+                                ownerId = grid.BigOwners.First( );
+                                ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
+                            }
 
 
-                        builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
-                        MyAPIGateway.Entities.RemapObjectBuilder( builder );
+                            builder.PersistentFlags = (MyPersistentEntityFlags2.InScene | MyPersistentEntityFlags2.CastShadows);
+                            MyAPIGateway.Entities.RemapObjectBuilder( builder );
 
                         //Log.Info("Conceal", string.Format("Force Revealing - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName.Replace("\r", "").Replace("\n", ""), ownerId, ownerName, builder.EntityId));
                         Log.Info( "Revealing" );
 
-                        IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
-                        entity.InScene = true;
-                        entity.OnAddedToScene( entity );
-                        BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
-                        MyAPIGateway.Entities.AddEntity( newEntity );
-                        entity.Physics.LinearVelocity = Vector3.Zero;
-                        entity.Physics.AngularVelocity = Vector3.Zero;
-                        MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
-                    }
-                } );
-                */
+                            IMyEntity newEntity = MyAPIGateway.Entities.CreateFromObjectBuilder( builder );
+                            entity.InScene = true;
+                            entity.OnAddedToScene( entity );
+                            BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+                            MyAPIGateway.Entities.AddEntity( newEntity );
+                            MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
+                            entity.Physics.LinearVelocity = Vector3.Zero;
+                            entity.Physics.AngularVelocity = Vector3.Zero;
+                        }
+                    } );
+                }
+
                 if ( !now )
                     Log.Info( string.Format( "Command would reveal {0} grids.  Type /admin reveal force to reveal them.", count ) );
 

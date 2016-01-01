@@ -41,38 +41,38 @@
         private static SortedList<long, ConcealItem> ConcealQueue = new SortedList<long, ConcealItem>( );
         private static SortedList<long, ConcealItem> RevealQueue = new SortedList<long, ConcealItem>( );
         private static SortedList<long, ConcealItem> MedbayQueue = new SortedList<long, ConcealItem>( );
-        private static bool ConcealTick;
 
 
-        //I probably don't need this struct if we don't want the bool, but eh. Easier to compare a long than an entity. Probably.
+        //I feel stupid having a struct for two items, but we can't compare IMyEntity so...
         struct ConcealItem
         {
             public ConcealItem( IMyEntity _entity, string _reason )
             {
                 this.entity = _entity;
                 this.reason = _reason;
-                //this.conceal = _conceal;
+            }
+            public ConcealItem( KeyValuePair<IMyEntity, string> kvp )
+            {
+                this.entity = kvp.Key;
+                this.reason = kvp.Value;                
             }
 
             public IMyEntity entity;
             public string reason;
-            //public bool conceal;
         };
 
         public static void ProcessConcealment( bool force = false )
         {
-            //if ( !MedbayQueue.Any( ) && !RevealQueue.Any( ) && !ConcealQueue.Any( ) )
-            //    return;
+            if ( !MedbayQueue.Any( ) && !RevealQueue.Any( ) && !ConcealQueue.Any( ) )
+                return;
             //let's not enter the game thread if we don't have to. The poor thing is taxed enough as it is
-
-            Wrapper.GameAction( ( ) =>
-            {
-            ConcealTick = true;
             ProcessConceal.ForceReveal = ((force && RevealQueue.Any( )) ? true : false);
             //if we are sent the force flag but there's nothing in reveal queue, set the flag back to false
             string forceString = (force ? "force reveal" : "concealment");
             //just so our debug messages can be pretty
 
+            Wrapper.GameAction( ( ) =>
+            {
                 //we want medbay reveal to have highest priority, even above force reveal
                 if ( MedbayQueue.Any( ) )
                 {
@@ -468,24 +468,23 @@
             int ConcealCount = 0;
             foreach ( IMyEntity entity in entitesToConceal )
             {
-                ConcealItem item = new ConcealItem( entity, "" );
                 long itemId = entity.EntityId;
 
-                if ( ConcealQueue.ContainsKey( itemId ) || MedbayQueue.ContainsKey( itemId ) || RevealQueue.ContainsKey( itemId ) )
+                if ( MedbayQueue.ContainsKey( itemId ) || RevealQueue.ContainsKey( itemId ) )
                     continue;
                 //If this entity is already queued, continue so we don't get dupes or interfere with reveal
 
-                ConcealQueue.Add( entity.EntityId, item );
+                
                 ++ConcealCount;
             }
 
+            ConcealQueue.Clear( );
+            foreach ( IMyEntity entity in entitesToConceal )
+                ConcealQueue.Add( entity.EntityId, new ConcealItem( entity, "" ) );
+
             if ( PluginSettings.Instance.DynamicShowMessages )
-                if ( ConcealTick )
-                {
-                    Essentials.Log.Info( "Queued {0} entities for conceal.", ConcealCount );
-                    ConcealTick = false;
-                }
-		}
+                Essentials.Log.Info( "Queued {0} entities for conceal.", ConcealCount );
+        }
 
 		private static void ConcealEntity( IMyEntity entity )
 		{
@@ -956,10 +955,7 @@
             int RevealCount = 0;
             foreach ( KeyValuePair<IMyEntity, string> entity in entitiesToReveal )
             {
-
-                //RevealEntity( entity );
-                if ( ConcealQueue.Count >= 50 )
-                    continue;
+                
                 IMyEntity processEntity = entity.Key;
                 ConcealItem item = new ConcealItem( processEntity, entity.Value );
 
@@ -972,22 +968,20 @@
                 if ( MedbayQueue.ContainsKey( processEntity.EntityId ) )
                     continue;
                 //skip this entity if it's already in the medbay queue, since it has a higher priority
-
-                ConcealQueue.Add( processEntity.EntityId, item );
+                
                 ++RevealCount;
             }
 
-            //no message if we're refreshing the queue
-            if ( PluginSettings.Instance.DynamicShowMessages && !ProcessConceal.ForceReveal )
-                if ( ConcealTick )
-                {
+            foreach ( KeyValuePair<IMyEntity, string> entity in entitiesToReveal )
+                RevealQueue.Add( entity.Key.EntityId, new ConcealItem( entity ) );
+
+                if ( PluginSettings.Instance.DynamicShowMessages )
                     Essentials.Log.Info( "Queued {0} entities for reveal.", RevealCount );
-                    ConcealTick = false;
-                }
         }
 
         private static void RevealMedbays( IMyEntity entity, string reason )
         {
+
             ConcealItem item = new ConcealItem( entity, reason );
 
             if ( ConcealQueue.ContainsKey( entity.EntityId ) )
@@ -1002,14 +996,7 @@
                 return;
             //we don't want dupes in the queue
 
-            MedbayQueue.Add( entity.EntityId, item );
-
-            if ( PluginSettings.Instance.DynamicShowMessages )
-                if ( ConcealTick )
-                {
-                    Essentials.Log.Info( "Queued {0} entities for reveal.", MedbayQueue.Count );
-                    ConcealTick = false;
-                }
+            MedbayQueue.Add( entity.EntityId, item );            
         }
 
         public static void RevealEntity( KeyValuePair<IMyEntity, string> item )
@@ -1111,6 +1098,8 @@
 		static public void RevealAll( )
 		{
             ConcealQueue.Clear( );
+            RevealQueue.Clear( );
+
             ProcessConceal.ForceReveal = true;
             //set the force flag
 
@@ -1134,12 +1123,12 @@
                 if ( builder == null )
                     continue;
 
-                count++;
-
                 long itemId = entity.EntityId;
                 ConcealItem item = new ConcealItem( entity, "Force reveal" );
-                if ( MedbayQueue.ContainsKey( itemId ) || RevealQueue.ContainsKey( itemId ) )
+                if ( MedbayQueue.ContainsKey( itemId ) )
                     continue;
+
+                count++;
 
                 RevealQueue.Add( entity.EntityId, item );
             }
