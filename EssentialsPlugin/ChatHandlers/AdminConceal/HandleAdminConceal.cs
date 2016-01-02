@@ -22,14 +22,17 @@
 			return "/admin conceal";
 		}
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog()
         {
-            string longMessage =
-                "/dialog \"Help\" \"Admin Conceal\" \"\"" +
-                "\"This command gives you a list of concealed grids.|" +
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "Admin Conceal";
+            DialogItem.content=
+                "This command gives you a list of concealed grids.|" +
                 "Use the force argument to force Essentials to process grids to conceal immediately.||" +
-                "Usage: /admin conceal <force>\" \"close\" ";
-            return longMessage;
+                "Usage: /admin conceal <force>";
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()

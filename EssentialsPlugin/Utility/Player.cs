@@ -449,7 +449,7 @@
 			}
 			catch (Exception ex)
 			{
-				Essentials.Log.Error( "Error saving player logins: {0}", ex );
+				Essentials.Log.Error( ex, "Error saving player logins");
 			}
 		}
 

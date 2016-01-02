@@ -24,12 +24,14 @@
 			return new string[] { "/waypoint add", "/wp add" };
 		}
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\""+GetHelp()+"\" \"close\" ";
-            return longMessage;
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "";
+            DialogItem.content = GetHelp( );
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()
@@ -78,7 +80,7 @@
 				Vector3D pos = playerEntity.GetPosition();
 				string name = words[0];
 
-				Communication.SendClientMessage(userId, string.Format("/waypoint add '{0}' '{0}' Neutral {1} {2} {3}", name, Math.Floor(pos.X), Math.Floor(pos.Y), Math.Floor(pos.Z)));
+				//Communication.SendClientMessage(userId, string.Format("/waypoint add '{0}' '{0}' Neutral {1} {2} {3}", name, Math.Floor(pos.X), Math.Floor(pos.Y), Math.Floor(pos.Z)));
 
 				WaypointItem item = new WaypointItem();
 				item.SteamId = userId;
@@ -88,7 +90,7 @@
 				item.WaypointType = WaypointTypes.Neutral;
 				Waypoints.Instance.Add(item);
 
-				Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
+				//Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
 			}
 			else
 			{
@@ -115,7 +117,7 @@
 						add += " " + word;
 				}
 
-				Communication.SendClientMessage(userId, string.Format("/waypoint add {0}", add));
+				//Communication.SendClientMessage(userId, string.Format("/waypoint add {0}", add));
 
 				string group = "";
 				if (words.Length == 7)
@@ -134,7 +136,7 @@
 				item.Group = group;
 				Waypoints.Instance.Add(item);
 
-				Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
+				//Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
 			}
 			return true;
 		}

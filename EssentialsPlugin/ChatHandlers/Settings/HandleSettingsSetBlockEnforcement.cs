@@ -16,17 +16,18 @@
             return "/settings setblockenforcement";
         }
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                ("/dialog \"Block Enforcement\" \"Set Help\" \"\" " +
-                "\"This command lets you configure Block Enforcement.||" +
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "Block Enforcement";
+            DialogItem.content = "This command lets you configure Block Enforcement.||" +
                 "Usage: /settings setblockenforcement <mode> <typeID> <maxPerGrid> <reachWarning> <exceedWarning>|" +
                 "Mode is 0 for disabled, 1 filters by typeID, and 2 by subtypeID.|" +
                 "Warning messages will be displayed when the player reaches and exceeds the max count of any block type. " +
-                "Messages are optional, but if used, they must be enclosed in quotation marks.\"" +
-                "\"close\" ");
-            return longMessage;
+                "Messages are optional, but if used, they must be enclosed in quotation marks.";
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()

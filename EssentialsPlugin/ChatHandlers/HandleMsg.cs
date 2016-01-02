@@ -16,12 +16,14 @@
 			return "/msg";
 		}
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\""+GetHelp()+"\" \"close\" ";
-            return longMessage;
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "";
+            DialogItem.content = GetHelp( );
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()
@@ -43,19 +45,19 @@
 		{
 			if(words.Count() < 2)
 			{
-				Communication.SendClientMessage(userId, "/message Server " + GetHelp());
+				Communication.SendPrivateInformation(userId, GetHelp());
 			}
 
 			ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerName(words[0], true);
 			if(steamId < 1)
 			{
-				Communication.SendClientMessage(userId, string.Format("/message Server an not find user: {0}", words[0]));
+				Communication.SendPrivateInformation(userId, string.Format("Can not find user: {0}", words[0]));
 				return true;
 			}
-
+            
 			string userName = PlayerMap.Instance.GetPlayerNameFromSteamId(userId);
-			Communication.SendClientMessage(steamId, string.Format("/message P:{0} {1}", userName, string.Join(" ", words.Skip(1).ToArray())));
-			Communication.SendClientMessage(userId, string.Format("/message Server Sent private message to: {0}", PlayerMap.Instance.GetPlayerNameFromSteamId(steamId)));
+			Communication.SendPrivateInformation(steamId,  string.Join(" ", words.Skip(1).ToArray()), userName);
+			Communication.SendPrivateInformation(userId, string.Format("Sent private message to: {0}", PlayerMap.Instance.GetPlayerNameFromSteamId(steamId)));
 
 			return true;
 		}

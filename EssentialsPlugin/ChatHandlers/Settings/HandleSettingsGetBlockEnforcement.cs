@@ -15,16 +15,17 @@
             return "/settings getblockenforcement";
         }
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                ("/dialog \"Block Enforcement\" \"Get Help\" \"\" " +
-                "\"This command retreives Block Enforcement items.||" +
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "Block Enforcement";
+            DialogItem.content = "This command retreives Block Enforcement items.||" +
                 "Usage: /settings setblockenforcement <index>|" +
                 "Running the command without the index argument returns a simplified list of items, " +
-                "run the command again with the number of the item you want more details for.\"" +
-                "\"close\" ");
-            return longMessage;
+                "run the command again with the number of the item you want more details for.";
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()
@@ -151,7 +152,7 @@
                     outList += "|Item sorts SubtypeID.";
                 }
             }
-            Communication.SendClientMessage(userId, string.Format("/dialog \"Block Enforcement\" \"Get Help\" \"\" \"{0}\" \"close\"", outList));
+            Communication.DisplayDialog(userId, "Block Enforcement", "Get Help", outList, "close");
             return true;
         }
     }

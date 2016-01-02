@@ -16,15 +16,16 @@
             return "/settings enableblockenforcement";
         }
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                ("/dialog \"Block Enforcement\" \"Enable Help\" \"\" " +
-                "\"This command lets you enable or disable Block Enforcement.||" +
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "Block Enforcement";
+            DialogItem.content = "This command lets you enable or disable Block Enforcement.||" +
                 "Usage: /settings setblockenforcement <true/false>|" +
-                "Running the command with no argument will return the current setting.\"" +
-                "\"close\" ");
-            return longMessage;
+                "Running the command with no argument will return the current setting.";
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()

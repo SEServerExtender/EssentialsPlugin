@@ -17,16 +17,18 @@
 			return "/admin notify";
 		}
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
             string fontList = GetFontList( ).Replace( ",", "|" );
-            string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\"This will broadcast a notification to all users.|" +
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "Admin Notification";
+            DialogItem.content = "This will broadcast a notification to all users.|" +
                 "Usage: /admin notify <color> <time> <message>|" +
                 "Message will be displayed for the number of seconds given in the <time> argument.||" +
-                "Colors:| " + fontList + "\" \"close\" ";
-            return longMessage;
+                "Colors:| " + fontList;
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()
@@ -64,7 +66,7 @@
 			}
 
 			string message = string.Join(" ", words.Skip(2).ToArray());
-			Communication.SendBroadcastMessage(string.Format("/notification {0} {1} {2}", font, timeInSeconds, message));
+			Communication.Notification(0, font, timeInSeconds, message);
 			return true;
 		}
 

@@ -28,6 +28,10 @@
 		private bool _serverRespawnMenuOverride;
         private bool _stopShipsOnStart;
 
+        private string _serverChatName;
+        private bool _factionChatPrefix;
+        private bool _whisperChatPrefix;
+
 		private bool _informationEnabled;
 		private MTObservableCollection<InformationItem> _informationItems;
 
@@ -165,6 +169,46 @@
             {
                 _stopShipsOnStart = value;
                 Save();
+            }
+        }
+
+        // Chat
+        public string ServerChatName
+        {
+            get
+            {
+                return _serverChatName;
+            }
+            set
+            {
+                _serverChatName = value;
+                Save( );
+            }
+        }
+
+        public bool FactionChatPrefix
+        {
+            get
+            {
+                return _factionChatPrefix;
+            }
+            set
+            {
+                _factionChatPrefix = value;
+                Save( );
+            }
+        }
+
+        public bool WhisperChatPrefix
+        {
+            get
+            {
+                return _whisperChatPrefix;
+            }
+            set
+            {
+                _whisperChatPrefix = value;
+                Save( );
             }
         }
 
@@ -876,6 +920,10 @@
 			_protectedItems.CollectionChanged += ItemsCollectionChanged;
 
             _stopShipsOnStart = false;
+
+            _serverChatName = "Server";
+            _factionChatPrefix = true;
+            _whisperChatPrefix = true;
 
             _backupDateFormat = "MM-dd-yyyy_HH-mm";
 			_backupDateFormatSubDirectory = "MM-dd-yyyy";

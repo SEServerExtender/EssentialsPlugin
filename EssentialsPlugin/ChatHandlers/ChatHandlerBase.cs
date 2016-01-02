@@ -1,11 +1,11 @@
 ﻿namespace EssentialsPlugin.ChatHandlers
 {
-	using System;
-	using System.Linq;
-	using NLog;
-	using SEModAPIInternal.API.Common;
-
-	public abstract class ChatHandlerBase
+    using System;
+    using System.Linq;
+    using NLog;
+    using SEModAPIInternal.API.Common;
+    using Utility;
+    public abstract class ChatHandlerBase
 	{
 		protected static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		public ChatHandlerBase( )
@@ -54,7 +54,7 @@
 
 		public abstract string GetHelp();
 
-        public abstract string GetHelpDialog();
+        public abstract Communication.ServerDialogItem GetHelpDialog();
 
         public virtual String GetCommandText()
 		{

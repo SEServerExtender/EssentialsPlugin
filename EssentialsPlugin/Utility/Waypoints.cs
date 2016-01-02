@@ -256,8 +256,8 @@
 				waypoints += string.Format("/waypoint add \"{0}\" \"{0}\" Neutral {1} {2} {3}", item.Name, item.X, item.Y, item.Z);
 			}
 
-			if (waypoints != "")
-				Communication.SendClientMessage(userId, waypoints);
+			//if (waypoints != "")
+				//Communication.SendClientMessage(userId, waypoints);
 		}
 	}
 

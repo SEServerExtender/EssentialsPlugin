@@ -363,7 +363,7 @@
 			}
 
 			Essentials.Log.Info( "Moving player {0} to '{1}'", targetPlayer.DisplayName, validPosition );
-			Communication.SendClientMessage( targetPlayer.SteamUserId, string.Format( "/move normal {0} {1} {2}", validPosition.X, validPosition.Y, validPosition.Z ) );
+			Communication.MoveMessage( targetPlayer.SteamUserId, "normal", validPosition );
 		}
 
 		private void FindViableAsteroid( out Vector3D validPosition, out Vector3D asteroidPosition )

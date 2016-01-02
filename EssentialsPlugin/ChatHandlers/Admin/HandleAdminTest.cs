@@ -1,48 +1,8 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
-    using System.Linq;
-    using Sandbox.ModAPI;
-    using VRageMath;
     using Utility;
-    using System.Collections.Generic;
-    using Sandbox.Common.ObjectBuilders;
-    using SEModAPI.API.Definitions;
-    using System.IO;
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using System.Runtime.ExceptionServices;
-    using System.Runtime.Serialization;
-    using System.Security;
-    using System.Threading;
-    using System.Windows.Forms;
-    using NLog;
-    using NLog.Targets;
-    using Sandbox;
-    using Sandbox.Common.ObjectBuilders;
-    using SEModAPI.API;
-    using SEModAPI.API.Definitions;
-    using SEModAPI.API.Sandbox;
-    using SEModAPI.API.Utility;
-    using SEModAPIInternal.API.Chat;
-    using SEModAPIInternal.API.Common;
-    using SEModAPIInternal.API.Server;
-    using SEModAPIInternal.Support;
-    using Timer = System.Timers.Timer;
-    using SEModAPIExtensions.API;
-    using SEModAPIInternal.API.Entity.Sector.SectorObject;
-    using SEModAPIInternal.API.Entity;
-    using VRage;
-    using EssentialsPlugin.Utility;
-    using VRage.ModAPI;
-    using Sandbox.Game.Replication;
-    using Sandbox.Engine.Multiplayer;
     public class HandleAdminTest : ChatHandlerBase
 	{
-
-        private DedicatedConfigDefinition _dedicatedConfigDefinition;
 
     public override string GetHelp()
 		{
@@ -54,12 +14,14 @@
 			return "/admin test";
 		}
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                "/dialog \"Help\" \"Admin Test\" \"\"" +
-                "\"For development testing.\" \"close\" ";
-            return longMessage;
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "";
+            DialogItem.content = GetHelp( );
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()
@@ -87,7 +49,7 @@
                 data[r] = (byte)messageString[r];
             }
 
-            Communication.SendDataMessage( userId, 5000, data );
+            Communication.SendDataMessage( userId, Communication.DataMessageType.Test, data );
             /*
             try
             {

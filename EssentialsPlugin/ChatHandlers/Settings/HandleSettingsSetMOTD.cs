@@ -1,10 +1,7 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.Settings
 {
-    using EssentialsPlugin.Settings;
-    using EssentialsPlugin.Utility;
     using EssentialsPlugin;
-    using System.ComponentModel;
-    using System;
+    using EssentialsPlugin.Settings;
     using EssentialsPlugin.Utility;
 
     public class HandleSettingsSetMOTD : ChatHandlerBase
@@ -18,16 +15,18 @@
             return "/settings setmotd";
         }
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                ("/dialog \"MOTD Help\" \"MOTD Header\" \"\" " +
-                "\"This command lets you set the message of the day.||" +
-                "Usage: /settings SetMOTD < enabled > < message > < title > < header > < button >|" +
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "MOTD";
+            DialogItem.content = "This command lets you set the message of the day.||" +
+                "Usage: /settings setmotd < enabled > < message > < title > < header > < button >|" +
                 "'Enabled' is the only required argument, and must be 'true' or 'false'.|" +
-                "Arguments with multiple words must be wrapped in quotations.\"" +
-                "\"close\" ");
-            return longMessage;
+                "Arguments with multiple words must be wrapped in quotations, and line breaks can be added with the pipe character.||" +
+                "This window would be made with: /settings setmotd enabled \"lots of text here\" Help MOTD close";
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()

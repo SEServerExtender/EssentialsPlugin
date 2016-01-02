@@ -52,7 +52,7 @@
 			}
 			catch ( Exception ex )
 			{
-				Essentials.Log.Error( "Entity list busy, skipping scan.", ex );
+				Essentials.Log.Error( ex, "Entity list busy, skipping scan.");
 			}
 
 			foreach ( IMyEntity entity in entities )

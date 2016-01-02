@@ -77,7 +77,7 @@
 			}
 			catch ( Exception ex )
 			{
-				Essentials.Log.Error( "{0}", ex );
+				Essentials.Log.Error( ex, "Check and send voxels" );
 			}
 			finally
 			{
@@ -134,7 +134,7 @@
 					headerData[ r + 2 ] = (byte)headerString[ r ];
 				}
 				Essentials.Log.Debug( "Sending Voxel Header Data: {0} / {1} - {2} ({3})", voxelData.Length, headerData.Length, steamId, voxel.GetPosition( ) );
-				Communication.SendDataMessage( steamId, 5001, headerData );
+				Communication.SendDataMessage( steamId, Communication.DataMessageType.VoxelHeader, headerData );
 
 				int blockSize = 4096;
 				for ( ushort r = 0; r < ( voxelData.Length / blockSize ) + 1; r++ )
@@ -156,12 +156,12 @@
 						outData[ s + 10 ] = (byte)( r >> ( s * 8 ) );
 
 					Buffer.BlockCopy( voxelData, r * blockSize, outData, 12, partLength );
-					Communication.SendDataMessage( steamId, 5002, outData );
+					Communication.SendDataMessage( steamId, Communication.DataMessageType.VoxelPart, outData );
 				}
 			}
 			catch ( Exception ex )
 			{
-				Essentials.Log.Error( "{0}", ex );
+				Essentials.Log.Error( ex, "Send voxel data" );
 			}
 		}
 

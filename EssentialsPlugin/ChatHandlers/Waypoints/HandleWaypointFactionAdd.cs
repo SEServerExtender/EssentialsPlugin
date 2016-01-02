@@ -26,12 +26,14 @@
 			return new[] { "/waypoint factionadd", "/wp factionadd", "/waypoint fa", "/wp fa" };
 		}
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\""+GetHelp()+"\" \"close\" ";
-            return longMessage;
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "";
+            DialogItem.content = GetHelp( );
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()
@@ -92,7 +94,7 @@
 				{
 					if (Player.CheckPlayerSameFaction(userId, steamId))
 					{
-						Communication.SendClientMessage(steamId, string.Format("/waypoint add '{0}' '{0}' Neutral {1} {2} {3}", name, Math.Floor(pos.X), Math.Floor(pos.Y), Math.Floor(pos.Z)));
+						//Communication.SendClientMessage(steamId, string.Format("/waypoint add '{0}' '{0}' Neutral {1} {2} {3}", name, Math.Floor(pos.X), Math.Floor(pos.Y), Math.Floor(pos.Z)));
 					}
 				}
 
@@ -107,7 +109,7 @@
 				                    };
 				Waypoints.Instance.Add(item);
 
-				Communication.SendFactionClientMessage(userId, string.Format("/message Server {2} has added the waypoint: '{0}' at {1} by '{2}'", item.Name, General.Vector3DToString(item.Position), playerName));
+				//Communication.SendFactionClientMessage(userId, string.Format("/message Server {2} has added the waypoint: '{0}' at {1} by '{2}'", item.Name, General.Vector3DToString(item.Position), playerName));
 			}
 			else
 			{
@@ -127,7 +129,7 @@
 				{
 					if (Player.CheckPlayerSameFaction(userId, steamId))
 					{
-						Communication.SendClientMessage(steamId, string.Format("/waypoint add {0}", add));
+						//Communication.SendClientMessage(steamId, string.Format("/waypoint add {0}", add));
 					}
 				}
 
@@ -149,7 +151,7 @@
 				item.Leader = faction.IsLeader(playerId);
 				Waypoints.Instance.Add(item);
 
-				Communication.SendFactionClientMessage(userId, string.Format("/message Server {2} has added the waypoint: '{0}' at {1} by '{2}'", item.Name, General.Vector3DToString(item.Position), playerName));
+				//Communication.SendFactionClientMessage(userId, string.Format("/message Server {2} has added the waypoint: '{0}' at {1} by '{2}'", item.Name, General.Vector3DToString(item.Position), playerName));
 			}
 			return true;
 		}

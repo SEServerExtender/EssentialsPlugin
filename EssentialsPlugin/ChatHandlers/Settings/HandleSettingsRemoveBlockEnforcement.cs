@@ -16,17 +16,18 @@
             return "/settings removeblockenforcement";
         }
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                ("/dialog \"Block Enforcement\" \"Remove Help\" \"\" " +
-                "\"This command lets you remove a Block Enforcement item.||" +
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "Block Enforcement";
+            DialogItem.content = "This command lets you remove a Block Enforcement item.||" +
                 "Usage: /settings removeblockenforcement <index>|" +
                 "This command will remove the block enforcement item at the given index.|" +
                 "Running the command without the index argument will return a simplified list of enforcement items. " +
-                "Use the '/settings getblockenforcement' command for more information.\"" +
-                "\"close\" ");
-            return longMessage;
+                "Use the '/settings getblockenforcement' command for more information.";
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()

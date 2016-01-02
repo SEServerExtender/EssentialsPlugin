@@ -21,12 +21,14 @@ namespace EssentialsPlugin.ChatHandlers
 			return "/admin scan inactive";
 		}
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\""+GetHelp()+"\" \"close\" ";
-            return longMessage;
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "";
+            DialogItem.content = GetHelp( );
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()
@@ -88,10 +90,7 @@ namespace EssentialsPlugin.ChatHandlers
 			{
 				if (!(entity is IMyCubeGrid))
 					continue;
-
-                if (entity.DisplayName.Contains("CommRelay"))
-                    continue;
-
+                
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(grid.EntityId);
 				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);

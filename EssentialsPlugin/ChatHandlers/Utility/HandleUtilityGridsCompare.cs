@@ -18,12 +18,14 @@
 			return "/utility grids compare";
 		}
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\""+GetHelp()+"\" \"close\" ";
-            return longMessage;
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "";
+            DialogItem.content = GetHelp( );
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()
@@ -53,7 +55,7 @@
 				entityList.Add(entity.EntityId);
 			}
 
-			Communication.SendClientMessage(userId, string.Format("/conceal {0}", string.Join(",", entityList.Select(x => x.ToString()).ToArray())));			
+			//Communication.SendClientMessage(userId, string.Format("/conceal {0}", string.Join(",", entityList.Select(x => x.ToString()).ToArray())));			
 			Console.WriteLine("Here: {0}", string.Join(",", entityList.Select(x => x.ToString()).ToArray()));
 			return true;
 		}

@@ -21,12 +21,14 @@
 			return "/motd";
 		}
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\""+GetHelp()+"\" \"close\" ";
-            return longMessage;
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "";
+            DialogItem.content = GetHelp( );
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()
@@ -61,8 +63,10 @@
 			}
 
 			SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingItem;
-			Communication.SendClientMessage(userId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), " ", gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText));			
-			return true;
+			Communication.DisplayDialog(userId, gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), 
+                gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText);
+                        
+            return true;
 		}
 	}
 }

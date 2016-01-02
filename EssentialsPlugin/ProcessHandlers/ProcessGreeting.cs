@@ -114,7 +114,7 @@
 									if (PluginSettings.Instance.GreetingNewUserItem.Enabled)
 									{
 										SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingNewUserItem;
-										Communication.SendClientMessage(item.SteamId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), " ", gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText));
+										Communication.DisplayDialog(item.SteamId, gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText);
 									}
 								}
 								else
@@ -122,7 +122,7 @@
 									if (PluginSettings.Instance.GreetingItem.Enabled)
 									{
 										SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingItem;
-										Communication.SendClientMessage(item.SteamId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), " ", gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText));
+										Communication.DisplayDialog(item.SteamId, gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText);
 									}
 								}
 

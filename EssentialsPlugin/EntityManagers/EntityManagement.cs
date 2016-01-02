@@ -140,7 +140,7 @@
 				}
 				catch ( Exception ex )
 				{
-					Essentials.Log.Error( "Error getting players list.  Check and Conceal failed: {0}", ex );
+					Essentials.Log.Error( ex, "Error getting players list.  Check and Conceal failed: {0}");
 					return;
 				}
 
@@ -150,7 +150,7 @@
 				}
 				catch ( Exception ex )
 				{
-					Essentials.Log.Error( "Error getting entity list, skipping check", ex );
+					Essentials.Log.Error( ex, "Error getting entity list, skipping check" );
 					return;
 				}
 
@@ -179,9 +179,6 @@
 						continue;
 
 					if ( !entity.InScene )
-						continue;
-                    
-					if ( entity.DisplayName.Contains( "CommRelay" ) )
 						continue;
 
 					if ( ( (IMyCubeGrid)entity ).GridSizeEnum != MyCubeSize.Small && !PluginSettings.Instance.ConcealIncludeLargeGrids )
@@ -263,12 +260,7 @@
 
 		private static bool CheckConcealBlockRules( IMyCubeGrid grid, List<IMyPlayer> players )
 		{
-			List<IMySlimBlock> blocks = new List<IMySlimBlock>( );
-
-            if ( grid.DisplayName.Contains( "CommRelay" ))
-                return true;
-
-            
+			List<IMySlimBlock> blocks = new List<IMySlimBlock>( );            
 
 			// Live dangerously
 			grid.GetBlocks( blocks, x => x.FatBlock != null );
@@ -494,9 +486,6 @@
 			{
 				if ( !entity.InScene )
 					return;
-
-                if ( entity.DisplayName.Contains( "CommRelay" ) )
-                    return;
 
 				MyObjectBuilder_CubeGrid builder = CubeGrids.SafeGetObjectBuilder( (IMyCubeGrid)entity );
 				if ( builder == null )
@@ -1177,7 +1166,7 @@
 					//ClientEntityManagement.Refresh(steamId);
 					//}
 
-					Communication.SendClientMessage( steamId, string.Format( "/conceal {0}", string.Join( ",", entitiesToConceal.Select( x => x.EntityId.ToString( ) + ":" + ( (MyObjectBuilder_CubeGrid)x.GetObjectBuilder( ) ).CubeBlocks.Count.ToString( ) + ":" + x.DisplayName ).ToArray( ) ) ) );
+					//Communication.SendClientMessage( steamId, string.Format( "/conceal {0}", string.Join( ",", entitiesToConceal.Select( x => x.EntityId.ToString( ) + ":" + ( (MyObjectBuilder_CubeGrid)x.GetObjectBuilder( ) ).CubeBlocks.Count.ToString( ) + ":" + x.DisplayName ).ToArray( ) ) ) );
 					Thread.Sleep( 1500 );
                     ConcealEntities( entitiesToConceal );
                     //CheckAndRevealEntities();
@@ -1207,12 +1196,7 @@
 				{
 					continue;
 				}
-
-				if ( entity.DisplayName.Contains( "CommRelay" ) )
-				{
-					continue;
-				}
-
+                
 				if ( !entity.InScene )
 				{
 					continue;

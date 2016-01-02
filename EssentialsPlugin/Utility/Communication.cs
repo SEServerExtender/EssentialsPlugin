@@ -21,171 +21,179 @@
 	{
 		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		private static Random m_random = new Random( );
-        private static int modStatus = 0;
-        
-        //workshop mod IDs
-        private static string pubEssentials = "559202083";
-        private static string testEssentials = "558596580";
-        private static string midspaceMod = "316190120";
 
-
-        public static void SendPublicInformation( String infoText )
+        public static void SendPublicInformation( string infoText )
 		{
 			if ( infoText == "" )
 				return;
 
-			ChatManager.Instance.SendPublicChatMessage( infoText );
-		}
+            ServerMessageItem MessageItem = new ServerMessageItem( );
+                MessageItem.From = PluginSettings.Instance.ServerChatName;
+                MessageItem.Message = infoText;
 
-		public static void SendPrivateInformation( ulong playerId, String infoText )
-		{
-			if ( infoText == "" )
-				return;
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            byte[ ] data = new byte[messageString.Length];
 
-			ChatManager.Instance.SendPrivateChatMessage( playerId, infoText );
-		}
-
-        public static Vector3D getPos(ulong userId)
-        {
-            Vector3D position = Vector3D.Zero;
-            Wrapper.GameAction(() =>
+            for ( int r = 0; r < messageString.Length; r++ )
             {
-                List<IMyPlayer> players = new List<IMyPlayer>();
-                MyAPIGateway.Players.GetPlayers(players, x => x.SteamUserId == userId);
+                data[r] = (byte)messageString[r];
+            }
 
-                if (players.Count > 0)
-                {
-                    IMyPlayer player = players.First();
-                    position = player.GetPosition();
-                }
-            });
-
-            return position;
+            BroadcastDataMessage( DataMessageType.Message, data );
         }
 
-
-        public static void SendClientMessage( ulong steamId, string message )
+		public static void SendPrivateInformation( ulong playerId, string infoText, string from = null )
 		{
-			if ( PlayerMap.Instance.GetPlayerIdsFromSteamId( steamId ).Count < 1 )
-			{
-				Log.Info( string.Format( "Unable to locate playerId for user with steamId: {0}", steamId ) );
+			if ( infoText == "" )
 				return;
-			}
 
-            ulong playerId = (ulong)PlayerMap.Instance.GetPlayerIdsFromSteamId( steamId )[0];
-
-            //let's make sure we have the right mods installed for the client to use CommRelays.
-            if ( PlayerManager.Instance.IsUserAdmin( steamId ) )
-            {
-                switch ( CheckMods( ) )
-                {
-                    case 0:
-                        //couldn't read modslist. should we do something?
-                        break;
-                    case 1:
-                        SendPrivateInformation( steamId, "Midspace's Admin Helper Commands mod is incompatible with Essentials. " +
-                            "MOTD and some other features are disabled." );
-                        return;
-                    case 2:
-                        SendPrivateInformation( steamId, "No Essentials mod detected. " +
-                            "MOTD and some other features are disabled." );
-                        return;
-                    case 3:
-                        //all good
-                        break;
-                }
-            }
-            else
-            {
-                if ( CheckMods( ) == 1 || CheckMods( ) == 2 )
-                {
-                    Log.Debug( string.Format( "Mod requirements not met, not creating CommRelay. Mod status: {0}", CheckMods( ) ) );
-                    return;
-                }
-                //if mod conditions aren't met and user isn't admin, print to debug log
-            }
-
-
-            CubeGridEntity entity = new CubeGridEntity( new FileInfo( Essentials.PluginPath + "CommRelay.sbc" ) );
-            long entityId = BaseEntity.GenerateEntityId( );
-			entity.EntityId = entityId;
-			entity.DisplayName = string.Format( "CommRelayOutput{0}", PlayerMap.Instance.GetPlayerIdsFromSteamId( steamId ).First( ) );
-            //entity.PositionAndOrientation = new MyPositionAndOrientation(MathUtility.GenerateRandomEdgeVector(getPos(steamId)), Vector3.Forward, Vector3.Up);
-            entity.PositionAndOrientation = new MyPositionAndOrientation( MathUtility.GenerateRandomEdgeVector( ), Vector3.Forward, Vector3.Up );
-
-            foreach ( MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks )
-			{
-				MyObjectBuilder_Beacon beacon = block as MyObjectBuilder_Beacon;
-				if ( beacon != null )
-				{
-					beacon.CustomName = message;
-				}
-			}
-
-
-            //IMyReplicable reprelay = (IMyReplicable)entity.
-            //MyReplicationServer repServ = (MyReplicationServer)MyMultiplayer.Static.ReplicationLayer;
-            //repServ.ForceEverything(new EndpointId(steamId));
-
-            //Sandbox.ModAPI.Ingame.IMyCubeGrid
+            ServerMessageItem MessageItem = new ServerMessageItem( );
             
-            SectorObjectManager.Instance.AddEntity(entity);
-            TimedEntityCleanup.Instance.Add( entityId );
-		}
+            if(from == null )
+                MessageItem.From = PluginSettings.Instance.ServerChatName;
 
-		public static void SendBroadcastMessage( string message )
-		{
-            //let's make sure we have the right mods installed for the client to use CommRelays.
-            if ( CheckMods( ) == 1 || CheckMods( ) == 2 )
+            else if ( PluginSettings.Instance.WhisperChatPrefix )
+                MessageItem.From = "<whisper> " + from;
+
+            else
+                MessageItem.From = from;
+
+            MessageItem.Message = infoText;
+
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            byte[ ] data = new byte[messageString.Length];
+
+            for ( int r = 0; r < messageString.Length; r++ )
             {
-                Log.Debug( string.Format( "Mod requirements not met, not creating CommRelay. Mod status: {0}", CheckMods( ) ) );
-                return;
+                data[r] = (byte)messageString[r];
+            }
+            
+            SendDataMessage( playerId, DataMessageType.Message, data );
+        }
+              
+        public static void SendFactionClientMessage( ulong playerSteamId, String message )
+		{
+            ServerMessageItem MessageItem = new ServerMessageItem( );
+            if ( PluginSettings.Instance.FactionChatPrefix )
+                MessageItem.From = "<faction> " + PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerSteamId );
+            else
+                MessageItem.From = PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerSteamId );
+
+            MessageItem.Message = message;
+
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            byte[ ] data = new byte[messageString.Length];
+
+            for ( int r = 0; r < messageString.Length; r++ )
+            {
+                data[r] = (byte)messageString[r];
             }
 
-            CubeGridEntity entity = new CubeGridEntity( new FileInfo( Essentials.PluginPath + "CommRelay.sbc" ) );
-			long entityId = BaseEntity.GenerateEntityId( );
-			entity.EntityId = entityId;
-			entity.DisplayName = string.Format( "CommRelayBroadcast{0}", m_random.Next( 1, 10000 ) );
-			entity.PositionAndOrientation = new MyPositionAndOrientation( MathUtility.GenerateRandomEdgeVector(), Vector3.Forward, Vector3.Up );
-
-			foreach ( MyObjectBuilder_CubeBlock block in entity.BaseCubeBlocks )
-			{
-				MyObjectBuilder_Beacon beacon = block as MyObjectBuilder_Beacon;
-				if ( beacon != null )
-				{
-					beacon.CustomName = message;
-				}
-			}
-
-			SectorObjectManager.Instance.AddEntity( entity );
-            TimedEntityCleanup.Instance.Add( entityId );
-		}
-
-		public static void SendFactionClientMessage( ulong playerSteamId, String message )
-		{
-			foreach ( ulong steamId in PlayerManager.Instance.ConnectedPlayers )
+            foreach ( ulong steamId in PlayerManager.Instance.ConnectedPlayers )
 			{
 				if ( Player.CheckPlayerSameFaction( playerSteamId, steamId ) )
 				{
-					SendClientMessage( steamId, message );
+                    SendDataMessage( steamId, DataMessageType.Message, data );
 				}
 			}
 		}
 
 		public static void Notification( ulong steamId, MyFontEnum color, int timeInSeconds, string message )
 		{
-			SendClientMessage( steamId, string.Format( "/notification {0} {1} {2}", color, timeInSeconds, message ) );
-		}
+            ServerNotificationItem MessageItem = new ServerNotificationItem( );
+                MessageItem.color = color;
+                MessageItem.time = timeInSeconds;
+                MessageItem.message= message;
 
-		// 
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            byte[ ] data = new byte[messageString.Length];
+
+            for ( int r = 0; r < messageString.Length; r++ )
+            {
+                data[r] = (byte)messageString[r];
+            }
+
+            if ( steamId != 0 )
+                SendDataMessage( steamId, DataMessageType.Notification, data );
+
+            BroadcastDataMessage( DataMessageType.Notification, data );
+        }		
 
 		public static void DisplayDialog( ulong steamId, string header, string subheader, string content, string buttonText = "OK" )
 		{
-			SendClientMessage( steamId, string.Format( "/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", header, subheader, " ", content.Replace( "\r\n", "|" ), buttonText ) );
-		}
+            ServerDialogItem MessageItem = new ServerDialogItem( );
+                MessageItem.title = header;
+                MessageItem.header = subheader;
+                MessageItem.content = content;
+                MessageItem.buttonText = buttonText;
 
-		public static void SendDataMessage( ulong steamId, long msgId, byte[ ] data )
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            byte[ ] data = new byte[messageString.Length];
+
+            for ( int r = 0; r < messageString.Length; r++ )
+            {
+                data[r] = (byte)messageString[r];
+            }
+
+            SendDataMessage( steamId, DataMessageType.Dialog, data );
+        }
+
+        public static void DisplayDialog( ulong steamId, ServerDialogItem MessageItem)
+        {
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            byte[ ] data = new byte[messageString.Length];
+
+            for ( int r = 0; r < messageString.Length; r++ )
+            {
+                data[r] = (byte)messageString[r];
+            }
+
+            SendDataMessage( steamId, DataMessageType.Dialog, data );
+        }
+
+        public static void MoveMessage( ulong steamId, string moveType, double x, double y, double z )
+        {
+            ServerMoveItem MoveItem = new ServerMoveItem( );
+            MoveItem.moveType = moveType;
+            MoveItem.x = x;
+            MoveItem.y = y;
+            MoveItem.z = z;
+
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( MoveItem );
+            byte[ ] data = new byte[messageString.Length];
+
+            for ( int r = 0; r < messageString.Length; r++ )
+            {
+                data[r] = (byte)messageString[r];
+            }
+
+            SendDataMessage( steamId, DataMessageType.Move, data );
+        }
+
+        public static void MoveMessage( ulong steamId, string moveType, Vector3D position )
+        {
+            ServerMoveItem MoveItem = new ServerMoveItem( );
+            MoveItem.moveType = moveType;
+            MoveItem.x = position.X;
+            MoveItem.y = position.Y;
+            MoveItem.z = position.Z;
+
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( MoveItem );
+            byte[ ] data = new byte[messageString.Length];
+
+            for ( int r = 0; r < messageString.Length; r++ )
+            {
+                data[r] = (byte)messageString[r];
+            }
+
+            SendDataMessage( steamId, DataMessageType.Move, data );
+        }
+
+        public static void SendDataMessage( ulong steamId, DataMessageType messageType, byte[ ] data )
 		{
+            //this may be unsafe, but whatever, my sanity requires the enum
+            long msgId = (long)messageType;
+
 			string msgIdString = msgId.ToString( );
 			byte[ ] newData = new byte[ data.Length + msgIdString.Length + 1 ];
 			newData[ 0 ] = (byte)msgIdString.Length;
@@ -197,9 +205,12 @@
 			ServerNetworkManager.SendDataMessage( 9000, newData, steamId );
 		}
 
-		public static void BroadcastDataMessage( long msgId, byte[ ] data )
-		{
-			string msgIdString = msgId.ToString( );
+		public static void BroadcastDataMessage( DataMessageType messageType, byte[ ] data )
+        {
+            //this may be unsafe, but whatever, my sanity requires the enum
+            long msgId = (long)messageType;
+
+            string msgIdString = msgId.ToString( );
 			byte[ ] newData = new byte[ data.Length + msgIdString.Length + 1 ];
 			newData[ 0 ] = (byte)msgIdString.Length;
 			for ( int r = 0; r < msgIdString.Length; r++ )
@@ -210,52 +221,53 @@
 			MyAPIGateway.Multiplayer.SendMessageToOthers( 9000, newData );
 		}
 
-
-        //<summary>
-        //Midspace's Admin Helper Commands mod can totally break the Essentials client mod
-        //so we need to see if we have it installed, and disable some Essentials features.
-        //While we're here, might as well check for missing Essentials mods.
-        //this is a temporary measure (I hope)
-        //0 = uninitialized
-        //1 = incompatible mod (only Midspace's at the moment)
-        //2 = missing Essentials mod
-        //3 = mod requirements okay
-        //</summary>
-        public static int CheckMods( )
-        {
-            if ( modStatus == 0 )
-            {
-                if ( File.Exists( Path.Combine( Server.Instance.Path, "SpaceEngineers-Dedicated.cfg" ) ) )
-                {
-                    DedicatedConfigDefinition m_configList;
-                    MyConfigDedicatedData<MyObjectBuilder_SessionSettings> config = DedicatedConfigDefinition.Load( new FileInfo( Path.Combine( Server.Instance.Path, "SpaceEngineers-Dedicated.cfg" ) ) );
-                    m_configList = new DedicatedConfigDefinition( config );
-
-                    //Midspace said she fixed this, so let's try
-                    //if ( m_configList.Mods.Contains( midspaceMod ) )
-                    //{
-                    //    modStatus = 1;
-                    //    return modStatus;
-                    //}
-                    if ( !(m_configList.Mods.Contains( pubEssentials ) || m_configList.Mods.Contains( testEssentials )) )
-                    {
-                        modStatus = 2;
-                        return modStatus;
-                    }
-                    else
-                    {
-                        modStatus = 3;
-                        return modStatus;
-                    }
-                }
-            }
-            return modStatus;
-        }
-
         public class ServerMessageItem
 		{
 			public string From { get; set; }
 			public string Message { get; set; }
 		}
+
+        public class ServerDialogItem
+        {
+            public string title { get; set; }
+            public string header { get; set; }
+            public string content { get; set; }
+            public string buttonText { get; set; }
+        }
+
+        public class ServerNotificationItem
+        {
+            public MyFontEnum color { get; set; }
+            public int time { get; set; }
+            public string message { get; set; }
+        }
+
+        public class ServerMoveItem
+        {
+            public string moveType { get; set; }
+            public double x { get; set; }
+            public double y { get; set; }
+            public double z { get; set; }
+        } 
+
+        public enum DataMessageType
+        {
+            Test = 5000,
+            VoxelHeader,
+            VoxelPart,
+            Message,
+            RemoveStubs,
+            ChangeServer,
+            ServerSpeed,
+            Credits,
+
+            //skipped a few addresses to avoid conflict
+            //just in case
+            Dialog = 5020,
+            Move,
+            Notification,
+            MaxSpeed,
+            ServerInfo
+        }        
 	}
 }

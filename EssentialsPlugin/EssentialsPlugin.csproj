@@ -151,7 +151,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Settings\PluginSettings.cs" />
-    <Compile Include="ProcessHandlers\ProcessCommunication.cs" />
     <Compile Include="ProcessHandlers\ProcessRespawn.cs" />
     <Compile Include="ProcessHandlers\ProcessNewUserTransport.cs" />
     <Compile Include="ProcessHandlers\ProcessGreeting.cs" />

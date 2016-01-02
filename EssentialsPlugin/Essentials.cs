@@ -46,7 +46,6 @@
 		private List<ProcessHandlerBase> _processHandlers;
 		private List<ChatHandlerBase> _chatHandlers;
 		private bool _running = true;
-		private DateTime m_lastProcessUpdate;
 
 		#endregion
 
@@ -129,7 +128,55 @@
             }
         }
 
-		[Category( "Information" )]
+        [Category( "Chat" )]
+        [Description( "Name that users see when the server sends a chat message" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public String ServerChatName
+        {
+            get
+            {
+                return PluginSettings.Instance.ServerChatName;
+            }
+            set
+            {
+                PluginSettings.Instance.ServerChatName = value;
+            }
+        }
+
+        [Category( "Chat" )]
+        [Description( "Faction messages will show <faction> before the sending user name" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool FactionChatPrefix
+        {
+            get
+            {
+                return PluginSettings.Instance.FactionChatPrefix;
+            }
+            set
+            {
+                PluginSettings.Instance.FactionChatPrefix = value;
+            }
+        }
+
+        [Category( "Chat" )]
+        [Description( "Private messages will show <whisper> before the sending user name" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool WhisperChatPrefix
+        {
+            get
+            {
+                return PluginSettings.Instance.WhisperChatPrefix;
+            }
+            set
+            {
+                PluginSettings.Instance.WhisperChatPrefix = value;
+            }
+        }
+
+        [Category( "Information" )]
 		[Description( "Enabled / Disable Information Commands" )]
 		[Browsable( true )]
 		[ReadOnly( false )]
@@ -942,7 +989,6 @@
                                    new ProcessGreeting( ),
                                    new ProcessRestart( ),
                                    new ProcessInfo( ),
-                                   new ProcessCommunication( ),
                                    new ProcessBackup( ),
                                    new ProcessLoginTracking( ),
                                    new ProcessDockingZone( ),
@@ -1400,8 +1446,8 @@
                 commandList = commandList.Replace(", ", "|");
                 //take our list of commands, put line breaks between all the entries and stuff it into a dialog winow
 
-                Communication.SendClientMessage(remoteUserId, string.Format("/dialog \"Help\" \"Available commands\" \"\" \"{0}||Type '/help dialog <command>' for more info.\" \"close\"", commandList));
-            }
+                Communication.DisplayDialog(remoteUserId, "Help", "Available commands",  (commandList + "{0}||Type '/help dialog <command>' for more info."), "close");
+            } 
             else
             {
                 string helpTarget = string.Join(" ", commandParts.Skip(2).ToArray());
@@ -1413,7 +1459,7 @@
                     {
                         if (String.Equals(handler.GetCommandText(), helpTarget, StringComparison.CurrentCultureIgnoreCase))
                         {
-                            Communication.SendClientMessage(remoteUserId, handler.GetHelpDialog());
+                            Communication.DisplayDialog(remoteUserId, handler.GetHelpDialog());
                             found = true;
                         }
                     }
@@ -1423,7 +1469,7 @@
                         {
                             if (String.Equals(cmd, helpTarget, StringComparison.CurrentCultureIgnoreCase))
                             {
-                                Communication.SendClientMessage(remoteUserId, handler.GetHelpDialog());
+                                Communication.DisplayDialog(remoteUserId, handler.GetHelpDialog());
                                 found = true;
                             }
                         }

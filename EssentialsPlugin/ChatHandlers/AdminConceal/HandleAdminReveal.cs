@@ -25,16 +25,18 @@
 			return "/admin reveal";
 		}
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\" This command allows you to reveal concealed grids.|" +
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "Admin Reveal";
+            DialogItem.content =
+                " This command allows you to reveal concealed grids.|" +
                 "Usage: /admin reveal (force) - this command without 'force' only show you how many grids would be revealed.||" +
-                "This command will run when concealment is disabled, and respects the update time setting." +
-                "\"\" \"close\" ";
-            return longMessage;
-        }
+                "This command will run when concealment is disabled, and respects the update time setting.";
+            DialogItem.buttonText = "close";
+            return DialogItem;
+        }        
 
         public override bool IsAdminCommand()
 		{

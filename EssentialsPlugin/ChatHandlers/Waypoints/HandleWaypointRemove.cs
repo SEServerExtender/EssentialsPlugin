@@ -21,12 +21,14 @@
 			return new string[] { "/waypoint remove", "/wp remove" };
 		}
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\""+GetHelp()+"\" \"close\" ";
-            return longMessage;
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "";
+            DialogItem.content = GetHelp( );
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()
@@ -63,8 +65,8 @@
 			}
 
 			Waypoints.Instance.Remove(userId, words[0]);
-			Communication.SendClientMessage(userId, string.Format("/waypoint remove '{0}'", words[0]));
-			Communication.SendPrivateInformation(userId, string.Format("Removed waypoint: '{0}'", words[0]));
+			//Communication.SendClientMessage(userId, string.Format("/waypoint remove '{0}'", words[0]));
+			//Communication.SendPrivateInformation(userId, string.Format("Removed waypoint: '{0}'", words[0]));
 			return true;
 		}
 	}

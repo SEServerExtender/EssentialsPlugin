@@ -22,12 +22,14 @@
 			return "/utility grids list";
 		}
 
-        public override string GetHelpDialog()
+        public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            string longMessage =
-                "/dialog \"Help\" \"\" \"\"" +
-                "\""+GetHelp()+"\" \"close\" ";
-            return longMessage;
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "";
+            DialogItem.content = GetHelp( );
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
         public override bool IsAdminCommand()
@@ -102,7 +104,7 @@
 
 			if (dialog)
 			{
-				Communication.SendClientMessage(userId, string.Format("/dialog \"{0}\" \"{1}\" \"{2}\" \"{3}\" \"{4}\"", "User Grid List", "Ships / Stations you ", "own:", result.Replace("\r\n", "|"), "OK"));
+				Communication.DisplayDialog(userId, "User Grid List", "Ships / Stations you own:", result.Replace("\r\n", "|"), "OK");
 				return true;
 			}
 
