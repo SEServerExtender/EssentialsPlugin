@@ -6,7 +6,7 @@
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject;
 	using VRage.ModAPI;
 
 	public class HandleAdminDeleteNoBeacon : ChatHandlerBase
@@ -15,7 +15,7 @@
 		{
 			return "This command allows you to delete all stations from an area defined by x, y, z, and radius.  Usage: /admin delete ships area [X] [Y] [Z] [RADIUS]";
 		}
-
+        
 		public override string GetCommandText()
 		{
 			return "/admin delete nobeacon";

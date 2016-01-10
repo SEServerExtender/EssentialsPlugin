@@ -113,7 +113,7 @@
 					}
 				}
 
-				/*
+                /*
 				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
 				if (gridBuilder == null)
 					continue;
@@ -136,7 +136,6 @@
 					}
 				}
 				*/
-
 				foreach ( SettingsBlockEnforcementItem item in PluginSettings.Instance.BlockEnforcementItems )
 				{
 					if ( item.Mode== SettingsBlockEnforcementItem.EnforcementMode.Off )
@@ -145,22 +144,35 @@
 					if ( !blocks.ContainsKey( item ) )
 						continue;
 
-					if ( blocks[ item ] > item.MaxPerGrid )
-					{
-						//foreach(long playerId in CubeGrids.GetBigOwners(gridBuilder))
-						foreach ( long playerId in grid.BigOwners )
-						{
-							ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerId( playerId );
-							if ( steamId > 0 )
-							{
-								//Communication.SendPrivateInformation(steamId, string.Format("You have exceeded the max block count of {0} on the ship '{1}'.  We are removing {2} blocks to enforce this block limit.", item.BlockTypeId, gridBuilder.DisplayName, blocks[item.BlockTypeId] - item.MaxPerGrid));
-								Communication.SendPrivateInformation( steamId, string.Format( "You have exceeded the max block count of {0} on the ship '{1}'.  We are removing {2} blocks to enforce this block limit.", item.BlockTypeId, grid.DisplayName, blocks[ item ] - item.MaxPerGrid ) );
-							}
-						}
+                    bool foundAdmin = false;
 
-						//DeleteReverse(item.BlockTypeId, blocks[item.BlockTypeId] - item.MaxPerGrid, grid, gridBuilder);
-						DeleteReverse( item, blocks[ item ] - item.MaxPerGrid, grid );
-					}
+                    if ( blocks[item] > item.MaxPerGrid )
+                    {
+                        if ( item.AdminExempt )
+                        {
+                            foreach ( long playerId in grid.BigOwners )
+                            {
+                                ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerId( playerId );
+                                if ( steamId > 0 && PlayerManager.Instance.IsUserAdmin( steamId ) )
+                                {
+                                    foundAdmin = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if ( !foundAdmin )
+                        {
+                            foreach ( long playerId in grid.BigOwners )
+                            {
+                                ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerId( playerId );
+                                if ( steamId > 0 )
+                                {
+                                    Communication.SendPrivateInformation( steamId, string.Format( "You have exceeded the max block count of {0} on the ship '{1}'.  We are removing {2} blocks to enforce this block limit.", item.BlockTypeId, grid.DisplayName, blocks[item] - item.MaxPerGrid ) );
+                                }
+                            }
+                            DeleteReverse( item, blocks[item] - item.MaxPerGrid, grid );
+                        }
+                    }
 				}
 			}
 		}

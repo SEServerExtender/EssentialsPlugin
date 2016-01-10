@@ -7,6 +7,7 @@
     using EntityManagers;
     using EssentialsPlugin.Utility;
     using Sandbox.ModAPI;
+    using SEModAPIInternal.API.Common;
     using VRage.ModAPI;
     using VRageMath;
 
@@ -103,13 +104,20 @@
                 }
             }
 
+            //it's much better to have the client move the player, so we're doing that
+            ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerName( sourceName );
+            //send blank move type to pop the user out of any seat they're in
+            Communication.MoveMessage( steamId, " ", startPosition );
+
+            /*
             if (!Player.Move(sourceName, startPosition))
 			{
 				Communication.SendPrivateInformation(userId, string.Format("Can not move user: {0} (Is user in a cockpit or not in game?)", sourceName));
 				return true;
 			}
+            */
 
-			Communication.SendPrivateInformation(userId, string.Format("Moved {0} to within {1}m of {2}", sourceName, (int)Math.Round(Vector3D.Distance(startPosition, position)), targetName));
+            Communication.SendPrivateInformation(userId, string.Format("Moved {0} to within {1}m of {2}", sourceName, (int)Math.Round(Vector3D.Distance(startPosition, position)), targetName));
 			return true;
 		}
 	}

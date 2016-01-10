@@ -1,18 +1,20 @@
 ﻿namespace EssentialsPlugin.ChatHandlers
 {
-	using System;
-	using System.Linq;
-	using System.Threading;
-	using EssentialsPlugin.Utility;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.ModAPI;
-	using SEModAPIInternal.API.Entity;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject;
-	using VRage;
-	using VRage.ModAPI;
-	using VRageMath;
+    using System;
+    using System.Linq;
+    using System.Threading;
+    using EssentialsPlugin.Utility;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.Engine.Multiplayer;
+    using Sandbox.Game.Replication;
+    using Sandbox.ModAPI;
+    using SEModAPIInternal.API.Entity;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject;
+    using VRage;
+    using VRage.ModAPI;
+    using VRageMath;
 
-	public class HandleAdminMoveGridTo : ChatHandlerBase
+    public class HandleAdminMoveGridTo : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{
@@ -71,57 +73,55 @@
 			Communication.SendPrivateInformation(userId, string.Format("Moving {0} to within {1}m of {2}.  This may take about 20 seconds.", sourceName, distance, targetName));
 
 			Vector3D position;
-			CharacterEntity charEntity = SectorObjectManager.Instance.GetTypedInternalData<CharacterEntity>().FirstOrDefault(x => x.DisplayName.ToLower() == targetName.ToLower() && x.Health > 0);
-			if(charEntity == null)
+            IMyEntity entity = Player.FindControlledEntity( targetName );
+            if (entity == null)
 			{
-				CubeGridEntity gridEntity = SectorObjectManager.Instance.GetTypedInternalData<CubeGridEntity>().FirstOrDefault(x => (x.DisplayName.ToLower().Contains(targetName.ToLower()) || x.Name.ToLower().Contains(targetName.ToLower())) && !x.IsDisposed);
-				if (gridEntity == null)
-				{
-					Communication.SendPrivateInformation(userId, string.Format("Can not find user or grid with the name: {0}", targetName));
-					return true;
-				}
-				position = gridEntity.Position;
+                entity = CubeGrids.Find( targetName );
+                if ( entity == null )
+                {
+                    Communication.SendPrivateInformation( userId, string.Format( "Can not find user or grid with the name: {0}", targetName ) );
+                    return true;
+                }
+                position = entity.GetPosition();
 			}
 			else
-				position = charEntity.Position;
+				position = entity.GetPosition();
 
 			Vector3D startPosition = MathUtility.RandomPositionFromPoint((Vector3)position, distance);
-			CubeGridEntity gridToMove = SectorObjectManager.Instance.GetTypedInternalData<CubeGridEntity>().FirstOrDefault(x => (x.DisplayName.ToLower().Contains(sourceName.ToLower()) || x.Name.ToLower().Contains(sourceName.ToLower())) && !x.IsDisposed);
-			if(gridToMove == null)
+            IMyEntity gridToMove = CubeGrids.Find( sourceName );
+            if (gridToMove == null)
 			{
 				Communication.SendPrivateInformation(userId, string.Format("Unable to find: {0}", sourceName));
 				return true;
 			}
+            
+            Communication.MoveMessage( 0, "normal", startPosition.X, startPosition.Y, startPosition.Z, gridToMove.EntityId );
 
-			IMyEntity entity = null;
-			long entityId = gridToMove.EntityId;
-			MyObjectBuilder_CubeGrid gridBuilder = null;
-			Wrapper.GameAction(() =>
-			{
-				entity = MyAPIGateway.Entities.GetEntityById(entityId);
-				gridBuilder = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder();
-				Log.Info(string.Format("Moving '{0}' from {1} to {2}", gridToMove.DisplayName, gridToMove.Position, startPosition));
-				gridToMove.Dispose();
-			});
+            //Wrapper.GameAction( ( ) =>
+             //{
+             //    gridToMove.GetTopMostParent( ).SetPosition( startPosition );
+             //    Log.Info( string.Format( "Moving '{0}' from {1} to {2}", gridToMove.DisplayName, gridToMove.GetPosition( ), startPosition ) );
+                // MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( gridToMove.GetTopMostParent() ) );
+            //} );
+            /*
+                        Thread.Sleep(5000);
 
-			Thread.Sleep(5000);
+                        Wrapper.GameAction(() =>
+                        {
+                            MyAPIGateway.Entities.RemoveFromClosedEntities(entity);
+                            Log.Info(string.Format("Removing '{0}' for move", entity.DisplayName));
+                        });
 
-			Wrapper.GameAction(() =>
-			{
-				MyAPIGateway.Entities.RemoveFromClosedEntities(entity);
-				Log.Info(string.Format("Removing '{0}' for move", entity.DisplayName));
-			});
+                        Thread.Sleep(10000);
 
-			Thread.Sleep(10000);
+                        Wrapper.GameAction(() =>
+                        {
+                            gridBuilder.PositionAndOrientation = new MyPositionAndOrientation(startPosition, gridBuilder.PositionAndOrientation.Value.Forward, gridBuilder.PositionAndOrientation.Value.Up);
+                            Log.Info(string.Format("Adding '{0}' for move", gridBuilder.DisplayName));
+                            SectorObjectManager.Instance.AddEntity(new CubeGridEntity(gridBuilder));
+                        });*/
 
-			Wrapper.GameAction(() =>
-			{
-				gridBuilder.PositionAndOrientation = new MyPositionAndOrientation(startPosition, gridBuilder.PositionAndOrientation.Value.Forward, gridBuilder.PositionAndOrientation.Value.Up);
-				Log.Info(string.Format("Adding '{0}' for move", gridBuilder.DisplayName));
-				SectorObjectManager.Instance.AddEntity(new CubeGridEntity(gridBuilder));
-			});
-
-			Communication.SendPrivateInformation(userId, string.Format("Moved {0} to within {1}m of {2}", sourceName, (int)Math.Round(Vector3D.Distance(startPosition, position)), targetName));
+            Communication.SendPrivateInformation(userId, string.Format("Moved {0} to within {1}m of {2}", sourceName, (int)Math.Round(Vector3D.Distance(startPosition, position)), targetName));
 			return true;
 		}
 	}

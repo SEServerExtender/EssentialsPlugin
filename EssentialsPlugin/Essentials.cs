@@ -1203,8 +1203,12 @@
 
 		#region IPlugin Members
 		public void Init( )
-		{
-			Log.Debug( "Initializing Essentials plugin at path {0}\\", Path.GetDirectoryName( Assembly.GetExecutingAssembly( ).Location ) );
+        {
+            //register object builder assembly
+            string path = System.IO.Path.Combine( AppDomain.CurrentDomain.BaseDirectory, "SpaceEngineers.ObjectBuilders.DLL" );
+            VRage.Plugins.MyPlugins.RegisterGameObjectBuildersAssemblyFile( path );
+
+            Log.Debug( "Initializing Essentials plugin at path {0}\\", Path.GetDirectoryName( Assembly.GetExecutingAssembly( ).Location ) );
 			DoInit( Path.GetDirectoryName( Assembly.GetExecutingAssembly( ).Location ) + "\\" );
             if ( PluginSettings.Instance.ProtectedEnabled )
                 Protection.Init( );
@@ -1212,7 +1216,11 @@
 
 		public void InitWithPath( String modPath )
 		{
-			Log.Debug( "Initializing Essentials plugin at path {0}\\", Path.GetDirectoryName( modPath ) );
+            //register object builder assembly
+            string path = System.IO.Path.Combine( AppDomain.CurrentDomain.BaseDirectory, "SpaceEngineers.ObjectBuilders.DLL" );
+            VRage.Plugins.MyPlugins.RegisterGameObjectBuildersAssemblyFile( path );
+
+            Log.Debug( "Initializing Essentials plugin at path {0}\\", Path.GetDirectoryName( modPath ) );
             DoInit( Path.GetDirectoryName( modPath ) + "\\" );
             if ( PluginSettings.Instance.ProtectedEnabled )
                 Protection.Init( );

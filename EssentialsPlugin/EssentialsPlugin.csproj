@@ -100,7 +100,7 @@
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanInactive.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminRestart.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminMemory.cs" />
-    <Compile Include="ChatHandlers\HandleLastSeen.cs" />
+    <Compile Include="EntityManagers\HandleLastSeen.cs" />
     <Compile Include="ChatHandlers\Leaderboard\HandleLeaderboardConquest.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminTurrets.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminTest.cs" />
@@ -248,6 +248,14 @@
     <Reference Include="SpaceEngineers.Game, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\SpaceEngineers.Game.dll</HintPath>
+    </Reference>
+    <Reference Include="SpaceEngineers.ObjectBuilders, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Debug\SpaceEngineers.ObjectBuilders.dll</HintPath>
+    </Reference>
+    <Reference Include="SpaceEngineers.ObjectBuilders.XmlSerializers, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Debug\SpaceEngineers.ObjectBuilders.XmlSerializers.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Design" />

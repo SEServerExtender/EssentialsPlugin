@@ -3,6 +3,7 @@
     using System.Linq;
     using EssentialsPlugin.Utility;
     using Sandbox.ModAPI;
+    using SEModAPIInternal.API.Common;
     using VRageMath;
 
     public class HandleAdminMovePlayerPosition : ChatHandlerBase
@@ -71,11 +72,16 @@
                 return true;
             }
 
+            //it's much better to have the client move the player, so we're doing that
+            ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerName( userName );
+            Communication.MoveMessage( steamId, "normal", startPosition );
+
+            /*
                 if (!Player.Move(userName, startPosition))
 			{
 				Communication.SendPrivateInformation(userId, string.Format("Unable to move player: {0}", userName));
 			}
-
+            */
 			/*
 			CharacterEntity charEntity = SectorObjectManager.Instance.GetTypedInternalData<CharacterEntity>().Where(x => x.DisplayName.ToLower() == userName.ToLower() && x.Health > 0).First();
 			CubeGridEntity gridEntity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "MovePlayer.sbc"));

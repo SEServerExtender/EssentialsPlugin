@@ -115,8 +115,8 @@
 
             if ( steamId != 0 )
                 SendDataMessage( steamId, DataMessageType.Notification, data );
-
-            BroadcastDataMessage( DataMessageType.Notification, data );
+            else
+                BroadcastDataMessage( DataMessageType.Notification, data );
         }		
 
 		public static void DisplayDialog( ulong steamId, string header, string subheader, string content, string buttonText = "OK" )
@@ -151,13 +151,14 @@
             SendDataMessage( steamId, DataMessageType.Dialog, data );
         }
 
-        public static void MoveMessage( ulong steamId, string moveType, double x, double y, double z )
+        public static void MoveMessage( ulong steamId, string moveType, double x, double y, double z, long entityId = 0 )
         {
             ServerMoveItem MoveItem = new ServerMoveItem( );
             MoveItem.moveType = moveType;
             MoveItem.x = x;
             MoveItem.y = y;
             MoveItem.z = z;
+            MoveItem.entityId = entityId;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MoveItem );
             byte[ ] data = new byte[messageString.Length];
@@ -166,8 +167,10 @@
             {
                 data[r] = (byte)messageString[r];
             }
-
-            SendDataMessage( steamId, DataMessageType.Move, data );
+            if ( steamId != 0 ) 
+                SendDataMessage( steamId, DataMessageType.Move, data );
+            else
+                BroadcastDataMessage( DataMessageType.Move, data );
         }
 
         public static void MoveMessage( ulong steamId, string moveType, Vector3D position )
@@ -248,6 +251,7 @@
             public double x { get; set; }
             public double y { get; set; }
             public double z { get; set; }
+            public long entityId { get; set; }
         } 
 
         public enum DataMessageType
@@ -267,7 +271,9 @@
             Move,
             Notification,
             MaxSpeed,
-            ServerInfo
+            ServerInfo,
+            SESEReady,
+            EssentialsReady
         }        
 	}
 }

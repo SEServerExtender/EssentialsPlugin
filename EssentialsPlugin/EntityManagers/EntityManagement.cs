@@ -942,6 +942,7 @@
         private static void RevealEntities( Dictionary<IMyEntity, string> entitiesToReveal )
         {
             int RevealCount = 0;
+
             foreach ( KeyValuePair<IMyEntity, string> entity in entitiesToReveal )
             {
                 
@@ -961,6 +962,7 @@
                 ++RevealCount;
             }
 
+            RevealQueue.Clear( );
             foreach ( KeyValuePair<IMyEntity, string> entity in entitiesToReveal )
                 RevealQueue.Add( entity.Key.EntityId, new ConcealItem( entity ) );
 

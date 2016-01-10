@@ -53,6 +53,19 @@
 			set { _mode = value; }
 		}
 
+        private bool _adminExempt;
+        public bool AdminExempt
+        {
+            get
+            {
+                return _adminExempt;
+            }
+            set
+            {
+                _adminExempt = value;
+            }
+        }
+
 		public override int GetHashCode( )
 		{
 			return ( string.IsNullOrEmpty( _blockSubtypeId ) ? string.Empty : _blockSubtypeId ).GetHashCode( )
