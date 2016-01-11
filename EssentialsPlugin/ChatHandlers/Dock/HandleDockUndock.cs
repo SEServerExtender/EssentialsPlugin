@@ -1,20 +1,23 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.Dock
 {
-	using System;
-	using System.Collections.Generic;
-	using System.IO;
-	using System.Linq;
-	using EssentialsPlugin.Utility;
-	using Microsoft.Xml.Serialization.GeneratedAssembly;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.ModAPI;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity;
-	using VRage;
-	using VRage.ObjectBuilders;
-	using VRageMath;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using EssentialsPlugin.Utility;
+    using Microsoft.Xml.Serialization.GeneratedAssembly;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.Engine.Multiplayer;
+    using Sandbox.Game.Replication;
+    using Sandbox.ModAPI;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Entity;
+    using VRage;
+    using VRage.ModAPI;
+    using VRage.ObjectBuilders;
+    using VRageMath;
 
-	public class HandleDockUndock: ChatHandlerBase
+    public class HandleDockUndock: ChatHandlerBase
 	{
 		// We need to only allow one dock at a time right now until I can address this.  It's causing duping when dropped packets occur
 		public static bool m_undocking = false;
@@ -173,11 +176,9 @@
 					                    {
 						                    try
 						                    {
-							                    MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd( cubeGrid );
-							                    List<MyObjectBuilder_EntityBase> addList = new List<MyObjectBuilder_EntityBase>( );
-							                    addList.Add( cubeGrid );
-							                    MyAPIGateway.Multiplayer.SendEntitiesCreated( addList );
-							                    undock = true;
+							                    IMyEntity entitiy = MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd( cubeGrid );
+                                                MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( entitiy ) );
+                                                undock = true;
 						                    }
 						                    catch ( Exception Ex )
 						                    {
