@@ -16,7 +16,7 @@
     using VRage;
     using VRageMath;
     using SEModAPI.API.Definitions;
-
+    using System.Text;
     public class Communication
 	{
 		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
@@ -32,14 +32,23 @@
                 MessageItem.Message = infoText;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            /*
             byte[ ] data = new byte[messageString.Length];
 
             for ( int r = 0; r < messageString.Length; r++ )
             {
                 data[r] = (byte)messageString[r];
             }
+            */
+            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
 
-            BroadcastDataMessage( DataMessageType.Message, data );
+            if ( ChatManager.EnableData )
+            {
+                BroadcastDataMessage( DataMessageType.Message, data );
+                ChatManager.Instance.AddChatHistory( new ChatManager.ChatEvent( DateTime.Now, 0, infoText ) );
+            }
+            else
+                ChatManager.Instance.SendPublicChatMessage( infoText );
         }
 
 		public static void SendPrivateInformation( ulong playerId, string infoText, string from = null )
@@ -61,17 +70,30 @@
             MessageItem.Message = infoText;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            /*
             byte[ ] data = new byte[messageString.Length];
 
             for ( int r = 0; r < messageString.Length; r++ )
             {
                 data[r] = (byte)messageString[r];
             }
-            
-            SendDataMessage( playerId, DataMessageType.Message, data );
+            */
+            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+
+            if ( ChatManager.EnableData )
+            {
+                SendDataMessage( playerId, DataMessageType.Message, data );
+                ChatManager.ChatEvent chatItem = new ChatManager.ChatEvent( );
+                chatItem.Timestamp = DateTime.Now;
+                chatItem.RemoteUserId = (from == null ? 0 : PlayerMap.Instance.GetSteamIdFromPlayerName( from ));
+                chatItem.Message = (from == null ? infoText : (string.Format( "{whisper to {0}}: {1}", PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerId ), infoText )));
+                ChatManager.Instance.AddChatHistory( chatItem );
+            }
+            else
+                ChatManager.Instance.SendPrivateChatMessage( playerId, infoText );
         }
               
-        public static void SendFactionClientMessage( ulong playerSteamId, String message )
+        public static void SendFactionClientMessage( ulong playerSteamId, string message )
 		{
             ServerMessageItem MessageItem = new ServerMessageItem( );
             if ( PluginSettings.Instance.FactionChatPrefix )
@@ -82,18 +104,27 @@
             MessageItem.Message = message;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            /*
             byte[ ] data = new byte[messageString.Length];
 
             for ( int r = 0; r < messageString.Length; r++ )
             {
                 data[r] = (byte)messageString[r];
             }
+            */
+            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
 
             foreach ( ulong steamId in PlayerManager.Instance.ConnectedPlayers )
 			{
 				if ( Player.CheckPlayerSameFaction( playerSteamId, steamId ) )
 				{
-                    SendDataMessage( steamId, DataMessageType.Message, data );
+                    if ( ChatManager.EnableData )
+                    {
+                        SendDataMessage( steamId, DataMessageType.Message, data );
+                        ChatManager.Instance.AddChatHistory( new ChatManager.ChatEvent( DateTime.Now, playerSteamId, "{faction message}: " + message ) );
+                    }
+                    else
+                        ChatManager.Instance.SendPrivateChatMessage( steamId, message );
 				}
 			}
 		}
@@ -106,12 +137,15 @@
                 MessageItem.message= message;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            /*
             byte[ ] data = new byte[messageString.Length];
 
             for ( int r = 0; r < messageString.Length; r++ )
             {
                 data[r] = (byte)messageString[r];
             }
+            */
+            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
 
             if ( steamId != 0 )
                 SendDataMessage( steamId, DataMessageType.Notification, data );
@@ -128,12 +162,15 @@
                 MessageItem.buttonText = buttonText;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            /*
             byte[ ] data = new byte[messageString.Length];
 
             for ( int r = 0; r < messageString.Length; r++ )
             {
                 data[r] = (byte)messageString[r];
             }
+            */
+            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
 
             SendDataMessage( steamId, DataMessageType.Dialog, data );
         }
@@ -141,12 +178,15 @@
         public static void DisplayDialog( ulong steamId, ServerDialogItem MessageItem)
         {
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            /*
             byte[ ] data = new byte[messageString.Length];
 
             for ( int r = 0; r < messageString.Length; r++ )
             {
                 data[r] = (byte)messageString[r];
             }
+            */
+            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
 
             SendDataMessage( steamId, DataMessageType.Dialog, data );
         }
@@ -161,12 +201,15 @@
             MoveItem.entityId = entityId;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MoveItem );
+            /*
             byte[ ] data = new byte[messageString.Length];
 
             for ( int r = 0; r < messageString.Length; r++ )
             {
                 data[r] = (byte)messageString[r];
             }
+            */
+            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
             if ( steamId != 0 ) 
                 SendDataMessage( steamId, DataMessageType.Move, data );
             else
@@ -182,12 +225,15 @@
             MoveItem.z = position.Z;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MoveItem );
+            /*
             byte[ ] data = new byte[messageString.Length];
 
             for ( int r = 0; r < messageString.Length; r++ )
             {
                 data[r] = (byte)messageString[r];
             }
+            */
+            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
 
             SendDataMessage( steamId, DataMessageType.Move, data );
         }
@@ -271,9 +317,7 @@
             Move,
             Notification,
             MaxSpeed,
-            ServerInfo,
-            SESEReady,
-            EssentialsReady
+            ServerInfo
         }        
 	}
 }

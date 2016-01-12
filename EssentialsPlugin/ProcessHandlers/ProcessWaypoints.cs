@@ -1,14 +1,15 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using EssentialsPlugin.Settings;
-	using EssentialsPlugin.Utility;
-	using Sandbox.ModAPI;
-	using VRageMath;
-
-	public class ProcessWaypoints : ProcessHandlerBase
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using EssentialsPlugin.Settings;
+    using EssentialsPlugin.Utility;
+    using Sandbox.ModAPI;
+    using VRageMath;
+    using Sandbox.Game.Multiplayer;
+    using SEModAPIInternal.API.Common;
+    public class ProcessWaypoints : ProcessHandlerBase
 	{
 		private List<ulong> m_waypointAdd = new List<ulong>( );
 
@@ -70,8 +71,8 @@
 							{
 								WaypointItem newItem = new WaypointItem();
 								newItem.Name = item.Name;
-								newItem.Text = item.Name;
-								newItem.WaypointType = WaypointTypes.Neutral;
+								//newItem.Text = item.Name;
+								//newItem.WaypointType = WaypointTypes.Neutral;
 								newItem.Position = new Vector3D(item.X, item.Y, item.Z);
 								newItem.SteamId = steamId;
 								Waypoints.Instance.Add(newItem);

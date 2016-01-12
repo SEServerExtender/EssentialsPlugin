@@ -46,7 +46,7 @@
 
 		public override int GetUpdateResolution()
 		{
-			return 1000;
+			return 1001;
 		}
 
 		public override void Handle()
@@ -60,22 +60,23 @@
 				{
 					List<IMyPlayer> players = new List<IMyPlayer>();
 					bool result = false;
-					Wrapper.GameAction(() =>
-					{
+
+                    //Wrapper.GameAction(() =>
+					//{
 						try
 						{
-							MyAPIGateway.Players.GetPlayers(players, null);
+							MyAPIGateway.Players.GetPlayers(players);
 							result = true;
 						}
 						catch (Exception ex)
 						{
 							Essentials.Log.Error( ex );
 						}
-					});
+					//});
 
 					if(!result)
 						return;
-
+                        
 					lock (m_greetingList)
 					{
 						for (int r = m_greetingList.Count - 1; r >= 0; r--)

@@ -76,6 +76,7 @@
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanCleanup.cs" />
     <Compile Include="ChatHandlers\AdminSettings\HandleAdminSettings.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminVersion.cs" />
+    <Compile Include="ChatHandlers\HandleLastSeen.cs" />
     <Compile Include="ChatHandlers\Settings\HandleSettingsEnableBlockEnforcement.cs" />
     <Compile Include="ChatHandlers\Settings\HandleSettingsGetBlockEnforcement.cs" />
     <Compile Include="ChatHandlers\Settings\HandleSettingsRemoveBlockEnforcement.cs" />
@@ -100,7 +101,6 @@
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanInactive.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminRestart.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminMemory.cs" />
-    <Compile Include="EntityManagers\HandleLastSeen.cs" />
     <Compile Include="ChatHandlers\Leaderboard\HandleLeaderboardConquest.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminTurrets.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminTest.cs" />

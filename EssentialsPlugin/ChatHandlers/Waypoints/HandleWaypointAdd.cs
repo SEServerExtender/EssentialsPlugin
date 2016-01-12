@@ -85,12 +85,12 @@
 				WaypointItem item = new WaypointItem();
 				item.SteamId = userId;
 				item.Name = name;
-				item.Text = name;
+				//item.Text = name;
 				item.Position = pos;
-				item.WaypointType = WaypointTypes.Neutral;
+				//item.WaypointType = WaypointTypes.Neutral;
 				Waypoints.Instance.Add(item);
 
-				//Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
+				Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
 			}
 			else
 			{
@@ -128,15 +128,15 @@
 				item.Name = words[0];
 
 				int diff = words.Length > 5 ? 1 : 0;
-				item.Text = words[diff];
-				WaypointTypes type = WaypointTypes.Neutral;
-				Enum.TryParse<WaypointTypes>(words[diff + 1], true, out type);
-				item.WaypointType = type;
+				item.Description = words[diff];
+				//WaypointTypes type = WaypointTypes.Neutral;
+				//Enum.TryParse<WaypointTypes>(words[diff + 1], true, out type);
+				//item.WaypointType = type;
 				item.Position = new Vector3D(double.Parse(words[diff + 2]), double.Parse(words[diff + 3]), double.Parse(words[diff + 4]));
 				item.Group = group;
 				Waypoints.Instance.Add(item);
 
-				//Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
+				Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
 			}
 			return true;
 		}

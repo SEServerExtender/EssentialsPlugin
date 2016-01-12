@@ -1109,7 +1109,7 @@
 			MyAPIGateway.Entities.OnEntityAdd += OnEntityAdd;
 			MyAPIGateway.Entities.OnEntityRemove += OnEntityRemove;
 
-			Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
+            Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
 		}
 
 		#endregion

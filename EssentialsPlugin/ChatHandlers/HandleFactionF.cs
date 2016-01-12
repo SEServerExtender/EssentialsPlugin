@@ -49,7 +49,7 @@
 			}
 
 			string userName = PlayerMap.Instance.GetPlayerNameFromSteamId(userId);
-			Communication.SendFactionClientMessage(userId, string.Format("/message F:{0} {1}", userName, string.Join(" ", words)));
+			Communication.SendFactionClientMessage(userId, string.Join(" ", words));
 			return true;
 		}
 	}
