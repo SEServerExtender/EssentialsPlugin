@@ -19,6 +19,13 @@
 			set { name = value; }
 		}
 
+        private string description;
+		public string Description
+		{
+			get { return description; }
+			set { description = value; }
+		}
+
 		private double x;
 		public double X
 		{

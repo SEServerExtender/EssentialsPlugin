@@ -959,7 +959,17 @@
         {
             get { return PluginSettings.Instance.BlockEnforcementItems; }
         }
-        
+
+        [Category("Block Enforcement System")]
+        [Description( "This is a list of entityIDs that are ignored by block enforcement.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public string[] BlockEnforcementExclusions
+        {
+            get { return PluginSettings.Instance.BlockEnforcementExclusions; }
+            set { PluginSettings.Instance.BlockEnforcementExclusions = value; }
+        }
+
         [Category( "Reserved Slots" )]
         [Description( "This reserves slots for whitelisted players or groups." )]
         [Browsable( true )]

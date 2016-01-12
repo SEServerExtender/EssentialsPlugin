@@ -103,10 +103,8 @@
 				                    {
 					                    SteamId = (ulong) faction.FactionId,
 					                    Name = name,
-					                    Text = name,
-					                    Position = pos,
-					                    WaypointType = WaypointTypes.Neutral,
-					                    Leader = faction.IsLeader( playerId )
+					                    //Text = name,
+					                    Position = pos
 				                    };
 				Waypoints.Instance.Add(item);
 
@@ -142,11 +140,11 @@
 				                    {
 					                    SteamId = (ulong) faction.FactionId,
 										Name = words[0],
-										Text = words[1]
+										//Text = words[1]
 				                    };
-				WaypointTypes type;
-				Enum.TryParse(words[2], true, out type);
-				item.WaypointType = type;
+				//WaypointTypes type;
+				//Enum.TryParse(words[2], true, out type);
+				//item.WaypointType = type;
 				item.Position = new Vector3D(double.Parse(words[3]), double.Parse(words[4]), double.Parse(words[5]));
 				item.Group = group;
 				item.Leader = faction.IsLeader(playerId);

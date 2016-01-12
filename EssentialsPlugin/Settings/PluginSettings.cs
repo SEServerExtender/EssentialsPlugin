@@ -110,6 +110,7 @@
 
         private bool _blockEnforcementEnabled;
         private MTObservableCollection<SettingsBlockEnforcementItem> _blockEnforcementItems;
+        private string[] _blockEnforcementExclusion = {};
 
         private bool _gameModeConquestEnabled;
 
@@ -879,6 +880,16 @@
                 Save();
             }
 		}
+
+        public string[] BlockEnforcementExclusions
+        {
+            get { return _blockEnforcementExclusion; }
+            set
+            {
+                _blockEnforcementExclusion = value;
+                Save( );
+            }
+        }
 
 		public bool GameModeConquestEnabled
 		{
