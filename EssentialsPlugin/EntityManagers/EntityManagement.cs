@@ -30,6 +30,7 @@
     using VRage.Collections;
     using Sandbox.Game.Entities.Blocks;
     using Sandbox.Game.Entities.Character;
+    using VRage.Game;
     public class EntityManagement
     {
         private static volatile bool _checkReveal;

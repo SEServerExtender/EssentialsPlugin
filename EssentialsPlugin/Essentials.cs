@@ -1,40 +1,40 @@
 ﻿namespace EssentialsPlugin
 {
-	using System;
-	using System.Collections.Generic;
-	using System.ComponentModel;
-	using System.ComponentModel.Design;
-	using System.Drawing.Design;
-	using System.IO;
-	using System.Linq;
-	using System.Reflection;
-	using System.Runtime.InteropServices;
-	using System.Threading;
-	using System.Windows.Forms.Design;
-	using EssentialsPlugin.ChatHandlers;
-	using EssentialsPlugin.ChatHandlers.Admin;
-	using EssentialsPlugin.ChatHandlers.AdminConceal;
-	using EssentialsPlugin.ChatHandlers.AdminDelete;
-	using EssentialsPlugin.ChatHandlers.AdminScan;
-	using EssentialsPlugin.ChatHandlers.Dock;
-	using EssentialsPlugin.ChatHandlers.Waypoints;
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.ComponentModel.Design;
+    using System.Drawing.Design;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Runtime.InteropServices;
+    using System.Threading;
+    using System.Windows.Forms.Design;
+    using EssentialsPlugin.ChatHandlers;
+    using EssentialsPlugin.ChatHandlers.Admin;
+    using EssentialsPlugin.ChatHandlers.AdminConceal;
+    using EssentialsPlugin.ChatHandlers.AdminDelete;
+    using EssentialsPlugin.ChatHandlers.AdminScan;
+    using EssentialsPlugin.ChatHandlers.Dock;
+    using EssentialsPlugin.ChatHandlers.Waypoints;
     using EssentialsPlugin.ChatHandlers.Settings;
-	using EssentialsPlugin.ProcessHandlers;
-	using EssentialsPlugin.Settings;
-	using EssentialsPlugin.Utility;
-	using EssentialsPlugin.UtilityClasses;
-	using NLog;
-	using Sandbox.ModAPI;
-	using SEModAPI.API.Utility;
-	using SEModAPIExtensions.API;
-	using SEModAPIExtensions.API.Plugin;
-	using SEModAPIExtensions.API.Plugin.Events;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
-	using VRage.ModAPI;
-
-	public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
+    using EssentialsPlugin.ProcessHandlers;
+    using EssentialsPlugin.Settings;
+    using EssentialsPlugin.Utility;
+    using EssentialsPlugin.UtilityClasses;
+    using NLog;
+    using Sandbox.ModAPI;
+    using SEModAPI.API.Utility;
+    using SEModAPIExtensions.API;
+    using SEModAPIExtensions.API.Plugin;
+    using SEModAPIExtensions.API.Plugin.Events;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
+    using VRage.ModAPI;
+    using System.Diagnostics;
+    public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
 	{
 		public static Logger Log;
 		#region Private Fields
@@ -1135,7 +1135,14 @@
 								catch ( Exception ex )
 								{
 									Log.Warn( "Handler Problems: {0} - {1}", currentHandler.GetUpdateResolution( ), ex );
-								}
+                                    StackTrace st = new StackTrace( ex, true );
+                                    StackFrame[ ] frames = st.GetFrames( );
+                                    
+                                    foreach ( StackFrame frame in frames )
+                                    {
+                                        Log.Error( "{0}:{1}({2},{3})", frame.GetFileName( ), frame.GetMethod( ).Name, frame.GetFileLineNumber( ), frame.GetFileColumnNumber( ) );
+                                    }
+                                }
 
 								// Let's make sure LastUpdate is set to now otherwise we may start processing too quickly
 								currentHandler.LastUpdate = DateTime.Now;

@@ -1,18 +1,19 @@
 ﻿namespace EssentialsPlugin.ChatHandlers
 {
-	using System;
-	using System.Collections.Generic;
-	using EssentialsPlugin.Utility;
-	using Sandbox.Common;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.ModAPI;
-	using Sandbox.ModAPI.Interfaces;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-	using VRage.ModAPI;
-	using VRageMath;
+    using System;
+    using System.Collections.Generic;
+    using EssentialsPlugin.Utility;
+    using Sandbox.Common;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.ModAPI;
+    using Sandbox.ModAPI.Interfaces;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+    using VRage.Game;
+    using VRage.ModAPI;
+    using VRageMath;
 
-	public class HandleAdminTurrets : ChatHandlerBase
+    public class HandleAdminTurrets : ChatHandlerBase
 	{
 		private Random m_random = new Random();
 		//private bool m_working = false;

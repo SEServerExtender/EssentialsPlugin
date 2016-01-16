@@ -1,25 +1,25 @@
 ﻿namespace EssentialsPlugin.Utility
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Threading;
-	using NLog;
-	using Sandbox.Common;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.ModAPI;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject;
-	using VRage;
-	using VRage.ModAPI;
-	using VRageMath;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+    using NLog;
+    using Sandbox.Common;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.ModAPI;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Entity;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject;
+    using VRage;
+    using VRage.ModAPI;
+    using VRageMath;
     using Sandbox.Game.Entities;
     using VRage.Groups;
     using Sandbox.Game.GameSystems;
     using Sandbox.Game.Entities.Cube;
-
-	public enum RemoveGridTypes
+    using VRage.Game;
+    public enum RemoveGridTypes
 	{
 		All,
 		Ships,

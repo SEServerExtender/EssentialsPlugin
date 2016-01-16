@@ -1,17 +1,18 @@
 ﻿namespace EssentialsPlugin.EntityManagers
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using EssentialsPlugin.Utility;
-	using Sandbox.Common;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.ModAPI;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
-	using VRage.ModAPI;
-	using VRageMath;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using EssentialsPlugin.Utility;
+    using Sandbox.Common;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.ModAPI;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+    using VRage.Game;
+    using VRage.ModAPI;
+    using VRageMath;
 
-	public class TurretManagement
+    public class TurretManagement
 	{
 		private static List<IMyEntity> _scanCache = new List<IMyEntity>( );
 		private static readonly List<IMyIdentity> IdentityCache = new List<IMyIdentity>();

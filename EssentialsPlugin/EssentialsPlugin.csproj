@@ -75,6 +75,7 @@
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanOverlimit.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanCleanup.cs" />
     <Compile Include="ChatHandlers\AdminSettings\HandleAdminSettings.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminSpeed.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminVersion.cs" />
     <Compile Include="ChatHandlers\HandleLastSeen.cs" />
     <Compile Include="ChatHandlers\Settings\HandleSettingsEnableBlockEnforcement.cs" />

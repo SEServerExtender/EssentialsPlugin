@@ -1,18 +1,19 @@
 ﻿namespace EssentialsPlugin.Utility
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using EssentialsPlugin.UtilityClasses;
-	using NLog;
-	using Sandbox.Common;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.Definitions;
-	using Sandbox.ModAPI;
-	using VRage.ModAPI;
-	using VRageMath;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using EssentialsPlugin.UtilityClasses;
+    using NLog;
+    using Sandbox.Common;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.Definitions;
+    using Sandbox.ModAPI;
+    using VRage.Game;
+    using VRage.ModAPI;
+    using VRageMath;
 
-	class Entity
+    class Entity
 	{
 		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		static public Boolean GreaterThan( Vector3D v, Vector3D container )
