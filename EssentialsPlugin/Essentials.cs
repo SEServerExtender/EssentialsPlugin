@@ -1012,6 +1012,8 @@
                                 new HandleAdminRestart( ),
                                 new HandleAdminTest( ),
                                 new HandleAdminVersion( ),
+                                new HandleAdminStop( ),
+                                new HandleAdminSpeed( ),
 
 
                                 //Admin Scan
@@ -1033,6 +1035,7 @@
                                 new HandleAdminDeleteNoBeacon( ),
                                 new HandleAdminDeleteShipsArea( ),
                                 new HandleAdminDeleteStationsArea( ),
+                                new HandleAdminDeleteFloating( ),
                
 
                                 //Admin Move
@@ -1520,7 +1523,7 @@
 
                     if (helpTopics.Any())
                     {
-                        Communication.SendPrivateInformation(remoteUserId, string.Format("Help topics for command '{0}': {1}", helpTarget.ToLower(), string.Join(",", helpTopics.ToArray())));
+                        Communication.DisplayDialog(remoteUserId, "Help", helpTarget.ToLower(), string.Format("Help topics for command '{0}': {1}", helpTarget.ToLower(), string.Join(",", helpTopics.ToArray())));
                         found = true;
                     }
                 }

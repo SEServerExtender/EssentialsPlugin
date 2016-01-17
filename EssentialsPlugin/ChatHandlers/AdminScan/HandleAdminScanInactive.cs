@@ -1,16 +1,17 @@
 namespace EssentialsPlugin.ChatHandlers
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using EssentialsPlugin.Utility;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.ModAPI;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity.Sector.SectorObject;
-	using VRage.ModAPI;
-
-	public class HandleAdminScanInactive : ChatHandlerBase
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using EssentialsPlugin.Utility;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.Game.Entities;
+    using Sandbox.ModAPI;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Entity.Sector.SectorObject;
+    using VRage.ModAPI;
+    using VRage.ObjectBuilders;
+    public class HandleAdminScanInactive : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{
@@ -44,8 +45,6 @@ namespace EssentialsPlugin.ChatHandlers
 		// admin nobeacon scan
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-            int counter = 0;
-
 			if(words.Count() > 3)
 				return false;
 
@@ -82,7 +81,7 @@ namespace EssentialsPlugin.ChatHandlers
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 			Wrapper.GameAction(() =>
 			{
-				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
+				MyAPIGateway.Entities.GetEntities(entities);
 			});
 
 			HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>();
@@ -91,9 +90,8 @@ namespace EssentialsPlugin.ChatHandlers
 				if (!(entity is IMyCubeGrid))
 					continue;
                 
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(grid.EntityId);
-				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
+                MyCubeGrid grid = (MyCubeGrid)entity;
+				MyObjectBuilder_EntityBase gridBuilder = grid.GetObjectBuilder();
 				if (gridBuilder == null)
 					continue;
 
@@ -101,18 +99,15 @@ namespace EssentialsPlugin.ChatHandlers
 				if (PluginSettings.Instance.LoginEntityWhitelist.Length > 0 && PluginSettings.Instance.LoginEntityWhitelist.Contains(grid.EntityId.ToString()))
 					continue;
 
-				if (CubeGrids.GetAllOwners(gridBuilder).Count < 1 && removeOwnerless)
+				if (grid.SmallOwners.Count < 1 && removeOwnerless)
 				{
 					Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) not owned by anyone.", entity.DisplayName , entity.EntityId));
 					entitiesFound.Add(entity);
 					continue;					
 				}
-
-                int countlength = CubeGrids.GetBigOwners(gridBuilder).Count;
-                foreach (long player in CubeGrids.GetBigOwners(gridBuilder))
+                
+                foreach (long player in grid.BigOwners)
 				{
-                    if (counter >= countlength)
-                        break;
 					// This playerId is protected by whitelist
 					if (PluginSettings.Instance.LoginPlayerIdWhitelist.Length > 0 && PluginSettings.Instance.LoginPlayerIdWhitelist.Contains(player.ToString()))
 						continue;

@@ -65,6 +65,7 @@
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteInactive.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteCleanup.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteGrids.cs" />
+    <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteFloating.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveGridTo.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayerCleanup.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayer.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanOverlimit.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanCleanup.cs" />
     <Compile Include="ChatHandlers\AdminSettings\HandleAdminSettings.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminStop.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminSpeed.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminVersion.cs" />
     <Compile Include="ChatHandlers\HandleLastSeen.cs" />
@@ -296,8 +298,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy /Y E:\GitHub\EssentialsPlugin\EssentialsPlugin\bin\x64\Debug\Essentials.dll c:\programdata\SpaceEngineersDedicated\SESEDevTest\Mods\Essentials</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
