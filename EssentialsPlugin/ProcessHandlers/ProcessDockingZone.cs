@@ -46,10 +46,10 @@
 				return;
 
 			List<IMyPlayer> players = new List<IMyPlayer>();
-			Wrapper.GameAction(() =>
-			{
+			//Wrapper.GameAction(() =>
+			//{
 				MyAPIGateway.Players.GetPlayers(players);
-			});
+			//});
 
 			foreach (IMyPlayer player in players)
 			{
@@ -87,9 +87,13 @@
 			List<IMyEntity> nearByEntities = null;
 
 			// Live dangerously (no wrapper for speed!)
+            //actually it causes crashes :(
 			try
 			{
-				nearByEntities = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
+                Wrapper.GameAction( ( ) =>
+                 {
+                     nearByEntities = MyAPIGateway.Entities.GetEntitiesInSphere( ref sphere );
+                 } );
 			}
 			catch(Exception ex)			
 			{
@@ -148,10 +152,10 @@
 		private void PopulateZoneCache()
 		{
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-			Wrapper.GameAction(() =>
-			{
+			//Wrapper.GameAction(() =>
+			//{
 				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
-			});
+			//});
 
 			m_zoneCache.Clear();
 			foreach (IMyEntity entity in entities)

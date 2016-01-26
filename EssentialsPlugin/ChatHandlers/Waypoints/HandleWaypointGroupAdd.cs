@@ -11,17 +11,7 @@
 		public override string GetHelp()
 		{
 			return "Adds a waypoint to a waypoint group.  Waypoint groups can be toggled on and off together with the toggle command.  Usage: /waypoint groupadd [group name] [existing waypoint name].  Example: /waypoint groupadd Targets Target1";
-		}
-
-		public override string GetCommandText()
-		{
-			return "/waypoint groupadd";
-		}
-
-		public override string[] GetMultipleCommandText()
-		{
-			return new string[] { "/waypoint groupadd", "/wp groupadd", "/waypoint ga", "/wp ga" };
-		}
+        }
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
@@ -33,7 +23,18 @@
             return DialogItem;
         }
 
-        public override bool IsAdminCommand()
+
+        public override string GetCommandText()
+		{
+			return "/waypoint groupadd";
+		}
+
+		public override string[] GetMultipleCommandText()
+		{
+			return new string[] { "/waypoint groupadd", "/wp groupadd", "/waypoint ga", "/wp ga" };
+		}
+
+		public override bool IsAdminCommand()
 		{
 			return false;
 		}

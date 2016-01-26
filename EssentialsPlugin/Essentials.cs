@@ -34,6 +34,7 @@
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
     using VRage.ModAPI;
     using System.Diagnostics;
+    using System.Text;
     public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
 	{
 		public static Logger Log;
@@ -1111,6 +1112,10 @@
 			MyAPIGateway.Entities.OnEntityRemove -= OnEntityRemove;
 			MyAPIGateway.Entities.OnEntityAdd += OnEntityAdd;
 			MyAPIGateway.Entities.OnEntityRemove += OnEntityRemove;
+            
+            MyAPIGateway.Multiplayer.RegisterMessageHandler( 9003, ReceiveDataMessage );
+            
+            Protection.Init( );
 
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
 		}
@@ -1220,8 +1225,6 @@
 
             Log.Debug( "Initializing Essentials plugin at path {0}\\", Path.GetDirectoryName( Assembly.GetExecutingAssembly( ).Location ) );
 			DoInit( Path.GetDirectoryName( Assembly.GetExecutingAssembly( ).Location ) + "\\" );
-            if ( PluginSettings.Instance.ProtectedEnabled )
-                Protection.Init( );
         }
 
 		public void InitWithPath( String modPath )
@@ -1232,8 +1235,6 @@
 
             Log.Debug( "Initializing Essentials plugin at path {0}\\", Path.GetDirectoryName( modPath ) );
             DoInit( Path.GetDirectoryName( modPath ) + "\\" );
-            if ( PluginSettings.Instance.ProtectedEnabled )
-                Protection.Init( );
         }
 
 		public void Shutdown( )
@@ -1258,6 +1259,34 @@
         public void OnMessageReceived( )
         {
 
+        }
+
+        public class MessageRecieveItem
+        {
+            public ulong fromID
+            {
+                get; set;
+            }
+            public long msgID
+            {
+                get; set;
+            }
+            public string message
+            {
+                get; set;
+            }
+        }
+
+        public void ReceiveDataMessage( byte[ ] data )
+        {
+            string text = Encoding.Unicode.GetString( data );
+            MessageRecieveItem item = MyAPIGateway.Utilities.SerializeFromXML<MessageRecieveItem>( text );
+            
+            if ( item.msgID == 5010 )
+            {
+                //chat command
+                HandleChatMessage( item.fromID, item.message );
+            }
         }
 
         /// <summary>

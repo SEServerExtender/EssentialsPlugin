@@ -9,17 +9,7 @@
 		public override string GetHelp()
 		{
 			return "Removes a personal waypoint.  Usage: /waypoint remove \"waypoint name\"";
-		}
-
-		public override string GetCommandText()
-		{
-			return "/waypoint remove";
-		}
-
-		public override string[] GetMultipleCommandText()
-		{
-			return new string[] { "/waypoint remove", "/wp remove" };
-		}
+        }
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
@@ -31,7 +21,18 @@
             return DialogItem;
         }
 
-        public override bool IsAdminCommand()
+
+        public override string GetCommandText()
+		{
+			return "/waypoint remove";
+		}
+
+		public override string[] GetMultipleCommandText()
+		{
+			return new string[] { "/waypoint remove", "/wp remove" };
+		}
+
+		public override bool IsAdminCommand()
 		{
 			return false;
 		}
@@ -63,10 +64,14 @@
 				Communication.SendPrivateInformation(userId, string.Format("You do not have a waypoint with the name: {0}", words[0]));
 				return true;
 			}
+            
 
 			Waypoints.Instance.Remove(userId, words[0]);
-			//Communication.SendClientMessage(userId, string.Format("/waypoint remove '{0}'", words[0]));
-			//Communication.SendPrivateInformation(userId, string.Format("Removed waypoint: '{0}'", words[0]));
+            //Communication.SendClientMessage(userId, string.Format("/waypoint remove '{0}'", words[0]));
+            WaypointItem item = items[0];
+            item.Remove = true;
+            Communication.WaypointMessage( item );
+			Communication.SendPrivateInformation(userId, string.Format("Removed waypoint: '{0}'", words[0]));
 			return true;
 		}
 	}

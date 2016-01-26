@@ -17,7 +17,7 @@
     {
         public override string GetHelp( )
         {
-            return "This command allows you to stop objects in the world. Usage: /admin stop (all) (floating) (ships) (piloted) (ship \"name\")";
+            return "This command allows you to stop objects in the world. Usage: /admin stop (all) (floating) (ships) (piloted)";
         }
         public override string GetCommandText( )
         {
@@ -34,8 +34,7 @@
                 "\"all\" will stop all floating objects (ore, components, backpacks), as well as unpiloted ships.|" +
                 "\"floating\" will stop only floating objects.|" +
                 "\"ships\" will stop only unpiloted ships.|" +
-                "\"piloted\" can be combined with \"all\" or \"ships\" to include piloted ships.|" +
-                "\"ship\" lets you stop an individual ship by its name. Be sure to enclose the name in quotation marks.";
+                "\"piloted\" can be combined with \"all\" or \"ships\" to include piloted ships.";
             DialogItem.buttonText = "close";
             return DialogItem;
         }
@@ -57,40 +56,25 @@
             bool floating = false;
             bool ships = false;
             bool piloted = false;
-            bool named = false;
-            string shipName = "";
 
             if ( words.Length < 1 )
             {
                 Communication.SendPrivateInformation( userId, GetHelp( ) );
                 return true;
             }
-            for ( int i = 0; i < words.Length; ++i )
+            if ( words.Contains( "all" ) )
             {
-                switch ( words[i] )
-                {
-                    case "all":
-                        ships = true;
-                        floating = true;
-                        break;
-                    case "floating":
-                        floating = true;
-                        break;
-                    case "ships":
-                        ships = true;
-                        break;
-                    case "piloted":
-                        ships = true;
-                        piloted = true;
-                        break;
-                    case "ship":
-                        named = true;
-                        shipName = words[i + 1];
-                        break;
-                    default:
-                        Communication.SendPrivateInformation( userId, GetHelp( ) );
-                        return true;
-                }
+                ships = true;
+                floating = true;
+            }
+            if ( words.Contains( "floating" ) )
+                floating = true;
+            if ( words.Contains( "ships" ) )
+                ships = true;
+            if ( words.Contains( "piloted" ) )
+            {
+                ships = true;
+                piloted = true;
             }
             HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
             Wrapper.GameAction( ( ) =>
@@ -104,19 +88,21 @@
                 if ( entity == null )
                     continue;
 
-                if ( !(entity is IMyCubeGrid) || !(entity is IMyFloatingObject) || !(entity is MyInventoryBagEntity) )
+                if ( entity.Physics == null )
                     continue;
+
+                //if ( !(entity is IMyCubeGrid) || !(entity is IMyFloatingObject) || !(entity is MyInventoryBagEntity) )
+                //    continue;
 
                 if ( ships && entity is IMyCubeGrid )
                 {
                     MyCubeGrid grid = (MyCubeGrid)entity;
                     foreach ( MySlimBlock block in grid.CubeBlocks )
                     {
-                        if ( !(block is Sandbox.ModAPI.Ingame.IMyShipController) )
+                        if ( !(block.FatBlock is MyCockpit) )
                             continue;
 
-                        Sandbox.ModAPI.Ingame.IMyShipController control = (Sandbox.ModAPI.Ingame.IMyShipController)block;
-                        if ( control.IsUnderControl )
+                        if ( ((MyCockpit)block.FatBlock).Pilot != null )
                         {
                             found = true;
                             break;
@@ -128,19 +114,8 @@
 
                     Stop( entity );
                 }
-
                 else if ( floating && (entity is IMyFloatingObject || entity is MyInventoryBagEntity) )
                     Stop( entity );
-            }
-            if ( named )
-            {
-                IMyEntity entity;
-                if ( !MyAPIGateway.Entities.TryGetEntityByName( shipName, out entity ) )
-                {
-                    Communication.SendPrivateInformation( userId, "Couldn't find a ship with name " + shipName );
-                    return true;
-                }
-                Stop( entity );
             }
             Communication.SendPrivateInformation( userId, count.ToString( ) + " entities have been stopped." );
             return true;

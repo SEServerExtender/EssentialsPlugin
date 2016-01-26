@@ -11,17 +11,7 @@
 		public override string GetHelp()
 		{
 			return "Removes a faction waypoint.  If a leader created the waypoint, only a leader can remove it.  Usage: /waypoint factionremove \"name\"";
-		}
-
-		public override string GetCommandText()
-		{
-			return "/waypoint factionremove";
-		}
-
-		public override string[] GetMultipleCommandText()
-		{
-			return new string[] { "/waypoint factionremove", "/wp factionremove", "/waypoint fr", "/wp fr" };
-		}
+        }
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
@@ -33,7 +23,18 @@
             return DialogItem;
         }
 
-        public override bool IsAdminCommand()
+
+        public override string GetCommandText()
+		{
+			return "/waypoint factionremove";
+		}
+
+		public override string[] GetMultipleCommandText()
+		{
+			return new string[] { "/waypoint factionremove", "/wp factionremove", "/waypoint fr", "/wp fr" };
+		}
+
+		public override bool IsAdminCommand()
 		{
 			return false;
 		}
@@ -81,14 +82,16 @@
 				Communication.SendPrivateInformation(userId, string.Format("You must be a faction leader to remove the waypoint: {0}", words[0]));
 				return true;
 			}
-
+            
 			Waypoints.Instance.Remove((ulong)faction.FactionId, words[0]);
 			foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
 			{
 				if (Player.CheckPlayerSameFaction(userId, steamId))
 				{
-					//Communication.SendClientMessage(steamId, string.Format("/waypoint remove '{0}'", words[0]));
-				}
+                    //Communication.SendClientMessage(steamId, string.Format("/waypoint remove '{0}'", words[0]));
+                    item.Remove = true;
+                    Communication.WaypointMessage( item );
+                }
 			}
 
 			Communication.SendFactionClientMessage(userId, string.Format("/message Server {0} has removed the waypoint: '{1}'", playerName, words[0]));

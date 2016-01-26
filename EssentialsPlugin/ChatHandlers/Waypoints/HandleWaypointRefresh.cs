@@ -7,9 +7,20 @@
 		public override string GetHelp()
 		{
 			return "Refreshes Waypoints in case your can't see them.  Usage: /waypoint refresh";
-		}
+        }
 
-		public override string GetCommandText()
+        public override Communication.ServerDialogItem GetHelpDialog( )
+        {
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
+            DialogItem.title = "Help";
+            DialogItem.header = "";
+            DialogItem.content = GetHelp( );
+            DialogItem.buttonText = "close";
+            return DialogItem;
+        }
+
+
+        public override string GetCommandText()
 		{
 			return "/waypoint refresh";
 		}
@@ -24,17 +35,7 @@
 			return false;
 		}
 
-        public override Communication.ServerDialogItem GetHelpDialog( )
-        {
-            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
-            DialogItem.title = "Help";
-            DialogItem.header = "";
-            DialogItem.content = GetHelp( );
-            DialogItem.buttonText = "close";
-            return DialogItem;
-        }
-
-        public override bool AllowedInConsole()
+		public override bool AllowedInConsole()
 		{
 			return false;
 		}

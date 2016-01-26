@@ -215,37 +215,59 @@
 
 		public static void SendClientWaypoints(ulong userId)
 		{
-            long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( userId );
-            List<WaypointItem> items = Instance.Get(userId);
-            IMyGps waypoint = null;
-            IMyGpsCollection waypointCollect = MyAPIGateway.Session.GPS;
-
-            List<IMyGps> playerWaypoints = new List<IMyGps>( );
-            waypointCollect.GetGpsList( playerId, playerWaypoints );
-
-
-            foreach (WaypointItem item in items)
+			List<WaypointItem> items = Instance.Get(userId);
+			string waypoints = "/waypoint clear";
+			foreach (WaypointItem item in items)
 			{
-                if ( !item.Toggle.Contains( userId ) )
-                {
-                    waypoint = waypointCollect.Create( item.Name, item.Description, item.Position, true );
+				if (!item.Toggle.Contains(userId))
+				{
+					if (waypoints != "")
+						waypoints += "\r\n";
 
-                    if ( !playerWaypoints.Contains( waypoint ) )
-                        waypointCollect.AddGps( playerId, waypoint );
-                }
-            }
-            
+					waypoints += string.Format("/waypoint add \"{0}\" \"{1}\" {2} {3} {4} {5}", item.Name, item.Text, item.WaypointType, Math.Floor(item.Position.X), Math.Floor(item.Position.Y), Math.Floor(item.Position.Z));
+				}
+			}
+
+			long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(userId);
+			IMyFaction faction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(playerId);
+			if (faction != null)
+			{
+				items = Instance.Get((ulong)faction.FactionId);
+				foreach (WaypointItem item in items.OrderBy(x => x.Group))
+				{
+					if (!item.Toggle.Contains(userId))
+					{
+						if (waypoints != "")
+							waypoints += "\r\n";
+
+						waypoints += string.Format("/waypoint add \"{0}\" \"{1}\" {2} {3} {4} {5}", item.Name, item.Text, item.WaypointType, Math.Floor(item.Position.X), Math.Floor(item.Position.Y), Math.Floor(item.Position.Z));
+					}
+				}
+			}
+
 			foreach (ServerWaypointItem item in PluginSettings.Instance.WaypointServerItems)
 			{
 				if (!item.Enabled)
 					continue;
 
-                waypoint = waypointCollect.Create( item.Name, item.Description, new Vector3D( item.X, item.Y, item.Z ), true );
+				if (waypoints != "")
+					waypoints += "\r\n";
 
-                if ( !playerWaypoints.Contains( waypoint ) )
-                    waypointCollect.AddGps( playerId, waypoint );
-            }            
+                //waypoints += string.Format("/waypoint add \"{0}\" \"{0}\" Neutral {1} {2} {3}", item.Name, item.X, item.Y, item.Z);
+
+                Communication.WaypointMessage( item );
+            }
+
+            //if ( waypoints != "" )
+				//Communication.SendClientMessage(userId, waypoints);
 		}
+	}
+
+	public enum WaypointTypes
+	{
+		Neutral,
+		Allied,
+		Enemy
 	}
 
 	[Serializable]
@@ -265,11 +287,11 @@
 			set { name = value; }
 		}
 
-		private string description;
-		public string Description
+		private string text;
+		public string Text
 		{
-			get { return description; }
-			set { description = value; }
+			get { return text; }
+			set { text = value; }
 		}
 
 		private Vector3D position;
@@ -279,6 +301,13 @@
 			set { position = value; }
 		}
 
+		private WaypointTypes waypointType;
+		public WaypointTypes WaypointType
+		{
+			get { return waypointType; }
+			set { waypointType = value; }
+		}
+
 		private string group = "";
 		public string Group
 		{
@@ -286,24 +315,24 @@
 			set { group = value; }
 		}
 
-        private TimeSpan? expireTime;
-        public TimeSpan? ExpireTime
-        {
-            get { return expireTime; }
-            set { expireTime = value; }
-        }
-
-        private bool leader = false;
+		private bool leader = false;
 		public bool Leader
 		{
 			get { return leader; }
 			set { leader = value; }
 		}
 
-        private List<ulong> toggle = new List<ulong>();
+		private List<ulong> toggle = new List<ulong>();
 		public List<ulong> Toggle
 		{
 			get { return toggle; }
+		}
+
+        private bool remove = false;
+        public bool Remove
+		{
+			get { return remove; }
+            set { remove = value; }
 		}
 	}
 }

@@ -11,17 +11,7 @@
 		public override string GetHelp()
 		{
 			return "Removes a waypoint to a waypoint group.  Usage: /waypoint groupremove [existing waypoint name].  Example: /waypoint groupremove Target1";
-		}
-
-		public override string GetCommandText()
-		{
-			return "/waypoint groupremove";
-		}
-
-		public override string[] GetMultipleCommandText()
-		{
-			return new string[] { "/waypoint groupremove", "/wp groupremove", "/waypoint gr", "/wp gr" };
-		}
+        }
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
@@ -33,7 +23,18 @@
             return DialogItem;
         }
 
-        public override bool IsAdminCommand()
+
+        public override string GetCommandText()
+		{
+			return "/waypoint groupremove";
+		}
+
+		public override string[] GetMultipleCommandText()
+		{
+			return new string[] { "/waypoint groupremove", "/wp groupremove", "/waypoint gr", "/wp gr" };
+		}
+
+		public override bool IsAdminCommand()
 		{
 			return false;
 		}

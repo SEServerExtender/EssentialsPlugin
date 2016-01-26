@@ -50,10 +50,10 @@
 			}
 
 			List<IMyPlayer> players = new List<IMyPlayer>();
-			Wrapper.GameAction(() =>
-			{
+			//Wrapper.GameAction(() =>
+			//{
 				MyAPIGateway.Players.GetPlayers(players);
-			});
+			//});
 
 			IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == userId);
 			if (player == null)

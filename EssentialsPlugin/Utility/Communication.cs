@@ -17,6 +17,7 @@
     using VRageMath;
     using SEModAPI.API.Definitions;
     using System.Text;
+    using Settings;
     public class Communication
 	{
 		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
@@ -238,6 +239,27 @@
             SendDataMessage( steamId, DataMessageType.Move, data );
         }
 
+        public static void WaypointMessage( WaypointItem item )
+        {
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( item );
+            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+            SendDataMessage( item.SteamId, DataMessageType.Waypoint, data );
+        }
+
+        public static void WaypointMessage( ServerWaypointItem serverItem )
+        {
+            WaypointItem item = new WaypointItem( );
+            item.Name = serverItem.Name;
+            item.Position = new Vector3D( serverItem.X, serverItem.Y, serverItem.Z );
+            item.Remove = serverItem.Enabled;
+            item.SteamId = 0;
+            item.Text = serverItem.Name;
+
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( item );
+            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+            BroadcastDataMessage( DataMessageType.Waypoint, data );
+        }
+
         public static void SendDataMessage( ulong steamId, DataMessageType messageType, byte[ ] data )
 		{
             //this may be unsafe, but whatever, my sanity requires the enum
@@ -317,7 +339,8 @@
             Move,
             Notification,
             MaxSpeed,
-            ServerInfo
+            ServerInfo,
+            Waypoint
         }        
 	}
 }

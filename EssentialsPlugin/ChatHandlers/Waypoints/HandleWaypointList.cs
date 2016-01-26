@@ -11,17 +11,7 @@
 		public override string GetHelp()
 		{
 			return "Lists all personal waypoints.  Usage: /waypoint list";
-		}
-
-		public override string GetCommandText()
-		{
-			return "/waypoint list";
-		}
-
-		public override string[] GetMultipleCommandText()
-		{
-			return new string[] { "/waypoint list", "/wp list" };
-		}
+        }
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
@@ -33,7 +23,18 @@
             return DialogItem;
         }
 
-        public override bool IsAdminCommand()
+
+        public override string GetCommandText()
+		{
+			return "/waypoint list";
+		}
+
+		public override string[] GetMultipleCommandText()
+		{
+			return new string[] { "/waypoint list", "/wp list" };
+		}
+
+		public override bool IsAdminCommand()
 		{
 			return false;
 		}
@@ -65,9 +66,9 @@
 					waypoints += "\r\n";
 
 				if(item.Group != null && item.Group != "")
-					waypoints += string.Format("Group {3} - {0}: '{1}' : {2}", item.Name, item.Description, General.Vector3DToString(item.Position), item.Group);
+					waypoints += string.Format("Group {3} - {0}: '{1}' : {2}", item.Name, item.Text, General.Vector3DToString(item.Position), item.Group);
 				else
-					waypoints += string.Format("{0}: '{1}' : {2}", item.Name, item.Description, General.Vector3DToString(item.Position));
+					waypoints += string.Format("{0}: '{1}' : {2}", item.Name, item.Text, General.Vector3DToString(item.Position));
 			}
 			personalCount = items.Count;
 
@@ -85,9 +86,9 @@
 						waypoints += "\r\n";
 
 					if (item.Group != null && item.Group != "")
-						waypoints += string.Format("F: Group {3} - {0}: '{1}' : {2}", item.Name, item.Description, General.Vector3DToString(item.Position), item.Group);
+						waypoints += string.Format("F: Group {3} - {0}: '{1}' : {2}", item.Name, item.Text, General.Vector3DToString(item.Position), item.Group);
 					else
-						waypoints += string.Format("F: {0}: '{1}' : {2}", item.Name, item.Description, General.Vector3DToString(item.Position));
+						waypoints += string.Format("F: {0}: '{1}' : {2}", item.Name, item.Text, General.Vector3DToString(item.Position));
 				}
 
 				factionCount = items.Count;

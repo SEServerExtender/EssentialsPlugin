@@ -66,7 +66,7 @@
 			}
 
 			string message = string.Join(" ", words.Skip(2).ToArray());
-			Communication.Notification(0, font, timeInSeconds, message);
+			Communication.Notification(0, font, (timeInSeconds * 1000), message);
 			return true;
 		}
 

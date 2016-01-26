@@ -14,17 +14,7 @@
 		public override string GetHelp()
 		{
 			return "Creates a faction waypoint.  Only your faction can see it.\r\nUsage: /waypoint factionadd \"waypoint name\" \"waypoint text\" Neutral | Allied | Enemy X Y Z (group name)\r\nExampleA: /waypoint factionadd MyWayPoint MyWaypoint Neutral 1000 1000 1000\r\nExampleB: /waypoint factionadd target\r\nExampleC: /waypoint factionadd Target1 Target1 Enemy 1000 1000 1000 Targets";
-		}
-
-		public override string GetCommandText()
-		{
-			return "/waypoint factionadd";
-		}
-
-		public override string[] GetMultipleCommandText()
-		{
-			return new[] { "/waypoint factionadd", "/wp factionadd", "/waypoint fa", "/wp fa" };
-		}
+        }
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
@@ -36,7 +26,18 @@
             return DialogItem;
         }
 
-        public override bool IsAdminCommand()
+
+        public override string GetCommandText()
+		{
+			return "/waypoint factionadd";
+		}
+
+		public override string[] GetMultipleCommandText()
+		{
+			return new[] { "/waypoint factionadd", "/wp factionadd", "/waypoint fa", "/wp fa" };
+		}
+
+		public override bool IsAdminCommand()
 		{
 			return false;
 		}
@@ -89,25 +90,28 @@
 
 				Vector3D pos = playerEntity.GetPosition();
 				string name = words[0];
+				WaypointItem item = new WaypointItem
+				                    {
+					                    SteamId = (ulong) faction.FactionId,
+					                    Name = name,
+					                    Text = name,
+					                    Position = pos,
+					                    WaypointType = WaypointTypes.Neutral,
+					                    Leader = faction.IsLeader( playerId )
+				                    };
+				Waypoints.Instance.Add(item);
 
 				foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
 				{
 					if (Player.CheckPlayerSameFaction(userId, steamId))
 					{
-						//Communication.SendClientMessage(steamId, string.Format("/waypoint add '{0}' '{0}' Neutral {1} {2} {3}", name, Math.Floor(pos.X), Math.Floor(pos.Y), Math.Floor(pos.Z)));
-					}
+                        //Communication.SendClientMessage(steamId, string.Format("/waypoint add '{0}' '{0}' Neutral {1} {2} {3}", name, Math.Floor(pos.X), Math.Floor(pos.Y), Math.Floor(pos.Z)));
+                        Communication.WaypointMessage( item );
+                    }
 				}
 
-				WaypointItem item = new WaypointItem
-				                    {
-					                    SteamId = (ulong) faction.FactionId,
-					                    Name = name,
-					                    //Text = name,
-					                    Position = pos
-				                    };
-				Waypoints.Instance.Add(item);
 
-				//Communication.SendFactionClientMessage(userId, string.Format("/message Server {2} has added the waypoint: '{0}' at {1} by '{2}'", item.Name, General.Vector3DToString(item.Position), playerName));
+				Communication.SendFactionClientMessage(userId, string.Format("/message Server {2} has added the waypoint: '{0}' at {1} by '{2}'", item.Name, General.Vector3DToString(item.Position), playerName));
 			}
 			else
 			{
@@ -123,14 +127,6 @@
 
 				string add = string.Join(" ", words.Select(s => s.ToLowerInvariant()));
 
-				foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
-				{
-					if (Player.CheckPlayerSameFaction(userId, steamId))
-					{
-						//Communication.SendClientMessage(steamId, string.Format("/waypoint add {0}", add));
-					}
-				}
-
 				string group = "";
 				if (words.Length == 7)
 					group = words[7];
@@ -139,17 +135,26 @@
 				                    {
 					                    SteamId = (ulong) faction.FactionId,
 										Name = words[0],
-										//Text = words[1]
+										Text = words[1]
 				                    };
-				//WaypointTypes type;
-				//Enum.TryParse(words[2], true, out type);
-				//item.WaypointType = type;
+				WaypointTypes type;
+				Enum.TryParse(words[2], true, out type);
+				item.WaypointType = type;
 				item.Position = new Vector3D(double.Parse(words[3]), double.Parse(words[4]), double.Parse(words[5]));
 				item.Group = group;
 				item.Leader = faction.IsLeader(playerId);
 				Waypoints.Instance.Add(item);
 
-				//Communication.SendFactionClientMessage(userId, string.Format("/message Server {2} has added the waypoint: '{0}' at {1} by '{2}'", item.Name, General.Vector3DToString(item.Position), playerName));
+				foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
+				{
+					if (Player.CheckPlayerSameFaction(userId, steamId))
+					{
+                        //Communication.SendClientMessage(steamId, string.Format("/waypoint add {0}", add));
+                        Communication.WaypointMessage( item );
+                    }
+				}
+
+				Communication.SendFactionClientMessage(userId, string.Format("/message Server {2} has added the waypoint: '{0}' at {1} by '{2}'", item.Name, General.Vector3DToString(item.Position), playerName));
 			}
 			return true;
 		}

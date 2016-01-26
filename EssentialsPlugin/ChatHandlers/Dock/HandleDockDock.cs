@@ -122,7 +122,7 @@
 					List<DockingItem> checkItems = Docking.Instance.Find(d => d.PlayerId == ownerId && d.TargetEntityId == parent.EntityId && d.DockingBeaconIds.Intersect(beaconListIds).Count() == 4);
 					if (checkItems.Count >= PluginSettings.Instance.DockingShipsPerZone)
 					{
-						Communication.SendPrivateInformation(userId, string.Format("Docking zone already '{0}' already contains the maximum capacity of ships.", pylonName));
+						Communication.SendPrivateInformation(userId, string.Format("Docking zone '{0}' already contains the maximum capacity of ships.", pylonName));
 						return true;
 					}
 
@@ -146,7 +146,10 @@
 					// Find ship in docking area
 					IMyCubeGrid dockingEntity = null;
 					HashSet<IMyEntity> cubeGrids = new HashSet<IMyEntity>();
-					MyAPIGateway.Entities.GetEntities(cubeGrids, f => f is IMyCubeGrid);
+                    Wrapper.GameAction( ( ) =>
+                     {
+                         MyAPIGateway.Entities.GetEntities( cubeGrids, f => f is IMyCubeGrid );
+                     } );
 					foreach (IMyCubeGrid gridCheck in cubeGrids)
 					{
 						if (gridCheck.IsStatic || gridCheck == parent)

@@ -12,17 +12,7 @@
 		public override string GetHelp()
 		{
 			return "Creates a personal waypoint.  Only you can see it.  Usage: /waypoint add \"waypoint name\" \"waypoint text\" Neutral | Allied | Enemy X Y Z.  Example: /waypoint add MyWayPoint MyWaypoint Neutral 1000 1000 1000";
-		}
-
-		public override string GetCommandText()
-		{
-			return "/waypoint add";
-		}
-
-		public override string[] GetMultipleCommandText()
-		{
-			return new string[] { "/waypoint add", "/wp add" };
-		}
+        }
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
@@ -34,7 +24,18 @@
             return DialogItem;
         }
 
-        public override bool IsAdminCommand()
+
+        public override string GetCommandText()
+		{
+			return "/waypoint add";
+		}
+
+		public override string[] GetMultipleCommandText()
+		{
+			return new string[] { "/waypoint add", "/wp add" };
+		}
+
+		public override bool IsAdminCommand()
 		{
 			return false;
 		}
@@ -85,11 +86,12 @@
 				WaypointItem item = new WaypointItem();
 				item.SteamId = userId;
 				item.Name = name;
-				//item.Text = name;
+				item.Text = name;
 				item.Position = pos;
-				//item.WaypointType = WaypointTypes.Neutral;
+				item.WaypointType = WaypointTypes.Neutral;
 				Waypoints.Instance.Add(item);
 
+                Communication.WaypointMessage( item );
 				Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
 			}
 			else
@@ -128,15 +130,16 @@
 				item.Name = words[0];
 
 				int diff = words.Length > 5 ? 1 : 0;
-				item.Description = words[diff];
-				//WaypointTypes type = WaypointTypes.Neutral;
-				//Enum.TryParse<WaypointTypes>(words[diff + 1], true, out type);
-				//item.WaypointType = type;
+				item.Text = words[diff];
+				WaypointTypes type = WaypointTypes.Neutral;
+				Enum.TryParse<WaypointTypes>(words[diff + 1], true, out type);
+				item.WaypointType = type;
 				item.Position = new Vector3D(double.Parse(words[diff + 2]), double.Parse(words[diff + 3]), double.Parse(words[diff + 4]));
 				item.Group = group;
 				Waypoints.Instance.Add(item);
 
-				Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
+                Communication.WaypointMessage( item );
+                Communication.SendPrivateInformation(userId, string.Format("Waypoint added: '{0}' at {1}", item.Name, General.Vector3DToString(item.Position)));
 			}
 			return true;
 		}
