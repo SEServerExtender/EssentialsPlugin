@@ -1,8 +1,9 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.AdminScan
 {
-	using EssentialsPlugin.Utility;
+    using System;
+    using EssentialsPlugin.Utility;
 
-	public class HandleAdminScanGrids : ChatHandlerBase
+    public class HandleAdminScanGrids : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{
@@ -36,7 +37,15 @@
 		// admin nobeacon scan
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			CubeGrids.ScanGrids(userId, words);
+            try
+            {
+                CubeGrids.ScanGrids( userId, words );
+            }
+            catch ( Exception ex )
+            {
+                Log.Info( ex, "scan grid" );
+                return false;
+            }
 			return true;
 		}
 	}

@@ -370,7 +370,7 @@
 		{
 			validPosition = Vector3D.Zero;
 			asteroidPosition = Vector3D.Zero;
-
+            /*
 			List<VoxelMap> voxelMaps = SectorObjectManager.Instance.GetTypedInternalData<VoxelMap>( );
 			for ( int r = 0; r < voxelMaps.Count; r++ )
 			{
@@ -385,8 +385,8 @@
 				asteroidPosition = voxelMap.Position;
 				validPosition = MathUtility.RandomPositionFromPoint( asteroidPosition, PluginSettings.Instance.NewUserTransportDistance );
 				break;
-
-				/*
+                
+				//*
 				if (voxelMap.Materials.Count > 3)
 				{
 					Log.Info(string.Format("Found asteroid with viable materials: {0} - {1}", voxelMap.Name, voxelMap.Materials.Count()));
@@ -395,7 +395,7 @@
 					break;
 				}
 				 */
-			}
+			//}
 		}
 	}
 }

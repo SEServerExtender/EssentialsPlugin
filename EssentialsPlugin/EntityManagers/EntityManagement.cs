@@ -608,13 +608,13 @@
 
 				List<IMyPlayer> players = new List<IMyPlayer>( );
 				HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
-				//Wrapper.GameAction(() =>
-				//{
 				MyAPIGateway.Players.GetPlayers( players );
-				MyAPIGateway.Entities.GetEntities( entities );
-				//});
+                Wrapper.GameAction( ( ) =>
+                 {
+                     MyAPIGateway.Entities.GetEntities( entities );
+                 } );
 
-				Dictionary<IMyEntity, string> entitiesToReveal = new Dictionary<IMyEntity, string>( );
+                Dictionary<IMyEntity, string> entitiesToReveal = new Dictionary<IMyEntity, string>( );
 				//HashSet<IMyEntity> entitiesToReveal = new HashSet<IMyEntity>();
 				foreach ( IMyEntity entity in entities )
 				{

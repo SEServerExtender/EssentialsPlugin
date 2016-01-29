@@ -36,41 +36,41 @@
     using System.Diagnostics;
     using System.Text;
     public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
-	{
-		public static Logger Log;
-		#region Private Fields
-		internal static Essentials Instance;
-		private static string _pluginPath;
-		//private static ControlForm controlForm;
-		private Thread _processThread;
-		private List<Thread> _processThreads;
-		private List<ProcessHandlerBase> _processHandlers;
-		private List<ChatHandlerBase> _chatHandlers;
-		private bool _running = true;
+    {
+        public static Logger Log;
+        #region Private Fields
+        internal static Essentials Instance;
+        private static string _pluginPath;
+        //private static ControlForm controlForm;
+        private Thread _processThread;
+        private List<Thread> _processThreads;
+        private List<ProcessHandlerBase> _processHandlers;
+        private List<ChatHandlerBase> _chatHandlers;
+        private bool _running = true;
 
-		#endregion
+        #endregion
 
-		#region Properties
-		public static string PluginPath
-		{
-			get { return _pluginPath; }
-			set { _pluginPath = value; }
-		}
+        #region Properties
+        public static string PluginPath
+        {
+            get { return _pluginPath; }
+            set { _pluginPath = value; }
+        }
 
-		internal static List<ChatHandlerBase> ChatHandlers
-		{
-			get
-			{
-				if ( Instance != null )
-				{
-					return Instance._chatHandlers;
-				}
+        internal static List<ChatHandlerBase> ChatHandlers
+        {
+            get
+            {
+                if ( Instance != null )
+                {
+                    return Instance._chatHandlers;
+                }
 
-				return null;
-			}
-		}
+                return null;
+            }
+        }
 
-		/*
+        /*
 		public static ControlForm PluginControlForm
 		{
 			get 
@@ -83,43 +83,43 @@
 		}
 		*/
 
-		[Category( "General" )]
-		[Description( "Name of the server used throughout this plugin" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public string ServerName
-		{
-			get { return PluginSettings.Instance.ServerName; }
-			set { PluginSettings.Instance.ServerName = value; }
-		}
+        [Category( "General" )]
+        [Description( "Name of the server used throughout this plugin" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public string ServerName
+        {
+            get { return PluginSettings.Instance.ServerName; }
+            set { PluginSettings.Instance.ServerName = value; }
+        }
 
-		[Category( "General" )]
-		[Description( "Should we allow users to see coordinates when they type /utility grids list if they own 100% of the ship?" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool ServerUtilityGridsShowCoords
-		{
-			get { return PluginSettings.Instance.ServerUtilityGridsShowCoords; }
-			set { PluginSettings.Instance.ServerUtilityGridsShowCoords = value; }
-		}
+        [Category( "General" )]
+        [Description( "Should we allow users to see coordinates when they type /utility grids list if they own 100% of the ship?" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool ServerUtilityGridsShowCoords
+        {
+            get { return PluginSettings.Instance.ServerUtilityGridsShowCoords; }
+            set { PluginSettings.Instance.ServerUtilityGridsShowCoords = value; }
+        }
 
-		[Category( "General" )]
-		[Description( "Enable / Disable respawn menu override.  If you're having issues with a very slow respawn menu, this will help, though please note it may cause more problems if your server is running quickly.  (Will give the spawn menu twice)" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool ServerRespawnMenuOverride
-		{
-			get { return PluginSettings.Instance.ServerRespawnMenuOverride; }
-			set
-			{
-				PluginSettings.Instance.ServerRespawnMenuOverride = value;
-			}
-		}
+        [Category( "General" )]
+        [Description( "Enable / Disable respawn menu override.  If you're having issues with a very slow respawn menu, this will help, though please note it may cause more problems if your server is running quickly.  (Will give the spawn menu twice)" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool ServerRespawnMenuOverride
+        {
+            get { return PluginSettings.Instance.ServerRespawnMenuOverride; }
+            set
+            {
+                PluginSettings.Instance.ServerRespawnMenuOverride = value;
+            }
+        }
 
-        [Category("General")]
-        [Description("Enable / Disable stopping all ships when server starts")]
-        [Browsable(true)]
-        [ReadOnly(false)]
+        [Category( "General" )]
+        [Description( "Enable / Disable stopping all ships when server starts" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
         public bool StopShipsOnStart
         {
             get { return PluginSettings.Instance.StopShipsOnStart; }
@@ -178,426 +178,426 @@
         }
 
         [Category( "Information" )]
-		[Description( "Enabled / Disable Information Commands" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool InformationEnabled
-		{
-			get
-			{
-				return PluginSettings.Instance.InformationEnabled;
-			}
+        [Description( "Enabled / Disable Information Commands" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool InformationEnabled
+        {
+            get
+            {
+                return PluginSettings.Instance.InformationEnabled;
+            }
 
-			set
-			{
-				PluginSettings.Instance.InformationEnabled = value;
-			}
-		}
+            set
+            {
+                PluginSettings.Instance.InformationEnabled = value;
+            }
+        }
 
-		[Category( "Information" )]
-		[Description( "Information command items.  These are accessed with the /info command.  Each item you define can be access by typing /info <info command> or they can be scheduled to be sent out at certain intervals." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public MTObservableCollection<InformationItem> InformationItems
-		{
-			get
-			{
-				return PluginSettings.Instance.InformationItems;
-			}
-		}
+        [Category( "Information" )]
+        [Description( "Information command items.  These are accessed with the /info command.  Each item you define can be access by typing /info <info command> or they can be scheduled to be sent out at certain intervals." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public MTObservableCollection<InformationItem> InformationItems
+        {
+            get
+            {
+                return PluginSettings.Instance.InformationItems;
+            }
+        }
 
-		[Category( "Automated Restart" )]
-		[Description( "Enable / Disable Automated Server Restarts" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool RestartEnabled
-		{
-			get
-			{
-				return PluginSettings.Instance.RestartEnabled;
-			}
+        [Category( "Automated Restart" )]
+        [Description( "Enable / Disable Automated Server Restarts" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool RestartEnabled
+        {
+            get
+            {
+                return PluginSettings.Instance.RestartEnabled;
+            }
 
-			set
-			{
-				PluginSettings.Instance.RestartEnabled = value;
-			}
-		}
+            set
+            {
+                PluginSettings.Instance.RestartEnabled = value;
+            }
+        }
 
-		[Category( "Automated Restart" )]
-		[Description( "Restart Notification Items.  Each item is a notification sent to the user at specified intervals.  Use this to warn users that a restart is going to occur before it happens." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public MTObservableCollection<RestartNotificationItem> RestartNotificationItems
-		{
-			get
-			{
-				return PluginSettings.Instance.RestartNotificationItems;
-			}
-		}
+        [Category( "Automated Restart" )]
+        [Description( "Restart Notification Items.  Each item is a notification sent to the user at specified intervals.  Use this to warn users that a restart is going to occur before it happens." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public MTObservableCollection<RestartNotificationItem> RestartNotificationItems
+        {
+            get
+            {
+                return PluginSettings.Instance.RestartNotificationItems;
+            }
+        }
 
-		[Category( "Automated Restart" )]
-		[Description( "Restart Time Items.  Each item is a time of day when a restart will occur." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public MTObservableCollection<RestartTimeItem> RestartTimeItems
-		{
-			get
-			{
-				return PluginSettings.Instance.RestartTimeItems;
-			}
-		}
+        [Category( "Automated Restart" )]
+        [Description( "Restart Time Items.  Each item is a time of day when a restart will occur." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public MTObservableCollection<RestartTimeItem> RestartTimeItems
+        {
+            get
+            {
+                return PluginSettings.Instance.RestartTimeItems;
+            }
+        }
 
-		[Category( "Automated Restart" )]
-		[Description( "Extra processes to run before the server is restarted.  Allows adding custom scripts during restart.  Each line is a seperate process." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		[Editor( typeof( MultilineStringEditor ), typeof( UITypeEditor ) )]
-		public string RestartAddedProcesses
-		{
-			get
-			{
-				return PluginSettings.Instance.RestartAddedProcesses;
-			}
-			set
-			{
-				PluginSettings.Instance.RestartAddedProcesses = value;
-			}
-		}
+        [Category( "Automated Restart" )]
+        [Description( "Extra processes to run before the server is restarted.  Allows adding custom scripts during restart.  Each line is a seperate process." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        [Editor( typeof( MultilineStringEditor ), typeof( UITypeEditor ) )]
+        public string RestartAddedProcesses
+        {
+            get
+            {
+                return PluginSettings.Instance.RestartAddedProcesses;
+            }
+            set
+            {
+                PluginSettings.Instance.RestartAddedProcesses = value;
+            }
+        }
 
-		[Category( "Automated Restart" )]
-		[Description( "Enable / Disable A trigger which automatically restarts the server if it becomes unresponsive for 1 full minute." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool RestartWhenUnresponsive
-		{
-			get { return PluginSettings.Instance.RestartWhenUnresponsive; }
-			set { PluginSettings.Instance.RestartWhenUnresponsive = value; }
-		}
+        [Category( "Automated Restart" )]
+        [Description( "Enable / Disable A trigger which automatically restarts the server if it becomes unresponsive for 1 full minute." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool RestartWhenUnresponsive
+        {
+            get { return PluginSettings.Instance.RestartWhenUnresponsive; }
+            set { PluginSettings.Instance.RestartWhenUnresponsive = value; }
+        }
 
-		[Category( "Join Greeting" )]
-		[Description( "Enable / Disable Join Greetings" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool GreetingEnabled
-		{
-			get { return PluginSettings.Instance.GreetingEnabled; }
-			set { PluginSettings.Instance.GreetingEnabled = value; }
-		}
+        [Category( "Join Greeting" )]
+        [Description( "Enable / Disable Join Greetings" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool GreetingEnabled
+        {
+            get { return PluginSettings.Instance.GreetingEnabled; }
+            set { PluginSettings.Instance.GreetingEnabled = value; }
+        }
 
-		[Category( "Join Greeting" )]
-		[Description( "Greeting Dialog Displayed To User On Join" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		[TypeConverter( typeof( ExpandableObjectConverter ) )]
-		public SettingsGreetingDialogItem GreetingItem
-		{
-			get { return PluginSettings.Instance.GreetingItem; }
-			set { PluginSettings.Instance.GreetingItem = value; }
-		}
+        [Category( "Join Greeting" )]
+        [Description( "Greeting Dialog Displayed To User On Join" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        [TypeConverter( typeof( ExpandableObjectConverter ) )]
+        public SettingsGreetingDialogItem GreetingItem
+        {
+            get { return PluginSettings.Instance.GreetingItem; }
+            set { PluginSettings.Instance.GreetingItem = value; }
+        }
 
-		[Category( "Join Greeting" )]
-		[Description( "Greeting Sent To User On Join" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public string GreetingMessage
-		{
-			get
-			{
-				return PluginSettings.Instance.GreetingMessage;
-			}
+        [Category( "Join Greeting" )]
+        [Description( "Greeting Sent To User On Join" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public string GreetingMessage
+        {
+            get
+            {
+                return PluginSettings.Instance.GreetingMessage;
+            }
 
-			set
-			{
-				PluginSettings.Instance.GreetingMessage = value;
-			}
-		}
+            set
+            {
+                PluginSettings.Instance.GreetingMessage = value;
+            }
+        }
 
-		[Category( "Join Greeting" )]
-		[Description( "Enable / Disable Sending this message to all users, and not just to the joining user privately" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool GreetingPublic
-		{
-			get { return PluginSettings.Instance.GreetingPublic; }
-			set { PluginSettings.Instance.GreetingPublic = value; }
-		}
+        [Category( "Join Greeting" )]
+        [Description( "Enable / Disable Sending this message to all users, and not just to the joining user privately" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool GreetingPublic
+        {
+            get { return PluginSettings.Instance.GreetingPublic; }
+            set { PluginSettings.Instance.GreetingPublic = value; }
+        }
 
-		[Category( "Join Greeting" )]
-		[Description( "Greeting Dialog Displayed To User On Join" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		[TypeConverter( typeof( ExpandableObjectConverter ) )]
-		public SettingsGreetingDialogItem GreetingNewUserItem
-		{
-			get { return PluginSettings.Instance.GreetingNewUserItem; }
-			set { PluginSettings.Instance.GreetingNewUserItem = value; }
-		}
-
-
-		[Category( "Join Greeting" )]
-		[Description( "Greeting Sent To New Users On Join" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public string NewUserGreetingMessage
-		{
-			get
-			{
-				return PluginSettings.Instance.GreetingNewUserMessage;
-			}
-
-			set
-			{
-				PluginSettings.Instance.GreetingNewUserMessage = value;
-			}
-		}
-
-		[Category( "Automated Backup" )]
-		[Description( "Enable / Disabled Automated Backups" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		[DefaultValue( true )]
-		public bool BackupEnabled
-		{
-			get { return PluginSettings.Instance.BackupEnabled; }
-			set { PluginSettings.Instance.BackupEnabled = value; }
-		}
-
-		[Category( "Automated Backup" )]
-		[Description( "Backup Items. These items control when backups occur." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		[DisplayName( @"Backup Times" )]
-		public MTObservableCollection<BackupItem> BackupItems
-		{
-			get { return PluginSettings.Instance.BackupItems; }
-		}
-
-		[Category( "Automated Backup" )]
-		[Description( "Base directory to put backups into" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		[Editor( typeof( FolderNameEditor ), typeof( UITypeEditor ) )]
-		public string BackupBaseDirectory
-		{
-			get { return PluginSettings.Instance.BackupBaseDirectory; }
-			set { PluginSettings.Instance.BackupBaseDirectory = value; }
-		}
-
-		[Category( "Automated Backup" )]
-		[Description( "Should each backup go into a dated subdirectory?" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool BackupCreateSubDirectories
-		{
-			get { return PluginSettings.Instance.BackupCreateSubDirectories; }
-			set { PluginSettings.Instance.BackupCreateSubDirectories = value; }
-		}
-
-		[Category("Automated Backup")]
-		[Description("Date format to use for the backup file")]
-		[Browsable(true)]
-		[ReadOnly(false)]
-		public string BackupDateFormat
-		{
-			get { return PluginSettings.Instance.BackupDateFormat; }
-			set { PluginSettings.Instance.BackupDateFormat = value; }
-		}
-
-		[Category("Automated Backup")]
-		[Description("Date format to use for the subdirectory")]
-		[Browsable(true)]
-		[ReadOnly(false)]
-		public string BackupDateFormatSubDirectory
-		{
-			get { return PluginSettings.Instance.BackupDateFormatSubDirectory; }
-			set { PluginSettings.Instance.BackupDateFormatSubDirectory = value; }
-		}
-
-		[Category( "Automated Backup" )]
-		[Description( "Should backups be cleaned up after a certain period of time?" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool BackupCleanup
-		{
-			get { return PluginSettings.Instance.BackupCleanup; }
-			set { PluginSettings.Instance.BackupCleanup = value; }
-		}
-
-		[Category( "Automated Backup" )]
-		[Description( "Time in days to keep a backup" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public int BackupCleanupTime
-		{
-			get { return PluginSettings.Instance.BackupCleanupTime; }
-			set { PluginSettings.Instance.BackupCleanupTime = value; }
-		}
-
-		[Category( "Automated Backup" )]
-		[Description( "Enable / Disable backing up of asteroids" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool BackupAsteroids
-		{
-			get { return PluginSettings.Instance.BackupAsteroids; }
-			set
-			{
-				PluginSettings.Instance.BackupAsteroids = value;
-			}
-		}
-
-		[Category( "Automated Backup" )]
-		[Description( "Enable / Disable Backing up of essentials settings" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool BackupEssentials
-		{
-			get { return PluginSettings.Instance.BackupEssentials; }
-			set
-			{
-				PluginSettings.Instance.BackupEssentials = value;
-			}
-		}
+        [Category( "Join Greeting" )]
+        [Description( "Greeting Dialog Displayed To User On Join" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        [TypeConverter( typeof( ExpandableObjectConverter ) )]
+        public SettingsGreetingDialogItem GreetingNewUserItem
+        {
+            get { return PluginSettings.Instance.GreetingNewUserItem; }
+            set { PluginSettings.Instance.GreetingNewUserItem = value; }
+        }
 
 
-		[Category( "Automated New User Transport" )]
-		[Description( "Enable / Disable New User Transport.  This option will transport new user ships closer to asteroids.  It will randomly choose an appropriate asteroid that has enough resources inside it, and move them closer to that asteroid.  This helps on servers that have asteroids far apart." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool NewUserTransportEnabled
-		{
-			get { return PluginSettings.Instance.NewUserTransportEnabled; }
-			set { PluginSettings.Instance.NewUserTransportEnabled = value; }
-		}
+        [Category( "Join Greeting" )]
+        [Description( "Greeting Sent To New Users On Join" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public string NewUserGreetingMessage
+        {
+            get
+            {
+                return PluginSettings.Instance.GreetingNewUserMessage;
+            }
 
-		[Category( "Automated New User Transport" )]
-		[Description( "New User Transport Distance from asteroid to transport the user." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public int NewUserTransportDistance
-		{
-			get { return PluginSettings.Instance.NewUserTransportDistance; }
-			set { PluginSettings.Instance.NewUserTransportDistance = value; }
-		}
+            set
+            {
+                PluginSettings.Instance.GreetingNewUserMessage = value;
+            }
+        }
 
-		[Category( "Automated New User Transport" )]
-		[Description( "Move all spawn ships no matter if the user is new or not (Only works on login for now)" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool NewUserTransportMoveAllSpawnShips
-		{
-			get { return PluginSettings.Instance.NewUserTransportMoveAllSpawnShips; }
-			set { PluginSettings.Instance.NewUserTransportMoveAllSpawnShips = value; }
-		}
+        [Category( "Automated Backup" )]
+        [Description( "Enable / Disabled Automated Backups" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        [DefaultValue( true )]
+        public bool BackupEnabled
+        {
+            get { return PluginSettings.Instance.BackupEnabled; }
+            set { PluginSettings.Instance.BackupEnabled = value; }
+        }
 
-		[Category( "Automated New User Transport" )]
-		[Description( "Spawn only at asteroids that are this distance or less from center (0,0,0) - 0 means asteroids can be anywhere" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public int NewUserTransportAsteroidDistance
-		{
-			get { return PluginSettings.Instance.NewUserTransportAsteroidDistance; }
-			set { PluginSettings.Instance.NewUserTransportAsteroidDistance = value; }
-		}
+        [Category( "Automated Backup" )]
+        [Description( "Backup Items. These items control when backups occur." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        [DisplayName( @"Backup Times" )]
+        public MTObservableCollection<BackupItem> BackupItems
+        {
+            get { return PluginSettings.Instance.BackupItems; }
+        }
 
-		[Category( "Automated New User Transport" )]
-		[Description( "Type of spawn point we use.  Asteroids = we spawn near asteroids.  Origin = we spawn near origin." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public NewUserTransportSpawnPoint NewUserTransportSpawnType
-		{
-			get { return PluginSettings.Instance.NewUserTransportSpawnType; }
-			set { PluginSettings.Instance.NewUserTransportSpawnType = value; }
-		}
+        [Category( "Automated Backup" )]
+        [Description( "Base directory to put backups into" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        [Editor( typeof( FolderNameEditor ), typeof( UITypeEditor ) )]
+        public string BackupBaseDirectory
+        {
+            get { return PluginSettings.Instance.BackupBaseDirectory; }
+            set { PluginSettings.Instance.BackupBaseDirectory = value; }
+        }
 
-		[Category( "Automated New User Transport" )]
-		[Description( "The names of spawnships.  Used for automated spawn ship stopping." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public string[ ] NewUserTransportSpawnShipNames
-		{
-			get { return PluginSettings.Instance.NewUserTransportSpawnShipNames; }
-			set { PluginSettings.Instance.NewUserTransportSpawnShipNames = value; }
-		}
+        [Category( "Automated Backup" )]
+        [Description( "Should each backup go into a dated subdirectory?" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool BackupCreateSubDirectories
+        {
+            get { return PluginSettings.Instance.BackupCreateSubDirectories; }
+            set { PluginSettings.Instance.BackupCreateSubDirectories = value; }
+        }
 
-		[Category( "Automated New User Transport" )]
-		[Description( "Enable / Disable automatic spawn ship stopping.  The theory is, they cause havok errors if they jump physics worlds." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool NewUserTransportStopRunawaySpawnShips
-		{
-			get { return PluginSettings.Instance.NewUserTransportStopRunawaySpawnShips; }
-			set { PluginSettings.Instance.NewUserTransportStopRunawaySpawnShips = value; }
-		}
+        [Category( "Automated Backup" )]
+        [Description( "Date format to use for the backup file" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public string BackupDateFormat
+        {
+            get { return PluginSettings.Instance.BackupDateFormat; }
+            set { PluginSettings.Instance.BackupDateFormat = value; }
+        }
 
-		[Category( "Player Login Tracking" )]
-		[Description( "Enable / Disable Player Login Tracking.  This option tracks users login/logouts.  It also reads old logs to get player history.  It's recommended to enable this." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool LoginEnabled
-		{
-			get { return PluginSettings.Instance.LoginEnabled; }
-			set { PluginSettings.Instance.LoginEnabled = value; }
-		}
+        [Category( "Automated Backup" )]
+        [Description( "Date format to use for the subdirectory" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public string BackupDateFormatSubDirectory
+        {
+            get { return PluginSettings.Instance.BackupDateFormatSubDirectory; }
+            set { PluginSettings.Instance.BackupDateFormatSubDirectory = value; }
+        }
 
-		[Category( "Player Login Tracking" )]
-		[Description( "This is an entity whitelist for player logins.  Any entity in this list will never be considered 'inactive'." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public string[ ] LoginEntityWhitelist
-		{
-			get { return PluginSettings.Instance.LoginEntityWhitelist; }
-			set { PluginSettings.Instance.LoginEntityWhitelist = value; }
-		}
+        [Category( "Automated Backup" )]
+        [Description( "Should backups be cleaned up after a certain period of time?" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool BackupCleanup
+        {
+            get { return PluginSettings.Instance.BackupCleanup; }
+            set { PluginSettings.Instance.BackupCleanup = value; }
+        }
 
-		[Category( "Player Login Tracking" )]
-		[Description( "This is a player whitelist for player logins.  Any object owned by a player in this list will never be considered 'inactive'" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public string[ ] LoginPlayerIdWhitelist
-		{
-			get { return PluginSettings.Instance.LoginPlayerIdWhitelist; }
-			set { PluginSettings.Instance.LoginPlayerIdWhitelist = value; }
-		}
+        [Category( "Automated Backup" )]
+        [Description( "Time in days to keep a backup" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public int BackupCleanupTime
+        {
+            get { return PluginSettings.Instance.BackupCleanupTime; }
+            set { PluginSettings.Instance.BackupCleanupTime = value; }
+        }
 
-		[Category( "Protected Entities" )]
-		[Description( "Enable / Disable Protected Entities.  Protected entities have increased integrity, and also heal repair / fix deformation instantly when damaged." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool ProtectedEnabled
-		{
-			get { return PluginSettings.Instance.ProtectedEnabled; }
-			set { PluginSettings.Instance.ProtectedEnabled = value; }
-		}
+        [Category( "Automated Backup" )]
+        [Description( "Enable / Disable backing up of asteroids" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool BackupAsteroids
+        {
+            get { return PluginSettings.Instance.BackupAsteroids; }
+            set
+            {
+                PluginSettings.Instance.BackupAsteroids = value;
+            }
+        }
 
-		[Category( "Protected Entities" )]
-		[Description( "This is the list of entities that are protected by the server" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public MTObservableCollection<ProtectedItem> ProtectedItems
-		{
-			get { return PluginSettings.Instance.ProtectedItems; }
-		}
+        [Category( "Automated Backup" )]
+        [Description( "Enable / Disable Backing up of essentials settings" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool BackupEssentials
+        {
+            get { return PluginSettings.Instance.BackupEssentials; }
+            set
+            {
+                PluginSettings.Instance.BackupEssentials = value;
+            }
+        }
 
-		[Category( "Docking Zones" )]
-		[Description( "Enable / Disable docking zones.  This allows players to safely dock in zones created by 4 beacons with the same name.  This removes the entity from the world when docked, and adds it back when undocked." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool DockingEnabled
-		{
-			get { return PluginSettings.Instance.DockingEnabled; }
-			set { PluginSettings.Instance.DockingEnabled = value; }
-		}
 
-		[Category( "Docking Zones" )]
-		[Description( "Sets the number of ships that can dock in a zone.  Default is 1" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public int DockingShipsPerZone
-		{
-			get { return PluginSettings.Instance.DockingShipsPerZone; }
-			set { PluginSettings.Instance.DockingShipsPerZone = value; }
-		}
+        [Category( "Automated New User Transport" )]
+        [Description( "Enable / Disable New User Transport.  This option will transport new user ships closer to asteroids.  It will randomly choose an appropriate asteroid that has enough resources inside it, and move them closer to that asteroid.  This helps on servers that have asteroids far apart." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool NewUserTransportEnabled
+        {
+            get { return PluginSettings.Instance.NewUserTransportEnabled; }
+            set { PluginSettings.Instance.NewUserTransportEnabled = value; }
+        }
+
+        [Category( "Automated New User Transport" )]
+        [Description( "New User Transport Distance from asteroid to transport the user." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public int NewUserTransportDistance
+        {
+            get { return PluginSettings.Instance.NewUserTransportDistance; }
+            set { PluginSettings.Instance.NewUserTransportDistance = value; }
+        }
+
+        [Category( "Automated New User Transport" )]
+        [Description( "Move all spawn ships no matter if the user is new or not (Only works on login for now)" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool NewUserTransportMoveAllSpawnShips
+        {
+            get { return PluginSettings.Instance.NewUserTransportMoveAllSpawnShips; }
+            set { PluginSettings.Instance.NewUserTransportMoveAllSpawnShips = value; }
+        }
+
+        [Category( "Automated New User Transport" )]
+        [Description( "Spawn only at asteroids that are this distance or less from center (0,0,0) - 0 means asteroids can be anywhere" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public int NewUserTransportAsteroidDistance
+        {
+            get { return PluginSettings.Instance.NewUserTransportAsteroidDistance; }
+            set { PluginSettings.Instance.NewUserTransportAsteroidDistance = value; }
+        }
+
+        [Category( "Automated New User Transport" )]
+        [Description( "Type of spawn point we use.  Asteroids = we spawn near asteroids.  Origin = we spawn near origin." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public NewUserTransportSpawnPoint NewUserTransportSpawnType
+        {
+            get { return PluginSettings.Instance.NewUserTransportSpawnType; }
+            set { PluginSettings.Instance.NewUserTransportSpawnType = value; }
+        }
+
+        [Category( "Automated New User Transport" )]
+        [Description( "The names of spawnships.  Used for automated spawn ship stopping." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public string[ ] NewUserTransportSpawnShipNames
+        {
+            get { return PluginSettings.Instance.NewUserTransportSpawnShipNames; }
+            set { PluginSettings.Instance.NewUserTransportSpawnShipNames = value; }
+        }
+
+        [Category( "Automated New User Transport" )]
+        [Description( "Enable / Disable automatic spawn ship stopping.  The theory is, they cause havok errors if they jump physics worlds." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool NewUserTransportStopRunawaySpawnShips
+        {
+            get { return PluginSettings.Instance.NewUserTransportStopRunawaySpawnShips; }
+            set { PluginSettings.Instance.NewUserTransportStopRunawaySpawnShips = value; }
+        }
+
+        [Category( "Player Login Tracking" )]
+        [Description( "Enable / Disable Player Login Tracking.  This option tracks users login/logouts.  It also reads old logs to get player history.  It's recommended to enable this." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool LoginEnabled
+        {
+            get { return PluginSettings.Instance.LoginEnabled; }
+            set { PluginSettings.Instance.LoginEnabled = value; }
+        }
+
+        [Category( "Player Login Tracking" )]
+        [Description( "This is an entity whitelist for player logins.  Any entity in this list will never be considered 'inactive'." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public string[ ] LoginEntityWhitelist
+        {
+            get { return PluginSettings.Instance.LoginEntityWhitelist; }
+            set { PluginSettings.Instance.LoginEntityWhitelist = value; }
+        }
+
+        [Category( "Player Login Tracking" )]
+        [Description( "This is a player whitelist for player logins.  Any object owned by a player in this list will never be considered 'inactive'" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public string[ ] LoginPlayerIdWhitelist
+        {
+            get { return PluginSettings.Instance.LoginPlayerIdWhitelist; }
+            set { PluginSettings.Instance.LoginPlayerIdWhitelist = value; }
+        }
+
+        [Category( "Protected Entities" )]
+        [Description( "Enable / Disable Protected Entities.  Protected entities have increased integrity, and also heal repair / fix deformation instantly when damaged." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool ProtectedEnabled
+        {
+            get { return PluginSettings.Instance.ProtectedEnabled; }
+            set { PluginSettings.Instance.ProtectedEnabled = value; }
+        }
+
+        [Category( "Protected Entities" )]
+        [Description( "This is the list of entities that are protected by the server" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public MTObservableCollection<ProtectedItem> ProtectedItems
+        {
+            get { return PluginSettings.Instance.ProtectedItems; }
+        }
+
+        [Category( "Docking Zones" )]
+        [Description( "Enable / Disable docking zones.  This allows players to safely dock in zones created by 4 beacons with the same name.  This removes the entity from the world when docked, and adds it back when undocked." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool DockingEnabled
+        {
+            get { return PluginSettings.Instance.DockingEnabled; }
+            set { PluginSettings.Instance.DockingEnabled = value; }
+        }
+
+        [Category( "Docking Zones" )]
+        [Description( "Sets the number of ships that can dock in a zone.  Default is 1" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public int DockingShipsPerZone
+        {
+            get { return PluginSettings.Instance.DockingShipsPerZone; }
+            set { PluginSettings.Instance.DockingShipsPerZone = value; }
+        }
 
         [Category( "Dynamic Entity Management" )]
         [DisplayName( "Enabled" )]
@@ -651,51 +651,51 @@
         }
 
         [Category( "Dynamic Entity Management" )]
-		[DisplayName( "Conceal Distance")]
-		[Description( "The distance a player must be from a grid for it to be revealed due to distance.  The smaller this value is, the longer a grid will be hidden from sight.  Default is 8000m (max view distance)" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public float DynamicConcealDistance
-		{
-			get { return PluginSettings.Instance.DynamicConcealDistance; }
-			set { PluginSettings.Instance.DynamicConcealDistance = value; }
-		}
+        [DisplayName( "Conceal Distance" )]
+        [Description( "The distance a player must be from a grid for it to be revealed due to distance.  The smaller this value is, the longer a grid will be hidden from sight.  Default is 8000m (max view distance)" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public float DynamicConcealDistance
+        {
+            get { return PluginSettings.Instance.DynamicConcealDistance; }
+            set { PluginSettings.Instance.DynamicConcealDistance = value; }
+        }
 
-		[Category( "Dynamic Entity Management" )]
-		[DisplayName( "Include Large Grids")]
-		[Description( "Enable / Disable management of large block grids.  Large block grids require a different set of scans due to them having medical bays." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool DynamicConcealIncludeLargeGrids
-		{
-			get { return PluginSettings.Instance.ConcealIncludeLargeGrids; }
-			set { PluginSettings.Instance.ConcealIncludeLargeGrids = value; }
-		}
+        [Category( "Dynamic Entity Management" )]
+        [DisplayName( "Include Large Grids" )]
+        [Description( "Enable / Disable management of large block grids.  Large block grids require a different set of scans due to them having medical bays." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool DynamicConcealIncludeLargeGrids
+        {
+            get { return PluginSettings.Instance.ConcealIncludeLargeGrids; }
+            set { PluginSettings.Instance.ConcealIncludeLargeGrids = value; }
+        }
 
-		[Category( "Dynamic Entity Management" )]
-		[DisplayName( "Block Subtype Ignore List")]
-		[Description( "The list of subtype blocks that will make the entity manager ignore a grid.  If a grid contains any of these block subtypes, it will automatically not include it when deciding whether to conceal the grid or not" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public string[ ] DynamicConcealIgnoreSubTypeList
-		{
-			get { return PluginSettings.Instance.DynamicConcealIgnoreSubTypeList; }
-			set { PluginSettings.Instance.DynamicConcealIgnoreSubTypeList = value; }
-		}
+        [Category( "Dynamic Entity Management" )]
+        [DisplayName( "Block Subtype Ignore List" )]
+        [Description( "The list of subtype blocks that will make the entity manager ignore a grid.  If a grid contains any of these block subtypes, it will automatically not include it when deciding whether to conceal the grid or not" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public string[ ] DynamicConcealIgnoreSubTypeList
+        {
+            get { return PluginSettings.Instance.DynamicConcealIgnoreSubTypeList; }
+            set { PluginSettings.Instance.DynamicConcealIgnoreSubTypeList = value; }
+        }
 
-		[Category( "Dynamic Entity Management" )]
-		[DisplayName( "Include MedBays")]
-		[Description( "The list of subtype blocks that will make the entity manager ignore a grid.  If a grid contains any of these block subtypes, it will automatically not include it when deciding whether to conceal the grid or not" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool DynamicConcealIncludeMedBays
-		{
-			get { return PluginSettings.Instance.DynamicConcealIncludeMedBays; }
-			set { PluginSettings.Instance.DynamicConcealIncludeMedBays = value; }
-		}
+        [Category( "Dynamic Entity Management" )]
+        [DisplayName( "Include MedBays" )]
+        [Description( "The list of subtype blocks that will make the entity manager ignore a grid.  If a grid contains any of these block subtypes, it will automatically not include it when deciding whether to conceal the grid or not" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool DynamicConcealIncludeMedBays
+        {
+            get { return PluginSettings.Instance.DynamicConcealIncludeMedBays; }
+            set { PluginSettings.Instance.DynamicConcealIncludeMedBays = value; }
+        }
 
-		/*  Experiments not working yet */
-		/*
+        /*  Experiments not working yet */
+        /*
 		[Category("Dynamic Entity Management")]
 		[Description("")]
 		[Browsable(true)]
@@ -735,80 +735,80 @@
 			}
 		}
 		/**/
-		[Category( "Dynamic Entity Management" )]
-		[DisplayName( "Log Actions" )]
-		[Description( "Enable / Disable console messages that display whether an entity is concealed or revealed.  Should be off if you don't care about seeing how many entities get revealed/concealed." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool DynamicShowMessages
-		{
-			get { return PluginSettings.Instance.DynamicShowMessages; }
-			set
-			{
-				PluginSettings.Instance.DynamicShowMessages = value;
-			}
-		}
+        [Category( "Dynamic Entity Management" )]
+        [DisplayName( "Log Actions" )]
+        [Description( "Enable / Disable console messages that display whether an entity is concealed or revealed.  Should be off if you don't care about seeing how many entities get revealed/concealed." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool DynamicShowMessages
+        {
+            get { return PluginSettings.Instance.DynamicShowMessages; }
+            set
+            {
+                PluginSettings.Instance.DynamicShowMessages = value;
+            }
+        }
 
-		[Category( "Dynamic Turret Management" )]
-		[DisplayName( "Enabled" )]
-		[Description( "Enable / Disable dynamic management of turrets.  Turrets that do not have a valid target within their target range will be disabled.  This will improve sim speed." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool DynamicTurretManagmentEnabled
-		{
-			get { return PluginSettings.Instance.DynamicTurretManagmentEnabled; }
-			set
-			{
-				PluginSettings.Instance.DynamicTurretManagmentEnabled = value;
-			}
-		}
+        [Category( "Dynamic Turret Management" )]
+        [DisplayName( "Enabled" )]
+        [Description( "Enable / Disable dynamic management of turrets.  Turrets that do not have a valid target within their target range will be disabled.  This will improve sim speed." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool DynamicTurretManagmentEnabled
+        {
+            get { return PluginSettings.Instance.DynamicTurretManagmentEnabled; }
+            set
+            {
+                PluginSettings.Instance.DynamicTurretManagmentEnabled = value;
+            }
+        }
 
-		[Category( "Dynamic Turret Management" )]
-		[DisplayName( "Activation Distance" )]
-		[Description( "Distance from a grid that has a turret that a valid target must be before enabling.  Should be 2x or more than the scan distance of a turret." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public int DynamicTurretTargetDistance
-		{
-			get { return PluginSettings.Instance.DynamicTurretTargetDistance; }
-			set
-			{
-				PluginSettings.Instance.DynamicTurretTargetDistance = value;
-			}
-		}
+        [Category( "Dynamic Turret Management" )]
+        [DisplayName( "Activation Distance" )]
+        [Description( "Distance from a grid that has a turret that a valid target must be before enabling.  Should be 2x or more than the scan distance of a turret." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public int DynamicTurretTargetDistance
+        {
+            get { return PluginSettings.Instance.DynamicTurretTargetDistance; }
+            set
+            {
+                PluginSettings.Instance.DynamicTurretTargetDistance = value;
+            }
+        }
 
-		[Category( "Dynamic Turret Management" )]
-		[DisplayName( "Allow Exemption" )]
-		[Description( "Enable / Disable Allowing users to manually exempt their turrets from control with the [ManualControl] tag in custom name of turret." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool DynamicTurretAllowExemption
-		{
-			get { return PluginSettings.Instance.DynamicTurretAllowExemption; }
-			set
-			{
-				PluginSettings.Instance.DynamicTurretAllowExemption = value;
-			}
-		}
+        [Category( "Dynamic Turret Management" )]
+        [DisplayName( "Allow Exemption" )]
+        [Description( "Enable / Disable Allowing users to manually exempt their turrets from control with the [ManualControl] tag in custom name of turret." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool DynamicTurretAllowExemption
+        {
+            get { return PluginSettings.Instance.DynamicTurretAllowExemption; }
+            set
+            {
+                PluginSettings.Instance.DynamicTurretAllowExemption = value;
+            }
+        }
 
-		[Category( "Dynamic Turret Management" )]
-		[Description( "Set the type of management the server does.  All means anything will turn the turrets back on.  All but owner means everything except owner of turret turns them on.  EnemyAndNeutral mean enemy and neutral players/grids turn the turrets back on." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		[DisplayName( "Mode" )]
-		public DynamicTurretManagementMode DynamicTurretManagementMode
-		{
-			get { return PluginSettings.Instance.DynamicTurretManagementMode; }
-			set
-			{
-				PluginSettings.Instance.DynamicTurretManagementMode = value;
-			}
-		}
+        [Category( "Dynamic Turret Management" )]
+        [Description( "Set the type of management the server does.  All means anything will turn the turrets back on.  All but owner means everything except owner of turret turns them on.  EnemyAndNeutral mean enemy and neutral players/grids turn the turrets back on." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        [DisplayName( "Mode" )]
+        public DynamicTurretManagementMode DynamicTurretManagementMode
+        {
+            get { return PluginSettings.Instance.DynamicTurretManagementMode; }
+            set
+            {
+                PluginSettings.Instance.DynamicTurretManagementMode = value;
+            }
+        }
 
-        [Category("Dynamic Entity Management")]
-        [Description("Enable / Disable dynamic voxel management.")]
-        [Browsable(true)]
-        [ReadOnly(false)]
+        [Category( "Dynamic Entity Management" )]
+        [Description( "Enable / Disable dynamic voxel management." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
         public bool DynamicVoxelManagementEnabled
         {
             get { return PluginSettings.Instance.DynamicVoxelManagementEnabled; }
@@ -818,10 +818,10 @@
             }
         }
 
-        [Category("Dynamic Entity Management")]
-        [Description("Sets the distance in which voxels are sent to the client")]
-        [Browsable(true)]
-        [ReadOnly(false)]
+        [Category( "Dynamic Entity Management" )]
+        [Description( "Sets the distance in which voxels are sent to the client" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
         public int DynamicVoxelDistance
         {
             get { return PluginSettings.Instance.DynamicVoxelDistance; }
@@ -831,7 +831,7 @@
             }
         }
 
-		/*
+        /*
 		[Category("Dynamic Entity Management")]
 		[Description("Enable / Disable dynamic block management.  This manager disables blocks of ships that can't be concealed to further increase gamelogic savings.")]
 		[Browsable(true)]
@@ -846,115 +846,115 @@
 		}
 		*/
 
-		[Category( "Waypoint System" )]
-		[Description( "Enable / Disable personal waypoints.  These are hud displayed waypoints that only a user can see." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool WaypointsEnabled
-		{
-			get { return PluginSettings.Instance.WaypointsEnabled; }
-			set
-			{
-				PluginSettings.Instance.WaypointsEnabled = value;
-			}
-		}
+        [Category( "Waypoint System" )]
+        [Description( "Enable / Disable personal waypoints.  These are hud displayed waypoints that only a user can see." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool WaypointsEnabled
+        {
+            get { return PluginSettings.Instance.WaypointsEnabled; }
+            set
+            {
+                PluginSettings.Instance.WaypointsEnabled = value;
+            }
+        }
 
-		[Category( "Waypoint System" )]
-		[Description( "Maximum personal waypoints a player can have." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public int WaypointsMaxPerPlayer
-		{
-			get { return PluginSettings.Instance.WaypointsMaxPerPlayer; }
-			set
-			{
-				PluginSettings.Instance.WaypointsMaxPerPlayer = value;
-			}
-		}
+        [Category( "Waypoint System" )]
+        [Description( "Maximum personal waypoints a player can have." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public int WaypointsMaxPerPlayer
+        {
+            get { return PluginSettings.Instance.WaypointsMaxPerPlayer; }
+            set
+            {
+                PluginSettings.Instance.WaypointsMaxPerPlayer = value;
+            }
+        }
 
-		[Category( "Waypoint System" )]
-		[Description( "Server waypoints that every user will see and can not removed" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public MTObservableCollection<ServerWaypointItem> WaypointServerItems
-		{
-			get { return PluginSettings.Instance.WaypointServerItems; }
-		}
+        [Category( "Waypoint System" )]
+        [Description( "Server waypoints that every user will see and can not removed" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public MTObservableCollection<ServerWaypointItem> WaypointServerItems
+        {
+            get { return PluginSettings.Instance.WaypointServerItems; }
+        }
 
-		[Category( "Waypoint System" )]
-		[Description( "Default waypoints added for a user if they have none or are new" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public MTObservableCollection<ServerWaypointItem> WaypointDefaultItems
-		{
-			get { return PluginSettings.Instance.WaypointDefaultItems; }
-		}
+        [Category( "Waypoint System" )]
+        [Description( "Default waypoints added for a user if they have none or are new" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public MTObservableCollection<ServerWaypointItem> WaypointDefaultItems
+        {
+            get { return PluginSettings.Instance.WaypointDefaultItems; }
+        }
 
-		[Category( "Waypoint System" )]
-		[Description( "Maximum faction waypoints per faction" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public int WaypointsMaxPerFaction
-		{
-			get { return PluginSettings.Instance.WaypointsMaxPerFaction; }
-			set { PluginSettings.Instance.WaypointsMaxPerFaction = value; }
-		}
+        [Category( "Waypoint System" )]
+        [Description( "Maximum faction waypoints per faction" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public int WaypointsMaxPerFaction
+        {
+            get { return PluginSettings.Instance.WaypointsMaxPerFaction; }
+            set { PluginSettings.Instance.WaypointsMaxPerFaction = value; }
+        }
 
-		[Category( "Automated Cleanup System" )]
-		[Description( "Enable / Disable automated cleanup" )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool CleanupEnabled
-		{
-			get { return PluginSettings.Instance.CleanupEnabled; }
-			set { PluginSettings.Instance.CleanupEnabled = value; }
-		}
+        [Category( "Automated Cleanup System" )]
+        [Description( "Enable / Disable automated cleanup" )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool CleanupEnabled
+        {
+            get { return PluginSettings.Instance.CleanupEnabled; }
+            set { PluginSettings.Instance.CleanupEnabled = value; }
+        }
 
-		[Category( "Automated Cleanup System" )]
-		[Description( "Items that are triggered by a reached capacity.  These cleanup items will execute when a certain limit has been reached." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public MTObservableCollection<SettingsCleanupTriggerItem> CleanupTriggerItems
-		{
-			get { return PluginSettings.Instance.CleanupTriggerItems; }
-		}
+        [Category( "Automated Cleanup System" )]
+        [Description( "Items that are triggered by a reached capacity.  These cleanup items will execute when a certain limit has been reached." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public MTObservableCollection<SettingsCleanupTriggerItem> CleanupTriggerItems
+        {
+            get { return PluginSettings.Instance.CleanupTriggerItems; }
+        }
 
-		[Category( "Automated Cleanup System" )]
-		[Description( "Items that are triggered by time.  These items will execute when a certain time of the day is reached." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public MTObservableCollection<SettingsCleanupTimedItem> CleanupTimedItems
-		{
-			get { return PluginSettings.Instance.CleanupTimedItems; }
-		}
+        [Category( "Automated Cleanup System" )]
+        [Description( "Items that are triggered by time.  These items will execute when a certain time of the day is reached." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public MTObservableCollection<SettingsCleanupTimedItem> CleanupTimedItems
+        {
+            get { return PluginSettings.Instance.CleanupTimedItems; }
+        }
 
-		[Category( "Automated Cleanup System" )]
-		[Description( "Notifications to users that a cleanup is about to occur." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public MTObservableCollection<SettingsCleanupNotificationItem> CleanupNotificationItems
-		{
-			get { return PluginSettings.Instance.CleanupNotificationItems; }
-		}
+        [Category( "Automated Cleanup System" )]
+        [Description( "Notifications to users that a cleanup is about to occur." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public MTObservableCollection<SettingsCleanupNotificationItem> CleanupNotificationItems
+        {
+            get { return PluginSettings.Instance.CleanupNotificationItems; }
+        }
 
-		[Category( "Block Enforcement System" )]
-		[Description( "Enable / Disable block type max count enforcement.  This removes blocks that exceed a certain count.  They are removed forcefully from a grid.  When max is reached, a warning is given.  When max is exceeded another warning." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public bool BlockEnforcementEnabled
-		{
-			get { return PluginSettings.Instance.BlockEnforcementEnabled; }
-			set { PluginSettings.Instance.BlockEnforcementEnabled = value; }
-		}
+        [Category( "Block Enforcement System" )]
+        [Description( "Enable / Disable block type max count enforcement.  This removes blocks that exceed a certain count.  They are removed forcefully from a grid.  When max is reached, a warning is given.  When max is exceeded another warning." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool BlockEnforcementEnabled
+        {
+            get { return PluginSettings.Instance.BlockEnforcementEnabled; }
+            set { PluginSettings.Instance.BlockEnforcementEnabled = value; }
+        }
 
-		[Category( "Block Enforcement System" )]
-		[Description( "Enforcement Items.  These are how block enforcements are defined.  Each item is a block that is scanned for." )]
-		[Browsable( true )]
-		[ReadOnly( false )]
-		public MTObservableCollection<SettingsBlockEnforcementItem> BlockEnforcementItems
-		{
-			get { return PluginSettings.Instance.BlockEnforcementItems; }
-		}
+        [Category( "Block Enforcement System" )]
+        [Description( "Enforcement Items.  These are how block enforcements are defined.  Each item is a block that is scanned for." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public MTObservableCollection<SettingsBlockEnforcementItem> BlockEnforcementItems
+        {
+            get { return PluginSettings.Instance.BlockEnforcementItems; }
+        }
 
         /*
 		[Category("Game Modes")]
@@ -974,14 +974,14 @@
 
         #region Constructors and Initializers
 
-        private void DoInit(string path)
+        private void DoInit( string path )
         {
             Instance = this;
             //controlForm.Text = "Testing";
             _pluginPath = path;
 
             // Load our settings
-            PluginSettings.Instance.Load();
+            PluginSettings.Instance.Load( );
 
             // Setup process handlers
             _processHandlers = new List<ProcessHandlerBase>
@@ -1105,69 +1105,69 @@
                             };
 
             _processThreads = new List<Thread>( );
-			_processThread = new Thread( PluginProcessing );
-			_processThread.Start( );
+            _processThread = new Thread( PluginProcessing );
+            _processThread.Start( );
 
-			MyAPIGateway.Entities.OnEntityAdd -= OnEntityAdd;
-			MyAPIGateway.Entities.OnEntityRemove -= OnEntityRemove;
-			MyAPIGateway.Entities.OnEntityAdd += OnEntityAdd;
-			MyAPIGateway.Entities.OnEntityRemove += OnEntityRemove;
-            
-            MyAPIGateway.Multiplayer.RegisterMessageHandler( 9003, ReceiveDataMessage );
-            
+            MyAPIGateway.Entities.OnEntityAdd -= OnEntityAdd;
+            MyAPIGateway.Entities.OnEntityRemove -= OnEntityRemove;
+            MyAPIGateway.Entities.OnEntityAdd += OnEntityAdd;
+            MyAPIGateway.Entities.OnEntityRemove += OnEntityRemove;
+
+            //MyAPIGateway.Multiplayer.RegisterMessageHandler( 9003, ReceiveDataMessage );
+
             Protection.Init( );
 
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
-		}
+        }
 
-		#endregion
+        #endregion
 
-		#region Processing Loop
-		private void PluginProcessing( )
-		{
-			try
-			{
-				foreach ( ProcessHandlerBase handler in _processHandlers )
-				{
-					ProcessHandlerBase currentHandler = handler;
-					Thread thread = new Thread( ( ) =>
-					{
-						while ( _running )
-						{
-							if ( currentHandler.CanProcess( ) )
-							{
-								try
-								{
-									currentHandler.Handle( );
-								}
-								catch ( Exception ex )
-								{
-									Log.Warn( "Handler Problems: {0} - {1}", currentHandler.GetUpdateResolution( ), ex );
+        #region Processing Loop
+        private void PluginProcessing( )
+        {
+            try
+            {
+                foreach ( ProcessHandlerBase handler in _processHandlers )
+                {
+                    ProcessHandlerBase currentHandler = handler;
+                    Thread thread = new Thread( ( ) =>
+                    {
+                        while ( _running )
+                        {
+                            if ( currentHandler.CanProcess( ) )
+                            {
+                                try
+                                {
+                                    currentHandler.Handle( );
+                                }
+                                catch ( Exception ex )
+                                {
+                                    Log.Warn( "Handler Problems: {0} - {1}", currentHandler.GetUpdateResolution( ), ex );
                                     StackTrace st = new StackTrace( ex, true );
                                     StackFrame[ ] frames = st.GetFrames( );
-                                    
+
                                     foreach ( StackFrame frame in frames )
                                     {
                                         Log.Error( "{0}:{1}({2},{3})", frame.GetFileName( ), frame.GetMethod( ).Name, frame.GetFileLineNumber( ), frame.GetFileColumnNumber( ) );
                                     }
                                 }
 
-								// Let's make sure LastUpdate is set to now otherwise we may start processing too quickly
-								currentHandler.LastUpdate = DateTime.Now;
-							}
+                                // Let's make sure LastUpdate is set to now otherwise we may start processing too quickly
+                                currentHandler.LastUpdate = DateTime.Now;
+                            }
 
-							Thread.Sleep( 100 );
-						}
-					} );
+                            Thread.Sleep( 100 );
+                        }
+                    } );
 
-					_processThreads.Add( thread );
-					thread.Start( );
-				}
+                    _processThreads.Add( thread );
+                    thread.Start( );
+                }
 
-				foreach ( Thread thread in _processThreads )
-					thread.Join( );
+                foreach ( Thread thread in _processThreads )
+                    thread.Join( );
 
-				/*
+                /*
 				while (true)
 				{
 					if (DateTime.Now - m_lastProcessUpdate > TimeSpan.FromMilliseconds(100))
@@ -1199,36 +1199,36 @@
 				}
 				*/
 
-			}
-			catch ( ThreadAbortException ex )
-			{
-				Log.Trace( ex );
-			}
-			catch ( Exception ex )
-			{
-				Log.Error( ex );
-			}
-			finally
-			{
-				MyAPIGateway.Entities.OnEntityAdd -= OnEntityAdd;
-				MyAPIGateway.Entities.OnEntityRemove -= OnEntityRemove;
-			}
-		}
-		#endregion
+            }
+            catch ( ThreadAbortException ex )
+            {
+                Log.Trace( ex );
+            }
+            catch ( Exception ex )
+            {
+                Log.Error( ex );
+            }
+            finally
+            {
+                MyAPIGateway.Entities.OnEntityAdd -= OnEntityAdd;
+                MyAPIGateway.Entities.OnEntityRemove -= OnEntityRemove;
+            }
+        }
+        #endregion
 
-		#region IPlugin Members
-		public void Init( )
+        #region IPlugin Members
+        public void Init( )
         {
             //register object builder assembly
             string path = System.IO.Path.Combine( AppDomain.CurrentDomain.BaseDirectory, "SpaceEngineers.ObjectBuilders.DLL" );
             VRage.Plugins.MyPlugins.RegisterGameObjectBuildersAssemblyFile( path );
 
             Log.Debug( "Initializing Essentials plugin at path {0}\\", Path.GetDirectoryName( Assembly.GetExecutingAssembly( ).Location ) );
-			DoInit( Path.GetDirectoryName( Assembly.GetExecutingAssembly( ).Location ) + "\\" );
+            DoInit( Path.GetDirectoryName( Assembly.GetExecutingAssembly( ).Location ) + "\\" );
         }
 
-		public void InitWithPath( String modPath )
-		{
+        public void InitWithPath( String modPath )
+        {
             //register object builder assembly
             string path = System.IO.Path.Combine( AppDomain.CurrentDomain.BaseDirectory, "SpaceEngineers.ObjectBuilders.DLL" );
             VRage.Plugins.MyPlugins.RegisterGameObjectBuildersAssemblyFile( path );
@@ -1237,20 +1237,20 @@
             DoInit( Path.GetDirectoryName( modPath ) + "\\" );
         }
 
-		public void Shutdown( )
-		{
-			Log.Info( "Shutting down plugin: {0} - {1}", Name, Version );
+        public void Shutdown( )
+        {
+            Log.Info( "Shutting down plugin: {0} - {1}", Name, Version );
 
-			foreach ( Thread thread in _processThreads )
-				thread.Abort( );
+            foreach ( Thread thread in _processThreads )
+                thread.Abort( );
 
-			_processThread.Abort( );
-		}
+            _processThread.Abort( );
+        }
 
-		public void Update( )
-		{
+        public void Update( )
+        {
 
-		}
+        }
 
         #endregion
 
@@ -1281,11 +1281,15 @@
         {
             string text = Encoding.Unicode.GetString( data );
             MessageRecieveItem item = MyAPIGateway.Utilities.SerializeFromXML<MessageRecieveItem>( text );
-            
+
             if ( item.msgID == 5010 )
-            {
+            {/*
                 //chat command
-                HandleChatMessage( item.fromID, item.message );
+                if ( item.message[0] != '/' )
+                    return;
+
+                HandleChatMessage( item.fromID, item.message );*/
+                OnChatReceived( new ChatManager.ChatEvent( ChatManager.ChatEventType.OnChatReceived, DateTime.Now, item.fromID, 0, item.message, 0 ));
             }
         }
 
@@ -1299,8 +1303,15 @@
 			if ( obj.Message[ 0 ] != '/' )
 				return;
 
-			HandleChatMessage( obj.SourceUserId, obj.Message );
-		}
+            if ( obj.SourceUserId == 0 && obj.RemoteUserId == 0 )
+                HandleChatMessage( obj.SourceUserId, obj.Message );
+
+            else if ( obj.SourceUserId == 0 && obj.RemoteUserId != 0 )
+                HandleChatMessage( obj.RemoteUserId, obj.Message );
+
+            else
+                HandleChatMessage( obj.SourceUserId, obj.Message );
+        }
 
 		public void HandleChatMessage( ulong steamId, string message )
         {

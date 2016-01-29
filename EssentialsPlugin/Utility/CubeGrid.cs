@@ -825,13 +825,14 @@
 
 			if ( !quiet )
 				Communication.SendPrivateInformation( userId, string.Format( "Scanning for ships with options: {0}", GetOptionsText( options ) ) );
-
+                        
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
+            Log.Info( "getting grids" );
             Wrapper.GameAction( ( ) =>
             {
-            	MyAPIGateway.Entities.GetEntities( entities, x => x is IMyCubeGrid );
+                MyAPIGateway.Entities.GetEntities( entities );
             } );
-            
+            Log.Info( "got grids" );
 
             HashSet<IMyEntity> entitiesToConfirm = new HashSet<IMyEntity>( );
 			HashSet<IMyEntity> entitiesUnconnected = new HashSet<IMyEntity>( );
