@@ -44,7 +44,7 @@
 		// admin deletearea x y z radius
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			if (words.Length < 3)
+			if (words.Length != 3)
 			{
 				Communication.SendPrivateInformation(userId, GetHelp());
 				return true;
