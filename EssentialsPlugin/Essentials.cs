@@ -1261,38 +1261,6 @@
 
         }
 
-        public class MessageRecieveItem
-        {
-            public ulong fromID
-            {
-                get; set;
-            }
-            public long msgID
-            {
-                get; set;
-            }
-            public string message
-            {
-                get; set;
-            }
-        }
-
-        public void ReceiveDataMessage( byte[ ] data )
-        {
-            string text = Encoding.Unicode.GetString( data );
-            MessageRecieveItem item = MyAPIGateway.Utilities.SerializeFromXML<MessageRecieveItem>( text );
-
-            if ( item.msgID == 5010 )
-            {/*
-                //chat command
-                if ( item.message[0] != '/' )
-                    return;
-
-                HandleChatMessage( item.fromID, item.message );*/
-                OnChatReceived( new ChatManager.ChatEvent( ChatManager.ChatEventType.OnChatReceived, DateTime.Now, item.fromID, 0, item.message, 0 ));
-            }
-        }
-
         /// <summary>
         /// Raised when a chat messages are received.
         /// NOTE: This is raised on a different thread
@@ -1302,14 +1270,7 @@
 		{
 			if ( obj.Message[ 0 ] != '/' )
 				return;
-
-            if ( obj.SourceUserId == 0 && obj.RemoteUserId == 0 )
-                HandleChatMessage( obj.SourceUserId, obj.Message );
-
-            else if ( obj.SourceUserId == 0 && obj.RemoteUserId != 0 )
-                HandleChatMessage( obj.RemoteUserId, obj.Message );
-
-            else
+            
                 HandleChatMessage( obj.SourceUserId, obj.Message );
         }
 
