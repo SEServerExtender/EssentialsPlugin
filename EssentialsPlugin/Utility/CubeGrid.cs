@@ -31,9 +31,13 @@
 		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		public static Vector3D RemoveGridsInSphere( ulong userId, Vector3D startPosition, float radius, RemoveGridTypes removeType )
 		{
+            List<IMyEntity> entitiesToMove = new List<IMyEntity>( );
 			BoundingSphereD sphere = new BoundingSphereD( startPosition, radius );
-			List<IMyEntity> entitiesToMove = MyAPIGateway.Entities.GetEntitiesInSphere( ref sphere );
-			List<IMyEntity> entitiesToRemove = new List<IMyEntity>( );
+            Wrapper.GameAction( ( ) =>
+             {
+                 entitiesToMove = MyAPIGateway.Entities.GetEntitiesInSphere( ref sphere );
+             } );
+            List<IMyEntity> entitiesToRemove = new List<IMyEntity>( );
 			int count = 0;
 
 			Wrapper.GameAction( ( ) =>
@@ -1489,8 +1493,10 @@
 			HashSet<IMyEntity> gridsProcessed = new HashSet<IMyEntity>( );
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
 
-  
-                MyAPIGateway.Entities.GetEntities(entities, collect);
+            Wrapper.GameAction( ( ) =>
+             {
+                 MyAPIGateway.Entities.GetEntities( entities, collect );
+             } );
 
 			foreach ( IMyEntity entity in entities )
 			{

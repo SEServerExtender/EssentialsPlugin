@@ -31,6 +31,24 @@
     using Sandbox.Game.Entities.Blocks;
     using Sandbox.Game.Entities.Character;
     using VRage.Game;
+
+    class ConcealItem
+    {
+        public ConcealItem( IMyEntity _entity, string _reason )
+        {
+            this.entity = _entity;
+            this.reason = _reason;
+        }
+        public ConcealItem( KeyValuePair<IMyEntity, string> kvp )
+        {
+            this.entity = kvp.Key;
+            this.reason = kvp.Value;
+        }
+
+        public IMyEntity entity;
+        public string reason;
+    }
+
     public class EntityManagement
     {
         private static volatile bool _checkReveal;
@@ -42,26 +60,7 @@
         private static SortedList<long, ConcealItem> ConcealQueue = new SortedList<long, ConcealItem>( );
         private static SortedList<long, ConcealItem> RevealQueue = new SortedList<long, ConcealItem>( );
         private static SortedList<long, ConcealItem> MedbayQueue = new SortedList<long, ConcealItem>( );
-
-
-        //I feel stupid having a struct for two items, but we can't compare IMyEntity so...
-        struct ConcealItem
-        {
-            public ConcealItem( IMyEntity _entity, string _reason )
-            {
-                this.entity = _entity;
-                this.reason = _reason;
-            }
-            public ConcealItem( KeyValuePair<IMyEntity, string> kvp )
-            {
-                this.entity = kvp.Key;
-                this.reason = kvp.Value;                
-            }
-
-            public IMyEntity entity;
-            public string reason;
-        };
-
+                
         public static void ProcessConcealment( bool force = false )
         {
             if ( !MedbayQueue.Any( ) && !RevealQueue.Any( ) && !ConcealQueue.Any( ) )
@@ -147,7 +146,10 @@
 
 				try
 				{
-					MyAPIGateway.Entities.GetEntities( entities );
+                    Wrapper.GameAction( ( ) =>
+                     {
+                         MyAPIGateway.Entities.GetEntities( entities );
+                     } );
 				}
 				catch ( Exception ex )
 				{
@@ -1149,7 +1151,10 @@
 
 				try
 				{
-					MyAPIGateway.Entities.GetEntities( entities );
+                    Wrapper.GameAction( ( ) =>
+                     {
+                         MyAPIGateway.Entities.GetEntities( entities );
+                     } );
 				}
 				catch
 				{
