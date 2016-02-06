@@ -955,6 +955,70 @@
         {
             get { return PluginSettings.Instance.BlockEnforcementItems; }
         }
+        
+        [Category( "Reserved Slots" )]
+        [Description( "This reserves slots for whitelisted players or groups." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool ReservedSlotsEnabled
+        {
+            get
+            {
+                return PluginSettings.Instance.ReservedSlotsEnabled;
+            }
+            set
+            {
+                PluginSettings.Instance.ReservedSlotsEnabled = value;
+            }
+        }
+
+        [Category( "Reserved Slots" )]
+        [Description( "Number of slots to reserve." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public int ReservedSlotsCount
+        {
+            get
+            {
+                return PluginSettings.Instance.ReservedSlotsCount;
+            }
+            set
+            {
+                PluginSettings.Instance.ReservedSlotsCount = value;
+            }
+        }
+
+        [Category( "Reserved Slots" )]
+        [Description( "Group ID number. Players in this group can occupy a reserved slot." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public ulong ReservedSlotsGroupID
+        {
+            get
+            {
+                return PluginSettings.Instance.ReservedSlotsGroup;
+            }
+            set
+            {
+                PluginSettings.Instance.ReservedSlotsGroup = value;
+            }
+        }
+
+        [Category( "Reserved Slots" )]
+        [Description( "SteamID of players who can occupy a reserved slot." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public string[] ReservedSlotsPlayers
+        {
+            get
+            {
+                return PluginSettings.Instance.ReservedSlotsPlayers;
+            }
+            set
+            {
+                PluginSettings.Instance.ReservedSlotsPlayers = value;
+            }
+        }
 
         /*
 		[Category("Game Modes")]
@@ -998,7 +1062,8 @@
                                    new ProcessCleanup( ),
                                    new ProcessBlockEnforcement( ),
                                    new ProcessSpawnShipTracking( ),
-                                   new ProcessVoxels(  )
+                                   new ProcessVoxels(  ),
+                                   new ProcessReservedSlots()
                                };
 
             // Setup chat handlers
@@ -1116,6 +1181,7 @@
             //MyAPIGateway.Multiplayer.RegisterMessageHandler( 9003, ReceiveDataMessage );
 
             Protection.Init( );
+            ProcessReservedSlots.Init( );
 
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
         }

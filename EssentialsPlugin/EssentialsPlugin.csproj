@@ -142,6 +142,7 @@
     <Compile Include="ProcessHandlers\ProcessConceal.cs" />
     <Compile Include="ProcessHandlers\ProcessDockingZone.cs" />
     <Compile Include="ProcessHandlers\ProcessBlocks.cs" />
+    <Compile Include="ProcessHandlers\ProcessReservedSlots.cs" />
     <Compile Include="ProcessHandlers\ProcessTurrets.cs" />
     <Compile Include="ProcessHandlers\ProcessConquest.cs" />
     <Compile Include="ProcessHandlers\ProcessLoginTracking.cs" />
@@ -255,6 +256,10 @@
     <Reference Include="SpaceEngineers.ObjectBuilders.XmlSerializers, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Debug\SpaceEngineers.ObjectBuilders.XmlSerializers.dll</HintPath>
+    </Reference>
+    <Reference Include="SteamSDK, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SEServerExtender\GameLibraries\SteamSDK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Design" />

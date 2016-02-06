@@ -112,7 +112,12 @@
 		private MTObservableCollection<SettingsBlockEnforcementItem> _blockEnforcementItems;
 
 		private bool _gameModeConquestEnabled;
-		#endregion
+        #endregion
+
+        private bool _reservedSlotsEnabled;
+        private int _reservedSlotsCount;
+        private ulong _reservedSlotsGroup;
+        private string[ ] _reservedSlotsPlayers = { };
 
 		#region Static Properties
 		public static DateTime RestartStartTime
@@ -893,10 +898,62 @@
 			}
 		}
 
-		#endregion
+        public bool ReservedSlotsEnabled
+        {
+            get
+            {
+                return _reservedSlotsEnabled;
+            }
+            set
+            {
+                _reservedSlotsEnabled = value;
+                Save( );
+            }
+        }
 
-		#region Constructor
-		public PluginSettings()
+        public int ReservedSlotsCount
+        {
+            get
+            {
+                return _reservedSlotsCount;
+            }
+            set
+            {
+                _reservedSlotsCount = value;
+                Save( );
+            }
+        }
+
+        public ulong ReservedSlotsGroup
+        {
+            get
+            {
+                return _reservedSlotsGroup;
+            }
+            set
+            {
+                _reservedSlotsGroup = value;
+                Save( );
+            }
+        }
+
+        public string[ ] ReservedSlotsPlayers
+        {
+            get
+            {
+                return _reservedSlotsPlayers;
+            }
+            set
+            {
+                _reservedSlotsPlayers = value;
+                Save( );
+            }
+        }
+
+        #endregion
+
+        #region Constructor
+        public PluginSettings()
 		{
 			// Default is 12 hours
 			_start = DateTime.Now;
@@ -918,6 +975,10 @@
 			_restartTimeItems.CollectionChanged += ItemsCollectionChanged;
 			_backupItems.CollectionChanged += ItemsCollectionChanged;
 			_protectedItems.CollectionChanged += ItemsCollectionChanged;
+
+            _reservedSlotsEnabled = false;
+            _reservedSlotsCount = 5;
+            _reservedSlotsGroup = 0;
 
             _stopShipsOnStart = false;
 
