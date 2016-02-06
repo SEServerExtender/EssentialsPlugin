@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Sandbox.Engine.Multiplayer;
 using Sandbox.ModAPI;
 using SEModAPIExtensions.API;
+using SEModAPIInternal.API.Common;
 using SEModAPIInternal.API.Server;
 using SteamSDK;
 
@@ -33,11 +34,24 @@ namespace EssentialsPlugin.ProcessHandlers
         {
             //it might be better to hook into ValidateAuthTicketResponse, but doing it this way lets the game
             //take care of denying banned players and group/friend whitelisting
-                        
+
+            if ( !PluginSettings.Instance.ReservedSlotsEnabled )
+                return;
+
             if ( PluginSettings.Instance.ReservedSlotsPlayers.Contains( remoteUserId.ToString( ) ) )
             {
                 reservedPlayers.Add( remoteUserId );
                 Essentials.Log.Info( "Whitelisted player connected: " + remoteUserId.ToString( ) );
+                Essentials.Log.Info( string.Format( "{0} whitelisted players connected. {1} of {2} reserved slots allocated.",
+                    reservedPlayers.Count, Math.Min( reservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount ), PluginSettings.Instance.ReservedSlotsCount ) );
+
+                return;
+            }
+
+            if ( PluginSettings.Instance.ReservedSlotsAdmins && PlayerManager.Instance.IsUserAdmin( remoteUserId ) )
+            {
+                reservedPlayers.Add( remoteUserId );
+                Essentials.Log.Info( "Whitelisted admin connected: " + remoteUserId.ToString( ) );
                 Essentials.Log.Info( string.Format( "{0} whitelisted players connected. {1} of {2} reserved slots allocated.",
                     reservedPlayers.Count, Math.Min( reservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount ), PluginSettings.Instance.ReservedSlotsCount ) );
 
@@ -62,7 +76,7 @@ namespace EssentialsPlugin.ProcessHandlers
 
             int publicPlayers = connectedPlayers.Count - Math.Min( reservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount );
             int publicSlots = Server.Instance.Config.MaxPlayers - PluginSettings.Instance.ReservedSlotsCount;
-            
+
             if ( publicPlayers < publicSlots )
                 return;
 
@@ -81,6 +95,9 @@ namespace EssentialsPlugin.ProcessHandlers
 
         private static void GameServer_UserGroupStatus( ulong userId, ulong groupId, bool member, bool officier )
         {
+            if ( !PluginSettings.Instance.ReservedSlotsEnabled )
+                return;
+
             if ( groupId == PluginSettings.Instance.ReservedSlotsGroup && waitingPlayers.Remove( userId ) )
             {
                 if ( member || officier )

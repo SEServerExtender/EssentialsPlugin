@@ -1020,6 +1020,22 @@
             }
         }
 
+        [Category( "Reserved Slots" )]
+        [Description( "Add all server admins to the whitelist." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool ReservedSlotsAdmins
+        {
+            get
+            {
+                return PluginSettings.Instance.ReservedSlotsAdmins;
+            }
+            set
+            {
+                PluginSettings.Instance.ReservedSlotsAdmins = value;
+            }
+        }
+
         /*
 		[Category("Game Modes")]
 		[Description("Conquest Game Mode - This mode tracks asteroid owners by counting owned blocks near an asteroid to determine the owner.  Includes a leaderboard")]

@@ -118,6 +118,7 @@
         private int _reservedSlotsCount;
         private ulong _reservedSlotsGroup;
         private string[ ] _reservedSlotsPlayers = { };
+        private bool _reservedSlotsAdmins;
 
 		#region Static Properties
 		public static DateTime RestartStartTime
@@ -950,6 +951,19 @@
             }
         }
 
+        public bool ReservedSlotsAdmins
+        {
+            get
+            {
+                return _reservedSlotsAdmins;
+            }
+            set
+            {
+                _reservedSlotsAdmins = value;
+                Save( );
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -979,6 +993,7 @@
             _reservedSlotsEnabled = false;
             _reservedSlotsCount = 5;
             _reservedSlotsGroup = 0;
+            _reservedSlotsAdmins = false;
 
             _stopShipsOnStart = false;
 
