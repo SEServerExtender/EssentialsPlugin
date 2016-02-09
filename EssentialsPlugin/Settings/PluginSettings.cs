@@ -21,7 +21,7 @@
 		#region Private Fields
 		private static PluginSettings _instance;
 		private static bool _loading = false;
-		private static DateTime _start;
+		public static DateTime Start;
 
 		private string _serverName;
 		private bool _serverUtilityGridsShowCoords;
@@ -120,18 +120,9 @@
         private string[ ] _reservedSlotsPlayers = { };
 
 		#region Static Properties
-		public static DateTime RestartStartTime
-		{
-			get
-			{
-				return _start;
-			}
-		}
 
-		public static PluginSettings Instance
-		{
-			get { return _instance ?? ( _instance = new PluginSettings( ) ); }
-		}
+		public static PluginSettings Instance => _instance ?? ( _instance = new PluginSettings( ) );
+
 		#endregion
 
 		#region Properties
@@ -228,10 +219,7 @@
 			}
 		}
 
-		public MTObservableCollection<InformationItem> InformationItems
-		{
-			get { return _informationItems; }
-		}
+		public MTObservableCollection<InformationItem> InformationItems => _informationItems;
 
 		// Automated Restarts
 		public bool RestartEnabled
@@ -956,7 +944,7 @@
         public PluginSettings()
 		{
 			// Default is 12 hours
-			_start = DateTime.Now;
+			Start = DateTime.Now;
 			_newUserTransportDistance = 500;
 			_backupAsteroids = true;
 
@@ -1036,7 +1024,7 @@
 			{
 				lock (this)
 				{
-					String fileName = Essentials.PluginPath + "Essential-Settings.xml";
+					string fileName = Essentials.PluginPath + "Essential-Settings.xml";
 					if (File.Exists(fileName))
 					{
 						using (StreamReader reader = new StreamReader(fileName))
@@ -1072,7 +1060,7 @@
 			{
 				lock (this)
 				{
-					String fileName = Essentials.PluginPath + "Essential-Settings.xml";
+					string fileName = Essentials.PluginPath + "Essential-Settings.xml";
 					using (StreamWriter writer = new StreamWriter(fileName))
 					{
 						XmlSerializer x = new XmlSerializer(typeof(PluginSettings));
@@ -1125,7 +1113,7 @@
 
 			try
 			{
-				string[] words = line.Split(new char[] { ' ' });
+				string[] words = line.Split( ' ' );
 				SettingsOperators so = SettingsOperators.List;
 				string newValue = "";
 				string name = "";
@@ -1135,10 +1123,7 @@
 
 				if (words.Length == 2)
 				{
-					if (words[1].ToLower() == "add")
-						so = SettingsOperators.Add;
-					else
-						so = SettingsOperators.Remove;
+					so = words[1].ToLower() == "add" ? SettingsOperators.Add : SettingsOperators.Remove;
 				}
 				else if (words.Length > 2)
 				{
@@ -1155,7 +1140,7 @@
 				}
 				else
 				{
-					result += string.Format("Getting Value(s) For Setting: {0}\r\n", name == "" ? "root" : name);
+					result += $"Getting Value(s) For Setting: {( name == "" ? "root" : name )}\r\n";
 				}
 
 				result += ReflectObject(_instance, name, null, so, newValue);
@@ -1179,7 +1164,7 @@
 				if (propertyInfo != null)
 					checkType = propertyInfo.PropertyType;
 				
-				string[] names = name.Split(new char[] { '.' }, 2);
+				string[] names = name.Split(new[] { '.' }, 2);
 				if (checkType.IsArray)
 				{
 					ReflectArray(obj, propertyInfo, so, newValue, ref result, names);
@@ -1225,23 +1210,21 @@
 							string value = "";
 							if (info.PropertyType.IsValueType || info.PropertyType == typeof(string))
 							{
-								value += string.Format("{0}: {1}", info.Name, ReflectObject(obj, recurseName, info, so, newValue));
+								value += $"{info.Name}: {ReflectObject( obj, recurseName, info, so, newValue )}";
 							}
 							else if (info.PropertyType.IsArray)
 							{								
 								if(!recurse)
-									value += string.Format("{0}: (array)", info.Name);
+									value += $"{info.Name}: (array)";
 								else
 									value += ReflectObject(obj, recurseName, info, so, newValue);
 							}
 							else if(info.GetValue(obj) != null && info.GetValue(obj).GetType().InheritsOrImplements(typeof(IList<>)))
 							{							
 								if (!recurse)
-									value += string.Format("{0}: (list)", info.Name);
+									value += $"{info.Name}: (list)";
 								else
 									value += ReflectObject(obj, recurseName, info, so, newValue);
-
-								found = true;
 							}
 
 							if (result != "" && value != "")
@@ -1254,7 +1237,7 @@
 
 					if(!found)
 					{
-						result += string.Format("Unabled to find setting: {0}", name);
+						result += $"Unabled to find setting: {name}";
 					}
 				}
 			}
@@ -1266,6 +1249,7 @@
 			return result;
 		}
 
+		/// <exception cref="OverflowException">The array is multidimensional and contains more than <see cref="F:System.Int32.MaxValue" /> elements.</exception>
 		private void ReflectArray(object obj, PropertyInfo info, SettingsOperators so, string newValue, ref string result, string[] names)
 		{
 			int item = 0;
@@ -1287,7 +1271,7 @@
 				Array newArray = Array.CreateInstance(elementType, arrayToReflect.Length + 1);
 				Array.Copy(arrayToReflect, newArray, Math.Min(arrayToReflect.Length, newArray.Length));
 				info.SetValue(obj, newArray);
-				result += string.Format("{{ Added New Array Element - New size: {0} }}", arrayToReflect.Length + 1);
+				result += $"{{ Added New Array Element - New size: {arrayToReflect.Length + 1} }}";
 				Save();
 				return;
 			}
@@ -1304,7 +1288,7 @@
 					Array.Copy(arrayToReflect, item + 1, newArray, item, arrayToReflect.Length - item - 1);
 
 				info.SetValue(obj, newArray);
-				result += string.Format("{{ Removed Array Element At: {0} }}", item);
+				result += $"{{ Removed Array Element At: {item} }}";
 				Save();
 				return;
 			}
@@ -1319,14 +1303,14 @@
 
 					if (so == SettingsOperators.Set && newValue != "")
 					{
-						result += (string.Format("Setting Value of {0} item #{1} to '{2}'", info.Name, r, newValue));
+						result += ( $"Setting Value of {info.Name} item #{r} to '{newValue}'" );
 						arrayToReflect.SetValue(Convert.ChangeType(newValue, arrayToReflect.GetType().GetElementType()), r);
 						Save();
 					}
 					else
 					{
 						object itemToReflect = arrayToReflect.GetValue(r);
-						result += "{" + string.Format("{0}: {1}", r, itemToReflect) + "}";
+						result += "{" + $"{r}: {itemToReflect}" + "}";
 					}
 
 					added = true;
@@ -1362,7 +1346,7 @@
 			{
 				Type elementType = listToReflect.GetType().GetGenericArguments()[0];
 				listToReflect.Add(Activator.CreateInstance(elementType));
-				result += string.Format("{{ Added New List Element - New size: {0} }}", listToReflect.Count);
+				result += $"{{ Added New List Element - New size: {listToReflect.Count} }}";
 				Save();
 				return;
 			}
@@ -1370,7 +1354,7 @@
 			{
 				item = int.Parse(newValue);
 				listToReflect.RemoveAt(item);
-				result += string.Format("{{ Removed List Element At: {0} - New Size: {1} }}", item, listToReflect.Count);
+				result += $"{{ Removed List Element At: {item} - New Size: {listToReflect.Count} }}";
 				Save();
 				return;
 			}
@@ -1385,7 +1369,7 @@
 						result += "\r\n";
 
 					object itemToReflect = listToReflect.GetType().GetProperty("Item").GetValue(listToReflect, new object[] { r });
-					String value = string.Format("{0} : {1}", r, ReflectObject(itemToReflect, recurseName, listToReflect.GetType().GetProperty("Item"), so, newValue));
+					string value = $"{r} : {ReflectObject( itemToReflect, recurseName, listToReflect.GetType( ).GetProperty( "Item" ), so, newValue )}";
 					value = "{" + value.Replace("\r\n", ", ") + "}";
 					result += value;					
 					added = true;
