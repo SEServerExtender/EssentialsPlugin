@@ -26,6 +26,7 @@ namespace EssentialsPlugin.ProcessHandlers
 
             _init = true;
             SteamSDK.SteamServerAPI.Instance.GameServer.UserGroupStatus += GameServer_UserGroupStatus;
+            //SteamSDK.SteamServerAPI.Instance.GameServer.ValidateAuthTicketResponse -= MyDedicatedServerBase.GameServer_ValidateAuthTicketResponse( );
 
             Essentials.Log.Info( "Reserved slots initialized" );
         }

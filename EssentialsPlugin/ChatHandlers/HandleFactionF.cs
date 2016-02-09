@@ -8,7 +8,7 @@
 	{
 		public override string GetHelp()
 		{
-			return "Sends a private message to all faction members that are online.  Usage: /faction <msg>";
+			return "Sends a private message to all faction members that are online.  Usage: /f <msg>";
 		}
 
 		public override string GetCommandText()
