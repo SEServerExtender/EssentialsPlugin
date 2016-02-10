@@ -1194,17 +1194,12 @@
             MyAPIGateway.Entities.OnEntityAdd += OnEntityAdd;
             MyAPIGateway.Entities.OnEntityRemove += OnEntityRemove;
 
-            MyAPIGateway.Multiplayer.RegisterMessageHandler( 9003, ReceiveDataMessage );
+            //MyAPIGateway.Multiplayer.RegisterMessageHandler( 9003, ReceiveDataMessage );
 
             Protection.Init( );
             ProcessReservedSlots.Init( );
 
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
-        }
-
-        private void ReceiveDataMessage( byte[] data )
-        {
-            
         }
 
         #endregion
@@ -1354,14 +1349,11 @@
         /// </summary>
         /// <param name="obj"></param>
         public void OnChatReceived( ChatManager.ChatEvent obj )
-        {
-            if ( obj.Message[0] != '/' )
-            {
-                ChatHistory.AddChat( obj );
-                return;
-            }
-
-            HandleChatMessage( obj.SourceUserId, obj.Message );
+		{
+			if ( obj.Message[ 0 ] != '/' )
+				return;
+            
+                HandleChatMessage( obj.SourceUserId, obj.Message );
         }
 
 		public void HandleChatMessage( ulong steamId, string message )

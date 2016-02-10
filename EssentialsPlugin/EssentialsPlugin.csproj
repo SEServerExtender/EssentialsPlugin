@@ -184,6 +184,7 @@
     <Compile Include="UtilityClasses\SerializeableDictionary.cs" />
     <Compile Include="UtilityClasses\UIEditors.cs" />
     <Compile Include="Utility\Backup.cs" />
+    <Compile Include="Utility\ChatHistory.cs" />
     <Compile Include="Utility\Docking.cs" />
     <Compile Include="Utility\DockingItem.cs" />
     <Compile Include="Utility\Protection.cs" />

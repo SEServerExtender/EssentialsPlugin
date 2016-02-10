@@ -63,10 +63,10 @@
                 
         public static void ProcessConcealment( bool force = false )
         {
+            //let's not enter the game thread if we don't have to. The poor thing is taxed enough as it is
+            ProcessConceal.ForceReveal = RevealQueue.Any( );
             if ( !MedbayQueue.Any( ) && !RevealQueue.Any( ) && !ConcealQueue.Any( ) )
                 return;
-            //let's not enter the game thread if we don't have to. The poor thing is taxed enough as it is
-            ProcessConceal.ForceReveal = ((force && RevealQueue.Any( )) ? true : false);
             //if we are sent the force flag but there's nothing in reveal queue, set the flag back to false
             string forceString = (force ? "force reveal" : "concealment");
             //just so our debug messages can be pretty
