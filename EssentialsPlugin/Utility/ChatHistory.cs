@@ -19,7 +19,6 @@
             MethodInfo globalMessageInfo = syncCharacter.GetMethod( "SendNewGlobalMessage",
                                                                     BindingFlags.Public | BindingFlags.Instance );
             globalMessageInfo = globalMessageInfo.MakeGenericMethod( typeof( MyPlayer.PlayerId ), typeof( string ) );
-            MyPlayer.PlayerId id = new MyPlayer.PlayerId( obj.SourceUserId );
             object classInstance = Activator.CreateInstance( syncCharacter );
             globalMessageInfo.Invoke( classInstance, new object[ ] { new MyPlayer.PlayerId( obj.SourceUserId ), obj.Message } );
         }

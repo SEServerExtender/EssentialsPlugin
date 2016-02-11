@@ -1357,7 +1357,8 @@
         {
             if ( obj.Message[0] != '/' )
             {
-                ChatHistory.AddChat( obj );
+                //one day this will work. today is not that day :(
+                //ChatHistory.AddChat( obj );
                 return;
             }
 
