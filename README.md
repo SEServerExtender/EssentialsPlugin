@@ -1,26 +1,29 @@
+
+
+----------
 Dedicated Server Essentials - Plugin
 ====================================
 Requirements
 ------------
-This plugin requires SEServerExtender v1.85.08 or above.  Please download and install that first from https://github.com/rexxar-tc/SEServerExtender. 
-
+This plugin requires SEServerExtender v1.85.08 or above.  Please download and install that first from https://github.com/SEServerExtender/SEServerExtender. 
+6
 This plugin requires a workshop mod.  This mod acts as a gateway between the client and server and is required for some functionality to work (private messaging, faction messaging, command hiding): http://steamcommunity.com/sharedfiles/filedetails/?id=559202083
 
-This plugin is available at github at: https://github.com/rexxar-tc/EssentialsPlugin/releases
+This plugin is available at github at: https://github.com/SEServerExtender/EssentialsPlugin/releases
 
-Please post issues you have with the plugin at: https://github.com/rexxar-tc/EssentialsPlugin/issues
+Please post issues you have with the plugin at: https://github.com/SEServerExtender/EssentialsPlugin/issues
 
 Overview
 --------
-This plugin is aimed at being an essential plugin to run on dedicated servers running extender.  It will cover a lot of very basic requirements for server administration.  This plugin looks to really show off how valuable server extender can be, by providing a lot of built in cleaning and adminstrative options and commands.
+This plugin is aimed at being an essential plugin to run on dedicated servers with Extender.  It will cover a lot of very basic requirements for server administration.  This plugin looks to really show off how valuable server extender can be, by providing a lot of built in cleaning and administrative options and commands.
 
 There are many options in this plugin, and those options will expand as time goes on.  Every section of the plugin can be disabled if desired, to tightly control what an administrator wants to do.
 
 Installation
 ------------
-If you're just using the archive provided, just unzip the archive into it's own sub directory off the Mods directory of your world instance. 
+If you're just using the DLL provided, just copy it into it's own sub directory off the Mods directory of your world instance. 
 
-If you want to compile the source provided.  Compile and copy the .dll created after compiling of this project into it's own sub directory of your Mods directory of your instance.  Also move the .sbc files included the .zip archive of any of the releases into that directory as well.
+If you want to compile the source provided.  Compile and copy the .dll created after compiling of this project into it's own sub directory of your Mods directory of your instance.
 
 Please make sure to add the associated workshop mod as well.  It is ID: 559202083.  Just add this mod in extender Mods section of the configuration and it will install automatically on restart!
 
@@ -33,7 +36,6 @@ Major Feature Overview
 - Automated Restart with notifications
 - Chat Information commands with interval based repeating
 - Automated Join Messages for new and old players 
-- Automated new player spawn movement
 - Advanced Administrator Commands
 - Player Login Tracking
 - Private and Faction Messaging
@@ -44,6 +46,8 @@ Major Feature Overview
 - Dynamic Entity Management
 - Waypoint System
 - Block Enforcement
+- Player and grid teleportation
+- Reserved slots
 
 In depth Feature Analysis
 ------------------------
@@ -65,6 +69,8 @@ Options:
   - Enabled - Enable / Disable this backup item
   - Hour - The hour to run this item in the range between 0-23.  If you specify -1 for this option it will run every hour
   - Minute - The minute to run this item in the range between 0-59.
+- BackupDateFormat - This allows you to set a custom date format for backup filenames.
+  - BackupDateFormatSubDirectory - Same as above, but for the subdirectory name if you have that enabled
 
 Automated Restart with Notifications
 ------------------------------------
@@ -96,7 +102,7 @@ Options:
 - InformationEnabled - This allows you to turn Information commands off or on
 - InformationItems - This lets you define information commands.  Defining an item is pretty simple. 
   - Enabled - Enable / Disable this information item
-  - IntervalSeconds - The amount of time it takes for this item to be broadcasted publically.  Set to 0 to not have it broadcast
+  - IntervalSeconds - The amount of time it takes for this item to be broadcasted publicly.  Set to 0 to not have it broadcast
   - SubCommand - The command a user types to view this information item.  If you leave this blank, users will not be able to view this command via /info, and will only see it if you use it in an interval.
   - SubText - The actual text that is displayed with this item is queried using the /info command or broadcasted.  You may use the %name% tag which gets replaced by the user's name.  This is a multiline text, and each line will be broadcasted individually per interval as well.  So this allows you to setup messages that get sent in order.
 
@@ -267,7 +273,8 @@ Options:
 - DynamicConcealDistance - This is the distance that a player must be from an entity before it reveals.  If they get any closer than this distance (in meters) then the entity reveals itself.  (default: 8000 meters)
 - DynamicConcealIgnoreSubTypeList - This is a list of block subtypes that.  This allows administrators to make it so that grids that contain these subtypes never get concealed.  Helpful for when blocks "warp" users around or require a "end point" like stargates.
 - DynamicConcealIncludeLargeGrids - When this is disabled, large grids and stations can not be concealed.  This is the safest mode, as then only small ships get concealed.  Once you enable this, large grids and stations without med bays can be concealed.  This requires more checks and is a bit more intensive, but results in the biggest increase in UPS.
-- DynamicConcealIncludeMedBays - When this is disabled, large grids with medbays are not disabled.  When enabled, large grids with med bays are concealed, but are revealed when a user logs in that can use that med bay.  Please note that there is a very tiny chance that a spawn point won't be shown when a user logs in and a grid is concealed.  All they need to do is hit "refresh" and it comes back.  The chance of this happening is VERY small.  (I've only ever seen it happen once)
+- DynamicConcealIncludeMedBays - When this is disabled, large grids with medbays are not disabled.  When enabled, large grids with med bays are concealed, but are revealed when a user logs in that can use that med bay. This setting will also ignore all ships with occupied cryopods. It doesn't seem to be possible to conceal a grid with an occupied cryopod in a way that will let players respawn in it, so they are permanently revealed while occupied.
+- DynamicConcealConcealPirates - When this is disabled, concealment will ignore all grids owned by pirates/
 - DynamicShowMessages - When enabled, this shows when ships are concealed/revealed.  Some people consider it a bit spammy, so you can turn it off if you don't like the messages.  
 - DynamicTurretManagement - Enable / Disables turret management.  This will allow the server to control the enabled state of turrets dynamically.  
 - DynamicTurretTargetDistance - This is the distance turrets will scan in order to determine if there is an enemy.  Obviously as you increase this option, so does the CPU usage, though that shouldn't effect things too badly.  It's recommended to keep this value 2x the distance of the distance your turrets can shoot.  For example most default turrets can fire at 800m, so setting it 1600m+ is best.  (Default is 2000m)
@@ -301,13 +308,35 @@ Options:
 - MaxExceedWarning - (option not currently used)
 - MaxReachWarning - (option not currently used)
 
+
+Reserved Slots
+--------------
+Reserved slots allows you to permanently keep server slots free for whitelisted players. For example, on a server with 30 max players, and 5 reserved slots, 25 players not in the whitelis can connect, but any after that will be rejected with a "Server is full" message (unfortunately I can't send them a custom message, so they get a stock one). Those extra 5 slots will remain available to players in the whitelist.
+
+- ReservedSlotsAdmins - If this is enabled, server admins are implicitly added to the whitelist.
+- ReservedSlotsCount - The number of reserved slots.
+- ReservedSlotsEnabled - Enables / disables this feature.
+- ReservedSlotsGroupID - The ID number of a Steam group. All players in this group are implicitly whitelisted.
+- ReservedSlotsPlayers - SteamID of individual players you want in the whitelist. It's okay if there is overlap between this list and admins or groups.
+
+Miscellaneous Options
+---------------------
+
+- Chat
+  - FactionChatPrefix - Adds \<faction\> before the username when sending faction messages. "/faction dodexahedron hello" will send dodexahedron the message "\<faction\> rexxar: hello"
+  - ServerChatName - Sets the name players see in chat messages sent by the Essentials plugin.
+  - WhisperhatPrefix - Same as the faction chat prefix, but shows \<whisper\> when someone uses the /msg command.
+
+
+- General
+  - StopShipsOnStart - If this is turned on, Essentials will stop all ships in the world when the server starts. This can be undesireable for worlds with cargo ships enabled.
+
 Advanced Administrator Chat Commands
 ------------------------------------
 
 We've added new administrator commands that we will expand upon slowly.  They will aid in moving grids and stations around, along with trying to keep things clean.
 
 For options, do not include braces.  [] stand for required, while () stand for optional.
-
 
 Scan Commands
 -------------
@@ -324,7 +353,7 @@ Move commands
 Command| Options|Example
 -------|--------|-----------------------------------------------------------------------------------------------------
 /admin move player position | [username] [x] [y] [z] | /admin move player position tyrsis 0 0 0 - This moves a player 'tyrsis' to position 0 0 0.
-/admin move player to | [sourceUsername] [targetUsername or targetGridname] (distance) | /admin move player to tyrsis vicious 500 - This moves player 'tyrsis' near player 'vicious' within 500m.  Please note that player 'tyrsis' must be in a space suit for this to work (out of cockpit).
+/admin move player to | [sourceUsername] \[targetUsername&nbsp;or&nbsp;targetGridname\] (distance) | /admin move player to tyrsis vicious 500 - This moves player 'tyrsis' near player 'vicious' within 500m.  Please note that player 'tyrsis' must be in a space suit for this to work (out of cockpit).
 /admin move area to position | [sx] [sy] [sz] [tx] [ty] [tz] [radius] | /admin move area to position 10000 10000 10000 20000 20000 20000 5000 - This would move all ships and stations that are within 5000m of (10000,10000,10000) and move them towards (20000,20000,20000) relative to where they were before they were moved in relation to the original point. So if a ship was 100m from (10000,10000,10000) they would be 100m from (20000,20000,20000) after the move.
 /admin move area towards | [sx] [sy] [sz] [tx] [ty] [tz] [radius] | /admin move area towards 20000 0 0 0 0 0 5000 1000 - This command would move all ships within 1000m of point (20000,0,0) towards (0,0,0) and move them 5000m.  So a ship at (20000,0,0) would be moved to (15000,0,0).
 
@@ -343,6 +372,7 @@ Ownership commands
 Command| Options|Example
 -------|--------|-----------------------------------------------------------------------------------------------------
 /admin ownership change | [username] [entityId] | /admin ownership change tyrsis 4949392 - This will change grid #494392 and make the owner 'tyrsis'
+/admin ownership change | [username] [grid name] | /admin ownership change tyrsis "Voyager" - This will change the grid named "Voyager" and make the owner 'tyrsis'
 
 Utility commands
 ------------------
@@ -351,9 +381,10 @@ Command| Options|Example
 /pos | (no options) | /pos - This gives the user his current X, Y, Z position in the world
 /timeleft | (no options) | /timeleft - this gives the user the amount of time remaining before the next scheduled restart
 /msg | [username] [message] | /msg tyrsis testing a private message - This will send a private message to the user 'tyrsis' with the message 'testing a private message'.  This command requires the workshop mod to function properly.
-/faction | [message] | /faction hello everyone in my faction - This will send a private faction only message to all users in the same faction as the user sending it.  
+/faction | [message] | /faction hello everyone in my faction - This will send a private faction only message to all users in the same faction as the user sending it.  This command can be shortened to /f
 /utility grids list | (page number) or dialog | /utility grids list 1 - This lists all your grids by name and id.  If you have more than 7 ships, the ships are separated into pages.  Use a number after /utility grids list to list that specific page.  If you do /utility grids list dialog you will get your entire grid list in a nice little dialog.
 /utility export server | [ship name] | /utility export server My Ship - This exports the ship "My Ship" to the server.  The ships are exported to an "Exports" directory in the mods directory of the server under the username of the user who exported it.
+/settings getblockenforcement|(index)| Shows a simplified list of block enforcement rules set on the server in a dialog window. Run the command again with the number of a rule to get detailed information on it.
 
 Waypoint commands
 ------------------
@@ -369,7 +400,18 @@ Command| Options|Example
 /waypoint refresh | (no options) | This refreshes the waypoints in case they didn't load on login
 /waypoint toggle | "group" | /waypoint toggle Asteroids - This turns off all waypoints in the asteroids group.
 
+General admin commands
+----------------------
+Command| Options|Example
+-------|--------|-------
+/admin backup |(no options)|Forces the server to take a backup immediately if you have the feature configured.
+/admin restart | [minutes]|Restarts the server after a given time. Note: this will simply shut down the server unless you have correctly configured automatic restarts.
+/admin speed|[player] [speed]|/admin speed rexxar 10  - This will limit the player rexxar to 10m/s, regardless of if they are piloting a ship, sat as a passenger, walking, or using a jetpack.
+/admin delete floating|(no options)|Deletes all floating objects in the world, including ore, components, hand tools, and backpacks.
+/admin stop|[all, floating, ships]|Stops floating objects, ships, or both that are moving and unpiloted.
+/admin notify|[text color] [seconds] [message]|/admin notify Red 5 "test" - This will display a notificaion above the chat area in red texts that stays for 5 seconds.
+/admin version|(no options)|Prints a chat message with the current Essentials version.
 
 Credits:
 Originally created by Tyrsis
-Maintained by dodexahedron
+Maintained by dodexahedron and rexxar
