@@ -459,7 +459,7 @@
             }
         }
 
-
+        /*
         [Category( "Automated New User Transport" )]
         [Description( "Enable / Disable New User Transport.  This option will transport new user ships closer to asteroids.  It will randomly choose an appropriate asteroid that has enough resources inside it, and move them closer to that asteroid.  This helps on servers that have asteroids far apart." )]
         [Browsable( true )]
@@ -529,7 +529,7 @@
             get { return PluginSettings.Instance.NewUserTransportStopRunawaySpawnShips; }
             set { PluginSettings.Instance.NewUserTransportStopRunawaySpawnShips = value; }
         }
-
+        */
         [Category( "Player Login Tracking" )]
         [Description( "Enable / Disable Player Login Tracking.  This option tracks users login/logouts.  It also reads old logs to get player history.  It's recommended to enable this." )]
         [Browsable( true )]
@@ -804,7 +804,8 @@
                 PluginSettings.Instance.DynamicTurretManagementMode = value;
             }
         }
-
+        //dynamic voxel managment is both broken and unnecessary since Keen has their own streaming
+        /*
         [Category( "Dynamic Entity Management" )]
         [Description( "Enable / Disable dynamic voxel management." )]
         [Browsable( true )]
@@ -830,7 +831,7 @@
                 PluginSettings.Instance.DynamicVoxelDistance = value;
             }
         }
-
+        */
         /*
 		[Category("Dynamic Entity Management")]
 		[Description("Enable / Disable dynamic block management.  This manager disables blocks of ships that can't be concealed to further increase gamelogic savings.")]
@@ -1036,6 +1037,37 @@
             }
         }
 
+        [Category( "Timed Commands" )]
+        [Description( "Enables/disables timed commands." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool TimedCommandsEnabled
+        {
+            get
+            {
+                return PluginSettings.Instance.TimedCommandsEnabled;
+            }
+            set
+            {
+                PluginSettings.Instance.TimedCommandsEnabled = value;
+            }
+        }
+
+        [Category( "Timed Commands" )]
+        [Description( "This allows you to define commands to be run automatically at specified times." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public MTObservableCollection<TimedCommandItem> TimedCommandsItems
+        {
+            get
+            {
+                return PluginSettings.Instance.TimedCommandsItems;
+            }
+            set
+            {
+                PluginSettings.Instance.TimedCommandsItems = value;
+            }
+        }
         /*
 		[Category("Game Modes")]
 		[Description("Conquest Game Mode - This mode tracks asteroid owners by counting owned blocks near an asteroid to determine the owner.  Includes a leaderboard")]
@@ -1079,7 +1111,8 @@
                                    new ProcessBlockEnforcement( ),
                                    new ProcessSpawnShipTracking( ),
                                    new ProcessVoxels(  ),
-                                   new ProcessReservedSlots()
+                                   new ProcessReservedSlots(),
+                                   new ProcessTimedCommands(  )
                                };
 
             // Setup chat handlers
@@ -1336,7 +1369,9 @@
 
         public void Update( )
         {
-
+            if (MyAPIGateway.Session == null)
+                return;
+            Protection.DealDamage(  );
         }
 
         #endregion

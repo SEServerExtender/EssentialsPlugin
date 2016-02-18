@@ -1174,7 +1174,7 @@
 					//ClientEntityManagement.Refresh(steamId);
 					//}
 
-					//Communication.SendClientMessage( steamId, string.Format( "/conceal {0}", string.Join( ",", entitiesToConceal.Select( x => x.EntityId.ToString( ) + ":" + ( (MyObjectBuilder_CubeGrid)x.GetObjectBuilder( ) ).CubeBlocks.Count.ToString( ) + ":" + x.DisplayName ).ToArray( ) ) ) );
+					//Communication.WaypointMessage( steamId, string.Format( "/conceal {0}", string.Join( ",", entitiesToConceal.Select( x => x.EntityId.ToString( ) + ":" + ( (MyObjectBuilder_CubeGrid)x.GetObjectBuilder( ) ).CubeBlocks.Count.ToString( ) + ":" + x.DisplayName ).ToArray( ) ) ) );
 					Thread.Sleep( 1500 );
                     ConcealEntities( entitiesToConceal );
                     //CheckAndRevealEntities();

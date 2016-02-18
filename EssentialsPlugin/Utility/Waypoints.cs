@@ -216,17 +216,15 @@
 		public static void SendClientWaypoints(ulong userId)
 		{
 			List<WaypointItem> items = Instance.Get(userId);
-			string waypoints = "/waypoint clear";
+			//string waypoints = "clear";
+		    Communication.WaypointMessage( userId, "clear" );
 			foreach (WaypointItem item in items)
 			{
 				if (!item.Toggle.Contains(userId))
-				{
-					if (waypoints != "")
-						waypoints += "\r\n";
-
-					waypoints += string.Format("/waypoint add \"{0}\" \"{1}\" {2} {3} {4} {5}", item.Name, item.Text, item.WaypointType, Math.Floor(item.Position.X), Math.Floor(item.Position.Y), Math.Floor(item.Position.Z));
-				}
-			}
+                {
+                    Communication.WaypointMessage( userId, string.Format( "add \"{0}\" \"{1}\" {2} {3} {4} {5}", item.Name, item.Text, item.WaypointType, Math.Floor( item.Position.X ), Math.Floor( item.Position.Y ), Math.Floor( item.Position.Z ) ) );
+                }
+            }
 
 			long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(userId);
 			IMyFaction faction = MyAPIGateway.Session.Factions.TryGetPlayerFaction(playerId);
@@ -236,13 +234,10 @@
 				foreach (WaypointItem item in items.OrderBy(x => x.Group))
 				{
 					if (!item.Toggle.Contains(userId))
-					{
-						if (waypoints != "")
-							waypoints += "\r\n";
-
-						waypoints += string.Format("/waypoint add \"{0}\" \"{1}\" {2} {3} {4} {5}", item.Name, item.Text, item.WaypointType, Math.Floor(item.Position.X), Math.Floor(item.Position.Y), Math.Floor(item.Position.Z));
-					}
-				}
+                    {
+                        Communication.WaypointMessage( userId, string.Format( "add \"{0}\" \"{1}\" {2} {3} {4} {5}", item.Name, item.Text, item.WaypointType, Math.Floor( item.Position.X ), Math.Floor( item.Position.Y ), Math.Floor( item.Position.Z ) ) );
+                    }
+                }
 			}
 
 			foreach (ServerWaypointItem item in PluginSettings.Instance.WaypointServerItems)
@@ -250,17 +245,10 @@
 				if (!item.Enabled)
 					continue;
 
-				if (waypoints != "")
-					waypoints += "\r\n";
-
-                //waypoints += string.Format("/waypoint add \"{0}\" \"{0}\" Neutral {1} {2} {3}", item.Name, item.X, item.Y, item.Z);
-
-                Communication.WaypointMessage( item );
+                Communication.WaypointMessage( userId, string.Format( "add \"{0}\" \"{0}\" Neutral {1} {2} {3}", item.Name, item.X, item.Y, item.Z ) );
             }
 
-            //if ( waypoints != "" )
-				//Communication.SendClientMessage(userId, waypoints);
-		}
+        }
 	}
 
 	public enum WaypointTypes
@@ -326,13 +314,6 @@
 		public List<ulong> Toggle
 		{
 			get { return toggle; }
-		}
-
-        private bool remove = false;
-        public bool Remove
-		{
-			get { return remove; }
-            set { remove = value; }
 		}
 	}
 }

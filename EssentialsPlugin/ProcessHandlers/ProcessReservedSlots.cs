@@ -4,24 +4,23 @@
     using System.Collections.Generic;
     using System.Linq;
     using Sandbox.Engine.Multiplayer;
-    using Sandbox.Game.AI.BrainSimulatorIntegration;
     using Sandbox.ModAPI;
+    using SEModAPI.API;
     using SEModAPIExtensions.API;
     using SEModAPIInternal.API.Common;
     using SEModAPIInternal.API.Server;
     using SteamSDK;
-    using VRageMath;
 
     public class ProcessReservedSlots : ProcessHandlerBase
     {
-        private static readonly List<ulong> ReservedPlayers = new List<ulong>( );
-        private static readonly List<ulong> WaitingPlayers = new List<ulong>( );
+        private static readonly HashSet<ulong> ReservedPlayers = new HashSet<ulong>( );
+        private static readonly HashSet<ulong> WaitingPlayers = new HashSet<ulong>( );
         private static readonly List<IMyPlayer> ConnectedPlayers = new List<IMyPlayer>( );
         private static bool _init;
 
         public static void Init( )
         {
-            if (_init)
+            if ( _init )
                 return;
 
             _init = true;
@@ -37,13 +36,13 @@
             //using the player join event takes too long, sometimes they can load in before we boot them
             //we're not replacing the lobby yet, but hooking into this event will give us more time to verify players
 
-            if (!PluginSettings.Instance.ReservedSlotsEnabled)
+            if ( !PluginSettings.Instance.ReservedSlotsEnabled )
                 return;
 
-            if (response != AuthSessionResponseEnum.OK)
+            if ( response != AuthSessionResponseEnum.OK )
                 return;
 
-            if (PluginSettings.Instance.ReservedSlotsPlayers.Contains( remoteUserId.ToString( ) ))
+            if ( PluginSettings.Instance.ReservedSlotsPlayers.Contains( remoteUserId.ToString( ) ) )
             {
                 ReservedPlayers.Add( remoteUserId );
                 Essentials.Log.Info( "Whitelisted player connected: " + remoteUserId );
@@ -54,7 +53,7 @@
                 return;
             }
 
-            if (PluginSettings.Instance.ReservedSlotsAdmins && PlayerManager.Instance.IsUserAdmin( remoteUserId ))
+            if ( PluginSettings.Instance.ReservedSlotsAdmins && PlayerManager.Instance.IsUserAdmin( remoteUserId ) )
             {
                 ReservedPlayers.Add( remoteUserId );
                 Essentials.Log.Info( "Whitelisted admin connected: " + remoteUserId );
@@ -66,12 +65,13 @@
                 return;
             }
 
-            if (PluginSettings.Instance.ReservedSlotsGroup != 0)
+            if ( PluginSettings.Instance.ReservedSlotsGroup != 0 )
             {
+                WaitingPlayers.Add( remoteUserId );
+
                 //ask Steam if the connecting player is in the whitelisted group. response is raised as an event; GameServer_UserGroupStatus
                 SteamServerAPI.Instance.GameServer.RequestGroupStatus( remoteUserId,
                                                                        PluginSettings.Instance.ReservedSlotsGroup );
-                WaitingPlayers.Add( remoteUserId );
                 return;
             }
 
@@ -128,30 +128,42 @@
                                 Math.Min( ReservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount );
             int publicSlots = Server.Instance.Config.MaxPlayers - PluginSettings.Instance.ReservedSlotsCount;
 
-            if (publicPlayers < publicSlots)
+            if ( ExtenderOptions.IsDebugging )
+            {
+                Essentials.Log.Debug( "Public players: " + publicPlayers.ToString( ) );
+                Essentials.Log.Debug( "Public slots: " + publicSlots.ToString( ) );
+                Essentials.Log.Debug( "Connected players: " + ConnectedPlayers.Count.ToString( ) );
+                Essentials.Log.Debug( "Reserved players: " + ReservedPlayers.Count.ToString( ) );
+                Essentials.Log.Debug( "Reserved slots: " + PluginSettings.Instance.ReservedSlotsCount.ToString( ) );
+            }
+
+            if ( publicPlayers < publicSlots )
                 return;
 
             //don't do anything while we're waiting for group authorization
-            if (WaitingPlayers.Contains( remoteUserId ))
+            if ( WaitingPlayers.Contains( remoteUserId ) )
                 return;
 
             //kick the player with the "Server is full" message
             //too bad we can't send a custom message, but they're hardcoded into the client
             Essentials.Log.Info( "Player denied: " + remoteUserId );
-            JoinResultMsg msg = new JoinResultMsg( );
-            msg.JoinResult = JoinResult.ServerFull;
-            msg.Admin = 0;
+            JoinResultMsg msg = new JoinResultMsg
+            {
+                JoinResult = JoinResult.ServerFull,
+                Admin = 0
+            };
             ServerNetworkManager.Instance.SendStruct( remoteUserId, msg, msg.GetType( ) );
         }
 
         private static void GameServer_UserGroupStatus( ulong userId, ulong groupId, bool member, bool officier )
         {
-            if (!PluginSettings.Instance.ReservedSlotsEnabled)
+            if ( !PluginSettings.Instance.ReservedSlotsEnabled )
                 return;
 
-            if (groupId == PluginSettings.Instance.ReservedSlotsGroup && WaitingPlayers.Remove( userId ))
+            if ( groupId == PluginSettings.Instance.ReservedSlotsGroup )
             {
-                if (member || officier)
+                WaitingPlayers.Remove( userId );
+                if ( member || officier )
                 {
                     ReservedPlayers.Add( userId );
                     Essentials.Log.Info( "Whitelisted player connected: " + userId );
@@ -168,7 +180,7 @@
         public override void OnPlayerLeft( ulong remoteUserId )
         {
             //free up allocated slots so someone else can use it
-            if (ReservedPlayers.Contains( remoteUserId ))
+            if ( ReservedPlayers.Contains( remoteUserId ) )
             {
                 Essentials.Log.Info( "Freed slot from: " + remoteUserId );
                 ReservedPlayers.Remove( remoteUserId );

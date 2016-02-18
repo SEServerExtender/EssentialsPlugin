@@ -11,7 +11,12 @@
 		public override string GetHelp()
 		{
 			return "Lists all personal waypoints.  Usage: /waypoint list";
-        }
+		}
+
+		public override string GetCommandText()
+		{
+			return "/waypoint list";
+		}
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
@@ -23,13 +28,7 @@
             return DialogItem;
         }
 
-
-        public override string GetCommandText()
-		{
-			return "/waypoint list";
-		}
-
-		public override string[] GetMultipleCommandText()
+        public override string[] GetMultipleCommandText()
 		{
 			return new string[] { "/waypoint list", "/wp list" };
 		}

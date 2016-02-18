@@ -19,18 +19,18 @@
     using System.Text;
     using Settings;
     public class Communication
-	{
-		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
-		private static Random m_random = new Random( );
+    {
+        private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
+        private static Random m_random = new Random( );
 
         public static void SendPublicInformation( string infoText )
-		{
-			if ( infoText == "" )
-				return;
+        {
+            if ( infoText == "" )
+                return;
 
             ServerMessageItem MessageItem = new ServerMessageItem( );
-                MessageItem.From = PluginSettings.Instance.ServerChatName;
-                MessageItem.Message = infoText;
+            MessageItem.From = PluginSettings.Instance.ServerChatName;
+            MessageItem.Message = infoText;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
             byte[ ] data = Encoding.Unicode.GetBytes( messageString );
@@ -42,17 +42,17 @@
             else
                 ChatManager.Instance.SendPublicChatMessage( infoText );
 
-                ChatManager.Instance.AddChatHistory( new ChatManager.ChatEvent( DateTime.Now, 0, infoText ) );
+            ChatManager.Instance.AddChatHistory( new ChatManager.ChatEvent( DateTime.Now, 0, infoText ) );
         }
 
-		public static void SendPrivateInformation( ulong playerId, string infoText, string from = null )
-		{
-			if ( infoText == "" )
-				return;
+        public static void SendPrivateInformation( ulong playerId, string infoText, string from = null )
+        {
+            if ( infoText == "" )
+                return;
 
             ServerMessageItem MessageItem = new ServerMessageItem( );
-            
-            if(from == null )
+
+            if ( from == null )
                 MessageItem.From = PluginSettings.Instance.ServerChatName;
 
             else if ( PluginSettings.Instance.WhisperChatPrefix )
@@ -79,9 +79,9 @@
             chatItem.Message = (from == null ? infoText : (string.Format( "{whisper to {0}}: {1}", PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerId ), infoText )));
             ChatManager.Instance.AddChatHistory( chatItem );
         }
-              
+
         public static void SendFactionClientMessage( ulong playerSteamId, string message )
-		{
+        {
             ServerMessageItem MessageItem = new ServerMessageItem( );
             if ( PluginSettings.Instance.FactionChatPrefix )
                 MessageItem.From = "<faction> " + PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerSteamId );
@@ -94,9 +94,9 @@
             byte[ ] data = Encoding.Unicode.GetBytes( messageString );
 
             foreach ( ulong steamId in PlayerManager.Instance.ConnectedPlayers )
-			{
-				if ( Player.CheckPlayerSameFaction( playerSteamId, steamId ) )
-				{
+            {
+                if ( Player.CheckPlayerSameFaction( playerSteamId, steamId ) )
+                {
                     if ( ChatManager.EnableData )
                     {
                         SendDataMessage( steamId, DataMessageType.Message, data );
@@ -104,16 +104,16 @@
                     }
                     else
                         ChatManager.Instance.SendPrivateChatMessage( steamId, message );
-				}
-			}
-		}
+                }
+            }
+        }
 
-		public static void Notification( ulong steamId, MyFontEnum color, int timeInSeconds, string message )
-		{
+        public static void Notification( ulong steamId, MyFontEnum color, int timeInSeconds, string message )
+        {
             ServerNotificationItem MessageItem = new ServerNotificationItem( );
-                MessageItem.color = color;
-                MessageItem.time = timeInSeconds;
-                MessageItem.message= message;
+            MessageItem.color = color;
+            MessageItem.time = timeInSeconds;
+            MessageItem.message = message;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
             byte[ ] data = Encoding.Unicode.GetBytes( messageString );
@@ -122,15 +122,15 @@
                 SendDataMessage( steamId, DataMessageType.Notification, data );
             else
                 BroadcastDataMessage( DataMessageType.Notification, data );
-        }		
+        }
 
-		public static void DisplayDialog( ulong steamId, string header, string subheader, string content, string buttonText = "OK" )
-		{
+        public static void DisplayDialog( ulong steamId, string header, string subheader, string content, string buttonText = "OK" )
+        {
             ServerDialogItem MessageItem = new ServerDialogItem( );
-                MessageItem.title = header;
-                MessageItem.header = subheader;
-                MessageItem.content = content;
-                MessageItem.buttonText = buttonText;
+            MessageItem.title = header;
+            MessageItem.header = subheader;
+            MessageItem.content = content;
+            MessageItem.buttonText = buttonText;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
             byte[ ] data = Encoding.Unicode.GetBytes( messageString );
@@ -138,7 +138,7 @@
             SendDataMessage( steamId, DataMessageType.Dialog, data );
         }
 
-        public static void DisplayDialog( ulong steamId, ServerDialogItem MessageItem)
+        public static void DisplayDialog( ulong steamId, ServerDialogItem MessageItem )
         {
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
             byte[ ] data = Encoding.Unicode.GetBytes( messageString );
@@ -157,7 +157,7 @@
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MoveItem );
             byte[ ] data = Encoding.Unicode.GetBytes( messageString );
-            if ( steamId != 0 ) 
+            if ( steamId != 0 )
                 SendDataMessage( steamId, DataMessageType.Move, data );
             else
                 BroadcastDataMessage( DataMessageType.Move, data );
@@ -184,12 +184,18 @@
             SendDataMessage( item.SteamId, DataMessageType.Waypoint, data );
         }
 
+        public static void WaypointMessage( ulong userId, string waypointString )
+        {
+            byte[ ] data = Encoding.Unicode.GetBytes( waypointString );
+            SendDataMessage( userId, DataMessageType.Waypoint, data );
+        }
+
         public static void WaypointMessage( ServerWaypointItem serverItem )
         {
             WaypointItem item = new WaypointItem( );
             item.Name = serverItem.Name;
             item.Position = new Vector3D( serverItem.X, serverItem.Y, serverItem.Z );
-            item.Remove = serverItem.Enabled;
+            //item.Remove = serverItem.Enabled;
             item.SteamId = 0;
             item.Text = serverItem.Name;
 
@@ -199,66 +205,116 @@
         }
 
         public static void SendDataMessage( ulong steamId, DataMessageType messageType, byte[ ] data )
-		{
+        {
             //this may be unsafe, but whatever, my sanity requires the enum
             long msgId = (long)messageType;
 
-			string msgIdString = msgId.ToString( );
-			byte[ ] newData = new byte[ data.Length + msgIdString.Length + 1 ];
-			newData[ 0 ] = (byte)msgIdString.Length;
-			for ( int r = 0; r < msgIdString.Length; r++ )
-				newData[ r + 1 ] = (byte)msgIdString[ r ];
+            //TODO: Check for max message size of 4kB
+            string msgIdString = msgId.ToString( );
+            byte[ ] newData = new byte[data.Length + msgIdString.Length + 1];
+            newData[0] = (byte)msgIdString.Length;
+            for ( int r = 0; r < msgIdString.Length; r++ )
+                newData[r + 1] = (byte)msgIdString[r];
 
-			Buffer.BlockCopy( data, 0, newData, msgIdString.Length + 1, data.Length );
+            Buffer.BlockCopy( data, 0, newData, msgIdString.Length + 1, data.Length );
 
-			ServerNetworkManager.SendDataMessage( 9000, newData, steamId );
-		}
+            Wrapper.GameAction( ( ) =>
+                                {
+                                    MyAPIGateway.Multiplayer.SendMessageTo( 9000, newData, steamId );
+                                } );
+            //ServerNetworkManager.SendDataMessage( 9000, newData, steamId );
+        }
 
-		public static void BroadcastDataMessage( DataMessageType messageType, byte[ ] data )
+        public static void BroadcastDataMessage( DataMessageType messageType, byte[ ] data )
         {
             //this may be unsafe, but whatever, my sanity requires the enum
             long msgId = (long)messageType;
 
             string msgIdString = msgId.ToString( );
-			byte[ ] newData = new byte[ data.Length + msgIdString.Length + 1 ];
-			newData[ 0 ] = (byte)msgIdString.Length;
-			for ( int r = 0; r < msgIdString.Length; r++ )
-				newData[ r + 1 ] = (byte)msgIdString[ r ];
+            byte[ ] newData = new byte[data.Length + msgIdString.Length + 1];
+            newData[0] = (byte)msgIdString.Length;
+            for ( int r = 0; r < msgIdString.Length; r++ )
+                newData[r + 1] = (byte)msgIdString[r];
 
-			Buffer.BlockCopy( data, 0, newData, msgIdString.Length + 1, data.Length );
+            Buffer.BlockCopy( data, 0, newData, msgIdString.Length + 1, data.Length );
 
-			MyAPIGateway.Multiplayer.SendMessageToOthers( 9000, newData );
-		}
+            Wrapper.GameAction( ( ) =>
+                                {
+                                    MyAPIGateway.Multiplayer.SendMessageToOthers( 9000, newData );
+                                } );
+        }
 
         public class ServerMessageItem
-		{
-			public string From { get; set; }
-			public string Message { get; set; }
-		}
+        {
+            public string From
+            {
+                get; set;
+            }
+            public string Message
+            {
+                get; set;
+            }
+        }
 
         public class ServerDialogItem
         {
-            public string title { get; set; }
-            public string header { get; set; }
-            public string content { get; set; }
-            public string buttonText { get; set; }
+            public string title
+            {
+                get; set;
+            }
+            public string header
+            {
+                get; set;
+            }
+            public string content
+            {
+                get; set;
+            }
+            public string buttonText
+            {
+                get; set;
+            }
         }
 
         public class ServerNotificationItem
         {
-            public MyFontEnum color { get; set; }
-            public int time { get; set; }
-            public string message { get; set; }
+            public MyFontEnum color
+            {
+                get; set;
+            }
+            public int time
+            {
+                get; set;
+            }
+            public string message
+            {
+                get; set;
+            }
         }
 
         public class ServerMoveItem
         {
-            public string moveType { get; set; }
-            public double x { get; set; }
-            public double y { get; set; }
-            public double z { get; set; }
-            public long entityId { get; set; }
-        } 
+            public string moveType
+            {
+                get; set;
+            }
+            public double x
+            {
+                get; set;
+            }
+            public double y
+            {
+                get; set;
+            }
+            public double z
+            {
+                get; set;
+            }
+            public long entityId
+            {
+                get; set;
+            }
+        }
 
         public enum DataMessageType
         {
@@ -279,6 +335,6 @@
             MaxSpeed,
             ServerInfo,
             Waypoint
-        }        
-	}
+        }
+    }
 }

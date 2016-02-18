@@ -7,7 +7,12 @@
 		public override string GetHelp()
 		{
 			return "Toggles waypoints off or on.  Specifying a group name hides only that group.  Specifying a waypoint name only toggles that waypoint.  Usage: /waypoint toggle (optional: group name or waypoint name).  Example: /waypoint toggle Targets";
-        }
+		}
+
+		public override string GetCommandText()
+		{
+			return "/waypoint add";
+		}
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
@@ -19,13 +24,7 @@
             return DialogItem;
         }
 
-
-        public override string GetCommandText()
-		{
-			return "/waypoint add";
-		}
-
-		public override string[] GetMultipleCommandText()
+        public override string[] GetMultipleCommandText()
 		{
 			return new string[] { "/waypoint toggle", "/wp toggle" };
 		}

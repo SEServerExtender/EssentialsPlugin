@@ -112,13 +112,16 @@
 		private MTObservableCollection<SettingsBlockEnforcementItem> _blockEnforcementItems;
 
 		private bool _gameModeConquestEnabled;
-        #endregion
 
         private bool _reservedSlotsEnabled;
         private int _reservedSlotsCount;
         private ulong _reservedSlotsGroup;
         private string[ ] _reservedSlotsPlayers = { };
         private bool _reservedSlotsAdmins;
+
+	    private bool _timedCommandsEnabled;
+	    private MTObservableCollection<TimedCommandItem> _TimedCommandsItem;
+        #endregion
 
 		#region Static Properties
 
@@ -952,6 +955,25 @@
             }
         }
 
+	    public bool TimedCommandsEnabled
+	    {
+	        get {return _timedCommandsEnabled;}
+	        set
+	        {
+	            _timedCommandsEnabled = value; 
+	            Save(  );
+	        }
+	    }
+
+	    public MTObservableCollection<TimedCommandItem> TimedCommandsItems
+	    {
+	        get { return _TimedCommandsItem; }
+	        set
+	        {
+	            _TimedCommandsItem = value;
+	            Save(  );
+	        }
+	    }
         #endregion
 
         #region Constructor
@@ -1021,6 +1043,10 @@
 
 			_blockEnforcementItems = new MTObservableCollection<SettingsBlockEnforcementItem>();
 			_blockEnforcementItems.CollectionChanged += ItemsCollectionChanged;
+
+            _timedCommandsEnabled = false;
+            _TimedCommandsItem = new MTObservableCollection<TimedCommandItem>(  );
+            _TimedCommandsItem.CollectionChanged += ItemsCollectionChanged;
 		}
 
 

@@ -142,6 +142,7 @@
     <Compile Include="ProcessHandlers\ProcessConceal.cs" />
     <Compile Include="ProcessHandlers\ProcessDockingZone.cs" />
     <Compile Include="ProcessHandlers\ProcessBlocks.cs" />
+    <Compile Include="ProcessHandlers\ProcessTimedCommands.cs" />
     <Compile Include="ProcessHandlers\ProcessReservedSlots.cs" />
     <Compile Include="ProcessHandlers\ProcessTurrets.cs" />
     <Compile Include="ProcessHandlers\ProcessConquest.cs" />
@@ -179,11 +180,13 @@
     <Compile Include="Settings\SettingsRestartItem.cs" />
     <Compile Include="Settings\SettingsRestartNotificationItem.cs" />
     <Compile Include="Settings\SettingsServerWaypointItem.cs" />
+    <Compile Include="Settings\SettingsTimedCommandItem.cs" />
     <Compile Include="UtilityClasses\MTObservableCollection.cs" />
     <Compile Include="UtilityClasses\OrientedBoundingBox.cs" />
     <Compile Include="UtilityClasses\SerializeableDictionary.cs" />
     <Compile Include="UtilityClasses\UIEditors.cs" />
     <Compile Include="Utility\Backup.cs" />
+    <Compile Include="Utility\CargoShips.cs" />
     <Compile Include="Utility\ChatHistory.cs" />
     <Compile Include="Utility\Docking.cs" />
     <Compile Include="Utility\DockingItem.cs" />

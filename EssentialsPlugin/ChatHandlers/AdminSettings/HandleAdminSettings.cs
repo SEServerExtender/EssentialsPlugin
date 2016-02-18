@@ -46,7 +46,7 @@
                 //string longMessage =
                 //    "/dialog \"Help\" \"Admin Settings\" \"\"" +
                 //    "\"" + results.Replace( "\r\n", "| " ) + "\" \"close\" ";
-                //Communication.SendClientMessage( userId, longMessage );
+                //Communication.WaypointMessage( userId, longMessage );
 
                 Communication.DisplayDialog( userId, "Admin Settings", "Current Settings", results.Replace( "\r\n", "|" ), "close" );
             }

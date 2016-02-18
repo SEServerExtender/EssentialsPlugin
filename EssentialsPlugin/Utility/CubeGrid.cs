@@ -18,6 +18,7 @@
     using VRage.Groups;
     using Sandbox.Game.GameSystems;
     using Sandbox.Game.Entities.Cube;
+    using SEModAPIExtensions.API;
     using VRage.Game;
     public enum RemoveGridTypes
 	{
@@ -1362,7 +1363,7 @@
 			{
 				if ( block.Owner == 0 )
 					continue;
-
+                
 				if ( ownerList.ContainsKey( block.Owner ) )
 					ownerList[ block.Owner ] = ownerList[ block.Owner ] + 1;
 				else
@@ -1439,27 +1440,35 @@
 		}
 
 		public static bool DoesBlockSupplyPower( MyObjectBuilder_CubeBlock block )
-		{
-			MyObjectBuilder_BatteryBlock battery = block as MyObjectBuilder_BatteryBlock;
-			if ( battery != null )
-			{
-				if ( battery.CurrentStoredPower > 0f )
-					return true;
-			}
+        {
+            if ( block is MyObjectBuilder_BatteryBlock )
+            {
+                MyObjectBuilder_BatteryBlock battery = (MyObjectBuilder_BatteryBlock)block;
+                if ( battery != null )
+                {
+                    if ( battery.CurrentStoredPower > 0f )
+                        return true;
+                }
+            }
 
-			MyObjectBuilder_Reactor reactor = block as MyObjectBuilder_Reactor;
-			if ( reactor != null )
-			{
-				if ( reactor.Inventory.Items.Count > 0 )
-					return true;
-			}
+            if ( block is MyObjectBuilder_Reactor )
+            {
+                MyObjectBuilder_Reactor reactor = (MyObjectBuilder_Reactor)block;
+                if ( reactor != null )
+                {
+                    //reactors in creative mode provide power without uranium
+                    if ( reactor.Inventory.Items.Count > 0 || Server.Instance.Config.GameMode == MyGameModeEnum.Creative )
+                        return true;
+                }
+            }
 
-			if ( block is MyObjectBuilder_SolarPanel )
-			{
-				return true;
-			}
+            if ( block is MyObjectBuilder_SolarPanel )
+            {
+                return true;
+            }
 
-			return false;
+
+            return false;
 		}
 
 		public static bool DoesGridHavePowerSupply( MyObjectBuilder_CubeGrid grid )

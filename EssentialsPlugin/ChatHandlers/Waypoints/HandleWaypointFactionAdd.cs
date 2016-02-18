@@ -14,7 +14,12 @@
 		public override string GetHelp()
 		{
 			return "Creates a faction waypoint.  Only your faction can see it.\r\nUsage: /waypoint factionadd \"waypoint name\" \"waypoint text\" Neutral | Allied | Enemy X Y Z (group name)\r\nExampleA: /waypoint factionadd MyWayPoint MyWaypoint Neutral 1000 1000 1000\r\nExampleB: /waypoint factionadd target\r\nExampleC: /waypoint factionadd Target1 Target1 Enemy 1000 1000 1000 Targets";
-        }
+		}
+
+		public override string GetCommandText()
+		{
+			return "/waypoint factionadd";
+		}
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
@@ -26,13 +31,7 @@
             return DialogItem;
         }
 
-
-        public override string GetCommandText()
-		{
-			return "/waypoint factionadd";
-		}
-
-		public override string[] GetMultipleCommandText()
+        public override string[] GetMultipleCommandText()
 		{
 			return new[] { "/waypoint factionadd", "/wp factionadd", "/waypoint fa", "/wp fa" };
 		}
@@ -90,6 +89,15 @@
 
 				Vector3D pos = playerEntity.GetPosition();
 				string name = words[0];
+
+				foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
+				{
+					if (Player.CheckPlayerSameFaction(userId, steamId))
+					{
+						Communication.WaypointMessage(steamId, string.Format("add '{0}' '{0}' Neutral {1} {2} {3}", name, Math.Floor(pos.X), Math.Floor(pos.Y), Math.Floor(pos.Z)));
+					}
+				}
+
 				WaypointItem item = new WaypointItem
 				                    {
 					                    SteamId = (ulong) faction.FactionId,
@@ -100,16 +108,6 @@
 					                    Leader = faction.IsLeader( playerId )
 				                    };
 				Waypoints.Instance.Add(item);
-
-				foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
-				{
-					if (Player.CheckPlayerSameFaction(userId, steamId))
-					{
-                        //Communication.SendClientMessage(steamId, string.Format("/waypoint add '{0}' '{0}' Neutral {1} {2} {3}", name, Math.Floor(pos.X), Math.Floor(pos.Y), Math.Floor(pos.Z)));
-                        Communication.WaypointMessage( item );
-                    }
-				}
-
 
 				Communication.SendFactionClientMessage(userId, string.Format("/message Server {2} has added the waypoint: '{0}' at {1} by '{2}'", item.Name, General.Vector3DToString(item.Position), playerName));
 			}
@@ -126,6 +124,14 @@
 				}
 
 				string add = string.Join(" ", words.Select(s => s.ToLowerInvariant()));
+
+				foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
+				{
+					if (Player.CheckPlayerSameFaction(userId, steamId))
+					{
+						Communication.WaypointMessage(steamId, string.Format("add {0}", add));
+					}
+				}
 
 				string group = "";
 				if (words.Length == 7)
@@ -144,15 +150,6 @@
 				item.Group = group;
 				item.Leader = faction.IsLeader(playerId);
 				Waypoints.Instance.Add(item);
-
-				foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
-				{
-					if (Player.CheckPlayerSameFaction(userId, steamId))
-					{
-                        //Communication.SendClientMessage(steamId, string.Format("/waypoint add {0}", add));
-                        Communication.WaypointMessage( item );
-                    }
-				}
 
 				Communication.SendFactionClientMessage(userId, string.Format("/message Server {2} has added the waypoint: '{0}' at {1} by '{2}'", item.Name, General.Vector3DToString(item.Position), playerName));
 			}

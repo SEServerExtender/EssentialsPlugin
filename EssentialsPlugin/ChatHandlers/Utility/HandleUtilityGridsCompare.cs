@@ -55,7 +55,7 @@
 				entityList.Add(entity.EntityId);
 			}
 
-			//Communication.SendClientMessage(userId, string.Format("/conceal {0}", string.Join(",", entityList.Select(x => x.ToString()).ToArray())));			
+			//Communication.WaypointMessage(userId, string.Format("/conceal {0}", string.Join(",", entityList.Select(x => x.ToString()).ToArray())));			
 			Console.WriteLine("Here: {0}", string.Join(",", entityList.Select(x => x.ToString()).ToArray()));
 			return true;
 		}

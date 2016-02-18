@@ -137,10 +137,11 @@
                 }
 
                 if ( !now )
-                    Log.Info( string.Format( "Command would reveal {0} grids.  Type /admin reveal force to reveal them.", count ) );
+                   Communication.SendPrivateInformation( userId,
+                                                         $"Command would reveal {count} grids.  Type /admin reveal force to reveal them." );
 
                 else
-                    Log.Info( string.Format( "Command revealed {0} grids.", count ) );
+                    Communication.SendPrivateInformation(userId, $"Command revealed {count} grids." );
             }
             return true;
         }

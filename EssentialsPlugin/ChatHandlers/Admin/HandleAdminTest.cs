@@ -36,7 +36,7 @@
 
         public override bool HandleCommand( ulong userId, string[ ] words )
         {
-            Communication.SendPrivateInformation( userId, "hello" );
+           CargoShips.SpawnPrefabWithTrajectory(  );
 
             return true;
         }

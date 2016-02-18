@@ -7,7 +7,12 @@
 		public override string GetHelp()
 		{
 			return "Refreshes Waypoints in case your can't see them.  Usage: /waypoint refresh";
-        }
+		}
+
+		public override string GetCommandText()
+		{
+			return "/waypoint refresh";
+		}
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
@@ -19,13 +24,7 @@
             return DialogItem;
         }
 
-
-        public override string GetCommandText()
-		{
-			return "/waypoint refresh";
-		}
-
-		public override string[] GetMultipleCommandText()
+        public override string[] GetMultipleCommandText()
 		{
 			return new string[] { "/waypoint refresh", "/wp refresh" };
 		}
