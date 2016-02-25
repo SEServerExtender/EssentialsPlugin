@@ -6,8 +6,9 @@
 	using EssentialsPlugin.Utility;
 	using Sandbox.Common.ObjectBuilders;
 	using SEModAPIInternal.API.Common;
+	using VRage.Game;
 
-	public class HandleAdminPlayerListActive : ChatHandlerBase
+    public class HandleAdminPlayerListActive : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{

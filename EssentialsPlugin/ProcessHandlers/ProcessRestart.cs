@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.IO;
+	using System.Net;
 	using System.Threading;
 	using System.Windows.Forms;
 	using EssentialsPlugin.Settings;
@@ -12,6 +13,7 @@
 	using Sandbox.ModAPI;
 	using SEModAPIExtensions.API;
 	using SEModAPIInternal.API.Common;
+	using SteamSDK;
 	using VRage.ModAPI;
 	using VRageMath;
 
@@ -21,8 +23,9 @@
 
 		private DateTime m_start;
 		private int m_done = -1;
+	    private bool _init;
 
-		static public DateTime? ForcedRestart
+        static public DateTime? ForcedRestart
 		{
 			get { return m_forcedRestart; }
 			set { m_forcedRestart = value; }
@@ -39,8 +42,8 @@
 		{
 			return 10000;
 		}
-
-		public override void Handle()
+        
+	    public override void Handle()
 		{
 			if (PluginSettings.Instance.RestartWhenUnresponsive)
 				CheckResponse();
@@ -50,12 +53,11 @@
 
 			SetRestartTime();
 			if(m_done < 0)
-				return;
+                return;
+            
+            //Log.Info(string.Format("Restart in {0} minutes", m_done));
 
-
-			//Log.Info(string.Format("Restart in {0} minutes", m_done));
-
-			if (DateTime.Now - m_start > TimeSpan.FromMinutes(m_done))
+            if ( DateTime.Now - m_start > TimeSpan.FromMinutes(m_done))
 			{
 				DoRestart();
 				return;

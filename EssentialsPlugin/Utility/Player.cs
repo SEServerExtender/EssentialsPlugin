@@ -22,6 +22,7 @@
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
     using VRage;
     using VRage.FileSystem;
+    using VRage.Game;
     using VRage.ModAPI;
     using VRage.ObjectBuilders;
     using VRageMath;

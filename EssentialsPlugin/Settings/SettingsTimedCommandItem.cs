@@ -30,9 +30,9 @@
 
         public int WarningTime { get; set; }
 
-        public bool HasWarned { get; set; }
+        public bool HasWarned;
 
-        public bool HasRun { get; set; }
+        public bool HasRun;
 
     }
 }

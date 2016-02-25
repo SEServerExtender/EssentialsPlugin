@@ -4,8 +4,9 @@
 	using System.Linq;
 	using EssentialsPlugin.Utility;
 	using Sandbox.Common;
+	using VRage.Game;
 
-	public class HandleAdminNotify : ChatHandlerBase
+    public class HandleAdminNotify : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{

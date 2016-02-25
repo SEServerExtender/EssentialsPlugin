@@ -8,6 +8,7 @@ namespace EssentialsPlugin.ChatHandlers.AdminDelete
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+	using VRage.Game;
 	using VRage.ModAPI;
 
 	public class HandleAdminDeleteInactive : ChatHandlerBase

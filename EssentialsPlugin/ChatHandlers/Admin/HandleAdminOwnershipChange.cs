@@ -9,6 +9,8 @@
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
     using VRage.ModAPI;
+    using VRage.Game;
+
     public class HandleAdminOwnershipChange : ChatHandlerBase
     {
         public override string GetHelp( )
@@ -102,7 +104,10 @@
                 Communication.SendPrivateInformation( userId, string.Format( "Could not find entity with id {0}.", gridId ) );
                 return true;
             }
-            grid.ChangeGridOwnership( playerId, Sandbox.Common.ObjectBuilders.MyOwnershipShareModeEnum.Faction );
+            Wrapper.GameAction( ( ) =>
+                                {
+                                    grid.ChangeGridOwnership( playerId, MyOwnershipShareModeEnum.Faction );
+                                } );
             Communication.SendPrivateInformation( userId, string.Format( "Ownership changed to player {0}", name ) );
             return true;
         }

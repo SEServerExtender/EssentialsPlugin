@@ -7,7 +7,9 @@
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+	using VRage.Game;
 	using VRage.ModAPI;
+    using VRage.Game.ObjectBuilders;
 
 	public class HandleAdminDeleteCleanup : ChatHandlerBase
 	{

@@ -7,6 +7,7 @@
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
 	using Sandbox.ModAPI.Ingame;
+	using VRage.Game;
 	using VRage.ModAPI;
 	using VRageMath;
 	using IMyCubeBlock = Sandbox.ModAPI.IMyCubeBlock;

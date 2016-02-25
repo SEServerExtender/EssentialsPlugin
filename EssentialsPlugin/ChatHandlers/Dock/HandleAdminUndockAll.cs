@@ -11,6 +11,7 @@
     using Sandbox.ModAPI;
     using SEModAPIInternal.API.Entity;
     using VRage;
+    using VRage.Game;
     using VRage.ModAPI;
     using VRage.ObjectBuilders;
     using VRageMath;

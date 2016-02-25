@@ -9,6 +9,7 @@ namespace EssentialsPlugin.ChatHandlers
     using Sandbox.ModAPI;
     using SEModAPIInternal.API.Common;
     using SEModAPIInternal.API.Entity.Sector.SectorObject;
+    using VRage.Game;
     using VRage.ModAPI;
     using VRage.ObjectBuilders;
     public class HandleAdminScanInactive : ChatHandlerBase

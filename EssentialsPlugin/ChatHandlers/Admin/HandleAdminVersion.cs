@@ -18,7 +18,6 @@
     using VRageMath;
     using VRage.ModAPI;
     using VRage.Serialization;
-    using Sandbox.Common.ObjectBuilders.ComponentSystem;
 
     public class HandleAdminVersion : ChatHandlerBase
     {

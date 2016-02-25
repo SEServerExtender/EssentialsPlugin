@@ -7,6 +7,7 @@
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Entity.Sector.SectorObject;
+	using VRage.Game;
 	using VRage.ModAPI;
 
 	public class TimedEntityCleanupItem

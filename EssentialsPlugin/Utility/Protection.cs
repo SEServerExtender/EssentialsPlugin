@@ -1,30 +1,43 @@
 ﻿namespace EssentialsPlugin.Utility
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
     using EssentialsPlugin.Settings;
     using Sandbox.Common.ObjectBuilders.Definitions;
+    using Sandbox.Game.Entities;
+    using Sandbox.Game.Entities.Cube;
     using Sandbox.ModAPI;
     using Sandbox.Game.Weapons;
+    using Sandbox.ModAPI.Interfaces;
     using SEModAPIInternal.API.Common;
+    using VRage.Game;
     using VRage.ModAPI;
     using VRage.ObjectBuilders;
-    public class Protection
+    using VRage.Utils;
+
+    public static class Protection
     {
         private static bool _init = false;
         private static DateTime _lastLog;
+        private static SortedList<IMySlimBlock, float> toDamage = new SortedList<IMySlimBlock, float>( );
 
         public static void Init( )
         {
             if ( _init )
                 return;
 
-                _init = true;
+            _init = true;
             MyAPIGateway.Session.DamageSystem.RegisterBeforeDamageHandler( 0, DamageHandler );
         }
 
-        public static void DamageHandler( object target, ref MyDamageInformation info )
+        private static void DamageHandler( object target, ref MyDamageInformation info )
         {
             if ( !PluginSettings.Instance.ProtectedEnabled )
+                return;
+
+            if (info.Type == MyDamageType.Drill)
                 return;
 
             IMySlimBlock block = target as IMySlimBlock;
@@ -32,49 +45,44 @@
                 return;
 
             IMyCubeGrid grid = block.CubeGrid;
-                        ulong steamId = PlayerMap.Instance.GetSteamId( info.AttackerId );
-
+            ulong steamId = PlayerMap.Instance.GetSteamId( info.AttackerId );
+            
             foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
             {
                 if ( item.Enabled && item.EntityId == grid.EntityId )
                 {
-                    //TODO: figure out how to get owner of a grinder
-                    /*
-                    if ( info.Type == MyDamageType.Grind || info.Type == MyDamageType.Weld )
+                    //info.Amount = 0;
+                    List<IMySlimBlock> armorBlocks = new List<IMySlimBlock>( );
+                    grid.GetBlocks( armorBlocks, x => x.FatBlock == null );
+                    
+                    float damageConst = info.Amount / armorBlocks.Count;
+
+                    foreach ( IMySlimBlock slimBlock in armorBlocks )
                     {
-                        
-                        IMyEntity weapon;
-                        if ( !MyAPIGateway.Entities.TryGetEntityById( info.AttackerId, out weapon ) )
-                            return;
-
-                        
-                        Wrapper.GameAction( ( ) =>
-                         {
-                             if(weapon.GetObjectBuilder() == MyObjectBuilder_AngleGrinderDefinition )
-                            {
-                                var grinder = (MyObjectBuilder_AngleGrinderDefinition)weapon;
-                                grinder.own
-                         } );
-
-
-                        if ( PlayerManager.Instance.IsUserAdmin( steamId ) || grid.BigOwners.Contains( info.AttackerId ) )
-                            return;
+                            //toDamage.Add( slimBlock,damageConst );
                     }
-                    //grid owners and admins can grind or weld protected grids
-                    */
-
-                    //else
-                    //{
-                        info.Amount = 0;
-                        if ( DateTime.Now - _lastLog > TimeSpan.FromSeconds( 1 ) )
-                        {
-                            _lastLog = DateTime.Now;
-                            Essentials.Log.Info( "Protected entity {0}.", grid.DisplayName );
-                            //Essentials.Log.Info( "Protected entity \"{0}\" from player \"{1}\".", grid.DisplayName, PlayerMap.Instance.GetFastPlayerNameFromSteamId( steamId ) );
-                        }
-                    //}
+                    
+                    info.Amount = 0;
+                    if ( DateTime.Now - _lastLog > TimeSpan.FromSeconds( 1 ) )
+                    {
+                        _lastLog = DateTime.Now;
+                        Essentials.Log.Info( "Protected entity {0}.", grid.DisplayName );
+                    }
                 }
             }
+        }
+
+        public static void DealDamage( )
+        {
+            if(!toDamage.Any(  ))
+                return;
+
+            Wrapper.GameAction( ( ) =>
+                                {
+                                    ( (IMyDestroyableObject) toDamage.First( ).Key ).DoDamage( toDamage.First( ).Value,
+                                                                                               MyDamageType.Unknown, true );
+                                } );
+            toDamage.RemoveAt(0);
         }
     }
 }

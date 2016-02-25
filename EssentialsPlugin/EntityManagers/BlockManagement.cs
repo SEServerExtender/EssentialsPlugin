@@ -11,6 +11,7 @@
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+	using VRage.Game;
 	using VRage.ModAPI;
 
 	public class BlockManagement

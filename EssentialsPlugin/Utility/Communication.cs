@@ -18,7 +18,9 @@
     using SEModAPI.API.Definitions;
     using System.Text;
     using Settings;
-    public class Communication
+    using VRage.Game;
+
+    public static class Communication
     {
         private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
         private static Random m_random = new Random( );
@@ -27,7 +29,7 @@
         {
             if ( infoText == "" )
                 return;
-
+           
             ServerMessageItem MessageItem = new ServerMessageItem( );
             MessageItem.From = PluginSettings.Instance.ServerChatName;
             MessageItem.Message = infoText;

@@ -10,8 +10,9 @@
 	using VRage.ModAPI;
 	using VRageMath;
     using Sandbox.Game;
+	using VRage.Game;
 
-	public class HandleUtilityGridsList : ChatHandlerBase
+    public class HandleUtilityGridsList : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{
