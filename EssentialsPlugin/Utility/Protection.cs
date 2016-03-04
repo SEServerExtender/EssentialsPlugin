@@ -22,6 +22,7 @@
         private static bool _init = false;
         private static DateTime _lastLog;
         private static SortedList<IMySlimBlock, float> toDamage = new SortedList<IMySlimBlock, float>( );
+        private static MyDisconnectHelper disconnect = new MyDisconnectHelper(  );
 
         public static void Init( )
         {
@@ -37,14 +38,12 @@
             if ( !PluginSettings.Instance.ProtectedEnabled )
                 return;
 
-            if (info.Type == MyDamageType.Drill)
-                return;
-
             IMySlimBlock block = target as IMySlimBlock;
             if ( block == null )
                 return;
-
+            
             IMyCubeGrid grid = block.CubeGrid;
+            
             ulong steamId = PlayerMap.Instance.GetSteamId( info.AttackerId );
             
             foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
@@ -70,6 +69,7 @@
                     }
                 }
             }
+
         }
 
         public static void DealDamage( )
@@ -84,6 +84,7 @@
                                 } );
             toDamage.RemoveAt(0);
         }
+        
     }
 }
 

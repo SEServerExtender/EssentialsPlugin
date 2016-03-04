@@ -1,9 +1,11 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
     using System;
+    using Entities.Blocks;
     using EssentialsPlugin;
     using EssentialsPlugin.ChatHandlers;
     using EssentialsPlugin.EntityManagers;
+    using Sandbox.Game.Entities.Blocks;
 
     public class ProcessConceal : ProcessHandlerBase
 	{

@@ -26,6 +26,7 @@
     using NLog;
     using Sandbox.ModAPI;
     using SEModAPI.API.Utility;
+    using SEModAPI.API;
     using SEModAPIExtensions.API;
     using SEModAPIExtensions.API.Plugin;
     using SEModAPIExtensions.API.Plugin.Events;
@@ -47,6 +48,8 @@
         private List<ProcessHandlerBase> _processHandlers;
         private List<ChatHandlerBase> _chatHandlers;
         private bool _running = true;
+        private DateTime _lastMessageTime = DateTime.Now;
+        private string _lastMessageString = "";
 
         #endregion
 
@@ -1390,6 +1393,19 @@
         /// <param name="obj"></param>
         public void OnChatReceived( ChatManager.ChatEvent obj )
         {
+            if ( DateTime.Now - _lastMessageTime < TimeSpan.FromMilliseconds( 200 ) && obj.Message == _lastMessageString )
+            {
+                //if we've received a duplicate message, discard it
+                _lastMessageTime = DateTime.Now;
+                _lastMessageString = obj.Message;
+                if ( ExtenderOptions.IsDebugging )
+                    Log.Debug( "Received duplicate message: " + System.Environment.NewLine + obj.Message );
+                return;
+            }
+
+            _lastMessageTime = DateTime.Now;
+            _lastMessageString = obj.Message;
+
             if ( obj.Message[0] != '/' )
             {
                 //one day this will work. today is not that day :(

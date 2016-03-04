@@ -65,7 +65,7 @@
                 Communication.SendPrivateInformation( userId, GetHelp( ) );
                 return true;
             }
-            byte[ ] data = Encoding.Unicode.GetBytes( MyAPIGateway.Utilities.SerializeToXML<float>( setSpeed ) );
+            byte[ ] data = Encoding.UTF8.GetBytes( MyAPIGateway.Utilities.SerializeToXML<float>( setSpeed ) );
             Communication.SendDataMessage( steamId, Communication.DataMessageType.MaxSpeed, data );
             Communication.SendPrivateInformation( userId, string.Format( "Set maximum speed of player {0} to {1}m/s.", words[0], setSpeed ) );
             return true;

@@ -35,7 +35,7 @@
             MessageItem.Message = infoText;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
-            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
 
             if ( ChatManager.EnableData )
             {
@@ -66,7 +66,7 @@
             MessageItem.Message = infoText;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
-            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
 
             if ( ChatManager.EnableData )
             {
@@ -93,7 +93,7 @@
             MessageItem.Message = message;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
-            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
 
             foreach ( ulong steamId in PlayerManager.Instance.ConnectedPlayers )
             {
@@ -118,7 +118,7 @@
             MessageItem.message = message;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
-            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
 
             if ( steamId != 0 )
                 SendDataMessage( steamId, DataMessageType.Notification, data );
@@ -135,7 +135,7 @@
             MessageItem.buttonText = buttonText;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
-            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
 
             SendDataMessage( steamId, DataMessageType.Dialog, data );
         }
@@ -143,7 +143,7 @@
         public static void DisplayDialog( ulong steamId, ServerDialogItem MessageItem )
         {
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
-            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
 
             SendDataMessage( steamId, DataMessageType.Dialog, data );
         }
@@ -158,7 +158,7 @@
             MoveItem.entityId = entityId;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MoveItem );
-            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
             if ( steamId != 0 )
                 SendDataMessage( steamId, DataMessageType.Move, data );
             else
@@ -174,7 +174,7 @@
             MoveItem.z = position.Z;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MoveItem );
-            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
 
             SendDataMessage( steamId, DataMessageType.Move, data );
         }
@@ -182,13 +182,13 @@
         public static void WaypointMessage( WaypointItem item )
         {
             string messageString = MyAPIGateway.Utilities.SerializeToXML( item );
-            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
             SendDataMessage( item.SteamId, DataMessageType.Waypoint, data );
         }
 
         public static void WaypointMessage( ulong userId, string waypointString )
         {
-            byte[ ] data = Encoding.Unicode.GetBytes( waypointString );
+            byte[ ] data = Encoding.UTF8.GetBytes( waypointString );
             SendDataMessage( userId, DataMessageType.Waypoint, data );
         }
 
@@ -202,7 +202,7 @@
             item.Text = serverItem.Name;
 
             string messageString = MyAPIGateway.Utilities.SerializeToXML( item );
-            byte[ ] data = Encoding.Unicode.GetBytes( messageString );
+            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
             BroadcastDataMessage( DataMessageType.Waypoint, data );
         }
 
