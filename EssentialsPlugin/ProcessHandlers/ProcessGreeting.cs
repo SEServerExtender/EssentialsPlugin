@@ -179,7 +179,7 @@
 
 			base.OnPlayerJoined(remoteUserId);
 		}
-
+        
 		public override void OnPlayerLeft(ulong remoteUserId)
 		{
 			lock (m_greetingList)
