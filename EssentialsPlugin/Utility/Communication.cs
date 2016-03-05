@@ -128,21 +128,23 @@
 
         public static void DisplayDialog( ulong steamId, string header, string subheader, string content, string buttonText = "OK" )
         {
-            ServerDialogItem MessageItem = new ServerDialogItem( );
-            MessageItem.title = header;
-            MessageItem.header = subheader;
-            MessageItem.content = content;
-            MessageItem.buttonText = buttonText;
+            ServerDialogItem messageItem = new ServerDialogItem
+                                           {
+                                               title = header,
+                                               header = subheader,
+                                               content = content,
+                                               buttonText = buttonText
+                                           };
 
-            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( messageItem );
             byte[ ] data = Encoding.UTF8.GetBytes( messageString );
 
             SendDataMessage( steamId, DataMessageType.Dialog, data );
         }
 
-        public static void DisplayDialog( ulong steamId, ServerDialogItem MessageItem )
+        public static void DisplayDialog( ulong steamId, ServerDialogItem messageItem )
         {
-            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( messageItem );
             byte[ ] data = Encoding.UTF8.GetBytes( messageString );
 
             SendDataMessage( steamId, DataMessageType.Dialog, data );

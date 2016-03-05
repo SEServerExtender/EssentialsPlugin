@@ -1115,7 +1115,8 @@
                                    new ProcessSpawnShipTracking( ),
                                    new ProcessVoxels(  ),
                                    new ProcessReservedSlots(),
-                                   new ProcessTimedCommands(  )
+                                   new ProcessTimedCommands(  ),
+                                   new ProcessSpeed(  )
                                };
 
             // Setup chat handlers

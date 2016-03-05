@@ -19,7 +19,7 @@
 			}
 		}
 
-		private string title;
+		private string title = "";
 		[Description("The title at the top of the dialog")]
 		public string Title
 		{
@@ -31,7 +31,7 @@
 			}
 		}
 
-		private string header;
+		private string header = "";
 		[Description("The subheader above the content")]
 		public string Header
 		{
@@ -43,7 +43,7 @@
 			}
 		}
 
-		private string contents;
+		private string contents = "";
 		[Description("The contents of the dialog.  This area has a scroll bar and can be long and use carriage returns.")]
 		[Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
 		public string Contents
@@ -56,7 +56,7 @@
 			}
 		}
 
-		private string buttonText;
+		private string buttonText = "";
 		[Description("The text in the button at the bottom of the dialog")]
 		public string ButtonText
 		{

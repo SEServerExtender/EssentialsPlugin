@@ -3,6 +3,7 @@
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
+	using System.Text;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
@@ -55,19 +56,19 @@
 			{
 				if (MyAPIGateway.Players == null)
 					return;
-				
-				try
+                
+                try
 				{
 					List<IMyPlayer> players = new List<IMyPlayer>();
 					bool result = false;
-
+                    
                     //Wrapper.GameAction(() =>
-					//{
-						try
+                    //{
+                    try
 						{
 							MyAPIGateway.Players.GetPlayers(players);
 							result = true;
-						}
+                    }
 						catch (Exception ex)
 						{
 							Essentials.Log.Error( ex );
@@ -76,21 +77,21 @@
 
 					if(!result)
 						return;
-                        
-					lock (m_greetingList)
+
+                    lock (m_greetingList)
 					{
 						for (int r = m_greetingList.Count - 1; r >= 0; r--)
-						{
-							GreetingItem item = m_greetingList[r];
+                        {
+                            GreetingItem item = m_greetingList[r];
 							if(DateTime.Now - item.Start > item.Timeout)
-							{
-								m_greetingList.RemoveAt(r);
+                            {
+                                m_greetingList.RemoveAt(r);
 								continue;
-							}
-							IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == item.SteamId && x.Controller != null && x.Controller.ControlledEntity != null);
+                            }
+                            IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == item.SteamId && x.Controller != null && x.Controller.ControlledEntity != null);
 							if (player != null)
-							{
-								m_greetingList.RemoveAt(r);
+                            {
+                                m_greetingList.RemoveAt(r);
 
 								string message;
 
@@ -98,8 +99,8 @@
 									message = PluginSettings.Instance.GreetingNewUserMessage.Replace("%name%", player.DisplayName);
 								else
 									message = PluginSettings.Instance.GreetingMessage.Replace("%name%", player.DisplayName);
-
-								message = message.Replace("%name%", player.DisplayName);
+                                
+                                message = message.Replace("%name%", player.DisplayName);
 								message = message.Replace("%players%", players.Count.ToString());
 								message = message.Replace("%maxplayers%", MyAPIGateway.Session.SessionSettings.MaxPlayers.ToString());
 
@@ -109,21 +110,24 @@
 									Communication.SendPublicInformation(finalMessage);
 								else
 									Communication.SendPrivateInformation(item.SteamId, finalMessage);
-
-								if (item.IsNewUser)
+                                
+                                if (item.IsNewUser)
 								{
 									if (PluginSettings.Instance.GreetingNewUserItem.Enabled)
 									{
 										SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingNewUserItem;
 										Communication.DisplayDialog(item.SteamId, gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText);
-									}
-								}
+                                    }
+                                }
 								else
-								{
-									if (PluginSettings.Instance.GreetingItem.Enabled)
-									{
-										SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingItem;
-										Communication.DisplayDialog(item.SteamId, gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText);
+                                {
+                                    Essentials.Log.Debug( "m" );
+                                    if (PluginSettings.Instance.GreetingItem.Enabled)
+                                    {
+                                        Essentials.Log.Debug( "n" );
+                                        SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingItem;
+                                        Essentials.Log.Debug( "o" );
+                                        Communication.DisplayDialog(item.SteamId, gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText);
 									}
 								}
 
@@ -155,6 +159,23 @@
 				m_greetingList.Add(item);
 				Essentials.Log.Info( "Greeting Added => {0} (New user: {1})", remoteUserId, item.IsNewUser );
 			}
+
+            //TODO: Kill this thing in a week or two once everyone's updated
+            byte[ ] data = Encoding.UTF8.GetBytes( "UTF MESSAGE" );
+            long msgId = 5024;
+            
+            string msgIdString = msgId.ToString( );
+            byte[ ] newData = new byte[data.Length + msgIdString.Length + 1];
+            newData[0] = (byte)msgIdString.Length;
+            for ( int r = 0; r < msgIdString.Length; r++ )
+                newData[r + 1] = (byte)msgIdString[r];
+
+            Buffer.BlockCopy( data, 0, newData, msgIdString.Length + 1, data.Length );
+
+            Wrapper.GameAction( ( ) =>
+             {
+                 MyAPIGateway.Multiplayer.SendMessageToOthers( 9000, newData );
+             } );
 
 			base.OnPlayerJoined(remoteUserId);
 		}

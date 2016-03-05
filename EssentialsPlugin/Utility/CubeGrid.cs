@@ -136,10 +136,12 @@
 						MyObjectBuilder_MotorAdvancedStator stator = (MyObjectBuilder_MotorAdvancedStator)block;
 						if ( stator.RotorEntityId != 0 )
 						{
-							IMyEntity connectedEntity;
-							MyAPIGateway.Entities.TryGetEntityById( (long) stator.RotorEntityId, out connectedEntity );
+							IMyEntity connectedEntity = null;
 
-							if ( connectedEntity != null )
+						    if ( stator.RotorEntityId != null )
+						        MyAPIGateway.Entities.TryGetEntityById( (long) stator.RotorEntityId, out connectedEntity );
+
+						    if ( connectedEntity != null )
 							{
 								result = true;
 								break;
@@ -158,10 +160,12 @@
 						MyObjectBuilder_MotorStator stator = (MyObjectBuilder_MotorStator)block;
 						if ( stator.RotorEntityId != 0 )
 						{
-							IMyEntity connectedEntity;
-							MyAPIGateway.Entities.TryGetEntityById( (long) stator.RotorEntityId, out connectedEntity );
+							IMyEntity connectedEntity=null;
 
-							if ( connectedEntity != null )
+						    if ( stator.RotorEntityId != null )
+						        MyAPIGateway.Entities.TryGetEntityById( (long) stator.RotorEntityId, out connectedEntity );
+
+						    if ( connectedEntity != null )
 							{
 								result = true;
 								break;

@@ -4,6 +4,7 @@
 *.suo
 *.user
 *.sln.docstates
+*.scgdat
 # Build results
 [Dd]ebug/
 [Rr]elease/

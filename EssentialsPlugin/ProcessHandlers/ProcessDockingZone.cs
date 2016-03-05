@@ -36,15 +36,15 @@
 
 		public override void Handle()
 		{
+			if (!PluginSettings.Instance.DockingEnabled)
+				return;
+
 			// ZoneCache can be used elsewhere.  I need to move this out of here.
 			if (DateTime.Now - m_lastZoneUpdate > TimeSpan.FromSeconds(30))
 			{
 				m_lastZoneUpdate = DateTime.Now;
 				PopulateZoneCache();
 			}
-
-			if (!PluginSettings.Instance.DockingEnabled)
-				return;
 
 			List<IMyPlayer> players = new List<IMyPlayer>();
 			//Wrapper.GameAction(() =>
@@ -123,7 +123,7 @@
 						continue;
 
 					// Get zones
-					foreach (KeyValuePair<String, List<IMyCubeBlock>> p in zoneList)
+					foreach (KeyValuePair<string, List<IMyCubeBlock>> p in zoneList)
 					{
 						// Check if we're inside
 						if (DockingZone.IsGridInside((IMyCubeGrid)parent, p.Value))
@@ -132,7 +132,7 @@
 							{
 								m_playersInside.Add(playerId);
 								ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerId(playerId);
-								Communication.Notification(steamId, MyFontEnum.Green, 7, string.Format("You are inside a valid docking zone: {0}", p.Key));
+								Communication.Notification(steamId, MyFontEnum.Green, 7, $"You are inside a valid docking zone: {p.Key}" );
 							}
 
 							return;
@@ -153,10 +153,10 @@
 		private void PopulateZoneCache()
 		{
 			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-			//Wrapper.GameAction(() =>
-			//{
-				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
-			//});
+			Wrapper.GameAction(() =>
+			{
+			    MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
+			});
 
 			m_zoneCache.Clear();
 			foreach (IMyEntity entity in entities)

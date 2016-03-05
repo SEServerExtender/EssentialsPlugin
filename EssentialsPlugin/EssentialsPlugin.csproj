@@ -137,6 +137,7 @@
     <Compile Include="EntityManagers\BlockManagement.cs" />
     <Compile Include="EntityManagers\TurretManagement.cs" />
     <Compile Include="GameModes\Conquest.cs" />
+    <Compile Include="ProcessHandlers\ProcessSpeed.cs" />
     <Compile Include="ProcessHandlers\ProcessBlockEnforcement.cs" />
     <Compile Include="ProcessHandlers\ProcessCleanup.cs" />
     <Compile Include="ProcessHandlers\ProcessConceal.cs" />
