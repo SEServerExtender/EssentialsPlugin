@@ -4,6 +4,7 @@
 	using System.Linq;
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
+	using VRage.Game.ModAPI;
 	using VRageMath;
 
 	public class HandlePos : ChatHandlerBase

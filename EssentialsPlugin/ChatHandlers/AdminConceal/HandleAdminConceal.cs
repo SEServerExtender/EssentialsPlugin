@@ -8,6 +8,7 @@
     using SEModAPIInternal.API.Common;
     using VRage.ModAPI;
     using EntityManagers;
+    using VRage.Game.ModAPI;
 
     public class HandleAdminConceal : ChatHandlerBase
 	{

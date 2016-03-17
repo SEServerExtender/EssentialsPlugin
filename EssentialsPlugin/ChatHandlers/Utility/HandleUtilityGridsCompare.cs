@@ -5,6 +5,7 @@
 	using System.Linq;
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
+	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 
 	public class HandleUtilityGridsCompare : ChatHandlerBase

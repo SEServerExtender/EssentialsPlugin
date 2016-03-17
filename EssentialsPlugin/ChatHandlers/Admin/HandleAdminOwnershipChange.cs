@@ -10,6 +10,7 @@
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
     using VRage.ModAPI;
     using VRage.Game;
+    using VRage.Game.ModAPI;
 
     public class HandleAdminOwnershipChange : ChatHandlerBase
     {

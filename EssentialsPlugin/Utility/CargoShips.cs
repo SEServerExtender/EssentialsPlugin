@@ -15,6 +15,7 @@
     using Sandbox.Engine.Physics;
     using Sandbox.Game.World;
     using VRage;
+    using VRage.Game.ModAPI;
     using VRage.Library.Collections;
 
     public static class CargoShips
@@ -294,7 +295,7 @@
                 }*/
 
                 // Deploy ship
-
+/*
                 MyPrefabManager.Static.SpawnPrefab(
                     resultList: m_tmpGridList,
                     prefabName: shipPrefab.SubtypeId,
@@ -309,7 +310,7 @@
                                      ownerId: shipPrefab.ResetOwnership ? spawnGroupId : 0,
                     updateSync: true);
          
-               
+               */
                 m_tmpGridList.Clear();
                 
             }

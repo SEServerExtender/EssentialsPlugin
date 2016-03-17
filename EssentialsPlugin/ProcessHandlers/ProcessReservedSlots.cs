@@ -10,6 +10,7 @@
     using SEModAPIInternal.API.Common;
     using SEModAPIInternal.API.Server;
     using SteamSDK;
+    using VRage.Game.ModAPI;
 
     public class ProcessReservedSlots : ProcessHandlerBase
     {

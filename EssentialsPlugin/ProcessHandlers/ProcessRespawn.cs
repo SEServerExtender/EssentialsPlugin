@@ -7,6 +7,7 @@
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Server;
 	using VRage.Game;
+	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 
 	public class ProcessRespawn : ProcessHandlerBase

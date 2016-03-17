@@ -8,6 +8,7 @@
 	using SEModAPIInternal.API.Common;
     using SEModAPIInternal.API.Entity.Sector.SectorObject;
 	using VRage.Game;
+	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 
 	public class HandleAdminDeleteNoBeacon : ChatHandlerBase

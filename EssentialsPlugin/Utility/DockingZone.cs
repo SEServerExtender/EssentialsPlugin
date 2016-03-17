@@ -8,11 +8,9 @@
 	using Sandbox.ModAPI;
 	using Sandbox.ModAPI.Ingame;
 	using VRage.Game;
+	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 	using VRageMath;
-	using IMyCubeBlock = Sandbox.ModAPI.IMyCubeBlock;
-	using IMyCubeGrid = Sandbox.ModAPI.IMyCubeGrid;
-	using IMySlimBlock = Sandbox.ModAPI.IMySlimBlock;
 	using IMyTerminalBlock = Sandbox.ModAPI.IMyTerminalBlock;
 
 	public static class DockingZone

@@ -16,11 +16,8 @@
     using VRage.ModAPI;
     using VRage.ObjectBuilders;
     using VRageMath;
-    using IMyCubeBlock = Sandbox.ModAPI.IMyCubeBlock;
-    using IMyCubeGrid = Sandbox.ModAPI.IMyCubeGrid;
     using IMyFunctionalBlock = Sandbox.ModAPI.Ingame.IMyFunctionalBlock;
     using IMyProductionBlock = Sandbox.ModAPI.Ingame.IMyProductionBlock;
-    using IMySlimBlock = Sandbox.ModAPI.IMySlimBlock;
     using IMyTerminalBlock = Sandbox.ModAPI.Ingame.IMyTerminalBlock;
     using Sandbox.Engine.Multiplayer;
     using Sandbox.Game.Replication;
@@ -30,7 +27,9 @@
     using VRage.Collections;
     using Sandbox.Game.Entities.Blocks;
     using Sandbox.Game.Entities.Character;
+    using SpaceEngineers.Game.ModAPI.Ingame;
     using VRage.Game;
+    using VRage.Game.ModAPI;
 
     class ConcealItem
     {

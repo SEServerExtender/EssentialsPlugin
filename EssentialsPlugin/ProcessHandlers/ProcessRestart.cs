@@ -14,6 +14,7 @@
 	using SEModAPIExtensions.API;
 	using SEModAPIInternal.API.Common;
 	using SteamSDK;
+	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 	using VRageMath;
 

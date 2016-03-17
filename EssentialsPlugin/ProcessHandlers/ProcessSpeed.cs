@@ -6,6 +6,7 @@
 	using Sandbox.ModAPI;
 	using Settings;
 	using Utility;
+	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 	using VRageMath;
 

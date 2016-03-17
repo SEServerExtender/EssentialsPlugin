@@ -11,6 +11,7 @@
 	using VRageMath;
     using Sandbox.Game;
 	using VRage.Game;
+	using VRage.Game.ModAPI;
 
     public class HandleUtilityGridsList : ChatHandlerBase
 	{

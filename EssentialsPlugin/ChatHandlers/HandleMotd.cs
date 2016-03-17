@@ -6,8 +6,9 @@
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
+	using VRage.Game.ModAPI;
 
-	public class HandleMotd : ChatHandlerBase
+    public class HandleMotd : ChatHandlerBase
 	{
 		DateTime m_start = DateTime.Now;
 

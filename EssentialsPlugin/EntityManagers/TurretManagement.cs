@@ -9,6 +9,7 @@
     using Sandbox.ModAPI;
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
     using VRage.Game;
+    using VRage.Game.ModAPI;
     using VRage.ModAPI;
     using VRageMath;
 

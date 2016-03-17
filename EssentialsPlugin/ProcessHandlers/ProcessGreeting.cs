@@ -8,8 +8,9 @@
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
+	using VRage.Game.ModAPI;
 
-	class GreetingItem
+    class GreetingItem
 	{
 		private DateTime _start;
 		public DateTime Start
@@ -121,12 +122,9 @@
                                 }
 								else
                                 {
-                                    Essentials.Log.Debug( "m" );
                                     if (PluginSettings.Instance.GreetingItem.Enabled)
                                     {
-                                        Essentials.Log.Debug( "n" );
                                         SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingItem;
-                                        Essentials.Log.Debug( "o" );
                                         Communication.DisplayDialog(item.SteamId, gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText);
 									}
 								}

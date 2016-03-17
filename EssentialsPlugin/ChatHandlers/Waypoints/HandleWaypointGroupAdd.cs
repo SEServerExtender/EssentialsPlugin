@@ -5,8 +5,9 @@
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
+	using VRage.Game.ModAPI;
 
-	public class HandleWaypointGroupAdd : ChatHandlerBase
+    public class HandleWaypointGroupAdd : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{

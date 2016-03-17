@@ -9,6 +9,7 @@
 	using NLog;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
+	using VRage.Game.ModAPI;
 	using VRageMath;
 
 	public class Waypoints

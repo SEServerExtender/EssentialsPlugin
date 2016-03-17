@@ -11,6 +11,7 @@
     using SEModAPIInternal.API.Entity.Sector.SectorObject;
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+    using VRage.Game.ModAPI;
     using VRage.ModAPI;
     public class HandleAdminDeleteFloating : ChatHandlerBase
     {
@@ -58,7 +59,7 @@
                 if ( entity == null )
                     continue;
 
-                if ( entity is IMyFloatingObject || entity is MyInventoryBagEntity )
+                if ( entity is IMyFloatingObject || entity is MyInventoryBagEntity || entity is IMyMeteor )
                 {
                     count++;
                     Wrapper.GameAction(()=>

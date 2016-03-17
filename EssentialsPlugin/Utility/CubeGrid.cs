@@ -20,6 +20,8 @@
     using Sandbox.Game.Entities.Cube;
     using SEModAPIExtensions.API;
     using VRage.Game;
+    using VRage.Game.ModAPI;
+
     public enum RemoveGridTypes
 	{
 		All,

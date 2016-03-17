@@ -10,6 +10,7 @@
 	using SEModAPIInternal.API.Entity.Sector.SectorObject;
 	using VRage;
 	using VRage.Game;
+	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 	using VRageMath;
 

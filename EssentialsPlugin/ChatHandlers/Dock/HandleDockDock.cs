@@ -13,6 +13,7 @@
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity;
 	using VRage.Game;
+	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 	using VRage.ObjectBuilders;
 	using VRageMath;

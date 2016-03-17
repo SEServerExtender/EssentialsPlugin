@@ -6,8 +6,9 @@
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
+	using VRage.Game.ModAPI;
 
-	public class HandleDockList : ChatHandlerBase
+    public class HandleDockList : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{

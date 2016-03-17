@@ -13,6 +13,8 @@
     using Sandbox.ModAPI.Interfaces;
     using SEModAPIInternal.API.Common;
     using VRage.Game;
+    using VRage.Game.ModAPI;
+    using VRage.Game.ModAPI.Interfaces;
     using VRage.ModAPI;
     using VRage.ObjectBuilders;
     using VRage.Utils;
@@ -22,7 +24,6 @@
         private static bool _init = false;
         private static DateTime _lastLog;
         private static SortedList<IMySlimBlock, float> toDamage = new SortedList<IMySlimBlock, float>( );
-        private static MyDisconnectHelper disconnect = new MyDisconnectHelper(  );
 
         public static void Init( )
         {
@@ -50,17 +51,6 @@
             {
                 if ( item.Enabled && item.EntityId == grid.EntityId )
                 {
-                    //info.Amount = 0;
-                    List<IMySlimBlock> armorBlocks = new List<IMySlimBlock>( );
-                    grid.GetBlocks( armorBlocks, x => x.FatBlock == null );
-                    
-                    float damageConst = info.Amount / armorBlocks.Count;
-
-                    foreach ( IMySlimBlock slimBlock in armorBlocks )
-                    {
-                            //toDamage.Add( slimBlock,damageConst );
-                    }
-                    
                     info.Amount = 0;
                     if ( DateTime.Now - _lastLog > TimeSpan.FromSeconds( 1 ) )
                     {
@@ -71,20 +61,6 @@
             }
 
         }
-
-        public static void DealDamage( )
-        {
-            if(!toDamage.Any(  ))
-                return;
-
-            Wrapper.GameAction( ( ) =>
-                                {
-                                    ( (IMyDestroyableObject) toDamage.First( ).Key ).DoDamage( toDamage.First( ).Value,
-                                                                                               MyDamageType.Unknown, true );
-                                } );
-            toDamage.RemoveAt(0);
-        }
-        
     }
 }
 

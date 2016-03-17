@@ -5,6 +5,7 @@
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
 	using VRage;
+	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 
 	public class VoxelManagement

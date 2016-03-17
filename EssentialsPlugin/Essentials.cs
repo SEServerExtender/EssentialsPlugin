@@ -1116,7 +1116,8 @@
                                    new ProcessVoxels(  ),
                                    new ProcessReservedSlots(),
                                    new ProcessTimedCommands(  ),
-                                   new ProcessSpeed(  )
+                                   new ProcessSpeed(  ),
+                                   //new ProcessPlayerCleanup(  )
                                };
 
             // Setup chat handlers
@@ -1133,6 +1134,7 @@
                                 new HandleAdminVersion( ),
                                 new HandleAdminStop( ),
                                 new HandleAdminSpeed( ),
+                                new HandleAdminIdentityCleanup(  ),
 
 
                                 //Admin Scan
@@ -1230,19 +1232,13 @@
             MyAPIGateway.Entities.OnEntityRemove -= OnEntityRemove;
             MyAPIGateway.Entities.OnEntityAdd += OnEntityAdd;
             MyAPIGateway.Entities.OnEntityRemove += OnEntityRemove;
-
-            MyAPIGateway.Multiplayer.RegisterMessageHandler( 9003, ReceiveDataMessage );
-
+            
             Protection.Init( );
             ProcessReservedSlots.Init( );
 
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
         }
-
-        private void ReceiveDataMessage( byte[] data )
-        {
-            
-        }
+        
 
         #endregion
 
@@ -1375,7 +1371,6 @@
         {
             if (MyAPIGateway.Session == null)
                 return;
-            Protection.DealDamage(  );
         }
 
         #endregion

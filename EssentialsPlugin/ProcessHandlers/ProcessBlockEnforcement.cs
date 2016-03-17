@@ -7,16 +7,16 @@
 	using Sandbox.ModAPI;
 	using Sandbox.ModAPI.Ingame;
 	using SEModAPIInternal.API.Common;
+	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 	using VRageMath;
-	using IMyCubeGrid = Sandbox.ModAPI.IMyCubeGrid;
 	using IMyTerminalBlock = Sandbox.ModAPI.Ingame.IMyTerminalBlock;
 
 	class ProcessBlockEnforcement : ProcessHandlerBase
 	{
 		public override int GetUpdateResolution( )
 		{
-			return 45000;
+			return 5000;
 		}
 
 		public override void Handle( )
@@ -48,7 +48,7 @@
 
 			try
 			{
-				MyAPIGateway.Entities.GetEntities( entities );
+				Wrapper.GameAction(()=>MyAPIGateway.Entities.GetEntities( entities ));
 			}
 			catch ( Exception ex )
 			{
@@ -67,14 +67,19 @@
 					continue;
 
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				IMyGridTerminalSystem gridTerminal = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid( grid );
+				//IMyGridTerminalSystem gridTerminal = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid( grid );
 
 				Dictionary<SettingsBlockEnforcementItem, int> blocks = new Dictionary<SettingsBlockEnforcementItem, int>( );
-				List<IMyTerminalBlock> blockstoProcess = new List<IMyTerminalBlock>( );
-				gridTerminal.GetBlocksOfType<IMyTerminalBlock>( blockstoProcess );
-				foreach ( IMyTerminalBlock myTerminalBlock in blockstoProcess )
+				//List<IMyTerminalBlock> blockstoProcess = new List<IMyTerminalBlock>( );
+				//gridTerminal.GetBlocksOfType<IMyTerminalBlock>( blockstoProcess );
+                List<IMySlimBlock>blockstoProcess = new List<IMySlimBlock>();
+                grid.GetBlocks( blockstoProcess, x => x.FatBlock is IMyTerminalBlock );
+				foreach ( IMySlimBlock myTerminalBlock in blockstoProcess )
 				{
-					IMyTerminalBlock block = myTerminalBlock;
+				    if ( myTerminalBlock?.FatBlock == null )
+				        continue;
+
+					IMyTerminalBlock block = (IMyTerminalBlock)myTerminalBlock.FatBlock;
 					foreach ( SettingsBlockEnforcementItem item in PluginSettings.Instance.BlockEnforcementItems )
 					{
 						if ( item.Mode == SettingsBlockEnforcementItem.EnforcementMode.Off )

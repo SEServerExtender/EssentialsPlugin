@@ -78,6 +78,7 @@
     <Compile Include="ChatHandlers\AdminSettings\HandleAdminSettings.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminStop.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminSpeed.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminIdentityCleanup.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminVersion.cs" />
     <Compile Include="ChatHandlers\HandleLastSeen.cs" />
     <Compile Include="ChatHandlers\Settings\HandleSettingsEnableBlockEnforcement.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="EntityManagers\BlockManagement.cs" />
     <Compile Include="EntityManagers\TurretManagement.cs" />
     <Compile Include="GameModes\Conquest.cs" />
+    <Compile Include="ProcessHandlers\ProcessPlayerCleanup.cs" />
     <Compile Include="ProcessHandlers\ProcessSpeed.cs" />
     <Compile Include="ProcessHandlers\ProcessBlockEnforcement.cs" />
     <Compile Include="ProcessHandlers\ProcessCleanup.cs" />

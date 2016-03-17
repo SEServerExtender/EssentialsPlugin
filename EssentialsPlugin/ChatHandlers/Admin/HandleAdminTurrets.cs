@@ -5,11 +5,13 @@
     using EssentialsPlugin.Utility;
     using Sandbox.Common;
     using Sandbox.Common.ObjectBuilders;
+    using Sandbox.Game.Entities;
     using Sandbox.ModAPI;
     using Sandbox.ModAPI.Interfaces;
     using SEModAPIInternal.API.Common;
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
     using VRage.Game;
+    using VRage.Game.ModAPI;
     using VRage.ModAPI;
     using VRageMath;
 

@@ -8,6 +8,7 @@
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
 	using VRage.Game;
+	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 
 	public class HandleAdminScanOverlimit : ChatHandlerBase

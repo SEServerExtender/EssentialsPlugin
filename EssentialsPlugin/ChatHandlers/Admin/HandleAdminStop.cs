@@ -13,6 +13,8 @@
     using VRageMath;
     using Sandbox.Game.Entities;
     using Sandbox.Game.Entities.Cube;
+    using VRage.Game.ModAPI;
+
     public class HandleAdminStop : ChatHandlerBase
     {
         public override string GetHelp( )

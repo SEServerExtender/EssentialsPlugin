@@ -6,6 +6,7 @@
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
+	using VRage.Game.ModAPI;
 	using VRageMath;
 
 	public class ProcessWaypoints : ProcessHandlerBase
