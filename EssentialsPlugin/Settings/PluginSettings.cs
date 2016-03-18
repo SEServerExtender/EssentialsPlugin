@@ -121,6 +121,9 @@
 
 	    private bool _timedCommandsEnabled;
 	    private MTObservableCollection<TimedCommandItem> _TimedCommandsItem;
+
+	    private bool _cargoShipsEnabled;
+	    private float _cargoShipSpawnTime;
         #endregion
 
 		#region Static Properties
@@ -974,6 +977,26 @@
 	            Save(  );
 	        }
 	    }
+
+	    public bool CargoShipsEnabled
+	    {
+	        get { return _cargoShipsEnabled; }
+	        set
+	        {
+	            _cargoShipsEnabled = value;
+	            Save( );
+	        }
+	    }
+
+	    public float CargoShipSpawnTime
+	    {
+	        get { return _cargoShipSpawnTime; }
+	        set
+	        {
+	            _cargoShipSpawnTime = value;
+	            Save( );
+	        }
+	    }
         #endregion
 
         #region Constructor
@@ -1047,6 +1070,9 @@
             _timedCommandsEnabled = false;
             _TimedCommandsItem = new MTObservableCollection<TimedCommandItem>(  );
             _TimedCommandsItem.CollectionChanged += ItemsCollectionChanged;
+
+            _cargoShipsEnabled = false;
+            _cargoShipSpawnTime = 10.0f;
 		}
 
 

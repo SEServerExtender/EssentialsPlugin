@@ -1,17 +1,17 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
     using Utility;
-    public class HandleAdminTest : ChatHandlerBase
+    public class HandleAdminSpawnCargo : ChatHandlerBase
 	{
 
     public override string GetHelp()
 		{
-			return "For testing.";
+			return "Spawns a cargo ship.";
 		}
 
 		public override string GetCommandText()
 		{
-			return "/admin test";
+			return "/admin spawn cargo";
 		}
 
         public override Communication.ServerDialogItem GetHelpDialog( )

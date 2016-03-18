@@ -1071,6 +1071,32 @@
                 PluginSettings.Instance.TimedCommandsItems = value;
             }
         }
+
+        [Category( "Cargo Ships" )]
+        [Description( "This enables or disables random cargo ships." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool CargoShipsEnabled {
+            get {
+                return PluginSettings.Instance.CargoShipsEnabled;
+            }
+            set {
+                PluginSettings.Instance.CargoShipsEnabled = value;
+            }
+        }
+
+        [Category( "Cargo Ships" )]
+        [Description( "The amount of time, in minutes, between ship spawn." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public float CargoShipSpawnTime {
+            get {
+                return PluginSettings.Instance.CargoShipSpawnTime;
+            }
+            set {
+                PluginSettings.Instance.CargoShipSpawnTime = value;
+            }
+        }
         /*
 		[Category("Game Modes")]
 		[Description("Conquest Game Mode - This mode tracks asteroid owners by counting owned blocks near an asteroid to determine the owner.  Includes a leaderboard")]
@@ -1117,6 +1143,7 @@
                                    new ProcessReservedSlots(),
                                    new ProcessTimedCommands(  ),
                                    new ProcessSpeed(  ),
+                                   new ProcessCargoShips(  )
                                    //new ProcessPlayerCleanup(  )
                                };
 
@@ -1135,6 +1162,7 @@
                                 new HandleAdminStop( ),
                                 new HandleAdminSpeed( ),
                                 new HandleAdminIdentityCleanup(  ),
+                                new HandleAdminSpawnCargo(  ),
 
 
                                 //Admin Scan
