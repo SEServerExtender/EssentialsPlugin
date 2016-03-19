@@ -50,27 +50,7 @@
                 return;
             _init = true;
             Essentials.Log.Info( "Init cargo ships" );
-            //cache planet locations and gravity sphere radius
-            HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
-            Wrapper.GameAction( ( ) =>
-             {
-                 //MyAPIGateway.Entities.GetEntities( entities, x => x is MyPlanet );
-                 MyAPIGateway.Entities.GetEntities( entities );
-             } );
-            
-            foreach ( IMyEntity entity in entities )
-            {
-                if (!( entity is MyPlanet ))
-                    continue;
 
-                MyPlanet planet = (MyPlanet) entity;
-                gravitySphereList.Add( new BoundingSphereD( planet.PositionComp.GetPosition(  ), planet.GravityLimit) );
-                Essentials.Log.Debug( planet.ToString());
-                Essentials.Log.Debug( planet.PositionComp.GetPosition( ).ToString() + ", " + planet.GravityLimit.ToString(  ) );
-                break;
-            }
-            
-            //Communication.DisplayDialog( 76561197996829390, "", "",results );
             //load spawn groups
              var spawnGroups = MyDefinitionManager.Static.GetSpawnGroupDefinitions();
             foreach (var spawnGroup in spawnGroups)
@@ -108,9 +88,7 @@
                 if ( planet == null )
                     continue;
                 BoundingSphereD gravitySphere = new BoundingSphereD( planet.PositionComp.GetPosition(  ), planet.GravityLimit + spawnRadius);
-                Essentials.Log.Info( gravitySphere );
-                Essentials.Log.Info( trajectory.Intersects( gravitySphere ) );
-
+                
                 float? intersect = trajectory.Intersects( gravitySphere );
                 if ( intersect.HasValue && intersect.Value > 0 )
                     return true;
@@ -129,9 +107,7 @@
         {
             if ( ExtenderOptions.IsDebugging )
                 Essentials.Log.Info( "Checking point gravity intersect" );
-
-            Essentials.Log.Info( testPoint );
-            Essentials.Log.Info( MyGravityProviderSystem.CalculateNaturalGravityInPoint( testPoint, true ) );
+            
             return !Vector3D.IsZero( MyGravityProviderSystem.CalculateNaturalGravityInPoint( testPoint, true ) );
 
             /*
