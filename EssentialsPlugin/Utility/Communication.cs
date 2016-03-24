@@ -78,10 +78,11 @@
             ChatManager.ChatEvent chatItem = new ChatManager.ChatEvent( );
             chatItem.Timestamp = DateTime.Now;
             chatItem.RemoteUserId = (from == null ? 0 : PlayerMap.Instance.GetSteamIdFromPlayerName( from ));
-            chatItem.Message = (from == null ? infoText : (string.Format( "{whisper to {0}}: {1}", PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerId ), infoText )));
+            chatItem.Message = (from == null ? infoText : ( $"{{whisper}} to {PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerId )}: {infoText}" ));
             ChatManager.Instance.AddChatHistory( chatItem );
         }
 
+        //TODO: Kill PlayerMap
         public static void SendFactionClientMessage( ulong playerSteamId, string message )
         {
             ServerMessageItem MessageItem = new ServerMessageItem( );

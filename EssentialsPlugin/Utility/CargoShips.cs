@@ -136,9 +136,7 @@
                                     }
 
                                     spawnGroup.ReloadPrefabs( );
-
-                                    ProfilerShort.Begin( "Generate position and direction" );
-
+                                    
                                     double spawnDistance = NEUTRAL_SHIP_SPAWN_DISTANCE;
                                     Vector3D playerPosition = Vector3D.Zero;
                                     bool isWorldLimited = MyEntities.IsWorldLimited( );
@@ -203,14 +201,7 @@
                                             Essentials.Log.Info( "Couldn't find free place for cargo spawn" );
                                         return;
                                     }
-
-                                    if ( IsPointInGravity( origin.Value ) )
-                                    {
-                                        if ( ExtenderOptions.IsDebugging )
-                                            Essentials.Log.Info( "Spawn point is in gravity" );
-                                        return;
-                                    }
-
+                                    
                                     // Radius in arc units of the forbidden sphere in the center, when viewed from origin
                                     float centerArcRadius = (float)Math.Atan( forbiddenRadius / ( origin.Value - spawnBox.Center ).Length( ) );
                                     
@@ -237,22 +228,11 @@
                                         directionMult = direction * intersection.Value;
                                     }
                                     destination = origin.Value + directionMult;
-
-                                    if ( IsPointInGravity( destination ) )
-                                    {
-                                        if ( ExtenderOptions.IsDebugging )
-                                            Essentials.Log.Info("Destination is in gravity"  );
-                                        return;
-                                    }
-
+                                    
                                     Vector3D upVector = Vector3D.CalculatePerpendicularVector( direction );
                                     Vector3D rightVector = Vector3D.Cross( direction, upVector );
                                     MatrixD originMatrix = MatrixD.CreateWorld( origin.Value, direction, upVector );
-
-                                    ProfilerShort.End( );
-
-                                    ProfilerShort.Begin( "Check free space" );
-
+                                    
                                     // CH:TODO: Convex cast to detect collision
                                     // Check ships' path to avoid possible collisions. (TODO: But only if it is said in the definitions)
                                     m_raycastHits.Clear( );
@@ -265,10 +245,21 @@
                                         Vector3D shipDestination = shipPosition + directionMult;
                                         float radius = prefabDef == null ? 10.0f : prefabDef.BoundingSphere.Radius;
 
+                                        if ( IsPointInGravity( shipPosition ) )
+                                        {
+                                            if(ExtenderOptions.IsDebugging)
+                                                Essentials.Log.Info( "Failed to spawn cargo ship: Spawn location is in gravity well" );
+                                            return;
+                                        }
+                                        if ( IsPointInGravity( shipDestination ) )
+                                        {
+                                            if(ExtenderOptions.IsDebugging)
+                                                Essentials.Log.Info( "Failed to spawn cargo ship: Destination is in gravity well" );
+                                        }
                                         if ( DoesTrajectoryIntersect( shipPosition, shipDestination, spawnGroup.SpawnRadius ) )
                                         {
                                             if ( ExtenderOptions.IsDebugging )
-                                                Essentials.Log.Info( "Ship path is in gravity well" );
+                                                Essentials.Log.Info( "Failed to spawn cargo ship: Ship path intersects gravity well" );
                                             return;
                                         }
 
@@ -276,7 +267,7 @@
                                         if ( m_raycastHits.Count > 0 )
                                         {
                                             if ( ExtenderOptions.IsDebugging )
-                                                Essentials.Log.Info( "Ship path intersects another object" );
+                                                Essentials.Log.Info("Failed to spawn cargo ship: Ship path intersects another object");
                                             return;
                                         }
 
@@ -288,7 +279,7 @@
                                             if ( m_raycastHits.Count > 0 )
                                             {
                                                 if(ExtenderOptions.IsDebugging)
-                                                    Essentials.Log.Info( "Ship path intersects another object" );
+                                                    Essentials.Log.Info("Failed to spawn cargo ship: Ship path intersects another object");
                                                 return;
                                             }
                                         }
@@ -318,7 +309,6 @@
                 }*/
 
                                         // Deploy ship
-                                        ProfilerShort.Begin( "Spawn cargo ship" );
                                         MyPrefabManager.Static.SpawnPrefab(
                                             resultList: m_tmpGridList,
                                             prefabName: shipPrefab.SubtypeId,
@@ -332,7 +322,6 @@
                                                              VRage.Game.ModAPI.SpawningOptions.DisableDampeners,
                                             ownerId: shipPrefab.ResetOwnership ? spawnGroupId : 0,
                                             updateSync: true );
-                                        ProfilerShort.End( );
 
                                         /*
                 foreach (var grid in m_tmpGridList)
@@ -347,18 +336,14 @@
                 }
                 */
                                         m_tmpGridList.Clear( );
-                                        ProfilerShort.End( );
                                     }
-                                    ProfilerShort.End( );
                                 } );
         }
 
         private static MySpawnGroupDefinition PickRandomSpawnGroup( )
         {
-            ProfilerShort.Begin( "Pick spawn group" );
             if ( m_spawnGroupCumulativeFrequencies.Count == 0 )
             {
-                ProfilerShort.End( );
                 return null;
             }
 

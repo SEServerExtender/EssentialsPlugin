@@ -1016,11 +1016,26 @@
         {
             get
             {
-                return PluginSettings.Instance.ReservedSlotsPlayers;
+                string[] tempStrings = new string[PluginSettings.Instance.ReservedSlotsPlayers.Count];
+                int count = 0;
+                foreach ( ulong id in PluginSettings.Instance.ReservedSlotsPlayers )
+                {
+                    tempStrings[count] = id.ToString( );
+                    count++;
+                }
+                return tempStrings;
             }
             set
             {
-                PluginSettings.Instance.ReservedSlotsPlayers = value;
+                List<ulong> tempList = new List<ulong>( );
+                foreach ( string idString in value )
+                {
+                    ulong id;
+                    if ( !ulong.TryParse( idString, out id ) )
+                        continue;
+                    tempList.Add( id );
+                }
+                PluginSettings.Instance.ReservedSlotsPlayers = tempList;
             }
         }
 
@@ -1144,7 +1159,6 @@
                                    new ProcessTimedCommands(  ),
                                    new ProcessSpeed(  ),
                                    new ProcessCargoShips(  )
-                                   //new ProcessPlayerCleanup(  )
                                };
 
             // Setup chat handlers
@@ -1162,6 +1176,7 @@
                                 new HandleAdminStop( ),
                                 new HandleAdminSpeed( ),
                                 new HandleAdminIdentityCleanup(  ),
+                                new HandleAdminFactionCleanup(  ),
                                 new HandleAdminSpawnCargo(  ),
 
 

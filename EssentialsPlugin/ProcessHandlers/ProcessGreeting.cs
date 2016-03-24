@@ -157,24 +157,7 @@
 				m_greetingList.Add(item);
 				Essentials.Log.Info( "Greeting Added => {0} (New user: {1})", remoteUserId, item.IsNewUser );
 			}
-
-            //TODO: Kill this thing in a week or two once everyone's updated
-            byte[ ] data = Encoding.UTF8.GetBytes( "UTF MESSAGE" );
-            long msgId = 5024;
             
-            string msgIdString = msgId.ToString( );
-            byte[ ] newData = new byte[data.Length + msgIdString.Length + 1];
-            newData[0] = (byte)msgIdString.Length;
-            for ( int r = 0; r < msgIdString.Length; r++ )
-                newData[r + 1] = (byte)msgIdString[r];
-
-            Buffer.BlockCopy( data, 0, newData, msgIdString.Length + 1, data.Length );
-
-            Wrapper.GameAction( ( ) =>
-             {
-                 MyAPIGateway.Multiplayer.SendMessageToOthers( 9000, newData );
-             } );
-
 			base.OnPlayerJoined(remoteUserId);
 		}
         

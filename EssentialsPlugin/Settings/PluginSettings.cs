@@ -116,7 +116,7 @@
         private bool _reservedSlotsEnabled;
         private int _reservedSlotsCount;
         private ulong _reservedSlotsGroup;
-        private string[ ] _reservedSlotsPlayers = { };
+        private List<ulong> _reservedSlotsPlayers;
         private bool _reservedSlotsAdmins;
 
 	    private bool _timedCommandsEnabled;
@@ -124,6 +124,8 @@
 
 	    private bool _cargoShipsEnabled;
 	    private float _cargoShipSpawnTime;
+
+	    private Dictionary<ulong, DateTime> _ticketPlayers;
         #endregion
 
 		#region Static Properties
@@ -932,7 +934,7 @@
             }
         }
 
-        public string[ ] ReservedSlotsPlayers
+        public List<ulong> ReservedSlotsPlayers
         {
             get
             {
@@ -957,6 +959,19 @@
                 Save( );
             }
         }
+
+	    public Dictionary<ulong, DateTime> TicketPlayers
+	    {
+	        get
+	        {
+	            return _ticketPlayers;
+	        }
+	        set
+	        {
+	            _ticketPlayers = value;
+	            Save( );
+	        }
+	    } 
 
 	    public bool TimedCommandsEnabled
 	    {
@@ -1027,6 +1042,7 @@
             _reservedSlotsCount = 5;
             _reservedSlotsGroup = 0;
             _reservedSlotsAdmins = false;
+            _reservedSlotsPlayers = new List<ulong>();
 
             _stopShipsOnStart = false;
 
@@ -1073,6 +1089,8 @@
 
             _cargoShipsEnabled = false;
             _cargoShipSpawnTime = 10.0f;
+
+            _ticketPlayers = new Dictionary<ulong, DateTime>();
 		}
 
 

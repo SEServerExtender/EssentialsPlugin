@@ -1,75 +1,114 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Sandbox.Game.Multiplayer;
     using Sandbox.Game.World;
     using Sandbox.ModAPI;
     using Utility;
+    using VRage.Game.ModAPI;
+    using VRage.ModAPI;
+
     public class HandleAdminIdentityCleanup : ChatHandlerBase
-	{
+    {
+        public override string GetHelp( )
+        {
+            return "Cleans up trash identities. Usage: /admin identity cleanup (verbose)";
+        }
 
-    public override string GetHelp()
-		{
-			return "For testing.";
-		}
-
-		public override string GetCommandText()
-		{
-			return "/admin identity cleanup";
-		}
+        public override string GetCommandText( )
+        {
+            return "/admin identity cleanup";
+        }
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
-            DialogItem.title = "Help";
-            DialogItem.header = "";
-            DialogItem.content = GetHelp( );
-            DialogItem.buttonText = "close";
-            return DialogItem;
+            Communication.ServerDialogItem dialogItem = new Communication.ServerDialogItem
+                                                        {
+                                                            title = "Help",
+                                                            header = "",
+                                                            content = GetHelp( ),
+                                                            buttonText = "close"
+                                                        };
+            return dialogItem;
         }
 
-        public override bool IsAdminCommand()
-		{
-			return true;
-		}
+        public override bool IsAdminCommand( )
+        {
+            return true;
+        }
 
-		public override bool AllowedInConsole()
-		{
-			return true;
-		}
+        public override bool AllowedInConsole( )
+        {
+            return true;
+        }
 
-        public override bool HandleCommand( ulong userId, string[ ] words )
-        {/*
+        public override bool HandleCommand( ulong userId, string[] words )
+        {
             MyPlayerCollection playerCollection = MyAPIGateway.Players as MyPlayerCollection;
+            bool verbose = words.Any( ) && words[0].ToLower( ) == "verbose";
 
             if ( playerCollection == null )
                 return true;
 
-            var identities = playerCollection.GetAllIdentities( ).GroupBy( x => x.DisplayName ).Where( y => y.Count( ) > 1 ).ToList( );
+            HashSet<long> owners = new HashSet<long>( );
+            HashSet<MyIdentity> toRemove = new HashSet<MyIdentity>( );
 
-            while ( identities.Count > 0 )
+            HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
+
+            Wrapper.GameAction( ( ) => MyAPIGateway.Entities.GetEntities( entities ) );
+
+            foreach ( IMyEntity entity in entities )
             {
-                string compareName = identities[0].Key;
-                var toDelete = identities.Where(x => x.  )
+                IMyCubeGrid grid = entity as IMyCubeGrid;
+                if ( grid == null )
+                    continue;
+
+                foreach ( long owner in grid.SmallOwners )
+                    owners.Add( owner );
             }
 
-            int count = identitiesToDelete.Count;
-            foreach(MyIdentity toDelete in identitiesToDelete)
+            Dictionary<long, MyIdentity>.ValueCollection myIdentities = playerCollection.GetAllIdentities( );
+
+            foreach ( MyIdentity identity in myIdentities )
             {
-                Essentials.Log.Info( $"Deleted dead identity {toDelete.DisplayName}" );
-              playerCollection.RemoveIdentity( toDelete.IdentityId );
+                if ( !identity.IsDead )
+                    continue;
+
+                if ( !owners.Contains( identity.IdentityId ) )
+                    toRemove.Add( identity );
             }
 
-            if ( count != 0 )
+            int count = toRemove.Count;
+            int removedCount = 0;
+            Essentials.Log.Info( count );
+
+            foreach ( MyIdentity identity in toRemove )
             {
-                Essentials.Log.Info( $"Deleted {count} dead identities." );
+                //make extra sure the player isn't online
+                if ( !identity.IsDead )
+                    continue;
+
+                //make sure the identity still exists
+                if ( !playerCollection.HasIdentity( identity.IdentityId ) )
+                    continue;
+
+                removedCount++;
+                if ( verbose )
+                    Communication.SendPrivateInformation( userId, $"Removed identity {identity.DisplayName}: {identity.IdentityId}" );
+
+                if ( DateTime.Now.Millisecond <10 )
+                    Communication.SendPrivateInformation( userId, $"Removed {removedCount} of {count} identities." );
+
+
+                Wrapper.GameAction( ( ) => playerCollection.RemoveIdentity( identity.IdentityId ) );
             }
-            */
+
+            Communication.SendPrivateInformation( userId, $"Removed {count} identities." );
+
             return true;
         }
-
-	}
-
+    }
 }
 

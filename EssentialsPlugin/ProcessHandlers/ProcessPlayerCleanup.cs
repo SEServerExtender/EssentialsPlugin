@@ -16,6 +16,7 @@
 	using SEModAPIExtensions.API;
 	using SEModAPIInternal.API.Common;
 	using SteamSDK;
+	using VRage.Game.ModAPI;
 	using VRage.Library.Collections;
 	using VRage.ModAPI;
 	using VRageMath;
@@ -29,28 +30,52 @@
         
 	    public override void Handle()
 	    {
+            Essentials.Log.Info( "Cleaning up identities." );
             MyPlayerCollection playerCollection = MyAPIGateway.Players as MyPlayerCollection;
 
-	        if ( playerCollection == null )
-	            return;
+            if ( playerCollection == null )
+                return;
 
-	        int count = 0;
-	        foreach ( var identity in playerCollection.GetAllIdentities( ) )
-	        {
-	            if ( identity.IsDead )
-	            {
-                    Essentials.Log.Info( $"Removed dead player: {identity.DisplayName}" );
-	                count++;
-	                playerCollection.RemoveIdentity( identity.IdentityId );
-	            }
-	        }
+            HashSet<long> owners = new HashSet<long>( );
+            HashSet<MyIdentity> toRemove = new HashSet<MyIdentity>( );
 
-	        if ( count != 0 )
-	        {
-	            Essentials.Log.Info( $"Deleted {count} dead identities." );
-	        }
-            
-			base.Handle();
+            HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
+            Wrapper.GameAction( ( ) => MyAPIGateway.Entities.GetEntities( entities, x => x is IMyCubeGrid ) );
+
+            foreach ( IMyEntity entity in entities )
+            {
+                var grid = entity as IMyCubeGrid;
+                if ( grid == null )
+                    continue;
+
+                foreach ( long owner in grid.SmallOwners )
+                {
+                    owners.Add( owner );
+                }
+            }
+
+            var myIdentities = playerCollection.GetAllIdentities( );
+
+            foreach ( MyIdentity identity in myIdentities )
+            {
+                if ( !identity.IsDead )
+                    continue;
+
+                if ( !owners.Contains( identity.IdentityId ) )
+                    toRemove.Add( identity );
+            }
+
+            int count = toRemove.Count;
+            Wrapper.GameAction( ( ) =>
+                                {
+                                    foreach ( MyIdentity identity in toRemove )
+                                    {
+                                        Essentials.Log.Info( $"Removed identity {identity.DisplayName}: {identity.IdentityId}" );
+                                        playerCollection.RemoveIdentity( identity.IdentityId );
+                                    }
+                                } );
+            Essentials.Log.Info( $"Removed {count} identities." );
+            base.Handle();
 		}
 	}
 }

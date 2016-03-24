@@ -113,7 +113,7 @@
 				Communication.SendPrivateInformation(userId, "==== Revealed Entities ===");
 				Communication.SendPrivateInformation(userId, "==== Unconnected Entities ===");
 				HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>();
-				CubeGrids.GetGridsUnconnected(entitiesFound, entities);
+				//CubeGrids.GetGridsUnconnected(entitiesFound, entities);
 				int count = 0;
 				List<IMySlimBlock> slimBlocks = new List<IMySlimBlock>();
 				foreach (IMyEntity entity in entitiesFound)
