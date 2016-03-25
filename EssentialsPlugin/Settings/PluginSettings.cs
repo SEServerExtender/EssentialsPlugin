@@ -15,108 +15,108 @@
 	using EssentialsPlugin.UtilityClasses;
 	using VRage.FileSystem;
 
-	[Serializable]
-	public class PluginSettings
-	{
-		#region Private Fields
-		private static PluginSettings _instance;
-		private static bool _loading = false;
-		public static DateTime Start;
+    [Serializable]
+    public class PluginSettings
+    {
+        #region Private Fields
+        private static PluginSettings _instance;
+        private static bool _loading = false;
+        public static DateTime Start;
 
-		private string _serverName;
-		private bool _serverUtilityGridsShowCoords;
-		private bool _serverRespawnMenuOverride;
+        private string _serverName;
+        private bool _serverUtilityGridsShowCoords;
+        private bool _serverRespawnMenuOverride;
         private bool _stopShipsOnStart;
 
         private string _serverChatName;
         private bool _factionChatPrefix;
         private bool _whisperChatPrefix;
 
-		private bool _informationEnabled;
-		private MTObservableCollection<InformationItem> _informationItems;
+        private bool _informationEnabled;
+        private MTObservableCollection<InformationItem> _informationItems;
 
-		private bool _greetingEnabled;
-		private string _greetingMessage;
-		private bool _greetingPublic;
-		private SettingsGreetingDialogItem _greetingItem;
-		private string _greetingNewUserMessage;
-		private SettingsGreetingDialogItem _greetingNewUserItem;
+        private bool _greetingEnabled;
+        private string _greetingMessage;
+        private bool _greetingPublic;
+        private SettingsGreetingDialogItem _greetingItem;
+        private string _greetingNewUserMessage;
+        private SettingsGreetingDialogItem _greetingNewUserItem;
 
-		private bool _restartEnabled;
-		private MTObservableCollection<RestartNotificationItem> _restartNotificationItems;
-		private MTObservableCollection<RestartTimeItem> _restartTimeItems;
-		private string _restartAddedProcesses;
-		private bool _restartWhenUnresponsive;
+        private bool _restartEnabled;
+        private MTObservableCollection<RestartNotificationItem> _restartNotificationItems;
+        private MTObservableCollection<RestartTimeItem> _restartTimeItems;
+        private string _restartAddedProcesses;
+        private bool _restartWhenUnresponsive;
 
-		private bool _backupEnabled;
-		private MTObservableCollection<BackupItem> _backupItems;
-		private bool _backupCreateSubDirectories;
-		private string _backupBaseDirectory;
-		private string _backupDateFormat;
-		private string _backupDateFormatSubDirectory;
-		private bool _backupCleanup;
-		private int _backupCleanupTime;
-		private bool _backupAsteroids;
-		private bool _backupEssentials;
+        private bool _backupEnabled;
+        private MTObservableCollection<BackupItem> _backupItems;
+        private bool _backupCreateSubDirectories;
+        private string _backupBaseDirectory;
+        private string _backupDateFormat;
+        private string _backupDateFormatSubDirectory;
+        private bool _backupCleanup;
+        private int _backupCleanupTime;
+        private bool _backupAsteroids;
+        private bool _backupEssentials;
 
-		private bool _newUserTransportEnabled;
-		private int _newUserTransportDistance;
-		private bool _newUserTransportMoveAllSpawnShips;
-		private int _newUserTransportAsteroidDistance;
-		private NewUserTransportSpawnPoint _newUserTransportSpawnType;
-		private string[] _newUserTransportSpawnShipNames = { };
-		private bool _newUserTransportStopRunawaySpawnShips;
+        private bool _newUserTransportEnabled;
+        private int _newUserTransportDistance;
+        private bool _newUserTransportMoveAllSpawnShips;
+        private int _newUserTransportAsteroidDistance;
+        private NewUserTransportSpawnPoint _newUserTransportSpawnType;
+        private string[] _newUserTransportSpawnShipNames = { };
+        private bool _newUserTransportStopRunawaySpawnShips;
 
-		private bool _loginEnabled;
-		private string[] _loginEntityWhitelist = { };
-		private string[] _loginPlayerIdWhitelist = { };
+        private bool _loginEnabled;
+        private string[] _loginEntityWhitelist = { };
+        private string[] _loginPlayerIdWhitelist = { };
 
-		private bool _protectedEnabled;
-		private MTObservableCollection<ProtectedItem> _protectedItems;
+        private bool _protectedEnabled;
+        private MTObservableCollection<ProtectedItem> _protectedItems;
 
-		private bool _dockingEnabled;
-		private int _dockingShipsPerZone;
+        private bool _dockingEnabled;
+        private int _dockingShipsPerZone;
 
-		private bool _dynamicConcealEnabled;
+        private bool _dynamicConcealEnabled;
         private int _dynamicConcealUpdateSpeed;
-		private float _dynamicConcealDistance;
-		private bool _dynamicConcealIncludeLargeGrids;
-		private string[] _dynamicConcealIgnoreSubTypeList = { };
-		private bool _dynamicConcealIncludeMedBays;
-		private bool _dynamicShowMessages;
+        private float _dynamicConcealDistance;
+        private bool _dynamicConcealIncludeLargeGrids;
+        private string[] _dynamicConcealIgnoreSubTypeList = { };
+        private bool _dynamicConcealIncludeMedBays;
+        private bool _dynamicShowMessages;
         private bool _dynamicConcealPirates;
         private bool _dynamicTurretManagementEnabled;
-		private int _dynamicTurretTargetDistance;
-		private bool _dynamicTurretAllowExemption;
-		private bool _dynamicBlockManagementEnabled;
-		private DynamicTurretManagementMode _mDynamicTurretManagementMode;
+        private int _dynamicTurretTargetDistance;
+        private bool _dynamicTurretAllowExemption;
+        private bool _dynamicBlockManagementEnabled;
+        private DynamicTurretManagementMode _mDynamicTurretManagementMode;
         private bool _dynamicVoxelManagementEnabled;
         private int _dynamicVoxelDistance;
-		
-		private bool _dynamicConcealServerOnly;
-		private bool _dynamicClientConcealEnabled;
-		private float _dynamicClientConcealDistance;
 
-		private bool _waypointsEnabled;
-		private int _waypointsMaxPerPlayer;
-		private MTObservableCollection<ServerWaypointItem> _waypointServerItems;
-		private MTObservableCollection<ServerWaypointItem> _waypointDefaultItems;
-		private int _waypointsMaxPerFaction;
+        private bool _dynamicConcealServerOnly;
+        private bool _dynamicClientConcealEnabled;
+        private float _dynamicClientConcealDistance;
 
-		private bool _cleanupEnabled;
-		private MTObservableCollection<SettingsCleanupTriggerItem> _cleanupTriggerItems;
-		private MTObservableCollection<SettingsCleanupTimedItem> _cleanupTimedItems;
-		private MTObservableCollection<SettingsCleanupNotificationItem> _cleanupNotificationItems;
+        private bool _waypointsEnabled;
+        private int _waypointsMaxPerPlayer;
+        private MTObservableCollection<ServerWaypointItem> _waypointServerItems;
+        private MTObservableCollection<ServerWaypointItem> _waypointDefaultItems;
+        private int _waypointsMaxPerFaction;
 
-		private bool _blockEnforcementEnabled;
-		private MTObservableCollection<SettingsBlockEnforcementItem> _blockEnforcementItems;
+        private bool _cleanupEnabled;
+        private MTObservableCollection<SettingsCleanupTriggerItem> _cleanupTriggerItems;
+        private MTObservableCollection<SettingsCleanupTimedItem> _cleanupTimedItems;
+        private MTObservableCollection<SettingsCleanupNotificationItem> _cleanupNotificationItems;
 
-		private bool _gameModeConquestEnabled;
+        private bool _blockEnforcementEnabled;
+        private MTObservableCollection<SettingsBlockEnforcementItem> _blockEnforcementItems;
+
+        private bool _gameModeConquestEnabled;
 
         private bool _reservedSlotsEnabled;
         private int _reservedSlotsCount;
         private ulong _reservedSlotsGroup;
-        private List<ulong> _reservedSlotsPlayers;
+        private string[] _reservedSlotsPlayers = {};
         private bool _reservedSlotsAdmins;
 
 	    private bool _timedCommandsEnabled;
@@ -124,8 +124,7 @@
 
 	    private bool _cargoShipsEnabled;
 	    private float _cargoShipSpawnTime;
-
-	    private Dictionary<ulong, DateTime> _ticketPlayers;
+        
         #endregion
 
 		#region Static Properties
@@ -934,7 +933,7 @@
             }
         }
 
-        public List<ulong> ReservedSlotsPlayers
+        public string[] ReservedSlotsPlayers
         {
             get
             {
@@ -958,19 +957,6 @@
                 _reservedSlotsAdmins = value;
                 Save( );
             }
-        }
-
-	    public Dictionary<ulong, DateTime> TicketPlayers
-	    {
-	        get
-	        {
-	            return _ticketPlayers;
-	        }
-	        set
-	        {
-	            _ticketPlayers = value;
-	            Save( );
-	        }
 	    } 
 
 	    public bool TimedCommandsEnabled
@@ -1042,7 +1028,6 @@
             _reservedSlotsCount = 5;
             _reservedSlotsGroup = 0;
             _reservedSlotsAdmins = false;
-            _reservedSlotsPlayers = new List<ulong>();
 
             _stopShipsOnStart = false;
 
@@ -1089,8 +1074,7 @@
 
             _cargoShipsEnabled = false;
             _cargoShipSpawnTime = 10.0f;
-
-            _ticketPlayers = new Dictionary<ulong, DateTime>();
+            
 		}
 
 

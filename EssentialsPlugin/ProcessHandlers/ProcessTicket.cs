@@ -32,7 +32,7 @@
 		{
 			if(!PluginSettings.Instance.ReservedSlotsEnabled)
                 return;
-
+            /*
             List<ulong> toRemove = new List<ulong>();
 
 	        foreach ( KeyValuePair<ulong, DateTime> ticketPlayer in PluginSettings.Instance.TicketPlayers )
@@ -64,7 +64,7 @@
 	            if ( PluginSettings.Instance.ReservedSlotsPlayers.Remove( id ) )
 	                PluginSettings.Instance.TicketPlayers.Remove( id );
 	        }
-
+            */
 		}
 	}
 }

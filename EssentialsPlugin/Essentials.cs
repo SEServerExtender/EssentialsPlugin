@@ -1016,6 +1016,7 @@
         {
             get
             {
+                /*
                 string[] tempStrings = new string[PluginSettings.Instance.ReservedSlotsPlayers.Count];
                 int count = 0;
                 foreach ( ulong id in PluginSettings.Instance.ReservedSlotsPlayers )
@@ -1023,10 +1024,12 @@
                     tempStrings[count] = id.ToString( );
                     count++;
                 }
-                return tempStrings;
+                return tempStrings;*/
+                return PluginSettings.Instance.ReservedSlotsPlayers;
             }
             set
             {
+               /*
                 List<ulong> tempList = new List<ulong>( );
                 foreach ( string idString in value )
                 {
@@ -1035,7 +1038,8 @@
                         continue;
                     tempList.Add( id );
                 }
-                PluginSettings.Instance.ReservedSlotsPlayers = tempList;
+                PluginSettings.Instance.ReservedSlotsPlayers = tempList;*/
+                PluginSettings.Instance.ReservedSlotsPlayers = value;
             }
         }
 

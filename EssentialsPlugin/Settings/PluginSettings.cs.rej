@@ -1,0 +1,10 @@
+diff a/EssentialsPlugin/Settings/PluginSettings.cs b/EssentialsPlugin/Settings/PluginSettings.cs	(rejected hunks)
+@@ -116,7 +116,7 @@
+         private bool _reservedSlotsEnabled;
+         private int _reservedSlotsCount;
+         private ulong _reservedSlotsGroup;
+-        private string[ ] _reservedSlotsPlayers = { };
++        private List<ulong> _reservedSlotsPlayers;
+         private bool _reservedSlotsAdmins;
+ 
+ 	    private bool _timedCommandsEnabled;

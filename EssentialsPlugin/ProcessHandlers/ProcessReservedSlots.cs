@@ -43,7 +43,7 @@
             if ( response != AuthSessionResponseEnum.OK )
                 return;
 
-            if ( PluginSettings.Instance.ReservedSlotsPlayers.Contains( remoteUserId ) )
+            if ( PluginSettings.Instance.ReservedSlotsPlayers.Contains( remoteUserId.ToString(  ) ) )
             {
                 _reservedPlayers.Add( remoteUserId );
                 Essentials.Log.Info( "Whitelisted player connected: " + remoteUserId );
@@ -197,9 +197,9 @@
 
         private static void RefreshPlayers( List<IMyPlayer> connectedPlayers )
         {
-            List<ulong> steamIds = connectedPlayers.Select( x => x.SteamUserId ).ToList( );
-            _reservedPlayers.Clear( );
-            _reservedPlayers = steamIds.Where( x => PluginSettings.Instance.ReservedSlotsPlayers.Contains( x ) ).ToList( );
+           // List<ulong> steamIds = connectedPlayers.Select( x => x.SteamUserId ).ToList( );
+           // _reservedPlayers.Clear( );
+           // _reservedPlayers = steamIds.Where( x => PluginSettings.Instance.ReservedSlotsPlayers.Contains( x.ToString(  ) ) ).ToList( );
         }
     }
 }
