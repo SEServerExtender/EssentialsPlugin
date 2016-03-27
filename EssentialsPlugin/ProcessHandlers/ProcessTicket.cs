@@ -1,70 +1,75 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Diagnostics;
-	using System.IO;
-	using System.Linq;
-	using System.Net;
-	using System.Threading;
-	using System.Windows.Forms;
-	using EssentialsPlugin.Settings;
-	using EssentialsPlugin.Utility;
-	using Sandbox;
-	using Sandbox.ModAPI;
-	using SEModAPIExtensions.API;
-	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Server;
-	using SteamSDK;
-	using VRage.Game;
-	using VRage.Game.ModAPI;
-	using VRage.ModAPI;
-	using VRageMath;
+    using System.Collections.Generic;
+    using System.Threading;
+    using EssentialsPlugin.Settings;
+    using EssentialsPlugin.Utility;
+    using Sandbox.Engine.Multiplayer;
+    using Sandbox.Game.World;
+    using SEModAPIInternal.API.Common;
+    using SEModAPIInternal.API.Server;
+    using VRage.Game;
 
-	class ProcessTicket : ProcessHandlerBase
-	{
-		public override int GetUpdateResolution()
-		{
-			return 60000;
-		}
-        
-	    public override void Handle()
-		{
-			if(!PluginSettings.Instance.ReservedSlotsEnabled)
+    class ProcessTicket : ProcessHandlerBase
+    {
+        public override int GetUpdateResolution( )
+        {
+            return 60000;
+        }
+
+        public override void Handle( )
+        {
+            if ( !PluginSettings.Instance.ReservedSlotsEnabled )
                 return;
-            /*
-            List<ulong> toRemove = new List<ulong>();
 
-	        foreach ( KeyValuePair<ulong, DateTime> ticketPlayer in PluginSettings.Instance.TicketPlayers )
-	        {
-	            string playerName = PlayerMap.Instance.GetFastPlayerNameFromSteamId( ticketPlayer.Key );
+            List<ulong> toRemove = new List<ulong>( );
 
-                if ( ticketPlayer.Value - DateTime.Now < TimeSpan.Zero )
+            foreach ( TicketPlayerItem item in PluginSettings.Instance.TicketPlayers )
+            {
+                MyIdentity identity = MySession.Static.Players.TryGetIdentity( PlayerMap.Instance.GetFastPlayerIdFromSteamId( item.TicketId ) );
+                if ( identity == null )
+                    continue;
+                if ( identity.IsDead )
+                    continue;
+                string playerName = identity.DisplayName;
+                item.TimeUsed++;
+                int timeLeft = item.TimeAllocated - item.TimeUsed;
+
+                if ( timeLeft <= 0 )
                 {
-                    Communication.Notification(0, MyFontEnum.Blue, 10, $"Goodbye {playerName}, thanks for joining us!" );
-                    toRemove.Add( ticketPlayer.Key );
+                    Communication.Notification( 0, MyFontEnum.Blue, 10, $"Goodbye {playerName}, thanks for joining us!" );
+                    Communication.SendPublicInformation( $"Goodbye {playerName}, thanks for joining us!" );
+                    if ( !toRemove.Contains( item.TicketId ) )
+                        toRemove.Add( item.TicketId );
                     continue;
                 }
-	            if ( ticketPlayer.Value - DateTime.Now < TimeSpan.FromMinutes( 1 ) )
-	            {
-                    Communication.Notification(0, MyFontEnum.Blue, 10, $"{playerName}, has one minute left!");
-	                continue;
-	            }
-	            if ( ticketPlayer.Value - DateTime.Now < TimeSpan.FromMinutes( 5 ) )
-	            {
-                    Communication.Notification(0, MyFontEnum.Blue, 10, $"{playerName}, has five minutes left!");
+                if ( timeLeft <= 1 )
+                {
+                    Communication.Notification( 0, MyFontEnum.Blue, 10, $"{playerName} has one minute left!" );
+                    Communication.SendPublicInformation( $"{playerName} has one minute left!" );
+                    continue;
+                }
+                if ( timeLeft <= 5 )
+                {
+                    Communication.Notification( 0, MyFontEnum.Blue, 10, $"{playerName} has five minutes left!" );
+                    Communication.SendPublicInformation( $"{playerName} has five minutes left!" );
                 }
             }
 
             Thread.Sleep( 10000 );
 
-	        foreach ( ulong id in toRemove )
-	        {
-                ServerNetworkManager.Instance.KickPlayer( id );
-	            if ( PluginSettings.Instance.ReservedSlotsPlayers.Remove( id ) )
-	                PluginSettings.Instance.TicketPlayers.Remove( id );
-	        }
-            */
-		}
-	}
+            foreach ( ulong steamId in toRemove )
+            {
+                 MyMultiplayer.Static.KickClient( steamId );
+                foreach ( var item in PluginSettings.Instance.TicketPlayers )
+                {
+                    if ( item.TicketId == steamId )
+                    {
+                        PluginSettings.Instance.TicketPlayers.Remove( item );
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }

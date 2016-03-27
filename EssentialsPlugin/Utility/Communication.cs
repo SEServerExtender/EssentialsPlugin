@@ -113,12 +113,14 @@
 
         public static void Notification( ulong steamId, MyFontEnum color, int timeInSeconds, string message )
         {
-            ServerNotificationItem MessageItem = new ServerNotificationItem( );
-            MessageItem.color = color;
-            MessageItem.time = timeInSeconds;
-            MessageItem.message = message;
+            ServerNotificationItem messageItem = new ServerNotificationItem
+                                                 {
+                                                     color = color,
+                                                     time = timeInSeconds,
+                                                     message = message
+                                                 };
 
-            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            string messageString = MyAPIGateway.Utilities.SerializeToXML( messageItem );
             byte[ ] data = Encoding.UTF8.GetBytes( messageString );
 
             if ( steamId != 0 )

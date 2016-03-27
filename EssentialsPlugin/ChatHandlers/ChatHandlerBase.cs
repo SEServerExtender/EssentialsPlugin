@@ -54,7 +54,15 @@
 
 		public abstract string GetHelp();
 
-        public abstract Communication.ServerDialogItem GetHelpDialog();
+        public virtual Communication.ServerDialogItem GetHelpDialog( )
+        {
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem();
+            DialogItem.title = "Help";
+            DialogItem.header = GetCommandText();
+            DialogItem.content = GetHelp();
+            DialogItem.buttonText = "close";
+            return DialogItem;
+        }
 
         public virtual String GetCommandText()
 		{

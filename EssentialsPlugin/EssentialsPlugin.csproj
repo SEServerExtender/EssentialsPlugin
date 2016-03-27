@@ -117,6 +117,10 @@
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanAreaAt.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveAreaToPosition.cs" />
     <Compile Include="ChatHandlers\HandleMotd.cs" />
+    <Compile Include="ChatHandlers\Ticket\HandleTicketExtend.cs" />
+    <Compile Include="ChatHandlers\Ticket\HandleTicketRemove.cs" />
+    <Compile Include="ChatHandlers\Ticket\HandleTicketAdd.cs" />
+    <Compile Include="ChatHandlers\Ticket\HandleTicketTimeleft.cs" />
     <Compile Include="ChatHandlers\Utility\HandleUtilityGridsCompare.cs" />
     <Compile Include="ChatHandlers\Utility\HandleUtilityGridsRefresh.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointFactionRemove.cs" />
@@ -186,6 +190,7 @@
     <Compile Include="Settings\SettingsInformationItem.cs" />
     <Compile Include="Settings\SettingsProtectedItem.cs" />
     <Compile Include="Settings\SettingsRestartItem.cs" />
+    <Compile Include="Settings\SettingsTickePlayerItem.cs" />
     <Compile Include="Settings\SettingsRestartNotificationItem.cs" />
     <Compile Include="Settings\SettingsServerWaypointItem.cs" />
     <Compile Include="Settings\SettingsTimedCommandItem.cs" />

@@ -1162,7 +1162,8 @@
                                    new ProcessReservedSlots(),
                                    new ProcessTimedCommands(  ),
                                    new ProcessSpeed(  ),
-                                   new ProcessCargoShips(  )
+                                   new ProcessCargoShips(  ),
+                                   new ProcessTicket(  )
                                };
 
             // Setup chat handlers
@@ -1268,7 +1269,13 @@
                                 new HandleMsg( ),
                                 new HandleFaction( ),
                                 new HandleFactionF( ),
-                                new HandleMotd( )
+                                new HandleMotd( ),
+
+                                //Tickets
+                                new HandleTicketAdd(  ),
+                                new HandleTicketExtend(  ),
+                                new HandleTicketRemove(  ),
+                                new HandleTicketTimeleft(  )
                             };
 
             _processThreads = new List<Thread>( );

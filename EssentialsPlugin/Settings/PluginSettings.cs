@@ -124,6 +124,8 @@
 
 	    private bool _cargoShipsEnabled;
 	    private float _cargoShipSpawnTime;
+
+        private List<TicketPlayerItem> _ticketPlayers; 
         
         #endregion
 
@@ -998,6 +1000,19 @@
 	            Save( );
 	        }
 	    }
+
+        public List<TicketPlayerItem> TicketPlayers
+        {
+            get
+                {
+                    return _ticketPlayers;
+                }
+            set
+            {
+                _ticketPlayers = value;
+                Save(  );
+            }
+        }
         #endregion
 
         #region Constructor
@@ -1075,6 +1090,7 @@
             _cargoShipsEnabled = false;
             _cargoShipSpawnTime = 10.0f;
             
+            _ticketPlayers = new List<TicketPlayerItem>();
 		}
 
 

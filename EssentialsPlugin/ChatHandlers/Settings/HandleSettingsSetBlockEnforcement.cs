@@ -22,7 +22,7 @@
             DialogItem.title = "Help";
             DialogItem.header = "Block Enforcement";
             DialogItem.content = "This command lets you configure Block Enforcement.||" +
-                "Usage: /settings setblockenforcement <mode> <typeID> <maxPerGrid> <reachWarning> <exceedWarning>|" +
+                "Usage: /settings setblockenforcement <mode> <typeID> <maxPerGrid> (reachWarning) (exceedWarning)|" +
                 "Mode is 0 for disabled, 1 filters by typeID, and 2 by subtypeID.|" +
                 "Warning messages will be displayed when the player reaches and exceeds the max count of any block type. " +
                 "Messages are optional, but if used, they must be enclosed in quotation marks.";

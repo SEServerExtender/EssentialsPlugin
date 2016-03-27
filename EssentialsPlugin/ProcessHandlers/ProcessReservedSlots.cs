@@ -4,7 +4,9 @@
     using System.Collections.Generic;
     using System.Linq;
     using Sandbox.Engine.Multiplayer;
+    using Sandbox.Game.World;
     using Sandbox.ModAPI;
+    using Settings;
     using SEModAPI.API;
     using SEModAPIExtensions.API;
     using SEModAPIInternal.API.Common;
@@ -51,6 +53,17 @@
                                      _reservedPlayers.Count,
                                      Math.Min( _reservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount ),
                                      PluginSettings.Instance.ReservedSlotsCount );
+                return;
+            }
+
+            if ( PluginSettings.Instance.TicketPlayers.Any( item => item.TicketId == remoteUserId ) )
+            {
+                _reservedPlayers.Add(remoteUserId);
+                Essentials.Log.Info("Ticket player connected: " + remoteUserId);
+                Essentials.Log.Info("{0} whitelisted players connected. {1} of {2} reserved slots allocated.",
+                                    _reservedPlayers.Count,
+                                    Math.Min(_reservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount),
+                                    PluginSettings.Instance.ReservedSlotsCount);
                 return;
             }
 
@@ -149,13 +162,19 @@
 
             //kick the player with the "Server is full" message
             //too bad we can't send a custom message, but they're hardcoded into the client
-            Essentials.Log.Info( "Player denied: " + remoteUserId );
+            ( MyMultiplayer.Static as MyDedicatedServerBase ).SendJoinResult( remoteUserId, JoinResult.ServerFull );
+            /*
+        VRage.Library.Collections.BitStream m_sendStream = new VRage.Library.Collections.BitStream();
+        Essentials.Log.Info( "Player denied: " + remoteUserId );
             JoinResultMsg msg = new JoinResultMsg
                                 {
                                     JoinResult = JoinResult.ServerFull,
                                     Admin = 0
                                 };
-            ServerNetworkManager.Instance.SendStruct( remoteUserId, msg, msg.GetType( ) );
+            m_sendStream.ResetWrite();
+            m_sendStream.WriteUInt16((ushort)msg.JoinResult);
+            m_sendStream.WriteUInt64(msg.Admin);
+            ServerNetworkManager.Instance.SendStruct( remoteUserId, m_sendStream, m_sendStream.GetType(  ) );*/
         }
 
         private static void GameServer_UserGroupStatus( ulong userId, ulong groupId, bool member, bool officier )
@@ -197,9 +216,9 @@
 
         private static void RefreshPlayers( List<IMyPlayer> connectedPlayers )
         {
-           // List<ulong> steamIds = connectedPlayers.Select( x => x.SteamUserId ).ToList( );
-           // _reservedPlayers.Clear( );
-           // _reservedPlayers = steamIds.Where( x => PluginSettings.Instance.ReservedSlotsPlayers.Contains( x.ToString(  ) ) ).ToList( );
+            List<ulong> steamIds = connectedPlayers.Select( x => x.SteamUserId ).ToList( );
+            _reservedPlayers.Clear( );
+            _reservedPlayers = steamIds.Where( x => PluginSettings.Instance.ReservedSlotsPlayers.Contains( x.ToString(  ) ) ).ToList( );
         }
     }
 }
