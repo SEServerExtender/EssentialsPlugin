@@ -18,8 +18,11 @@
     using VRage.Groups;
     using Sandbox.Game.GameSystems;
     using Sandbox.Game.Entities.Cube;
+    using Sandbox.Game.World;
+    using SEModAPI.API;
     using SEModAPIExtensions.API;
     using VRage.Game;
+    using VRage.Game.Entity;
     using VRage.Game.ModAPI;
     using VRage.Library.Utils;
 
@@ -35,23 +38,20 @@
 		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		public static Vector3D RemoveGridsInSphere( ulong userId, Vector3D startPosition, float radius, RemoveGridTypes removeType )
 		{
-            List<IMyEntity> entitiesToMove = new List<IMyEntity>( );
+            List<MyEntity> entitiesToMove = new List<MyEntity>( );
 			BoundingSphereD sphere = new BoundingSphereD( startPosition, radius );
-            Wrapper.GameAction( ( ) =>
-             {
-                 entitiesToMove = MyAPIGateway.Entities.GetEntitiesInSphere( ref sphere );
-             } );
-            List<IMyEntity> entitiesToRemove = new List<IMyEntity>( );
+            Wrapper.GameAction( ( ) => entitiesToMove = MyEntities.GetEntitiesInSphere(ref sphere) );
+            List<MyEntity> entitiesToRemove = new List<MyEntity>( );
 			int count = 0;
 
 			Wrapper.GameAction( ( ) =>
 			{
-				foreach ( IMyEntity entity in entitiesToMove )
+				foreach ( MyEntity entity in entitiesToMove )
 				{
-					if ( !( entity is IMyCubeGrid ) )
+					if ( !( entity is MyCubeGrid ) )
 						continue;
 
-					IMyCubeGrid grid = (IMyCubeGrid)entity;
+				    MyCubeGrid grid = (MyCubeGrid)entity;
 					MyObjectBuilder_CubeGrid cubeGrid = (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder( );
 					if ( removeType == RemoveGridTypes.Ships && cubeGrid.IsStatic )
 						continue;
@@ -60,17 +60,18 @@
 						continue;
 
 					entitiesToRemove.Add( entity );
-					Communication.SendPrivateInformation( userId, string.Format( "Deleting entity '{0}' at {1}", entity.DisplayName, General.Vector3DToString( entity.GetPosition( ) ) ) );
+					Communication.SendPrivateInformation( userId, string.Format( "Deleting entity '{0}' at {1}", entity.DisplayName, General.Vector3DToString( entity.PositionComp.GetPosition( ) ) ) );
 					count++;
 				}
 			} );
 
 			for ( int r = entitiesToRemove.Count - 1; r >= 0; r-- )
 			{
-				IMyEntity entity = entitiesToRemove[ r ];
-				//MyAPIGateway.Entities.RemoveEntity(entity);
-				CubeGridEntity gridEntity = new CubeGridEntity( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ), entity );
-				gridEntity.Dispose( );
+				MyEntity entity = entitiesToRemove[ r ];
+			    Wrapper.GameAction( ( ) => entity.Close( ) );
+			    //MyAPIGateway.Entities.RemoveEntity(entity);
+			    //CubeGridEntity gridEntity = new CubeGridEntity( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ), entity );
+			    //gridEntity.Dispose( );
 			}
 
 			Communication.SendPrivateInformation( userId, string.Format( "Total entities removed: {0}", count ) );
@@ -84,143 +85,39 @@
 			Matrix rot = Matrix.CreateFromQuaternion( rotate );
 			return new MyPositionAndOrientation( position, rot.Forward, rot.Up );
 		}
-
-		public static void GetGridsUnconnected( HashSet<IMyEntity> connectedList, HashSet<IMyEntity> entitiesToConfirm )
+        
+		public static MyGroupsBase<MyCubeGrid> Find( string displayName )
 		{
-			foreach ( IMyEntity entity in entitiesToConfirm )
-			{
-				if ( !( entity is IMyCubeGrid ) )
-					continue;
+			HashSet<MyEntity> entities = new HashSet<MyEntity>( );
 
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = SafeGetObjectBuilder( grid );
-				if ( gridBuilder == null )
-					continue;
-
-				bool result = false;
-				foreach ( MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks )
-				{
-					if ( block.TypeId == typeof( MyObjectBuilder_ShipConnector ) )
-					{
-						MyObjectBuilder_ShipConnector connector = (MyObjectBuilder_ShipConnector)block;
-						if ( connector.Connected )
-						{
-							IMyEntity connectedEntity;
-							MyAPIGateway.Entities.TryGetEntityById( connector.ConnectedEntityId, out connectedEntity );
-
-							if ( connectedEntity != null )
-							{
-								result = true;
-								break;
-							}
-						}
-					}
-
-					if ( block.TypeId == typeof( MyObjectBuilder_PistonBase ) )
-					{
-						result = true;
-						break;
-					}
-
-					if ( block.TypeId == typeof( MyObjectBuilder_ExtendedPistonBase ) )
-					{
-						result = true;
-						break;
-					}
-
-					if ( block.TypeId == typeof( MyObjectBuilder_PistonTop ) )
-					{
-						result = true;
-						break;
-					}
-
-					if ( block.TypeId == typeof( MyObjectBuilder_MotorAdvancedStator ) )
-					{
-						MyObjectBuilder_MotorAdvancedStator stator = (MyObjectBuilder_MotorAdvancedStator)block;
-						if ( stator.RotorEntityId != 0 )
-						{
-							IMyEntity connectedEntity = null;
-
-						    if ( stator.RotorEntityId != null )
-						        MyAPIGateway.Entities.TryGetEntityById( (long) stator.RotorEntityId, out connectedEntity );
-
-						    if ( connectedEntity != null )
-							{
-								result = true;
-								break;
-							}
-						}
-					}
-
-					if ( block.TypeId == typeof( MyObjectBuilder_MotorAdvancedRotor ) )
-					{
-						result = true;
-						break;
-					}
-
-					if ( block.TypeId == typeof( MyObjectBuilder_MotorStator ) )
-					{
-						MyObjectBuilder_MotorStator stator = (MyObjectBuilder_MotorStator)block;
-						if ( stator.RotorEntityId != 0 )
-						{
-							IMyEntity connectedEntity=null;
-
-						    if ( stator.RotorEntityId != null )
-						        MyAPIGateway.Entities.TryGetEntityById( (long) stator.RotorEntityId, out connectedEntity );
-
-						    if ( connectedEntity != null )
-							{
-								result = true;
-								break;
-							}
-						}
-					}
-
-					if ( block.TypeId == typeof( MyObjectBuilder_MotorRotor ) )
-					{
-						result = true;
-						break;
-					}
-				}
-
-				if ( !result )
-					connectedList.Add( entity );
-			}
-		}
-
-		public static IMyEntity Find( string displayName )
-		{
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
-
-			Wrapper.GameAction( ( ) =>
-			{
-				MyAPIGateway.Entities.GetEntities( entities, x => x is IMyCubeGrid );
-			} );
+			Wrapper.GameAction( ( ) => entities = MyEntities.GetEntities( ) );
 
             //return entities.FirstOrDefault( entity => entity.DisplayName.ToLower( ).Contains( displayName.ToLower( ) ) );
-            foreach ( IMyEntity entity in entities )
+            foreach ( MyEntity entity in entities )
             {
                 if ( entity.DisplayName.ToLower( ).Contains( displayName.ToLower( ) ) )
-                    return entity;
+                    return MyCubeGridGroups.Static.GetGroups( GridLinkTypeEnum.Logical );
             }
             return null;
 		}
 
-		public static bool WaitForLoadingEntity( CubeGridEntity grid )
-		{
-			int count = 0;
-			while ( grid.IsLoading )
-			{
-				Thread.Sleep( 100 );
-				count++;
-				if ( count > 10 )
-					return false;
-			}
+	    public static HashSet<MyGroupsBase<MyCubeGrid>> GetGroups( HashSet<MyEntity> entities, GridLinkTypeEnum linkType )
+	    {
+            HashSet<MyGroupsBase<MyCubeGrid>> result = new HashSet<MyGroupsBase<MyCubeGrid>>();
 
-			return true;
-		}
+	        foreach(MyEntity entity in entities)
+	        {
+                MyCubeGrid grid = entity as MyCubeGrid;
 
-		public static HashSet<IMyEntity> ScanCleanup( ulong userId, string[ ] words )
+                if (grid == null || grid.Closed)
+                    continue;
+
+	            result.Add( MyCubeGridGroups.Static.GetGroups( linkType ) );
+	        }
+	        return result;
+	    }
+        
+        /*public static HashSet<MyEntity> ScanCleanup( ulong userId, string[ ] words )
 		{
 			Dictionary<string, string> options = new Dictionary<string, string>( );
 
@@ -339,21 +236,18 @@
 
 			Communication.SendPrivateInformation( userId, string.Format( "Scanning for ships with options: {0}", GetOptionsText( options ) ) );
 
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
-			Wrapper.GameAction( ( ) =>
-			{
-				MyAPIGateway.Entities.GetEntities( entities, x => x is IMyCubeGrid );
-			} );
+			HashSet<MyEntity> entities = new HashSet<MyEntity>( );
+			Wrapper.GameAction( ( ) => entities = MyEntities.GetEntities( ) );
 
-			HashSet<IMyEntity> entitiesToConfirm = new HashSet<IMyEntity>( );
-			HashSet<IMyEntity> entitiesUnconnected = new HashSet<IMyEntity>( );
-			HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>( );
-			foreach ( IMyEntity entity in entities )
+			HashSet<MyEntity> entitiesToConfirm = new HashSet<MyEntity>( );
+			HashSet<MyEntity> entitiesUnconnected = new HashSet<MyEntity>( );
+			HashSet<MyEntity> entitiesFound = new HashSet<MyEntity>( );
+			foreach ( MyEntity entity in entities.Where(x => x is MyCubeGrid) )
 			{
-				if ( !( entity is IMyCubeGrid ) )
+				if ( !( entity is MyCubeGrid ) )
 					continue;
 
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
+				MyCubeGrid grid = (MyCubeGrid)entity;
 				MyObjectBuilder_CubeGrid gridBuilder;
 				try
 				{
@@ -393,7 +287,7 @@
 
 			Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
 			GetGridsUnconnected( entitiesUnconnected, entitiesToConfirm );
-			foreach ( IMyEntity entity in entitiesUnconnected )
+			foreach ( MyEntity entity in entitiesUnconnected )
 			{
 				subTypeDict.Clear( );
 				MyObjectBuilder_CubeGrid grid = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( );
@@ -490,7 +384,7 @@
 					entitiesFound.Add( entity );
 			}
 
-			foreach ( IMyEntity entity in entitiesFound )
+			foreach ( MyEntity entity in entitiesFound )
 			{
 				Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which has unconnected and has parameters specified.  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count ) );
 			}
@@ -498,8 +392,9 @@
 			Communication.SendPrivateInformation( userId, string.Format( "Found {0} grids considered to be trash", entitiesFound.Count ) );
 			return entitiesFound;
 		}
+        */
 
-		public static HashSet<IMyEntity> ScanGrids( ulong userId, string[ ] words )
+		public static HashSet<MyEntity> ScanGrids( ulong userId, string[ ] words )
 		{
 			Dictionary<string, string> options = new Dictionary<string, string>( );
 
@@ -826,45 +721,34 @@
 			if ( options.Count < 1 && quiet )
 			{
 				Communication.SendPrivateInformation( userId, "No options supplied for quiet scan, cancelling due to possible error" );
-				return new HashSet<IMyEntity>( );
+				return new HashSet<MyEntity>( );
 			}
 
 			if ( words.Length > options.Count )
 			{
 				Communication.SendPrivateInformation( userId, "Possible problem with your parameters (options provided is larger than options found).  Not returning any results in case of error" );
-				return new HashSet<IMyEntity>( );
+				return new HashSet<MyEntity>( );
 			}
 
 			if ( !quiet )
 				Communication.SendPrivateInformation( userId, string.Format( "Scanning for ships with options: {0}", GetOptionsText( options ) ) );
                         
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
-            Log.Info( "getting grids" );
-            Wrapper.GameAction( ( ) =>
-            {
-                MyAPIGateway.Entities.GetEntities( entities );
-            } );
-            Log.Info( "got grids" );
+			HashSet<MyEntity> entities = new HashSet<MyEntity>( );
+            if(ExtenderOptions.IsDebugging)
+                Log.Info( "getting grids" );
+            Wrapper.GameAction( ( ) => entities = MyEntities.GetEntities());
+            if (ExtenderOptions.IsDebugging)
+                Log.Info( "got grids" );
 
-            HashSet<IMyEntity> entitiesToConfirm = new HashSet<IMyEntity>( );
-			HashSet<IMyEntity> entitiesUnconnected = new HashSet<IMyEntity>( );
-			HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>( );
-			foreach ( IMyEntity entity in entities )
+            HashSet<MyEntity> entitiesToConfirm = new HashSet<MyEntity>( );
+			HashSet<MyEntity> entitiesUnconnected = new HashSet<MyEntity>( );
+			HashSet<MyEntity> entitiesFound = new HashSet<MyEntity>( );
+			foreach ( MyEntity entity in entities )
 			{
-				if ( !( entity is IMyCubeGrid ) )
+				if ( !( entity is MyCubeGrid ) )
 					continue;
 
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder;
-				try
-				{
-					gridBuilder = (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder( );
-				}
-				catch
-				{
-					continue;
-				}
-
+				MyCubeGrid grid = (MyCubeGrid)entity;
 				if ( PluginSettings.Instance.LoginEntityWhitelist.Contains( entity.EntityId.ToString( ) ) || PluginSettings.Instance.LoginEntityWhitelist.Contains( entity.DisplayName ) )
 					continue;
 
@@ -877,7 +761,7 @@
 					if ( hasDisplayNameExact && entity.DisplayName.Equals( displayName ) )
 						entitiesToConfirm.Add( entity );
 				}
-				else if ( hasCustomName && HasCustomName( gridBuilder, customName, hasCustomNameExact ) )
+				else if ( hasCustomName && grid.nam HasCustomName( gridBuilder, customName, hasCustomNameExact ) )
 				{
 					entitiesToConfirm.Add( entity );
 				}
@@ -917,7 +801,7 @@
             //int blocks = 0;
             
 
-            foreach(IMyEntity entity in entitiesUnconnected)
+            foreach(MyEntity entity in entitiesUnconnected)
             {
                 subTypeDict.Clear( );
 				typeDict.Clear( );
@@ -1100,7 +984,7 @@
 					entitiesFound.Add( entity );
 			}
 
-			foreach ( IMyEntity entity in entitiesFound )
+			foreach ( MyEntity entity in entitiesFound )
 			{
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				MyObjectBuilder_CubeGrid gridBuilder = SafeGetObjectBuilder( grid );
@@ -1121,7 +1005,7 @@
 			return entitiesFound;
 		}
 
-		private static bool ApplyBlockSubTypeExclusionFilter( ulong userId, Dictionary<string, int> subTypeDict, Dictionary<string, int> blockSubTypes, bool found, bool quiet, bool debug, IMyEntity entity )
+		private static bool ApplyBlockSubTypeExclusionFilter( ulong userId, Dictionary<string, int> subTypeDict, Dictionary<string, int> blockSubTypes, bool found, bool quiet, bool debug, MyEntity entity )
 		{
 			foreach ( KeyValuePair<string, int> pairBlockTypesInGrid in subTypeDict )
 			{
@@ -1155,7 +1039,7 @@
 			return found;
 		}
 
-		private static bool ApplyBlockSubTypeFilter( ulong userId, Dictionary<string, int> subTypeDict, Dictionary<string, int> blockSubTypes, bool debug, bool quiet, IMyEntity entity, bool found )
+		private static bool ApplyBlockSubTypeFilter( ulong userId, Dictionary<string, int> subTypeDict, Dictionary<string, int> blockSubTypes, bool debug, bool quiet, MyEntity entity, bool found )
 		{
 			bool hasType = false;
 			foreach ( KeyValuePair<string, int> pairBlockTypesInGrid in subTypeDict )
@@ -1201,7 +1085,7 @@
 			return found;
 		}
 
-		private static bool ApplyBlockInclusionFilter( ulong userId, Dictionary<string, int> typeDict, Dictionary<string, int> blockTypes, bool debug, bool quiet, IMyEntity entity, bool found )
+		private static bool ApplyBlockInclusionFilter( ulong userId, Dictionary<string, int> typeDict, Dictionary<string, int> blockTypes, bool debug, bool quiet, MyEntity entity, bool found )
 		{
 			bool hasType = false;
 			foreach ( KeyValuePair<string, int> pairBlockTypesInGrid in typeDict )
@@ -1247,7 +1131,7 @@
 			return found;
 		}
 
-		private static bool ApplyBlockExclusionFilter( ulong userId, Dictionary<string, int> typeDict, Dictionary<string, int> blockTypes, bool quiet, bool debug, IMyEntity entity )
+		private static bool ApplyBlockExclusionFilter( ulong userId, Dictionary<string, int> typeDict, Dictionary<string, int> blockTypes, bool quiet, bool debug, MyEntity entity )
 		{
 			bool found = true;
 			foreach ( KeyValuePair<string, int> blockTypesInGrid in typeDict )
@@ -1282,11 +1166,11 @@
 			return found;
 		}
 
-		public static void DeleteGrids( HashSet<IMyEntity> entities )
+		public static void DeleteGrids( HashSet<MyEntity> entities )
 		{
 			Wrapper.GameAction( ( ) =>
 			{
-				foreach ( IMyEntity entity in entities )
+				foreach ( MyEntity entity in entities )
 				{
 					if ( !( entity is IMyCubeGrid ) )
 						continue;
@@ -1398,28 +1282,26 @@
 			return ownerList.Select( x => x.Key ).ToList( );
 		}
 
-		public static bool HasCustomName( MyObjectBuilder_CubeGrid grid, string name, bool exact )
+		public static bool HasCustomName( MyCubeGrid grid, string name, bool exact )
 		{
-			foreach ( MyObjectBuilder_CubeBlock block in grid.CubeBlocks )
+			foreach (MySlimBlock block in grid.CubeBlocks )
 			{
-				MyObjectBuilder_TerminalBlock termBlock = block as MyObjectBuilder_TerminalBlock;
-				if ( termBlock != null )
-				{
-					if ( exact )
-					{
-						if ( termBlock.CustomName != null && termBlock.CustomName == name )
-						{
-							return true;
-						}
-					}
-					else
-					{
-						if ( termBlock.CustomName != null && termBlock.CustomName.Contains( name ) )
-						{
-							return true;
-						}
-					}
-				}
+			    MyTerminalBlock termBlock = block?.FatBlock as MyTerminalBlock;
+			    if (termBlock == null) continue;
+			    if ( exact )
+			    {
+			        if ( termBlock.CustomName != null && termBlock.CustomName == name )
+			        {
+			            return true;
+			        }
+			    }
+			    else
+			    {
+			        if ( termBlock.CustomName != null && termBlock.CustomName.Contains( name ) )
+			        {
+			            return true;
+			        }
+			    }
 			}
 
 			return false;
@@ -1503,18 +1385,18 @@
 		/// </summary>
 		/// <param name="grids"></param>
 		/// <param name="collect"></param>
-		public static void GetConnectedGrids( HashSet<IMyEntity> grids, Func<IMyEntity, bool> collect = null)
+		public static void GetConnectedGrids( HashSet<MyEntity> grids, Func<MyEntity, bool> collect = null)
 		{
 			List<IMySlimBlock> currentBlocks = new List<IMySlimBlock>( );
-			HashSet<IMyEntity> gridsProcessed = new HashSet<IMyEntity>( );
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
+			HashSet<MyEntity> gridsProcessed = new HashSet<MyEntity>( );
+			HashSet<MyEntity> entities = new HashSet<MyEntity>( );
 
             Wrapper.GameAction( ( ) =>
              {
                  MyAPIGateway.Entities.GetEntities( entities, collect );
              } );
 
-			foreach ( IMyEntity entity in entities )
+			foreach ( MyEntity entity in entities )
 			{
 				if ( !( entity is IMyCubeGrid ) )
 					continue;
@@ -1540,7 +1422,7 @@
 		/// <param name="grid"></param>
 		/// <param name="allBlocks"></param>
 		/// <param name="collect"></param>
-		public static void GetAllConnectedBlocks( HashSet<IMyEntity> gridsProcessed, IMyCubeGrid grid, List<IMySlimBlock> allBlocks, Func<IMySlimBlock, bool> collect = null )
+		public static void GetAllConnectedBlocks( HashSet<MyEntity> gridsProcessed, IMyCubeGrid grid, List<IMySlimBlock> allBlocks, Func<IMySlimBlock, bool> collect = null )
 		{
 			List<IMySlimBlock> currentBlocks = new List<IMySlimBlock>( );
 			List<IMyCubeGrid> connectedGrids = new List<IMyCubeGrid>( );
@@ -1563,9 +1445,9 @@
 			}
 		}
 
-		public static HashSet<IMyEntity> GetRecursiveGridList( IMyCubeGrid startGrid, HashSet<IMyEntity> ignoreList = null )
+		public static HashSet<MyEntity> GetRecursiveGridList( IMyCubeGrid startGrid, HashSet<MyEntity> ignoreList = null )
 		{
-			HashSet<IMyEntity> results = new HashSet<IMyEntity>( );
+			HashSet<MyEntity> results = new HashSet<MyEntity>( );
 			List<IMySlimBlock> currentBlocks = new List<IMySlimBlock>( );
 
 			results.Add( startGrid );
@@ -1576,7 +1458,7 @@
 					continue;
 
 				results.Add( connectedGrid );
-				foreach ( IMyEntity entity in GetRecursiveGridList( connectedGrid, results ) )
+				foreach ( MyEntity entity in GetRecursiveGridList( connectedGrid, results ) )
 				{
 					results.Add( entity );
 				}
@@ -1585,7 +1467,7 @@
 			return results;
 		}
 
-		private static List<IMyCubeGrid> GetConnectedGridList( HashSet<IMyEntity> checkedGrids, List<IMySlimBlock> blocks )
+		private static List<IMyCubeGrid> GetConnectedGridList( HashSet<MyEntity> checkedGrids, List<IMySlimBlock> blocks )
 		{
 			List<IMyCubeGrid> connectedGrids = new List<IMyCubeGrid>( );
 			foreach ( IMySlimBlock slimBlock in blocks )
@@ -1598,7 +1480,7 @@
 					if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_PistonBase ) )
 					{
 						MyObjectBuilder_PistonBase pistonBase = (MyObjectBuilder_PistonBase)cubeBlock.GetObjectBuilderCubeBlock( );
-						IMyEntity entity;
+						MyEntity entity;
 						if ( MyAPIGateway.Entities.TryGetEntityById( pistonBase.TopBlockId, out entity ) )
 						{
 							IMyCubeGrid parent = (IMyCubeGrid)entity.Parent;
@@ -1609,7 +1491,7 @@
 					else if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_ExtendedPistonBase ) )
 					{
 						MyObjectBuilder_PistonBase pistonBase = (MyObjectBuilder_PistonBase)cubeBlock.GetObjectBuilderCubeBlock( );
-						IMyEntity entity;
+						MyEntity entity;
 						if ( MyAPIGateway.Entities.TryGetEntityById( pistonBase.TopBlockId, out entity ) )
 						{
 							IMyCubeGrid parent = (IMyCubeGrid)entity.Parent;
@@ -1621,7 +1503,7 @@
 					else if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_ShipConnector ) )
 					{
 						MyObjectBuilder_ShipConnector connector = (MyObjectBuilder_ShipConnector)cubeBlock.GetObjectBuilderCubeBlock( );
-						IMyEntity entity;
+						MyEntity entity;
 						if ( MyAPIGateway.Entities.TryGetEntityById( connector.ConnectedEntityId, out entity ) )
 						{
 							IMyCubeGrid parent = (IMyCubeGrid)entity.Parent;
@@ -1632,7 +1514,7 @@
 					else if ( cubeBlock.BlockDefinition.TypeId == typeof( MyObjectBuilder_MotorAdvancedStator ) )
 					{
 						MyObjectBuilder_MotorAdvancedStator stator = (MyObjectBuilder_MotorAdvancedStator)cubeBlock.GetObjectBuilderCubeBlock( );
-						IMyEntity connectedEntity;
+						MyEntity connectedEntity;
 						if ( MyAPIGateway.Entities.TryGetEntityById( (long) stator.RotorEntityId, out connectedEntity ) )
 						{
 							IMyCubeGrid parent = (IMyCubeGrid)connectedEntity.Parent;
@@ -1655,3 +1537,4 @@
 		}
 	}
 }
+
