@@ -19,12 +19,15 @@
     using Sandbox.Game.GameSystems;
     using Sandbox.Game.Entities.Cube;
     using Sandbox.Game.World;
+    using Sandbox.ModAPI.Ingame;
     using SEModAPI.API;
     using SEModAPIExtensions.API;
+    using SpaceEngineers.Game.ModAPI.Ingame;
     using VRage.Game;
     using VRage.Game.Entity;
     using VRage.Game.ModAPI;
     using VRage.Library.Utils;
+    using IMyReactor = Sandbox.ModAPI.IMyReactor;
 
     public enum RemoveGridTypes
 	{
@@ -761,7 +764,7 @@
 					if ( hasDisplayNameExact && entity.DisplayName.Equals( displayName ) )
 						entitiesToConfirm.Add( entity );
 				}
-				else if ( hasCustomName && grid.nam HasCustomName( gridBuilder, customName, hasCustomNameExact ) )
+				else if ( hasCustomName && HasCustomName( grid, customName, hasCustomNameExact ) )
 				{
 					entitiesToConfirm.Add( entity );
 				}
@@ -769,7 +772,7 @@
 				{
 					continue;
 				}
-				else if ( isOwnedBy && ownedByPlayerId > 0 && GetAllOwners( gridBuilder ).Contains( ownedByPlayerId ) )
+				else if ( isOwnedBy && ownedByPlayerId > 0 && grid.SmallOwners.Contains( ownedByPlayerId ) )
 				{
 					entitiesToConfirm.Add( entity );
 				}
@@ -777,11 +780,11 @@
 				{
 					entitiesToConfirm.Add( entity );
 				}
-				else if ( !isOwnedBy && owner == 2 && HasOwner( gridBuilder ) )
+				else if ( !isOwnedBy && owner == 2 && grid.SmallOwners.Any(  ) )
 				{
 					entitiesToConfirm.Add( entity );
 				}
-				else if ( !isOwnedBy && owner == 1 && !HasOwner( gridBuilder ) )
+				else if ( !isOwnedBy && owner == 1 && !grid.SmallOwners.Any(  ) )
 				{
 					entitiesToConfirm.Add( entity );
 				}
@@ -789,13 +792,7 @@
 			Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
 			Dictionary<string, int> typeDict = new Dictionary<string, int>( );
 			List<string> checkList = new List<string>( );
-
-            //this is an ugly workaround to not being able to combine grids on pistons/rotors with the main grid
-            //with safe mode on we remove any grid with a piston or rotor from the list of grids to process
-
-            if (safeMode)
-                GetGridsUnconnected(entitiesUnconnected, entitiesToConfirm);
-            else
+            
                 entitiesUnconnected = entitiesToConfirm;
             
             //int blocks = 0;
@@ -806,7 +803,10 @@
                 subTypeDict.Clear( );
 				typeDict.Clear( );
 				checkList.Clear( );
-				MyObjectBuilder_CubeGrid grid = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( );
+				MyCubeGrid grid = entity as MyCubeGrid;
+
+                if (grid == null)
+                    continue;
                 
 				if ( online == 1 ) // notonline
 				{
@@ -817,7 +817,7 @@
 						if ( playerId < 1 )
 							continue;
 
-						if ( GetAllOwners( grid ).Contains( playerId ) )
+						if ( grid.SmallOwners.Contains( playerId ) )
 						{
 							foundOnline = true;
 							break;
@@ -836,7 +836,7 @@
 						if ( playerId < 1 )
 							continue;
 
-						if ( GetAllOwners( grid ).Contains( playerId ) )
+						if ( grid.SmallOwners.Contains( playerId ) )
 						{
 							foundOnline = false;
 							break;
@@ -848,30 +848,29 @@
 				}
 
 				bool found = true;
-				foreach ( MyObjectBuilder_CubeBlock block in grid.CubeBlocks )
+				foreach ( MySlimBlock slimBlock in grid.CubeBlocks )
 				{
+                    MyFunctionalBlock block = slimBlock?.FatBlock as MyFunctionalBlock;
+				    if (block == null)
+				        continue;
+                    
 					if ( functional != 0 )
 					{
-						if ( block is MyObjectBuilder_FunctionalBlock )
-						{
 							//							if (debug && !found)
 							//								Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which has a functional block.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count));
 
 							if ( !checkList.Contains( "functional" ) )
 								checkList.Add( "functional" );
 						}
-					}
 
 					if ( terminal != 0 )
 					{
-						if ( block is MyObjectBuilder_TerminalBlock )
-						{
 							//if (debug && !found)
 							//	Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which has a terminal block.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count));
 
 							if ( !checkList.Contains( "terminal" ) )
 								checkList.Add( "terminal" );
-						}
+						
 					}
 
 					if ( power != 0 )
@@ -888,7 +887,7 @@
 
 					if ( hasBlockSubType || hasBlockSubTypeLimits )
 					{
-						string subTypeName = block.GetId( ).SubtypeName;
+						string subTypeName = block.BlockDefinition.SubtypeName;
 						if ( subTypeDict.ContainsKey( subTypeName ) )
 							subTypeDict[ subTypeName ] = subTypeDict[ subTypeName ] + 1;
 						else
@@ -1265,7 +1264,7 @@
 			return ownerList.OrderBy( x => x.Value ).Where( x => x.Value == count ).Select( x => x.Key ).ToList( );
 		}
 
-		public static List<long> GetAllOwners( MyObjectBuilder_CubeGrid grid )
+		/*public static List<long> GetAllOwners( MyObjectBuilder_CubeGrid grid )
 		{
 			Dictionary<long, int> ownerList = new Dictionary<long, int>( );
 			foreach ( MyObjectBuilder_CubeBlock block in grid.CubeBlocks )
@@ -1280,7 +1279,7 @@
 			}
 
 			return ownerList.Select( x => x.Key ).ToList( );
-		}
+		}*/
 
 		public static bool HasCustomName( MyCubeGrid grid, string name, bool exact )
 		{
@@ -1290,14 +1289,14 @@
 			    if (termBlock == null) continue;
 			    if ( exact )
 			    {
-			        if ( termBlock.CustomName != null && termBlock.CustomName == name )
+			        if ( termBlock.CustomName != null && termBlock.CustomName.ToString(  ) == name )
 			        {
 			            return true;
 			        }
 			    }
 			    else
 			    {
-			        if ( termBlock.CustomName != null && termBlock.CustomName.Contains( name ) )
+			        if ( termBlock.CustomName != null && termBlock.CustomName.ToString(  ).Contains( name ) )
 			        {
 			            return true;
 			        }
@@ -1307,8 +1306,11 @@
 			return false;
 		}
 
-		public static bool HasOwner( MyObjectBuilder_CubeGrid grid )
+        /*
+		public static bool HasOwner( MyCubeGrid grid )
 		{
+		    return grid.SmallOwners.Any( );
+            
 			foreach ( MyObjectBuilder_CubeBlock block in grid.CubeBlocks )
 			{
 				if ( !( block is MyObjectBuilder_TerminalBlock ) )
@@ -1321,37 +1323,34 @@
 
 			return false;
 		}
-
+        */
 
 		private static string GetOptionsText( Dictionary<string, string> options )
 		{
 			return string.Join( ", ", options.Select( o => string.Format( "{0}={1}", o.Key, o.Value ) ) );
 		}
 
-		public static bool DoesBlockSupplyPower( MyObjectBuilder_CubeBlock block )
-        {
-            if ( block is MyObjectBuilder_BatteryBlock )
-            {
-                MyObjectBuilder_BatteryBlock battery = (MyObjectBuilder_BatteryBlock)block;
-                if ( battery != null )
-                {
-                    if ( battery.CurrentStoredPower > 0f )
-                        return true;
-                }
-            }
+		public static bool DoesBlockSupplyPower( MyCubeBlock block )
+		{
+		    if (block == null)
+		        return false;
 
-            if ( block is MyObjectBuilder_Reactor )
-            {
-                MyObjectBuilder_Reactor reactor = (MyObjectBuilder_Reactor)block;
-                if ( reactor != null )
-                {
-                    //reactors in creative mode provide power without uranium
-                    if ( reactor.Inventory.Items.Count > 0 || Server.Instance.Config.GameMode == MyGameModeEnum.Creative )
-                        return true;
-                }
-            }
+		    if (block is IMyBatteryBlock)
+		    {
+		        IMyBatteryBlock battery = block as IMyBatteryBlock;
+		        if (battery.CurrentStoredPower > 0f)
+		            return true;
+		    }
 
-            if ( block is MyObjectBuilder_SolarPanel )
+		    if (block is IMyReactor)
+		    {
+		        IMyReactor reactor = block as IMyReactor;
+		        //reactors in creative mode provide power without uranium
+		        if (reactor.GetInventoryCount( ) > 0 || Server.Instance.Config.GameMode == MyGameModeEnum.Creative)
+		            return true;
+		    }
+
+		    if ( block is IMySolarPanel )
             {
                 return true;
             }
@@ -1360,9 +1359,9 @@
             return false;
 		}
 
-		public static bool DoesGridHavePowerSupply( MyObjectBuilder_CubeGrid grid )
+		public static bool DoesGridHavePowerSupply( MyCubeGrid grid )
 		{
-			return grid.CubeBlocks.Any( DoesBlockSupplyPower );
+			return grid.CubeBlocks.Any( x => DoesBlockSupplyPower(x.FatBlock) );
 		}
 
 		public static MyObjectBuilder_CubeGrid SafeGetObjectBuilder( IMyCubeGrid grid )
