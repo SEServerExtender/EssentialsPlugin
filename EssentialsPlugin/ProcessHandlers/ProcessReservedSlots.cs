@@ -58,7 +58,7 @@
 
             if ( PluginSettings.Instance.TicketPlayers.Any( item => item.TicketId == remoteUserId ) )
             {
-                _reservedPlayers.Add(remoteUserId);
+                //_reservedPlayers.Add(remoteUserId);
                 Essentials.Log.Info("Ticket player connected: " + remoteUserId);
                 Essentials.Log.Info("{0} whitelisted players connected. {1} of {2} reserved slots allocated.",
                                     _reservedPlayers.Count,

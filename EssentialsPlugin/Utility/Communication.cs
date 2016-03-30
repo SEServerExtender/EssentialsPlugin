@@ -111,12 +111,12 @@
             }
         }
 
-        public static void Notification( ulong steamId, MyFontEnum color, int timeInSeconds, string message )
+        public static void Notification( ulong steamId, MyFontEnum color, int timeInMilliseconds, string message )
         {
             ServerNotificationItem messageItem = new ServerNotificationItem
                                                  {
                                                      color = color,
-                                                     time = timeInSeconds,
+                                                     time = timeInMilliseconds,
                                                      message = message
                                                  };
 

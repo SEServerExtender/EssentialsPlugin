@@ -1163,7 +1163,8 @@
                                    new ProcessTimedCommands(  ),
                                    new ProcessSpeed(  ),
                                    new ProcessCargoShips(  ),
-                                   new ProcessTicket(  )
+                                   new ProcessTicket(  ),
+                                   //new ProcessFun( )
                                };
 
             // Setup chat handlers

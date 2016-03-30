@@ -1,6 +1,7 @@
 ﻿namespace EssentialsPlugin.ProcessHandlers
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using EssentialsPlugin.Settings;
     using EssentialsPlugin.Utility;
@@ -37,22 +38,22 @@
 
                 if ( timeLeft <= 0 )
                 {
-                    Communication.Notification( 0, MyFontEnum.Blue, 10, $"Goodbye {playerName}, thanks for joining us!" );
-                    Communication.SendPublicInformation( $"Goodbye {playerName}, thanks for joining us!" );
+                    Communication.Notification( 0, MyFontEnum.Blue, 10000, $"Goodbye {playerName}, thanks for joining us!" );
+                    //Communication.SendPublicInformation( $"Goodbye {playerName}, thanks for joining us!" );
                     if ( !toRemove.Contains( item.TicketId ) )
                         toRemove.Add( item.TicketId );
                     continue;
                 }
                 if ( timeLeft <= 1 )
                 {
-                    Communication.Notification( 0, MyFontEnum.Blue, 10, $"{playerName} has one minute left!" );
-                    Communication.SendPublicInformation( $"{playerName} has one minute left!" );
+                    Communication.Notification( 0, MyFontEnum.Blue, 10000, $"{playerName} has one minute left!" );
+                    //Communication.SendPublicInformation( $"{playerName} has one minute left!" );
                     continue;
                 }
                 if ( timeLeft <= 5 )
                 {
-                    Communication.Notification( 0, MyFontEnum.Blue, 10, $"{playerName} has five minutes left!" );
-                    Communication.SendPublicInformation( $"{playerName} has five minutes left!" );
+                    Communication.Notification( 0, MyFontEnum.Blue, 10000, $"{playerName} has five minutes left!" );
+                    //Communication.SendPublicInformation( $"{playerName} has five minutes left!" );
                 }
             }
 
@@ -60,14 +61,11 @@
 
             foreach ( ulong steamId in toRemove )
             {
-                 MyMultiplayer.Static.KickClient( steamId );
-                foreach ( var item in PluginSettings.Instance.TicketPlayers )
+                MyMultiplayer.Static.KickClient( steamId );
+                foreach ( var item in PluginSettings.Instance.TicketPlayers.Where( item => item.TicketId == steamId ) )
                 {
-                    if ( item.TicketId == steamId )
-                    {
-                        PluginSettings.Instance.TicketPlayers.Remove( item );
-                        break;
-                    }
+                    PluginSettings.Instance.TicketPlayers.Remove( item );
+                    break;
                 }
             }
         }
