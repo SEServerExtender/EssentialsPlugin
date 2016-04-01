@@ -11,6 +11,7 @@
     using SEModAPIInternal.API.Entity;
     using SEModAPIInternal.API.Entity.Sector.SectorObject;
     using VRage;
+    using VRage.Game.Entity;
     using VRage.ModAPI;
     using VRageMath;
 
@@ -73,7 +74,7 @@
 			Communication.SendPrivateInformation(userId, string.Format("Moving {0} to within {1}m of {2}.  This may take about 20 seconds.", sourceName, distance, targetName));
 
 			Vector3D position;
-            IMyEntity entity = Player.FindControlledEntity( targetName );
+            MyEntity entity = (MyEntity)Player.FindControlledEntity( targetName );
             if (entity == null)
 			{
                 entity = CubeGrids.Find( targetName );
@@ -82,13 +83,13 @@
                     Communication.SendPrivateInformation( userId, string.Format( "Can not find user or grid with the name: {0}", targetName ) );
                     return true;
                 }
-                position = entity.GetPosition();
+                position = entity.PositionComp.GetPosition();
 			}
 			else
-				position = entity.GetPosition();
+				position = entity.PositionComp.GetPosition();
 
 			Vector3D startPosition = MathUtility.RandomPositionFromPoint((Vector3)position, distance);
-            IMyEntity gridToMove = CubeGrids.Find( sourceName );
+            MyEntity gridToMove = CubeGrids.Find( sourceName );
             if (gridToMove == null)
 			{
 				Communication.SendPrivateInformation(userId, string.Format("Unable to find: {0}", sourceName));

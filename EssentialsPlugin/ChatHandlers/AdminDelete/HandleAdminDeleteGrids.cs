@@ -4,10 +4,12 @@
 	using System.Linq;
 	using EssentialsPlugin.Utility;
 	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.Game.Entities;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity;
 	using VRage.Game;
+	using VRage.Game.Entity;
 	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 
@@ -45,7 +47,7 @@
 		// admin nobeacon scan
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			HashSet<IMyEntity> grids = CubeGrids.ScanGrids(userId, words);
+			HashSet<MyEntity> grids = CubeGrids.ScanGrids(userId, words);
 
 			bool confirm = true;
 			/*
@@ -55,21 +57,21 @@
 			}
 			*/
 			int count = 0;
-			foreach (IMyEntity entity in grids)
+			foreach (MyEntity entity in grids)
 			{
 				if (!(entity is IMyCubeGrid))
 					continue;
 
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
+				MyCubeGrid grid = (MyCubeGrid)entity;
+
 				if(confirm)
 					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, true);
 
 				long ownerId = 0;
 				string ownerName = "";
-				if (CubeGrids.GetBigOwners(gridBuilder).Count > 0)
+				if (grid.BigOwners.Count > 0)
 				{
-					ownerId = CubeGrids.GetBigOwners(gridBuilder).First();
+					ownerId = grid.BigOwners.First();
 					ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
 				}
 

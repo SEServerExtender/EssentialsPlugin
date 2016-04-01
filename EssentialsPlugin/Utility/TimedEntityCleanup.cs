@@ -5,6 +5,7 @@
 	using System.Linq;
 	using NLog;
 	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.Game.Entities;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Entity.Sector.SectorObject;
 	using VRage.Game;
@@ -69,12 +70,7 @@
 
 							if(entity != null)
 							{
-								MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
-								if (gridBuilder == null)
-									continue;
-
-								CubeGridEntity entityToDispose = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
-								entityToDispose.Dispose();
+                                    Wrapper.GameAction( ()=> entity.Close(  ) );
 							}
 							else
 								Log.Info("Entity is null");

@@ -203,6 +203,8 @@
     <Compile Include="Utility\ChatHistory.cs" />
     <Compile Include="Utility\Docking.cs" />
     <Compile Include="Utility\DockingItem.cs" />
+    <Compile Include="Utility\Extensions.cs" />
+    <Compile Include="Utility\GridGroup.cs" />
     <Compile Include="Utility\Protection.cs" />
     <Compile Include="Utility\TimedEntityCleanup.cs" />
     <Compile Include="Utility\Communication.cs" />

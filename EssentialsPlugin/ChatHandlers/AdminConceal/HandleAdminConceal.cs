@@ -8,6 +8,8 @@
     using SEModAPIInternal.API.Common;
     using VRage.ModAPI;
     using EntityManagers;
+    using Sandbox.Game.Entities;
+    using VRage.Game.Entity;
     using VRage.Game.ModAPI;
 
     public class HandleAdminConceal : ChatHandlerBase
@@ -115,16 +117,16 @@
 				HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>();
 				//CubeGrids.GetGridsUnconnected(entitiesFound, entities);
 				int count = 0;
-				List<IMySlimBlock> slimBlocks = new List<IMySlimBlock>();
+
 				foreach (IMyEntity entity in entitiesFound)
 				{
-					if (!(entity is IMyCubeGrid))
+					if (!(entity is MyCubeGrid))
 						continue;
 
 					if (!entity.InScene)
 						continue;
 
-					IMyCubeGrid grid = (IMyCubeGrid)entity;
+					MyCubeGrid grid = (MyCubeGrid)entity;
 					long ownerId = 0;
 					string ownerName = "";
 					if (grid.BigOwners.Count > 0)
@@ -135,53 +137,49 @@
 
 					if (ownerName == "")
 						ownerName = "No one";
-
-					grid.GetBlocks(slimBlocks, null);				
-					Communication.SendPrivateInformation(userId, string.Format("Id: {0} Display: {1} OwnerId: {2} OwnerName: {3} Position: {4} BlockCount: {5}", entity.EntityId, entity.DisplayName, ownerId, ownerName, General.Vector3DToString(entity.GetPosition()), slimBlocks.Count));
-					slimBlocks.Clear();
+				
+					Communication.SendPrivateInformation(userId, string.Format("Id: {0} Display: {1} OwnerId: {2} OwnerName: {3} Position: {4} BlockCount: {5}", entity.EntityId, entity.DisplayName, ownerId, ownerName, General.Vector3DToString(entity.GetPosition()), grid.BlocksCount));
 					count++;
 				}
 
 				Communication.SendPrivateInformation(userId, string.Format("Total unconnected revealed entities: {0}", count));
 
 				Communication.SendPrivateInformation(userId, "==== Connected Entities ===");
-				HashSet<IMyEntity> connectedFound = new HashSet<IMyEntity>();
-				CubeGrids.GetConnectedGrids(connectedFound);
-				Console.WriteLine("Here: {0} : {1} {2}", connectedFound.Intersect(entitiesFound).Count(), entitiesFound.Count, connectedFound.Count);
+			    var groups = CubeGrids.GetGroups( GridLinkTypeEnum.Logical );
+				//Console.WriteLine("Here: {0} : {1} {2}", connectedFound.Intersect(entitiesFound).Count(), entitiesFound.Count, connectedFound.Count);
 				count = 0;
-				slimBlocks.Clear();
-				foreach (IMyEntity entity in connectedFound)
-				{
-					if (!(entity is IMyCubeGrid))
-						continue;
 
-					if (entitiesFound.Contains(entity))
-						continue;
+			    foreach ( var group in groups )
+			    {
+			        foreach ( MyCubeGrid grid in group )
+			        {
+			            MyEntity entity = (MyEntity)grid;
 
-					if (!entity.InScene)
-						continue;
+			            if ( entitiesFound.Contains( entity ) )
+			                continue;
 
-					if (CubeGrids.GetRecursiveGridList((IMyCubeGrid)entity).Count < 2)
-						continue;
+			            if ( !entity.InScene )
+			                continue;
 
-					IMyCubeGrid grid = (IMyCubeGrid)entity;
-					long ownerId = 0;
-					string ownerName = "";
-					if (grid.BigOwners.Count > 0)
-					{
-						ownerId = grid.BigOwners.First();
-						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
-					}
+			            if ( group.Count < 2 )
+			                continue;
 
-					if (ownerName == "")
-						ownerName = "No one";
+			            long ownerId = 0;
+			            string ownerName = "";
+			            if ( grid.BigOwners.Count > 0 )
+			            {
+			                ownerId = grid.BigOwners.First( );
+			                ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
+			            }
 
-					grid.GetBlocks(slimBlocks, null);
-					Communication.SendPrivateInformation(userId, string.Format("Id: {0} Display: {1} OwnerId: {2} OwnerName: {3} Position: {4} BlockCount: {5} Connections: {6}", entity.EntityId, entity.DisplayName, ownerId, ownerName, General.Vector3DToString(entity.GetPosition()), slimBlocks.Count, CubeGrids.GetRecursiveGridList(grid).Count));
-					//Communication.SendPrivateInformation(userId, string.Format("Id: {0} Display: {1} OwnerId: {2} OwnerName: {3} Position: {4} BlockCount: {5} Connections: {6}", entity.EntityId, entity.DisplayName, ownerId, ownerName, General.Vector3DToString(entity.GetPosition()), slimBlocks.Count));
-					slimBlocks.Clear();
-					count++;
-				}
+			            if ( ownerName == "" )
+			                ownerName = "No one";
+
+			            Communication.SendPrivateInformation( userId, $"Id: {entity.EntityId} Display: {entity.DisplayName} OwnerId: {ownerId} OwnerName: {ownerName} Position: {grid.PositionComp.GetPosition( )} BlockCount: {grid.BlocksCount} Connections: {@group.Count}" );
+			            //Communication.SendPrivateInformation(userId, string.Format("Id: {0} Display: {1} OwnerId: {2} OwnerName: {3} Position: {4} BlockCount: {5} Connections: {6}", entity.EntityId, entity.DisplayName, ownerId, ownerName, General.Vector3DToString(entity.GetPosition()), slimBlocks.Count));
+			            count++;
+			        }
+			    }
 
 				Communication.SendPrivateInformation(userId, string.Format("Total connected revealed entities: {0}", count));
 

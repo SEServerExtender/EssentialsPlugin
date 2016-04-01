@@ -94,22 +94,19 @@ namespace EssentialsPlugin.ChatHandlers.AdminDelete
                 
                 IMyCubeGrid grid = (IMyCubeGrid)entity;
 				CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(grid.EntityId);
-				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
-				if (gridBuilder == null)
-					continue;
 
 				// This entity is protected by whitelist
 				if (PluginSettings.Instance.LoginEntityWhitelist.Length > 0 && PluginSettings.Instance.LoginEntityWhitelist.Contains(grid.EntityId.ToString()))
 					continue;
 
-				if (CubeGrids.GetAllOwners(gridBuilder).Count < 1 && removeOwnerless)
+				if (grid.SmallOwners.Count < 1 && removeOwnerless)
 				{
 					Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) not owned by anyone.", entity.DisplayName, entity.EntityId));
 					entitiesFound.Add(entity);
 					continue;
 				}
 
-				foreach (long player in CubeGrids.GetBigOwners(gridBuilder))
+				foreach (long player in grid.BigOwners)
 				{
 					// This playerId is protected by whitelist
 					if (PluginSettings.Instance.LoginPlayerIdWhitelist.Length > 0 && PluginSettings.Instance.LoginPlayerIdWhitelist.Contains(player.ToString()))

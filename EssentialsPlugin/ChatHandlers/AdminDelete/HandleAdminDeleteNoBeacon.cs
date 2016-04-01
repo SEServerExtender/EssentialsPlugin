@@ -4,10 +4,14 @@
 	using System.Linq;
 	using EssentialsPlugin.Utility;
 	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.Game.Entities;
+	using Sandbox.Game.Entities.Cube;
 	using Sandbox.ModAPI;
+	using Sandbox.ModAPI.Ingame;
 	using SEModAPIInternal.API.Common;
     using SEModAPIInternal.API.Entity.Sector.SectorObject;
 	using VRage.Game;
+	using VRage.Game.Entity;
 	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 
@@ -46,29 +50,25 @@
 		// admin deletearea x y z radius
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-			HashSet<IMyEntity> entitiesToConfirm = new HashSet<IMyEntity>();
-			HashSet<IMyEntity> entitiesConnected = new HashSet<IMyEntity>();
-			HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>();
-			Wrapper.GameAction(() =>
-			{
-				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
-			});
+			HashSet<MyEntity> entities = new HashSet<MyEntity>();
+			HashSet<MyEntity> entitiesToConfirm = new HashSet<MyEntity>();
+			HashSet<MyEntity> entitiesConnected = new HashSet<MyEntity>();
+			HashSet<MyEntity> entitiesFound = new HashSet<MyEntity>();
+            HashSet<List<MyCubeGrid>> groupsFound = new HashSet<List<MyCubeGrid>>();
 
-			foreach (IMyEntity entity in entities)
+			Wrapper.GameAction(() =>entities = MyEntities.GetEntities(  ));
+
+			foreach (MyEntity entity in entities)
 			{
-				if (!(entity is IMyCubeGrid))
+				if (!(entity is MyCubeGrid))
 					continue;
 
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
-				if (gridBuilder == null)
-					continue;
+				MyCubeGrid grid = (MyCubeGrid)entity;
 
 				bool found = false;
-				foreach (MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
+				foreach (MySlimBlock block in grid.CubeBlocks)
 				{
-					if (block.TypeId == typeof(MyObjectBuilder_Beacon))
+					if (block.FatBlock is IMyBeacon)
 					{
 						found = true;
 						break;
@@ -79,28 +79,18 @@
 					entitiesToConfirm.Add(grid);
 			}
 
-			CubeGrids.GetGridsUnconnected(entitiesFound, entitiesToConfirm);
+			//CubeGrids.GetGridsUnconnected(entitiesFound, entitiesToConfirm);
+		    groupsFound = CubeGrids.GetGroups( GridLinkTypeEnum.Logical, entitiesToConfirm );
 
-			foreach (IMyEntity entity in entitiesFound)
-			{
-				CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(entity.EntityId);
-                if (gridEntity == null)
-                {
-                    Log.Info("A found entity gridEntity was null!");
-                    continue;
-                }
-				Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) at {2} with no beacon.", gridEntity.Name, entity.EntityId, General.Vector3DToString(entity.GetPosition())));
-			}
-
-			for(int r = entitiesFound.Count - 1; r >= 0; r--)
-			{
-				//MyAPIGateway.Entities.RemoveEntity(entity);
-				IMyEntity entity = entitiesFound.ElementAt(r);
-				CubeGridEntity gridEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
-				gridEntity.Dispose();
-			}
-
-			Communication.SendPrivateInformation(userId, string.Format("Removed {0} grids with no beacons", entitiesFound.Count));
+		    foreach ( var group in groupsFound )
+		    {
+		        foreach ( MyCubeGrid grid in group )
+		        {
+		            Communication.SendPrivateInformation( userId, $"Found entity '{grid.DisplayName}' ({grid.EntityId}) at {grid.PositionComp.GetPosition( ).ToString( )} with no beacon." );
+		        Wrapper.GameAction( ()=>grid.Close(  ) );
+		        }
+		    }
+		    Communication.SendPrivateInformation(userId, $"Removed {entitiesFound.Count} grids with no beacons" );
 
 			return true;
 		}

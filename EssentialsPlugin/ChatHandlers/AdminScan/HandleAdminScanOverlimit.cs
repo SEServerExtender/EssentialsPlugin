@@ -5,6 +5,7 @@
 	using System.Linq;
 	using EssentialsPlugin.Utility;
 	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.Game.Entities;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
 	using VRage.Game;
@@ -74,25 +75,21 @@
 			HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>();
 			foreach (IMyEntity entity in entities)
 			{
-				if (!(entity is IMyCubeGrid))
+				if (!(entity is MyCubeGrid))
 					continue;
 
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
-				if (gridBuilder == null)
-					continue;
-
+				MyCubeGrid grid = (MyCubeGrid)entity;
 				if (PluginSettings.Instance.LoginEntityWhitelist.Contains(entity.EntityId.ToString()))
 					continue;
 
 				entitiesToConfirm.Add(entity);
 			}
 
-			CubeGrids.GetGridsUnconnected(entitiesUnconnected, entitiesToConfirm);
+			//CubeGrids.GetGridsUnconnected(entitiesUnconnected, entitiesToConfirm);
 			foreach(IMyEntity entity in entitiesUnconnected)
 			{
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
+				MyObjectBuilder_CubeGrid gridBuilder=null;// = CubeGrids.SafeGetObjectBuilder((IMyCubeGrid)entity);
 				if (gridBuilder == null)
 					continue;
 

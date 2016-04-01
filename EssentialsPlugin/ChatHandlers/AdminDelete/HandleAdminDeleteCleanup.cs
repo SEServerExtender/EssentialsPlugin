@@ -8,6 +8,7 @@
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity.Sector.SectorObject;
 	using VRage.Game;
+	using VRage.Game.Entity;
 	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
     using VRage.Game.ObjectBuilders;
@@ -45,9 +46,9 @@
 
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			HashSet<IMyEntity> entitiesFound = CubeGrids.ScanCleanup(userId, words);
+			HashSet<MyEntity> entitiesFound = CubeGrids.ScanCleanup(userId, words);
 
-			foreach (IMyEntity entity in entitiesFound)
+			foreach (MyEntity entity in entitiesFound)
 			{
 				CubeGridEntity removeEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
 				removeEntity.Dispose();

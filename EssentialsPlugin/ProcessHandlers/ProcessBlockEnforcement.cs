@@ -2,6 +2,7 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
 	using Sandbox.ModAPI;
@@ -65,6 +66,10 @@
 
 				if ( !entity.InScene )
 					continue;
+
+			    if ( PluginSettings.Instance.ProtectedEnabled && PluginSettings.Instance.ProtectedItems.Any( x => x.EntityId == entity.EntityId ) )
+			        continue;
+			    
 
 				IMyCubeGrid grid = (IMyCubeGrid)entity;
 				//IMyGridTerminalSystem gridTerminal = MyAPIGateway.TerminalActionsHelper.GetTerminalSystemForGrid( grid );

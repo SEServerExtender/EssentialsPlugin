@@ -4,10 +4,14 @@
 	using System.Collections.Generic;
 	using EssentialsPlugin.Utility;
 	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.Game.Entities;
+	using Sandbox.Game.Entities.Cube;
 	using Sandbox.ModAPI;
+	using Sandbox.ModAPI.Ingame;
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity.Sector.SectorObject;
 	using VRage.Game;
+	using VRage.Game.Entity;
 	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 
@@ -48,8 +52,9 @@
 			try
 			{
 				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-				HashSet<IMyEntity> entitiesToConfirm = new HashSet<IMyEntity>();
+				HashSet<MyEntity> entitiesToConfirm = new HashSet<MyEntity>();
 				HashSet<IMyEntity> entitiesConnected = new HashSet<IMyEntity>();
+                HashSet<List<MyCubeGrid>> groupsToConfirm = new HashSet<List<MyCubeGrid>>();
 				HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>();
 				Wrapper.GameAction(() =>
 				{
@@ -58,18 +63,17 @@
 
 				foreach (IMyEntity entity in entities)
 				{
-					if (!(entity is IMyCubeGrid))
+					if (!(entity is MyCubeGrid))
 						continue;
 
-					IMyCubeGrid grid = (IMyCubeGrid)entity;
-					MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
-					if (gridBuilder == null)
-						continue;
+					MyCubeGrid grid = (MyCubeGrid)entity;
 
 					bool found = false;
-					foreach (MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
+					foreach (MySlimBlock slimBlock in grid.CubeBlocks)
 					{
-						if(block.TypeId == typeof(MyObjectBuilder_Beacon))
+					    IMyCubeBlock block = slimBlock?.FatBlock;
+
+						if(block is IMyBeacon)
 						{
 							found = true;
 							break;
@@ -80,7 +84,7 @@
 						entitiesToConfirm.Add(grid);
 				}
 
-				CubeGrids.GetGridsUnconnected(entitiesFound, entitiesToConfirm);
+			    groupsToConfirm = CubeGrids.GetGroups( GridLinkTypeEnum.Logical, entitiesToConfirm );
 				
 				foreach (IMyEntity entity in entitiesFound)
 				{

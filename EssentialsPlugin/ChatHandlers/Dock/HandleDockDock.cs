@@ -223,7 +223,7 @@
 							Directory.CreateDirectory( info.DirectoryName );
 						}
 						//CubeGridEntity dockingGrid = new CubeGridEntity((MyObjectBuilder_CubeGrid)dockingEntity.GetObjectBuilder(), dockingEntity);
-						MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(dockingEntity);
+						MyObjectBuilder_CubeGrid gridBuilder=null;// = CubeGrids.SafeGetObjectBuilder(dockingEntity);
 						if (gridBuilder == null)
 						{
 							Communication.SendPrivateInformation(userId, string.Format("Failed to load entity for export: {0}", dockingEntity.DisplayName));

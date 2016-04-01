@@ -6,6 +6,7 @@
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
 	using SEModAPI.API.Utility;
+	using VRage.Game.Entity;
 	using VRage.ModAPI;
 
 	class ProcessCleanup : ProcessHandlerBase
@@ -64,7 +65,7 @@
 			if ( itemTime - DateTime.Now < _oneSecond && DateTime.Now - item.LastRan > _oneMinute )
 			{
 				string command = string.Format( "{0} quiet", item.ScanCommand );
-				HashSet<IMyEntity> entities = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
+				HashSet<MyEntity> entities = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
 				CubeGrids.DeleteGrids( entities );
 				Communication.SendPublicInformation( string.Format( "[NOTICE]: Timed cleanup has run.  {0} entities removed.  Have a nice day.", entities.Count ) );
 				item.LastRan = DateTime.Now;
@@ -105,7 +106,7 @@
 				{
 					item.LastRan = DateTime.Now;
 					string command = item.ScanCommand + " quiet";
-					HashSet<IMyEntity> entities = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
+					HashSet<MyEntity> entities = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
 					if ( entities.Count >= item.MaxCapacity )
 					{
 						Communication.SendPublicInformation( string.Format( "[NOTICE]: Cleanup triggered.  ({0} of {1}) triggered grids found.  Cleanup will run in {2} minutes.  Reason: {3}", entities.Count, item.MaxCapacity, item.MinutesAfterCapacity, item.Reason ) );
@@ -119,7 +120,7 @@
 				if ( DateTime.Now - item.LastRan > TimeSpan.FromMinutes( item.MinutesAfterCapacity ) )
 				{
 					string command = item.ScanCommand + " quiet";
-					HashSet<IMyEntity> entities = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
+					HashSet<MyEntity> entities = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
 					CubeGrids.DeleteGrids( entities );
 					Communication.SendPublicInformation( string.Format( "[NOTICE]: Triggered cleanup has run.  {0} entities removed.  Have a nice day.", entities.Count ) );
 					_triggerdItem = null;

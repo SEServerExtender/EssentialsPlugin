@@ -23,6 +23,7 @@
     using SEModAPI.API;
     using SEModAPIExtensions.API;
     using SpaceEngineers.Game.ModAPI.Ingame;
+    using VRage.Animations;
     using VRage.Game;
     using VRage.Game.Entity;
     using VRage.Game.ModAPI;
@@ -88,25 +89,29 @@
 			Matrix rot = Matrix.CreateFromQuaternion( rotate );
 			return new MyPositionAndOrientation( position, rot.Forward, rot.Up );
 		}
-        
-		public static MyGroupsBase<MyCubeGrid> Find( string displayName )
+
+        public static MyEntity Find(string displayName)
 		{
 			HashSet<MyEntity> entities = new HashSet<MyEntity>( );
 
 			Wrapper.GameAction( ( ) => entities = MyEntities.GetEntities( ) );
 
             //return entities.FirstOrDefault( entity => entity.DisplayName.ToLower( ).Contains( displayName.ToLower( ) ) );
-            foreach ( MyEntity entity in entities )
-            {
-                if ( entity.DisplayName.ToLower( ).Contains( displayName.ToLower( ) ) )
-                    return MyCubeGridGroups.Static.GetGroups( GridLinkTypeEnum.Logical );
-            }
-            return null;
+            return entities.FirstOrDefault( entity => entity is MyCubeGrid && entity.DisplayName.ToLower( ).Contains( displayName.ToLower( ) ) );
 		}
 
-	    public static HashSet<MyGroupsBase<MyCubeGrid>> GetGroups( HashSet<MyEntity> entities, GridLinkTypeEnum linkType )
+        /// <summary>
+        /// Gets groups from a list of entities. Pass entities as null to get all groups in the world.
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <param name="linkType"></param>
+        /// <returns></returns>
+	    public static HashSet<List<MyCubeGrid>> GetGroups(GridLinkTypeEnum linkType, HashSet<MyEntity> entities = null)
 	    {
-            HashSet<MyGroupsBase<MyCubeGrid>> result = new HashSet<MyGroupsBase<MyCubeGrid>>();
+            if(entities==null)
+                Wrapper.GameAction( ()=>entities=MyEntities.GetEntities(  ) );
+
+            HashSet<List<MyCubeGrid>> result = new HashSet<List<MyCubeGrid>>();
 
 	        foreach(MyEntity entity in entities)
 	        {
@@ -115,279 +120,309 @@
                 if (grid == null || grid.Closed)
                     continue;
 
-	            result.Add( MyCubeGridGroups.Static.GetGroups( linkType ) );
+	            result.Add( MyCubeGridGroups.Static.GetGroups( linkType ).GetGroupNodes( grid ) );
 	        }
 	        return result;
 	    }
-        
-        /*public static HashSet<MyEntity> ScanCleanup( ulong userId, string[ ] words )
-		{
-			Dictionary<string, string> options = new Dictionary<string, string>( );
 
-			bool requiresFunctional = true;
-			bool requiresTerminal = true;
-			bool requiresPower = true;
-			bool hasDisplayName = false;
-			bool ignoreOwnership = false;
-			bool requiresOwner = false;
-			bool debug = false;
-			bool hasBlockSubType = false;
-			bool hasBlockSubTypeLimits = false;
-			bool hasDisplayNameExact = false;
+	    public static MyCubeGrid GetLargestInGroup( List<MyCubeGrid> group )
+	    {
+	        MyCubeGrid result = null;
+	        foreach ( MyCubeGrid grid in group )
+	        {
+	            if ( result == null || grid.BlocksCount > result.BlocksCount )
+	                result = grid;
+	        }
+	        return result;
+	    }
 
-			options.Add( "Requires Functional", "true" );
-			options.Add( "Requires Terminal", "true" );
-			options.Add( "Requires Valid Power", "true" );
-			options.Add( "Matches Display Name Text", "false" );
-			options.Add( "Ignore Ownership", "false" );
-			options.Add( "Requires Ownership", "false" );
-			options.Add( "Debug", "false" );
-			options.Add( "Has Sub Block Type", "false" );
-			options.Add( "Has Sub Block Type Limits", "false" );
+	    public static void CloseGroups( HashSet<List<MyCubeGrid>> groups )
+	    {
+	        foreach ( var group in groups )
+	        {
+	            foreach ( MyCubeGrid grid in group )
+	            {
+	                Wrapper.GameAction( ()=> grid.Close(  ) );
+	            }
+	        }
+	    }
 
-			string displayName = "";
-			Dictionary<string, int> blockSubTypes = new Dictionary<string, int>( );
+	    public static HashSet<MyEntity> ScanCleanup( ulong userId, string[] words )
+	    {
+	        Dictionary<string, string> options = new Dictionary<string, string>( );
 
-			if ( words.Any( ) )
-			{
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "debug" ) != null )
-				{
-					options[ "Debug" ] = "true";
-					debug = true;
-				}
+	        bool requiresFunctional = true;
+	        bool requiresTerminal = true;
+	        bool requiresPower = true;
+	        bool hasDisplayName = false;
+	        bool ignoreOwnership = false;
+	        bool requiresOwner = false;
+	        bool debug = false;
+	        bool hasBlockSubType = false;
+	        bool hasBlockSubTypeLimits = false;
+	        bool hasDisplayNameExact = false;
+	        GridLinkTypeEnum linkType = GridLinkTypeEnum.Logical;
 
-				if ( words.SingleOrDefault( x => x.ToLower( ) == "ignoreownership" ) != null )
-				{
-					options[ "Ignore Ownership" ] = "true";
-					ignoreOwnership = true;
-				}
+	        options.Add( "Requires Functional", "true" );
+	        options.Add( "Requires Terminal", "true" );
+	        options.Add( "Requires Valid Power", "true" );
+	        options.Add( "Matches Display Name Text", "false" );
+	        options.Add( "Ignore Ownership", "false" );
+	        options.Add( "Requires Ownership", "false" );
+	        options.Add( "Debug", "false" );
+	        options.Add( "Has Sub Block Type", "false" );
+	        options.Add( "Has Sub Block Type Limits", "false" );
+	        options.Add( "Physical connection", "false" );
 
-				if ( words.SingleOrDefault( x => x.ToLower( ) == "isowned" ) != null )
-				{
-					options[ "Requires Ownership" ] = "true";
-					requiresOwner = true;
-				}
+	        string displayName = "";
+	        Dictionary<string, int> blockSubTypes = new Dictionary<string, int>( );
 
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "ignorefunctional" ) != null )
-				{
-					options[ "Requires Functional" ] = "false";
-					requiresFunctional = false;
-				}
+	        if ( words.Any( ) )
+	        {
+	            if ( words.FirstOrDefault( x => x.ToLower( ) == "debug" ) != null )
+	            {
+	                options["Debug"] = "true";
+	                debug = true;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "ignoreterminal" ) != null )
-				{
-					options[ "Requires Terminal" ] = "false";
-					requiresTerminal = false;
-				}
+	            if ( words.SingleOrDefault( x => x.ToLower( ) == "ignoreownership" ) != null )
+	            {
+	                options["Ignore Ownership"] = "true";
+	                ignoreOwnership = true;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "ignorepower" ) != null )
-				{
-					options[ "Requires Valid Power" ] = "ignore";
-					requiresPower = false;
-				}
+	            if ( words.SingleOrDefault( x => x.ToLower( ) == "isowned" ) != null )
+	            {
+	                options["Requires Ownership"] = "true";
+	                requiresOwner = true;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ) != null )
-				{
-					hasDisplayName = true;
-					displayName = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ).Split( ':' )[ 1 ];
-					options[ "Matches Display Name Text" ] = "true:" + displayName;
+	            if ( words.FirstOrDefault( x => x.ToLower( ) == "ignorefunctional" ) != null )
+	            {
+	                options["Requires Functional"] = "false";
+	                requiresFunctional = false;
+	            }
 
-					if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ).Split( ':' ).Length > 2 && words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ).Split( ':' )[ 2 ] == "exact" )
-						hasDisplayNameExact = true;
-				}
+	            if ( words.FirstOrDefault( x => x.ToLower( ) == "ignoreterminal" ) != null )
+	            {
+	                options["Requires Terminal"] = "false";
+	                requiresTerminal = false;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasblocksubtype:" ) ) != null )
-				{
-					string[ ] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasblocksubtype:" ) ).Split( ':' );
-					hasBlockSubType = true;
-					options[ "Has Sub Block Type" ] = "true";
+	            if ( words.FirstOrDefault( x => x.ToLower( ) == "ignorepower" ) != null )
+	            {
+	                options["Requires Valid Power"] = "ignore";
+	                requiresPower = false;
+	            }
 
-					if ( parts.Length < 3 )
-					{
-						blockSubTypes.Add( parts[ 1 ], 1 );
-						options.Add( "Sub Block Type: " + parts[ 1 ], "1" );
-					}
-					else
-					{
-						int count = 1;
-						int.TryParse( parts[ 2 ], out count );
-						blockSubTypes.Add( parts[ 1 ], count );
-						options.Add( "Sub Block Type: " + parts[ 1 ], count.ToString( ) );
-					}
-				}
+	            if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ) != null )
+	            {
+	                hasDisplayName = true;
+	                displayName = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ).Split( ':' )[1];
+	                options["Matches Display Name Text"] = "true:" + displayName;
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "limitblocksubtype:" ) ) != null )
-				{
-					string[ ] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "limitblocksubtype:" ) ).Split( ':' );
-					hasBlockSubTypeLimits = true;
-					options[ "Has Sub Block Type Limits" ] = "true";
+	                if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ).Split( ':' ).Length > 2 && words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ).Split( ':' )[2] == "exact" )
+	                    hasDisplayNameExact = true;
+	            }
 
-					if ( parts.Length < 3 )
-					{
-						blockSubTypes.Add( parts[ 1 ], 1 );
-						options.Add( "Sub Block Type Limit: " + parts[ 1 ], "1" );
-					}
-					else
-					{
-						int count = 1;
-						int.TryParse( parts[ 2 ], out count );
-						blockSubTypes.Add( parts[ 1 ], count );
-						options.Add( "Sub Block Type Limit: " + parts[ 1 ], count.ToString( ) );
-					}
-				}
-			}
+	            if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasblocksubtype:" ) ) != null )
+	            {
+	                string[] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasblocksubtype:" ) ).Split( ':' );
+	                hasBlockSubType = true;
+	                options["Has Sub Block Type"] = "true";
 
-			Communication.SendPrivateInformation( userId, string.Format( "Scanning for ships with options: {0}", GetOptionsText( options ) ) );
+	                if ( parts.Length < 3 )
+	                {
+	                    blockSubTypes.Add( parts[1], 1 );
+	                    options.Add( "Sub Block Type: " + parts[1], "1" );
+	                }
+	                else
+	                {
+	                    int count = 1;
+	                    int.TryParse( parts[2], out count );
+	                    blockSubTypes.Add( parts[1], count );
+	                    options.Add( "Sub Block Type: " + parts[1], count.ToString( ) );
+	                }
+	            }
 
-			HashSet<MyEntity> entities = new HashSet<MyEntity>( );
-			Wrapper.GameAction( ( ) => entities = MyEntities.GetEntities( ) );
+	            if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "limitblocksubtype:" ) ) != null )
+	            {
+	                string[] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "limitblocksubtype:" ) ).Split( ':' );
+	                hasBlockSubTypeLimits = true;
+	                options["Has Sub Block Type Limits"] = "true";
 
-			HashSet<MyEntity> entitiesToConfirm = new HashSet<MyEntity>( );
-			HashSet<MyEntity> entitiesUnconnected = new HashSet<MyEntity>( );
-			HashSet<MyEntity> entitiesFound = new HashSet<MyEntity>( );
-			foreach ( MyEntity entity in entities.Where(x => x is MyCubeGrid) )
-			{
-				if ( !( entity is MyCubeGrid ) )
-					continue;
+	                if ( parts.Length < 3 )
+	                {
+	                    blockSubTypes.Add( parts[1], 1 );
+	                    options.Add( "Sub Block Type Limit: " + parts[1], "1" );
+	                }
+	                else
+	                {
+	                    int count = 1;
+	                    int.TryParse( parts[2], out count );
+	                    blockSubTypes.Add( parts[1], count );
+	                    options.Add( "Sub Block Type Limit: " + parts[1], count.ToString( ) );
+	                }
+	            }
 
-				MyCubeGrid grid = (MyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder;
-				try
-				{
-					gridBuilder = (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder( );
-				}
-				catch
-				{
-					continue;
-				}
+	            if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "physical" ) ) != null )
+	            {
+	                linkType = GridLinkTypeEnum.Physical;
+	            }
+	        }
 
-				//CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(grid.EntityId);
+	        Communication.SendPrivateInformation( userId, string.Format( "Scanning for ships with options: {0}", GetOptionsText( options ) ) );
 
-				if ( PluginSettings.Instance.LoginEntityWhitelist.Contains( entity.EntityId.ToString( ) ) || PluginSettings.Instance.LoginEntityWhitelist.Contains( entity.DisplayName ) )
-					continue;
+	        HashSet<MyEntity> entities = new HashSet<MyEntity>( );
+	        Wrapper.GameAction( ( ) => entities = MyEntities.GetEntities( ) );
 
-				if ( hasDisplayName && displayName != "" )
-				{
-					if ( !hasDisplayNameExact && entity.DisplayName.Contains( displayName ) )
-						entitiesToConfirm.Add( entity );
+	        HashSet<MyEntity> entitiesToConfirm = new HashSet<MyEntity>( );
+	        HashSet<MyEntity> entitiesUnconnected = new HashSet<MyEntity>( );
+	        HashSet<MyEntity> entitiesFound = new HashSet<MyEntity>( );
+	        HashSet<List<MyCubeGrid>> groupsFound = new HashSet<List<MyCubeGrid>>( );
+	        foreach ( MyEntity entity in entities.Where( x => x is MyCubeGrid ) )
+	        {
+	            MyCubeGrid grid = entity as MyCubeGrid;
+	            if ( grid == null )
+	                continue;
 
-					if ( hasDisplayNameExact && entity.DisplayName.Equals( displayName ) )
-						entitiesToConfirm.Add( entity );
-				}
-				else if ( ignoreOwnership )
-				{
-					entitiesToConfirm.Add( entity );
-				}
-				else if ( requiresOwner && HasOwner( gridBuilder ) )
-				{
-					entitiesToConfirm.Add( entity );
-				}
-				else if ( !requiresOwner && !HasOwner( gridBuilder ) )
-				{
-					entitiesToConfirm.Add( entity );
-				}
-			}
+	            //CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(grid.EntityId);
 
-			Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
-			GetGridsUnconnected( entitiesUnconnected, entitiesToConfirm );
-			foreach ( MyEntity entity in entitiesUnconnected )
-			{
-				subTypeDict.Clear( );
-				MyObjectBuilder_CubeGrid grid = (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( );
-				bool found = false;
-				foreach ( MyObjectBuilder_CubeBlock block in grid.CubeBlocks )
-				{
-					if ( requiresFunctional )
-					{
-						if ( block is MyObjectBuilder_FunctionalBlock )
-						{
-							if ( debug && !found )
-								Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which has a functional block.  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count ) );
+	            if ( PluginSettings.Instance.LoginEntityWhitelist.Contains( entity.EntityId.ToString( ) ) || PluginSettings.Instance.LoginEntityWhitelist.Contains( entity.DisplayName ) )
+	                continue;
 
-							found = true;
-						}
-					}
+	            if ( hasDisplayName && displayName != "" )
+	            {
+	                if ( !hasDisplayNameExact && entity.DisplayName.Contains( displayName ) )
+	                    entitiesToConfirm.Add( entity );
 
-					if ( requiresTerminal )
-					{
-						if ( block is MyObjectBuilder_TerminalBlock )
-						{
-							if ( debug && !found )
-								Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which has a terminal block.  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count ) );
+	                if ( hasDisplayNameExact && entity.DisplayName.Equals( displayName ) )
+	                    entitiesToConfirm.Add( entity );
+	            }
+	            else if ( ignoreOwnership )
+	            {
+	                entitiesToConfirm.Add( entity );
+	            }
+	            else if ( requiresOwner && grid.BigOwners.Count > 0 )
+	            {
+	                entitiesToConfirm.Add( entity );
+	            }
+	            else if ( !requiresOwner && grid.BigOwners.Count == 0 )
+	            {
+	                entitiesToConfirm.Add( entity );
+	            }
+	        }
 
-							found = true;
-						}
-					}
+	        Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
+
+	        groupsFound = GetGroups( linkType, entitiesToConfirm );
+
+	        foreach ( var group in groupsFound )
+	        {
+	            foreach ( MyCubeGrid grid in group )
+	            {
+	                subTypeDict.Clear( );
+	                MyEntity entity = (MyEntity)grid;
+	                bool found = false;
+	                foreach ( MySlimBlock slimBlock in grid.CubeBlocks )
+	                {
+	                    if ( slimBlock?.FatBlock == null )
+	                        continue;
+
+	                    MyCubeBlock block = slimBlock.FatBlock;
+
+	                    if ( requiresFunctional )
+	                    {
+	                        if ( block is MyFunctionalBlock )
+	                        {
+	                            if ( debug && !found )
+	                                Communication.SendPrivateInformation( userId, $"Found grid '{entity.DisplayName}' ({entity.EntityId}) which has a functional block.  BlockCount={( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count}" );
+
+	                            found = true;
+	                        }
+	                    }
+
+	                    if ( requiresTerminal )
+	                    {
+	                        if ( block is MyTerminalBlock )
+	                        {
+	                            if ( debug && !found )
+	                                Communication.SendPrivateInformation( userId, $"Found grid '{entity.DisplayName}' ({entity.EntityId}) which has a terminal block.  BlockCount={( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count}" );
+
+	                            found = true;
+	                        }
+	                    }
 
 
-					if ( requiresPower )
-					{
-						if ( DoesBlockSupplyPower( block ) )
-						{
-							if ( debug && !found )
-								Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which has power.  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count ) );
+	                    if ( requiresPower )
+	                    {
+	                        if ( DoesBlockSupplyPower( block ) )
+	                        {
+	                            if ( debug && !found )
+	                                Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which has power.  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count ) );
 
-							found = true;
-						}
-					}
+	                            found = true;
+	                        }
+	                    }
 
-					if ( hasBlockSubType || hasBlockSubTypeLimits )
-					{
-						string subTypeName = block.GetId( ).SubtypeName;
-						if ( subTypeDict.ContainsKey( subTypeName ) )
-							subTypeDict[ subTypeName ] = subTypeDict[ subTypeName ] + 1;
-						else
-							subTypeDict.Add( subTypeName, 1 );
-					}
-				}
+	                    if ( hasBlockSubType || hasBlockSubTypeLimits )
+	                    {
+	                        string subTypeName = ((IMyCubeBlock)block).BlockDefinition.SubtypeName;
+	                        if ( subTypeDict.ContainsKey( subTypeName ) )
+	                            subTypeDict[subTypeName] = subTypeDict[subTypeName] + 1;
+	                        else
+	                            subTypeDict.Add( subTypeName, 1 );
+	                    }
+	                }
 
-				if ( hasBlockSubType )
-				{
-					foreach ( KeyValuePair<string, int> p in subTypeDict )
-					{
-						foreach ( KeyValuePair<string, int> s in blockSubTypes )
-						{
-							if ( p.Key.ToLower( ).Contains( s.Key.ToLower( ) ) )
-							{
-								if ( p.Value >= s.Value )
-								{
-									if ( debug )
-										Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which contains at least {4} of block type {3} ({5}).  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count, p.Key, s.Value, p.Value ) );
+	                if ( hasBlockSubType )
+	                {
+	                    foreach ( KeyValuePair<string, int> p in subTypeDict )
+	                    {
+	                        foreach ( KeyValuePair<string, int> s in blockSubTypes )
+	                        {
+	                            if ( p.Key.ToLower( ).Contains( s.Key.ToLower( ) ) )
+	                            {
+	                                if ( p.Value >= s.Value )
+	                                {
+	                                    if ( debug )
+	                                        Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which contains at least {4} of block type {3} ({5}).  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count, p.Key, s.Value, p.Value ) );
 
-									found = true;
-									break;
-								}
-							}
-						}
-					}
-				}
+	                                    found = true;
+	                                    break;
+	                                }
+	                            }
+	                        }
+	                    }
+	                }
 
-				if ( hasBlockSubTypeLimits && found )
-				{
-					foreach ( KeyValuePair<string, int> p in subTypeDict )
-					{
-						foreach ( KeyValuePair<string, int> s in blockSubTypes )
-						{
-							if ( p.Key.ToLower( ).Contains( s.Key.ToLower( ) ) )
-							{
-								if ( p.Value > s.Value )
-								{
-									if ( found )
-										found = false;
+	                if ( hasBlockSubTypeLimits && found )
+	                {
+	                    foreach ( KeyValuePair<string, int> p in subTypeDict )
+	                    {
+	                        foreach ( KeyValuePair<string, int> s in blockSubTypes )
+	                        {
+	                            if ( p.Key.ToLower( ).Contains( s.Key.ToLower( ) ) )
+	                            {
+	                                if ( p.Value > s.Value )
+	                                {
+	                                    if ( found )
+	                                        found = false;
 
-									Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which is over limit of block type {3} at {4}.  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count, s.Key, p.Value ) );
-									break;
-								}
-							}
-						}
-					}
-				}
+	                                    Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which is over limit of block type {3} at {4}.  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count, s.Key, p.Value ) );
+	                                    break;
+	                                }
+	                            }
+	                        }
+	                    }
+	                }
 
-				if ( !found )
-					entitiesFound.Add( entity );
-			}
+	                if ( !found )
+	                    entitiesFound.Add( entity );
+	            }
+	        }
 
-			foreach ( MyEntity entity in entitiesFound )
+	foreach ( MyEntity entity in entitiesFound )
 			{
 				Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which has unconnected and has parameters specified.  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count ) );
 			}
@@ -395,7 +430,6 @@
 			Communication.SendPrivateInformation( userId, string.Format( "Found {0} grids considered to be trash", entitiesFound.Count ) );
 			return entitiesFound;
 		}
-        */
 
 		public static HashSet<MyEntity> ScanGrids( ulong userId, string[ ] words )
 		{
@@ -425,7 +459,6 @@
 			bool debug = false;
 			bool isOwnedBy = false;
 			bool quiet = false;
-            bool safeMode = true;
 			bool requireBlockCount = false;
 			bool requireBlockCountLess = false;
 			bool isBlockSize = false;
@@ -441,6 +474,8 @@
 			int blockCount = 0;
 			int blockCountLess = 0;
 			int blockSize = 0;
+            GridLinkTypeEnum connectionType = GridLinkTypeEnum.Physical;
+
 			if ( words.Any( ) )
 			{
 				if ( words.FirstOrDefault( x => x.ToLower( ) == "debug" ) != null )
@@ -455,13 +490,19 @@
 					quiet = true;
 				}
 
-                if ( words.FirstOrDefault( x => x.ToLower( ) == "unsafe") != null )
+			    if ( words.FirstOrDefault( x => x.ToLower( ) == "physical" ) != null )
+			    {
+			        options.Add( "Physical connection", "true" );
+			        connectionType = GridLinkTypeEnum.Physical;
+			    }
+
+                if (words.FirstOrDefault(x => x.ToLower() == "logical") != null)
                 {
-                    options.Add( "Unsafe", "true" );
-                    safeMode = false;
+                    options.Add("Logical connection", "true");
+                    connectionType = GridLinkTypeEnum.Logical;
                 }
 
-				if ( words.SingleOrDefault( x => x.ToLower( ) == "ownership" ) != null )
+                if ( words.SingleOrDefault( x => x.ToLower( ) == "ownership" ) != null )
 				{
 					options.Add( "Ownership", "true" );
 					owner = 2;
@@ -734,272 +775,300 @@
 			}
 
 			if ( !quiet )
-				Communication.SendPrivateInformation( userId, string.Format( "Scanning for ships with options: {0}", GetOptionsText( options ) ) );
+				Communication.SendPrivateInformation( userId, $"Scanning for ships with options: {GetOptionsText( options )}" );
                         
 			HashSet<MyEntity> entities = new HashSet<MyEntity>( );
             if(ExtenderOptions.IsDebugging)
                 Log.Info( "getting grids" );
-            Wrapper.GameAction( ( ) => entities = MyEntities.GetEntities());
+		    HashSet<List<MyCubeGrid>> groups = GetGroups( connectionType );
             if (ExtenderOptions.IsDebugging)
                 Log.Info( "got grids" );
-
-            HashSet<MyEntity> entitiesToConfirm = new HashSet<MyEntity>( );
-			HashSet<MyEntity> entitiesUnconnected = new HashSet<MyEntity>( );
+            
 			HashSet<MyEntity> entitiesFound = new HashSet<MyEntity>( );
-			foreach ( MyEntity entity in entities )
-			{
-				if ( !( entity is MyCubeGrid ) )
-					continue;
-
-				MyCubeGrid grid = (MyCubeGrid)entity;
-				if ( PluginSettings.Instance.LoginEntityWhitelist.Contains( entity.EntityId.ToString( ) ) || PluginSettings.Instance.LoginEntityWhitelist.Contains( entity.DisplayName ) )
-					continue;
-
-
-				if ( hasDisplayName && displayName != string.Empty )
-				{
-					if ( !hasDisplayNameExact && entity.DisplayName.Contains( displayName ) )
-						entitiesToConfirm.Add( entity );
-
-					if ( hasDisplayNameExact && entity.DisplayName.Equals( displayName ) )
-						entitiesToConfirm.Add( entity );
-				}
-				else if ( hasCustomName && HasCustomName( grid, customName, hasCustomNameExact ) )
-				{
-					entitiesToConfirm.Add( entity );
-				}
-				else if ( hasCustomName )
-				{
-					continue;
-				}
-				else if ( isOwnedBy && ownedByPlayerId > 0 && grid.SmallOwners.Contains( ownedByPlayerId ) )
-				{
-					entitiesToConfirm.Add( entity );
-				}
-				else if ( !isOwnedBy && owner == 0 )
-				{
-					entitiesToConfirm.Add( entity );
-				}
-				else if ( !isOwnedBy && owner == 2 && grid.SmallOwners.Any(  ) )
-				{
-					entitiesToConfirm.Add( entity );
-				}
-				else if ( !isOwnedBy && owner == 1 && !grid.SmallOwners.Any(  ) )
-				{
-					entitiesToConfirm.Add( entity );
-				}
-			}
-			Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
+            HashSet<List<MyCubeGrid>> groupsFound=  new HashSet<List<MyCubeGrid>>();
+            HashSet<List<MyCubeGrid>> groupsToConfirm = new HashSet<List<MyCubeGrid>>();
+		    Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
 			Dictionary<string, int> typeDict = new Dictionary<string, int>( );
 			List<string> checkList = new List<string>( );
+
+		    foreach ( var group in groups )
+		    {
+		        if ( power == 1 && !DoesGroupHavePowerSupply( group ) )
+		            groupsFound.Add( group );
+		        if ( power == 2 && DoesGroupHavePowerSupply( group ) )
+		            groupsFound.Add( group );
+		        if ( owner == 1 && !group.Any( x => x.BigOwners.Count > 0 ) )
+		            groupsFound.Add( group );
+		    }
             
-                entitiesUnconnected = entitiesToConfirm;
+            /*
+		    foreach ( var group in GetGroups( connectionType, entities ) )
+		    {
+		        foreach ( MyCubeGrid grid in group )
+		        {
+		            MyEntity entity = (MyEntity)grid;
+                    
+		            if ( PluginSettings.Instance.LoginEntityWhitelist.Contains( entity.EntityId.ToString( ) ) || PluginSettings.Instance.LoginEntityWhitelist.Contains( entity.DisplayName ) )
+		                continue;
+
+
+		            if ( hasDisplayName && displayName != string.Empty )
+		            {
+		                if ( !hasDisplayNameExact && entity.DisplayName.Contains( displayName ) )
+		                {
+		                    groupsToConfirm.Add( group );
+		                    break;
+		                }
+
+		                if ( hasDisplayNameExact && entity.DisplayName.Equals( displayName ) )
+		                {
+		                    groupsToConfirm.Add( group );
+		                    break;
+		                }
+		            }
+		            else if ( hasCustomName && HasCustomName( grid, customName, hasCustomNameExact ) )
+		            {
+		                groupsToConfirm.Add( group );
+                        break;
+		            }
+		            else if ( hasCustomName )
+		            {
+		                continue;
+		            }
+		            else if ( isOwnedBy && ownedByPlayerId > 0 && grid.SmallOwners.Contains( ownedByPlayerId ) )
+                    {
+                        groupsToConfirm.Add(group);
+                        break;
+                    }
+		            else if ( !isOwnedBy && owner == 0 )
+                    {
+                        groupsToConfirm.Add(group);
+                        break;
+                    }
+		            else if ( !isOwnedBy && owner == 2 && grid.SmallOwners.Any( ) )
+                    {
+                        groupsToConfirm.Add(group);
+                        break;
+                    }
+		            else if ( !isOwnedBy && owner == 1 && !grid.SmallOwners.Any( ) )
+                    {
+                        groupsToConfirm.Add(group);
+                        break;
+                    }
+		        }
+		    }
+            
             
             //int blocks = 0;
-            
 
-            foreach(MyEntity entity in entitiesUnconnected)
-            {
-                subTypeDict.Clear( );
-				typeDict.Clear( );
-				checkList.Clear( );
-				MyCubeGrid grid = entity as MyCubeGrid;
+		    foreach ( var group in groupsToConfirm )
+		    {
+		        foreach ( MyCubeGrid grid in group)
+		        {
+		            MyEntity entity = (MyEntity)grid;
+		            subTypeDict.Clear( );
+		            typeDict.Clear( );
+		            checkList.Clear( );
 
-                if (grid == null)
-                    continue;
-                
-				if ( online == 1 ) // notonline
-				{
-					bool foundOnline = false;
-					foreach ( ulong player in PlayerManager.Instance.ConnectedPlayers )
-					{
-						long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( player );
-						if ( playerId < 1 )
-							continue;
+		            if ( grid == null )
+		                continue;
 
-						if ( grid.SmallOwners.Contains( playerId ) )
-						{
-							foundOnline = true;
-							break;
-						}
-					}
+		            if ( online == 1 ) // notonline
+		            {
+		                bool foundOnline = false;
+		                foreach ( ulong player in PlayerManager.Instance.ConnectedPlayers )
+		                {
+		                    long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( player );
+		                    if ( playerId < 1 )
+		                        continue;
 
-					if ( foundOnline )
-						continue;
-				}
-				else if ( online == 2 ) // online
-				{
-					bool foundOnline = true;
-					foreach ( ulong player in PlayerManager.Instance.ConnectedPlayers )
-					{
-						long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( player );
-						if ( playerId < 1 )
-							continue;
+		                    if ( grid.SmallOwners.Contains( playerId ) )
+		                    {
+		                        foundOnline = true;
+		                        break;
+		                    }
+		                }
 
-						if ( grid.SmallOwners.Contains( playerId ) )
-						{
-							foundOnline = false;
-							break;
-						}
-					}
+		                if ( foundOnline )
+		                    continue;
+		            }
+		            else if ( online == 2 ) // online
+		            {
+		                bool foundOnline = true;
+		                foreach ( ulong player in PlayerManager.Instance.ConnectedPlayers )
+		                {
+		                    long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( player );
+		                    if ( playerId < 1 )
+		                        continue;
 
-					if ( foundOnline )
-						continue;
-				}
+		                    if ( grid.SmallOwners.Contains( playerId ) )
+		                    {
+		                        foundOnline = false;
+		                        break;
+		                    }
+		                }
 
-				bool found = true;
-				foreach ( MySlimBlock slimBlock in grid.CubeBlocks )
-				{
-                    MyFunctionalBlock block = slimBlock?.FatBlock as MyFunctionalBlock;
-				    if (block == null)
-				        continue;
-                    
-					if ( functional != 0 )
-					{
-							//							if (debug && !found)
-							//								Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which has a functional block.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count));
+		                if ( foundOnline )
+		                    continue;
+		            }
 
-							if ( !checkList.Contains( "functional" ) )
-								checkList.Add( "functional" );
-						}
+		            bool found = true;
+		            foreach ( MySlimBlock slimBlock in grid.CubeBlocks )
+		            {
+		                MyFunctionalBlock block = slimBlock?.FatBlock as MyFunctionalBlock;
+		                if ( block == null )
+		                    continue;
 
-					if ( terminal != 0 )
-					{
-							//if (debug && !found)
-							//	Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which has a terminal block.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count));
+		                if ( functional != 0 )
+		                {
+		                    //							if (debug && !found)
+		                    //								Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which has a functional block.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count));
 
-							if ( !checkList.Contains( "terminal" ) )
-								checkList.Add( "terminal" );
-						
-					}
+		                    if ( !checkList.Contains( "functional" ) )
+		                        checkList.Add( "functional" );
+		                }
 
-					if ( power != 0 )
-					{
-						if ( DoesBlockSupplyPower( block ) )
-						{
-							//if (debug && !found)
-							//	Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which has power.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count));
+		                if ( terminal != 0 )
+		                {
+		                    //if (debug && !found)
+		                    //	Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which has a terminal block.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count));
 
-							if ( !checkList.Contains( "power" ) )
-								checkList.Add( "power" );
-						}
-					}
+		                    if ( !checkList.Contains( "terminal" ) )
+		                        checkList.Add( "terminal" );
 
-					if ( hasBlockSubType || hasBlockSubTypeLimits )
-					{
-						string subTypeName = block.BlockDefinition.SubtypeName;
-						if ( subTypeDict.ContainsKey( subTypeName ) )
-							subTypeDict[ subTypeName ] = subTypeDict[ subTypeName ] + 1;
-						else
-							subTypeDict.Add( subTypeName, 1 );
-					}
+		                }
 
-					if ( includesBlockType || excludesBlockType )
-					{
-						string typeName = block.GetId( ).TypeId.ToString( );
-						if ( typeDict.ContainsKey( typeName ) )
-							typeDict[ typeName ] = typeDict[ typeName ] + 1;
-						else
-							typeDict.Add( typeName, 1 );
-					}
-				}
+		                if ( power != 0 )
+		                {
+		                    if ( DoesBlockSupplyPower( block ) )
+		                    {
+		                        //if (debug && !found)
+		                        //	Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which has power.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count));
 
-				if ( functional != 0 )
-				{
-					if ( !checkList.Contains( "functional" ) && functional == 2 )
-						found = false;
+		                        if ( !checkList.Contains( "power" ) )
+		                            checkList.Add( "power" );
+		                    }
+		                }
 
-					if ( checkList.Contains( "functional" ) && functional == 1 )
-						found = false;
-				}
+		                if ( hasBlockSubType || hasBlockSubTypeLimits )
+		                {
+		                    string subTypeName = ( (IMyCubeBlock)block ).BlockDefinition.SubtypeName;
+		                    if ( subTypeDict.ContainsKey( subTypeName ) )
+		                        subTypeDict[subTypeName] = subTypeDict[subTypeName] + 1;
+		                    else
+		                        subTypeDict.Add( subTypeName, 1 );
+		                }
 
-				if ( terminal != 0 )
-				{
-					if ( !checkList.Contains( "terminal" ) && terminal == 2 )
-						found = false;
+		                if ( includesBlockType || excludesBlockType )
+		                {
+		                    string typeName = ( (IMyCubeBlock)block ).BlockDefinition.TypeIdString;
+		                    if ( typeDict.ContainsKey( typeName ) )
+		                        typeDict[typeName] = typeDict[typeName] + 1;
+		                    else
+		                        typeDict.Add( typeName, 1 );
+		                }
+		            }
 
-					if ( checkList.Contains( "terminal" ) && terminal == 1 )
-						found = false;
-				}
+		            if ( functional != 0 )
+		            {
+		                if ( !checkList.Contains( "functional" ) && functional == 2 )
+		                    found = false;
 
-				if ( power != 0 )
-				{
-					if ( !checkList.Contains( "power" ) && power == 2 )
-						found = false;
+		                if ( checkList.Contains( "functional" ) && functional == 1 )
+		                    found = false;
+		            }
 
-					if ( checkList.Contains( "power" ) && power == 1 )
-						found = false;
-				}
+		            if ( terminal != 0 )
+		            {
+		                if ( !checkList.Contains( "terminal" ) && terminal == 2 )
+		                    found = false;
 
-				if ( hasBlockSubType )
-				{
-					found = ApplyBlockSubTypeFilter( userId, subTypeDict, blockSubTypes, debug, quiet, entity, found );
-				}
+		                if ( checkList.Contains( "terminal" ) && terminal == 1 )
+		                    found = false;
+		            }
 
-				if ( includesBlockType )
-				{
-					found = ApplyBlockInclusionFilter( userId, typeDict, blockTypes, debug, quiet, entity, found );
-				}
+		            if ( power != 0 )
+		            {
+		                if ( !checkList.Contains( "power" ) && power == 2 )
+		                    found = false;
 
-				if ( hasBlockSubTypeLimits && found )
-				{
-					found = ApplyBlockSubTypeExclusionFilter( userId, subTypeDict, blockSubTypes, found, quiet, debug, entity );
-				}
+		                if ( checkList.Contains( "power" ) && power == 1 )
+		                    found = false;
+		            }
 
-				if ( excludesBlockType && found )
-					found = ApplyBlockExclusionFilter( userId, typeDict, blockTypes, quiet, debug, entity );
+		            if ( hasBlockSubType )
+		            {
+		                found = ApplyBlockSubTypeFilter( userId, subTypeDict, blockSubTypes, debug, quiet, entity, found );
+		            }
 
-				if ( requireBlockCount && found && grid.CubeBlocks.Count < blockCount )
-				{
-					found = false;
-				}
+		            if ( includesBlockType )
+		            {
+		                found = ApplyBlockInclusionFilter( userId, typeDict, blockTypes, debug, quiet, entity, found );
+		            }
 
-				if ( requireBlockCountLess && found && grid.CubeBlocks.Count >= blockCountLess )
-				{
-					found = false;
-				}
+		            if ( hasBlockSubTypeLimits && found )
+		            {
+		                found = ApplyBlockSubTypeExclusionFilter( userId, subTypeDict, blockSubTypes, found, quiet, debug, entity );
+		            }
 
-				if ( isBlockSize && found && blockSize == 0 && grid.GridSizeEnum != MyCubeSize.Small )
-				{
-					found = false;
-				}
+		            if ( excludesBlockType && found )
+		                found = ApplyBlockExclusionFilter( userId, typeDict, blockTypes, quiet, debug, entity );
 
-				if ( isBlockSize && found && blockSize == 1 && grid.GridSizeEnum != MyCubeSize.Large )
-				{
-					found = false;
-				}
+		            if ( requireBlockCount && found && grid.CubeBlocks.Count < blockCount )
+		            {
+		                found = false;
+		            }
 
-				if ( isBlockSize && found && blockSize == 2 && ( grid.GridSizeEnum != MyCubeSize.Large || grid.GridSizeEnum == MyCubeSize.Large && !grid.IsStatic ) )
-				{
-					found = false;
-				}
+		            if ( requireBlockCountLess && found && grid.CubeBlocks.Count >= blockCountLess )
+		            {
+		                found = false;
+		            }
 
-				if ( isBlockSize && found && blockSize == 2 && ( grid.GridSizeEnum != MyCubeSize.Large || grid.GridSizeEnum == MyCubeSize.Large && grid.IsStatic ) )
-				{
-					found = false;
-				}
+		            if ( isBlockSize && found && blockSize == 0 && grid.GridSizeEnum != MyCubeSize.Small )
+		            {
+		                found = false;
+		            }
 
-				if ( found )
-					entitiesFound.Add( entity );
-			}
+		            if ( isBlockSize && found && blockSize == 1 && grid.GridSizeEnum != MyCubeSize.Large )
+		            {
+		                found = false;
+		            }
 
-			foreach ( MyEntity entity in entitiesFound )
-			{
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = SafeGetObjectBuilder( grid );
-				string ownerName = "none";
-				if ( GetBigOwners( gridBuilder ).Count > 0 )
-				{
-					long ownerId = GetBigOwners( gridBuilder ).First( );
-					ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
-				}
+		            if ( isBlockSize && found && blockSize == 2 && ( grid.GridSizeEnum != MyCubeSize.Large || grid.GridSizeEnum == MyCubeSize.Large && !grid.IsStatic ) )
+		            {
+		                found = false;
+		            }
 
-				if ( !quiet )
-					Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) (Owner: {2}) which has specified parameters.  BlockCount={3}", entity.DisplayName, entity.EntityId, ownerName, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count ) );
-			}
+		            if ( isBlockSize && found && blockSize == 2 && ( grid.GridSizeEnum != MyCubeSize.Large || grid.GridSizeEnum == MyCubeSize.Large && grid.IsStatic ) )
+		            {
+		                found = false;
+		            }
 
-			if ( !quiet )
-				Communication.SendPrivateInformation( userId, string.Format( "Found {0} grids", entitiesFound.Count ) );
+		            if ( found )
+		                groupsFound.Add( group );
+		        }
+		    }
+
+		    foreach ( var group in groupsFound )
+		    {
+		        foreach ( MyCubeGrid grid in group )
+		        {
+                    MyEntity entity = (MyEntity)grid;
+		            string ownerName = "none";
+		            if ( grid.BigOwners.Count > 0 )
+		            {
+		                long ownerId = grid.BigOwners.First( );
+		                ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
+		            }
+
+		            if ( !quiet )
+		                Communication.SendPrivateInformation( userId, $"Found grid '{entity.DisplayName}' ({entity.EntityId}) (Owner: {ownerName}) which has specified parameters.  BlockCount={grid.CubeBlocks.Count}" );
+		            entitiesFound.Add( entity );
+		        }
+		    }
+            */
+		    if ( !quiet )
+				Communication.SendPrivateInformation( userId, $"Found {entitiesFound.Count} grids" );
 
 			return entitiesFound;
 		}
@@ -1025,7 +1094,7 @@
 								                                      string.Format( "Exclusion: Found grid '{0}' ({1}) which excludes block type of {3} at {4}.  BlockCount={2}",
 								                                                     entity.DisplayName,
 								                                                     entity.EntityId,
-								                                                     ( (MyObjectBuilder_CubeGrid) entity.GetObjectBuilder( ) ).CubeBlocks.Count,
+								                                                     ((MyCubeGrid)entity).CubeBlocks.Count,
 								                                                     pairBlockTypesFilter.Key,
 								                                                     pairBlockTypesInGrid.Value ) );
 							}
@@ -1055,7 +1124,7 @@
 								                                      string.Format( "Found grid '{0}' ({1}) which contains at least {4} of block type {3} ({5}).  BlockCount={2}",
 								                                                     entity.DisplayName,
 								                                                     entity.EntityId,
-								                                                     ( (MyObjectBuilder_CubeGrid) entity.GetObjectBuilder( ) ).CubeBlocks.Count,
+                                                                                     ((MyCubeGrid)entity).CubeBlocks.Count,
 								                                                     pairBlockTypesInGrid.Key,
 								                                                     pairBlockTypesFilter.Value,
 								                                                     pairBlockTypesInGrid.Value ) );
@@ -1076,7 +1145,7 @@
 					                                      string.Format( "Found grid '{0}' ({1}) which does not contain block type.  BlockCount={2}",
 					                                                     entity.DisplayName,
 					                                                     entity.EntityId,
-					                                                     ( (MyObjectBuilder_CubeGrid) entity.GetObjectBuilder( ) ).CubeBlocks.Count ) );
+                                                                         ((MyCubeGrid)entity).CubeBlocks.Count ) );
 				}
 
 				found = false;
@@ -1101,7 +1170,7 @@
 								                                      string.Format( "Found grid '{0}' ({1}) which contains at least {4} of block type {3} ({5}).  BlockCount={2}",
 								                                                     entity.DisplayName,
 								                                                     entity.EntityId,
-								                                                     ( (MyObjectBuilder_CubeGrid) entity.GetObjectBuilder( ) ).CubeBlocks.Count,
+                                                                                     ((MyCubeGrid)entity).CubeBlocks.Count,
 								                                                     pairBlockTypesInGrid.Key,
 								                                                     pairBlockTypesFilter.Value,
 								                                                     pairBlockTypesInGrid.Value ) );
@@ -1122,7 +1191,7 @@
 					                                      string.Format( "Found grid '{0}' ({1}) which does not contain block type.  BlockCount={2}",
 					                                                     entity.DisplayName,
 					                                                     entity.EntityId,
-					                                                     ( (MyObjectBuilder_CubeGrid) entity.GetObjectBuilder( ) ).CubeBlocks.Count ) );
+                                                                         ((MyCubeGrid)entity).CubeBlocks.Count ) );
 				}
 
 				found = false;
@@ -1152,7 +1221,7 @@
 																	  string.Format( "Exclusion: Found grid '{0}' ({1}) which excludes block type of {3} at {4}.  BlockCount={2}",
 																					 entity.DisplayName,
 																					 entity.EntityId,
-																					 ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count,
+                                                                                     ((MyCubeGrid)entity).CubeBlocks.Count,
 																					 pairBlockTypesFilter.Key,
 																					 blockTypesInGrid.Value ) );
 							}
@@ -1174,12 +1243,12 @@
 					if ( !( entity is IMyCubeGrid ) )
 						continue;
 
-					MyObjectBuilder_CubeGrid gridBuilder = SafeGetObjectBuilder( (IMyCubeGrid)entity );
+					MyCubeGrid grid = ( (MyCubeGrid)entity );
 					long ownerId = 0;
 					string ownerName = "";
-					if ( GetBigOwners( gridBuilder ).Count > 0 )
+					if (grid.BigOwners.Count > 0 )
 					{
-						ownerId = GetBigOwners( gridBuilder ).First( );
+						ownerId = grid.BigOwners.First( );
 						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
 					}
 
@@ -1189,7 +1258,7 @@
 			} );
 		}
 
-		public static bool GetOwner( MyObjectBuilder_CubeGrid grid, out long ownerId )
+		/* public static bool GetOwner( MyObjectBuilder_CubeGrid grid, out long ownerId )
 		{
 			ownerId = 0;
 			foreach ( MyObjectBuilder_CubeBlock block in grid.CubeBlocks )
@@ -1206,36 +1275,34 @@
 			}
 
 			return false;
-		}
+		}*/
 
-		public static bool IsFullOwner( MyObjectBuilder_CubeGrid grid, long ownerId, IMyPlayer factionPlayer = null )
+		public static bool IsFullOwner( MyCubeGrid grid, long ownerId, IMyPlayer factionPlayer = null )
 		{
 			bool found = false;
-			foreach ( MyObjectBuilder_CubeBlock block in grid.CubeBlocks )
+			foreach ( MySlimBlock slimBlock in grid.CubeBlocks )
 			{
-				if ( !( block is MyObjectBuilder_TerminalBlock ) )
-					continue;
-
-				MyObjectBuilder_TerminalBlock functional = (MyObjectBuilder_TerminalBlock)block;
+			    if ( slimBlock?.FatBlock == null )
+			        continue;
+                
+				MyTerminalBlock functional = (MyTerminalBlock)slimBlock.FatBlock;
 				if ( factionPlayer == null )
 				{
-					if ( functional.Owner != 0 && functional.Owner != ownerId )
-					{
-						return false;
-					}
-					else if ( functional.Owner != 0 )
-					{
+					if ( functional.OwnerId != 0)
+
+                        if ( functional.OwnerId != ownerId)
+                            return false;
+
 						found = true;
-					}
 				}
 				else
 				{
-					MyRelationsBetweenPlayerAndBlock relation = factionPlayer.GetRelationTo( functional.Owner );
-					if ( functional.Owner != 0 && ( relation == MyRelationsBetweenPlayerAndBlock.Owner || relation == MyRelationsBetweenPlayerAndBlock.FactionShare ) )
+					MyRelationsBetweenPlayerAndBlock relation = factionPlayer.GetRelationTo( functional.OwnerId );
+					if ( functional.OwnerId != 0 && ( relation == MyRelationsBetweenPlayerAndBlock.Owner || relation == MyRelationsBetweenPlayerAndBlock.FactionShare ) )
 					{
 						found = true;
 					}
-					else if ( functional.Owner != 0 && relation != MyRelationsBetweenPlayerAndBlock.FactionShare && relation != MyRelationsBetweenPlayerAndBlock.FactionShare )
+					else if ( functional.OwnerId != 0 && relation != MyRelationsBetweenPlayerAndBlock.FactionShare && relation != MyRelationsBetweenPlayerAndBlock.FactionShare )
 					{
 						return false;
 					}
@@ -1246,7 +1313,7 @@
 		}
 
 		// might not work? -- updated, needs testing
-		public static List<long> GetBigOwners( MyObjectBuilder_CubeGrid grid )
+		/*public static List<long> GetBigOwners( MyObjectBuilder_CubeGrid grid )
 		{
 			Dictionary<long, int> ownerList = new Dictionary<long, int>( );
 			foreach ( MyObjectBuilder_CubeBlock block in grid.CubeBlocks )
@@ -1262,7 +1329,7 @@
 
 			int count = ownerList.OrderBy( x => x.Value ).Select( x => x.Value ).FirstOrDefault( );
 			return ownerList.OrderBy( x => x.Value ).Where( x => x.Value == count ).Select( x => x.Key ).ToList( );
-		}
+		}*/
 
 		/*public static List<long> GetAllOwners( MyObjectBuilder_CubeGrid grid )
 		{
@@ -1355,16 +1422,27 @@
                 return true;
             }
 
-
             return false;
 		}
 
 		public static bool DoesGridHavePowerSupply( MyCubeGrid grid )
 		{
-			return grid.CubeBlocks.Any( x => DoesBlockSupplyPower(x.FatBlock) );
+		    return grid.CubeBlocks.Any( x => DoesBlockSupplyPower( x.FatBlock ) );
 		}
 
-		public static MyObjectBuilder_CubeGrid SafeGetObjectBuilder( IMyCubeGrid grid )
+        public static bool DoesGroupHavePowerSupply(List<MyCubeGrid> group )
+        {
+            bool found = false;
+            foreach ( MyCubeGrid grid in group )
+            {
+                if ( DoesGridHavePowerSupply( grid ) )
+                    found = true;
+            }
+            return found;
+        }
+        
+
+		/*public static MyObjectBuilder_CubeGrid SafeGetObjectBuilder( IMyCubeGrid grid )
 		{
 			MyObjectBuilder_CubeGrid gridBuilder = null;
 			try
@@ -1378,7 +1456,7 @@
 			return gridBuilder;
 		}
 
-
+        
 		/// <summary>
 		/// This only returns one grid per connected grid.  So if a grid has a connector and 4 pistons, it will count as 1 grid, not 5.
 		/// </summary>
@@ -1533,7 +1611,9 @@
 			List<IMySlimBlock> blocks = new List<IMySlimBlock>( );
 			grid.GetBlocks( blocks, collect );
 			blockList.AddRange( blocks );
-		}
+		}*/
 	}
+
+    
 }
 

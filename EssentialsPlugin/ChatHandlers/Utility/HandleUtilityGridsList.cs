@@ -10,6 +10,7 @@
 	using VRage.ModAPI;
 	using VRageMath;
     using Sandbox.Game;
+	using Sandbox.Game.Entities;
 	using VRage.Game;
 	using VRage.Game.ModAPI;
 
@@ -82,21 +83,20 @@
 			int count = 0;
 			foreach (IMyEntity entity in entities)
 			{
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
+				MyCubeGrid grid = entity as MyCubeGrid;
+                
+                if(grid==null)
+                    continue;
 
-				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
-				if (grid == null)
-					continue;
-
-				if (CubeGrids.GetAllOwners(gridBuilder).Contains(playerId))
+				if (grid.SmallOwners.Contains(playerId))
 				{
 					if(result != "")
 						result += "\r\n";
 
-					if(CubeGrids.IsFullOwner(gridBuilder, playerId, player) && !dialog)
+					if(CubeGrids.IsFullOwner(grid, playerId, player) && !dialog)
 						result += string.Format("Grid '{0}' at {2}", grid.DisplayName, grid.EntityId, ShowCoordinates(entity.GetPosition()));
-					else if (CubeGrids.IsFullOwner(gridBuilder, playerId, player) && dialog)
-						result += string.Format("{0} - {1} - {2}bl - {3}", grid.DisplayName, ShowCoordinates(entity.GetPosition()), gridBuilder.CubeBlocks.Count, gridBuilder.GridSizeEnum);
+					//else if (CubeGrids.IsFullOwner(grid, playerId, player) && dialog)
+						//result += string.Format("{0} - {1} - {2}bl - {3}", grid.DisplayName, ShowCoordinates(entity.GetPosition()), gridBuilder.CubeBlocks.Count, gridBuilder.GridSizeEnum);
 					else
 						result += string.Format("Grid '{0}'", grid.DisplayName, grid.EntityId);
 

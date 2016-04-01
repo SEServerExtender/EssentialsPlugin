@@ -4,6 +4,8 @@
 	using EssentialsPlugin.Utility;
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.Common.ObjectBuilders.Definitions;
+	using Sandbox.Game.Entities;
+	using Sandbox.Game.Entities.Cube;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
 	using VRage.Game;
@@ -84,15 +86,17 @@
 				if (!(entity is IMyCubeGrid))
 					continue;
 
-				IMyCubeGrid grid = (IMyCubeGrid)entity;
-				MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(grid);
-				if (gridBuilder == null)
-					continue;
+				MyCubeGrid grid = (MyCubeGrid)entity;
 
-				foreach (MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
+				foreach (MySlimBlock slimBlock in grid.CubeBlocks)
 				{
-					if (block.Owner != 0 && !owners.Contains(block.Owner))
-						owners.Add(block.Owner);
+				    MyFunctionalBlock block = slimBlock?.FatBlock as MyFunctionalBlock;
+
+				    if ( block == null )
+				        continue;
+
+					if (block.OwnerId != 0 && !owners.Contains(block.OwnerId))
+						owners.Add(block.OwnerId);
 				}
 			}
 			return owners;
