@@ -7,8 +7,10 @@
     using Sandbox.Game.World;
     using Sandbox.ModAPI;
     using Utility;
+    using VRage.Game;
     using VRage.Game.ModAPI;
     using VRage.ModAPI;
+    using VRage.Serialization;
 
     public class HandleAdminIdentityCleanup : ChatHandlerBase
     {
@@ -70,6 +72,16 @@
             }
 
             Dictionary<long, MyIdentity>.ValueCollection myIdentities = playerCollection.GetAllIdentities( );
+            
+            Wrapper.GameAction( ( ) =>
+                                {
+                                    MyObjectBuilder_Checkpoint checkpoint = MySession.Static.GetCheckpoint( MySession.Static.Name );
+                                    
+                                    foreach ( var player in checkpoint.AllPlayersData.Dictionary.Values )
+                                    {
+                                        player.CameraData = new SerializableDictionary<long, MyObjectBuilder_Player.CameraControllerSettings>( );
+                                    }
+                                } );
 
             foreach ( MyIdentity identity in myIdentities )
             {
