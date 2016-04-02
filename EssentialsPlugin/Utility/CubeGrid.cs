@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.Eventing.Reader;
     using System.Linq;
     using System.Threading;
     using NLog;
@@ -473,7 +474,8 @@
 			long ownedByPlayerId = 0;
 			int blockCount = 0;
 			int blockCountLess = 0;
-			int blockSize = 0;
+		    bool testStatic = false;
+		    MyCubeSize blockSize = MyCubeSize.Large;
             GridLinkTypeEnum connectionType = GridLinkTypeEnum.Physical;
 
 			if ( words.Any( ) )
@@ -738,25 +740,26 @@
 					{
 						options.Add( "Is Block Size", "small" );
 						isBlockSize = true;
-						blockSize = 0;
+						blockSize = MyCubeSize.Small;
 					}
 					else if ( parts[ 1 ].ToLower( ) == "large" )
 					{
 						options.Add( "Is Block Size", "large" );
 						isBlockSize = true;
-						blockSize = 1;
+						blockSize = MyCubeSize.Large;
 					}
 					else if ( parts[ 1 ].ToLower( ) == "station" )
 					{
 						options.Add( "Is Block Size", "station" );
 						isBlockSize = true;
-						blockSize = 2;
+						blockSize = MyCubeSize.Large;
+					    testStatic = true;
 					}
 					else if ( parts[ 1 ].ToLower( ) == "largeship" )
 					{
 						options.Add( "Is Block Size", "largeship" );
 						isBlockSize = true;
-						blockSize = 3;
+						blockSize = MyCubeSize.Large;
 					}
 				}
 
@@ -777,27 +780,66 @@
 			if ( !quiet )
 				Communication.SendPrivateInformation( userId, $"Scanning for ships with options: {GetOptionsText( options )}" );
                         
-			HashSet<MyEntity> entities = new HashSet<MyEntity>( );
-            if(ExtenderOptions.IsDebugging)
-                Log.Info( "getting grids" );
-		    HashSet<List<MyCubeGrid>> groups = GetGroups( connectionType );
-            if (ExtenderOptions.IsDebugging)
-                Log.Info( "got grids" );
-            
 			HashSet<MyEntity> entitiesFound = new HashSet<MyEntity>( );
-            HashSet<List<MyCubeGrid>> groupsFound=  new HashSet<List<MyCubeGrid>>();
+            HashSet<GridGroup> groupsFound = new HashSet<GridGroup>();
             HashSet<List<MyCubeGrid>> groupsToConfirm = new HashSet<List<MyCubeGrid>>();
 		    Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
 			Dictionary<string, int> typeDict = new Dictionary<string, int>( );
 			List<string> checkList = new List<string>( );
 
-		    foreach ( var group in groups )
+		    HashSet<MyEntity> entities = new HashSet<MyEntity>( );
+		    Wrapper.GameAction( ()=> entities = MyEntities.GetEntities(  ) );
+            HashSet<GridGroup> groups = GridGroup.GetGroups( entities, connectionType );
+
+		    foreach ( GridGroup group in groups )
 		    {
 		        if ( power == 1 && !DoesGroupHavePowerSupply( group ) )
 		            groupsFound.Add( group );
 		        if ( power == 2 && DoesGroupHavePowerSupply( group ) )
 		            groupsFound.Add( group );
-		        if ( owner == 1 && !group.Any( x => x.BigOwners.Count > 0 ) )
+
+		        if ( owner == 1 && group.BigOwners.Count == 0 )
+		            groupsFound.Add( group );
+		        if ( owner == 2 && group.BigOwners.Count > 0 )
+		            groupsFound.Add( group );
+
+		        if ( functional == 1 && !IsGroupFunctional( group ) )
+		            groupsFound.Add( group );
+		        if ( functional == 2 && IsGroupFunctional( group ) )
+		            groupsFound.Add( group );
+
+		        if ( terminal == 1 && !DoesGroupHaveTerminal( group ) )
+		            groupsFound.Add( group );
+		        if ( terminal == 2 && DoesGroupHaveTerminal( group ) )
+		            groupsFound.Add( group );
+
+		        if ( online == 1 && !AreOwnersOnline( group ) )
+		            groupsFound.Add( group );
+		        if ( online == 2 && AreOwnersOnline( group ) )
+		            groupsFound.Add( group );
+
+		        if ( hasDisplayName && DoesGroupHaveDisplayName( group, displayName, hasDisplayNameExact ) )
+		            groupsFound.Add( group );
+
+		        if ( hasCustomName && DoesGroupHaveCustomName( group, customName, hasCustomNameExact ) )
+		            groupsFound.Add( group );
+
+		        if ( isBlockSize && IsGroupGridSize( group, blockSize, testStatic ) )
+		            groupsFound.Add( group );
+
+		        if ( isOwnedBy && group.BigOwners.Count == 1 && group.BigOwners[0] == ownedByPlayerId )
+		            groupsFound.Add( group );
+
+		        if ( requireBlockCount && group.CubeBlocks.Count > blockCount )
+		            groupsFound.Add( group );
+
+		        if ( requireBlockCountLess && group.CubeBlocks.Count < blockCountLess )
+		            groupsFound.Add( group );
+
+		        if ( hasBlockSubType && blockSubTypes.Keys.Any( x => DoesGroupHaveBlockSubtype( group, x ) ) )
+		            groupsFound.Add( group );
+
+		        if ( excludesBlockType && !blockSubTypes.Keys.Any( x => DoesGroupHaveBlockSubtype( group, x ) ) )
 		            groupsFound.Add( group );
 		    }
             
@@ -1427,20 +1469,89 @@
 
 		public static bool DoesGridHavePowerSupply( MyCubeGrid grid )
 		{
-		    return grid.CubeBlocks.Any( x => DoesBlockSupplyPower( x.FatBlock ) );
+		    return grid.CubeBlocks.Any( x => DoesBlockSupplyPower( x?.FatBlock ) );
 		}
 
-        public static bool DoesGroupHavePowerSupply(List<MyCubeGrid> group )
+        public static bool DoesGroupHavePowerSupply(GridGroup group )
         {
-            bool found = false;
-            foreach ( MyCubeGrid grid in group )
-            {
-                if ( DoesGridHavePowerSupply( grid ) )
-                    found = true;
-            }
-            return found;
+            return group.CubeBlocks.Any( x => DoesBlockSupplyPower( x?.FatBlock )  );
         }
-        
+
+	    public static bool IsGroupFunctional( GridGroup group )
+	    {
+	        foreach ( MySlimBlock slimBlock in group.CubeBlocks )
+	        {
+	            MyFunctionalBlock block = slimBlock?.FatBlock as MyFunctionalBlock;
+	            if ( block == null )
+	                continue;
+	            if ( block.IsFunctional )
+	                return true;
+	        }
+	        return false;
+	    }
+
+	    public static bool DoesGroupHaveTerminal( GridGroup group )
+	    {
+	        return group.CubeBlocks.Any( x => (x?.FatBlock as MyTerminalBlock) != null );
+	    }
+
+	    public static bool AreOwnersOnline( GridGroup group )
+	    {
+	        foreach ( ulong steamId in PlayerManager.Instance.ConnectedPlayers )
+	        {
+	            long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( steamId );
+	            if ( group.SmallOwners.Contains( playerId ) )
+	                return true;
+	        }
+	        return false;
+	    }
+
+	    public static bool DoesGroupHaveDisplayName( GridGroup group, string displayName, bool partial = true )
+	    {
+	        if ( partial )
+	            return group.CubeBlocks.Any( x => x?.FatBlock != null && x.FatBlock.Name.ToLower( ).Contains( displayName.ToLower()));
+	        else
+	            return ( group.CubeBlocks.Any( x => x?.FatBlock != null && x.FatBlock.Name.ToLower( ) == displayName.ToLower( ) ) );
+	    }
+
+	    public static bool DoesGroupHaveCustomName( GridGroup group, string customName, bool partial = true )
+	    {
+	        if ( partial )
+	            return group.Nodes.Any( x => x.Name.ToLower( ).Contains( customName.ToLower( ) ) );
+	        else
+	            return group.Nodes.Any( x => x.Name.ToLower( ) == customName.ToLower( ) );
+	    }
+
+	    public static bool IsGroupGridSize( GridGroup group, MyCubeSize size, bool isStatic = false )
+	    {
+	        if( isStatic )
+	            return group.Nodes.Any( x => x.Physics!=null && x.Physics.IsStatic );
+            else
+	            return group.Nodes.Any( x => x.GridSizeEnum == size );
+	    }
+
+	    public static bool DoesGroupHaveBlockSubtype( GridGroup group, string subtype )
+	    {
+	        return group.CubeBlocks.Any( x => ( x?.FatBlock as IMyCubeBlock ) != null && ( (IMyCubeBlock)x.FatBlock ).BlockDefinition.SubtypeName.ToLower( ).Contains( subtype ) );
+	    }
+
+	    public static int GroupBlockSubtypeCount( GridGroup group, string subtype )
+	    {
+	        int result = 0;
+
+	        foreach ( MySlimBlock slimBlock in group.CubeBlocks )
+	        {
+	            IMyCubeBlock block = slimBlock?.FatBlock as IMyCubeBlock;
+
+	            if ( block == null )
+	                continue;
+
+	            if ( block.BlockDefinition.SubtypeName.ToLower( ).Contains( subtype ) )
+	                result++;
+	        }
+
+	        return result;
+	    }
 
 		/*public static MyObjectBuilder_CubeGrid SafeGetObjectBuilder( IMyCubeGrid grid )
 		{
