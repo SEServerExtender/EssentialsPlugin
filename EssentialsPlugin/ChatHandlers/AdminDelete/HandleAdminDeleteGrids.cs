@@ -45,43 +45,42 @@
 		}
 
 		// admin nobeacon scan
-		public override bool HandleCommand(ulong userId, string[] words)
-		{
-			HashSet<MyEntity> grids = CubeGrids.ScanGrids(userId, words);
+	    public override bool HandleCommand( ulong userId, string[] words )
+	    {
+	        HashSet<GridGroup> groups = CubeGrids.ScanGrids( userId, words );
 
-			bool confirm = true;
-			/*
+	        bool confirm = true;
+	        /*
 			if (words.FirstOrDefault(x => x.ToLower() == "confirm") != null)
 			{
 				confirm = true;
 			}
 			*/
-			int count = 0;
-			foreach (MyEntity entity in grids)
-			{
-				if (!(entity is IMyCubeGrid))
-					continue;
+	        int gridCount = 0;
+	        int groupCount = 0;
+	        foreach (GridGroup group in groups)
+            {
+	                long ownerId = 0;
+	                string ownerName = "";
+	                if (group.BigOwners.Count > 0)
+	                {
+	                    ownerId = group.BigOwners.First( );
+                    //TODO
+	                    ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
+	                }
 
-				MyCubeGrid grid = (MyCubeGrid)entity;
+	                if (confirm)
+	                    Log.Info( "Cleanup removed group with parent - Id: {0} Display: {1} OwnerId: {2} OwnerName: {3}",
+	                              group.Parent.EntityId, group.Parent.DisplayName, ownerId, ownerName );
 
-				if(confirm)
-					BaseEntityNetworkManager.BroadcastRemoveEntity(entity, true);
+                gridCount += group.Grids.Count;
+                groupCount++;
 
-				long ownerId = 0;
-				string ownerName = "";
-				if (grid.BigOwners.Count > 0)
-				{
-					ownerId = grid.BigOwners.First();
-					ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
-				}
+	                if (confirm)
+	                    group.Close(  );
+            }
 
-				if(confirm)
-					Log.Info( "Cleanup Removed Grid - Id: {0} Display: {1} OwnerId: {2} OwnerName: {3}", entity.EntityId, entity.DisplayName, ownerId, ownerName );
-
-				count++;
-			}
-
-			Communication.SendPrivateInformation(userId, string.Format("Operation deletes {0} grids", count));
+	    Communication.SendPrivateInformation(userId, $"Operation deletes {gridCount} grids in {groupCount} groups." );
 			return true;
 		}
 	}

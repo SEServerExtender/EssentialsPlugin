@@ -106,10 +106,14 @@
 				{
 					item.LastRan = DateTime.Now;
 					string command = item.ScanCommand + " quiet";
-					HashSet<MyEntity> entities = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
-					if ( entities.Count >= item.MaxCapacity )
+					HashSet<GridGroup> groups = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
+				    int gridsCount = 0;
+				    foreach (var group in groups)
+				        gridsCount += group.Grids.Count;
+
+                    if ( gridsCount >= item.MaxCapacity )
 					{
-						Communication.SendPublicInformation( string.Format( "[NOTICE]: Cleanup triggered.  ({0} of {1}) triggered grids found.  Cleanup will run in {2} minutes.  Reason: {3}", entities.Count, item.MaxCapacity, item.MinutesAfterCapacity, item.Reason ) );
+						Communication.SendPublicInformation( string.Format( "[NOTICE]: Cleanup triggered.  ({0} of {1}) triggered grids found.  Cleanup will run in {2} minutes.  Reason: {3}", gridsCount, item.MaxCapacity, item.MinutesAfterCapacity, item.Reason ) );
 						item.NotificationItemsRan.Clear( );
 						_triggerdItem = item;
 					}

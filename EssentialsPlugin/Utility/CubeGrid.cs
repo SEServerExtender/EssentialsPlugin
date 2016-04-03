@@ -432,418 +432,450 @@
 			return entitiesFound;
 		}
 
-		public static HashSet<MyEntity> ScanGrids( ulong userId, string[ ] words )
-		{
-			Dictionary<string, string> options = new Dictionary<string, string>( );
+	    public static HashSet<GridGroup> ScanGrids( ulong userId, string[] words )
+	    {
+	        Dictionary<string, string> options = new Dictionary<string, string>( );
 
-			// 0 - ignore 1 - no 2 - yes
-			// functional
-			// terminal
-			// ownership
-			// power
-			int functional = 0;
-			int terminal = 0;
-			int power = 0;
-			int owner = 0;
-			int online = 0;
+	        // 0 - ignore 1 - no 2 - yes
+	        // functional
+	        // terminal
+	        // ownership
+	        // power
+	        int functional = 0;
+	        int terminal = 0;
+	        int power = 0;
+	        int owner = 0;
+	        int online = 0;
 
-			// debug
-			// hasdisplayname
-			// blocksubtype
-			// blocksubtypelimit
-			bool hasDisplayName = false;
-			bool hasDisplayNameExact = false;
-			bool hasBlockSubType = false;
-			bool hasBlockSubTypeLimits = false;
-			bool includesBlockType = false;
-			bool excludesBlockType = false;
-			bool debug = false;
-			bool isOwnedBy = false;
-			bool quiet = false;
-			bool requireBlockCount = false;
-			bool requireBlockCountLess = false;
-			bool isBlockSize = false;
-			bool hasCustomName = false;
-			bool hasCustomNameExact = false;
+	        // debug
+	        // hasdisplayname
+	        // blocksubtype
+	        // blocksubtypelimit
+	        bool hasDisplayName = false;
+	        bool hasDisplayNameExact = false;
+	        bool hasBlockSubType = false;
+	        bool hasBlockSubTypeLimits = false;
+	        bool includesBlockType = false;
+	        bool excludesBlockType = false;
+	        bool debug = false;
+	        bool isOwnedBy = false;
+	        bool quiet = false;
+	        bool requireBlockCount = false;
+	        bool requireBlockCountLess = false;
+	        bool isBlockSize = false;
+	        bool hasCustomName = false;
+	        bool hasCustomNameExact = false;
 
-			string displayName = string.Empty;
-			string customName = string.Empty;
-			Dictionary<string, int> blockSubTypes = new Dictionary<string, int>( );
-			Dictionary<string, int> blockTypes = new Dictionary<string, int>( );
-			Dictionary<string, int> blockTypesExcluded = new Dictionary<string, int>( );
-			long ownedByPlayerId = 0;
-			int blockCount = 0;
-			int blockCountLess = 0;
-		    bool testStatic = false;
-		    MyCubeSize blockSize = MyCubeSize.Large;
-            GridLinkTypeEnum connectionType = GridLinkTypeEnum.Physical;
+	        string displayName = string.Empty;
+	        string customName = string.Empty;
+	        Dictionary<string, int> blockSubTypes = new Dictionary<string, int>( );
+	        Dictionary<string, int> blockTypes = new Dictionary<string, int>( );
+	        Dictionary<string, int> blockTypesExcluded = new Dictionary<string, int>( );
+	        long ownedByPlayerId = 0;
+	        int blockCount = 0;
+	        int blockCountLess = 0;
+	        bool testStatic = false;
+	        MyCubeSize blockSize = MyCubeSize.Large;
+	        GridLinkTypeEnum connectionType = GridLinkTypeEnum.Physical;
 
-			if ( words.Any( ) )
-			{
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "debug" ) != null )
-				{
-					options.Add( "Debug", "true" );
-					debug = true;
-				}
+	        if (words.Any( ))
+	        {
+	            if (words.FirstOrDefault( x => x.ToLower( ) == "debug" ) != null)
+	            {
+	                options.Add( "Debug", "true" );
+	                debug = true;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "quiet" ) != null )
-				{
-					options.Add( "Quiet", "true" );
-					quiet = true;
-				}
+	            if (words.FirstOrDefault( x => x.ToLower( ) == "quiet" ) != null)
+	            {
+	                options.Add( "Quiet", "true" );
+	                quiet = true;
+	            }
 
-			    if ( words.FirstOrDefault( x => x.ToLower( ) == "physical" ) != null )
-			    {
-			        options.Add( "Physical connection", "true" );
-			        connectionType = GridLinkTypeEnum.Physical;
-			    }
+	            if (words.FirstOrDefault( x => x.ToLower( ) == "physical" ) != null)
+	            {
+	                options.Add( "Physical connection", "true" );
+	                connectionType = GridLinkTypeEnum.Physical;
+	            }
 
-                if (words.FirstOrDefault(x => x.ToLower() == "logical") != null)
-                {
-                    options.Add("Logical connection", "true");
-                    connectionType = GridLinkTypeEnum.Logical;
-                }
+	            if (words.FirstOrDefault( x => x.ToLower( ) == "logical" ) != null)
+	            {
+	                options.Add( "Logical connection", "true" );
+	                connectionType = GridLinkTypeEnum.Logical;
+	            }
 
-                if ( words.SingleOrDefault( x => x.ToLower( ) == "ownership" ) != null )
-				{
-					options.Add( "Ownership", "true" );
-					owner = 2;
-				}
+	            if (words.SingleOrDefault( x => x.ToLower( ) == "ownership" ) != null)
+	            {
+	                options.Add( "Ownership", "true" );
+	                owner = 2;
+	            }
 
-				if ( words.SingleOrDefault( x => x.ToLower( ) == "noownership" ) != null )
-				{
-					options.Add( "Ownership", "false" );
-					owner = 1;
-				}
+	            if (words.SingleOrDefault( x => x.ToLower( ) == "noownership" ) != null)
+	            {
+	                options.Add( "Ownership", "false" );
+	                owner = 1;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "functional" ) != null )
-				{
-					options.Add( "Functional", "true" );
-					functional = 2;
-				}
+	            if (words.FirstOrDefault( x => x.ToLower( ) == "functional" ) != null)
+	            {
+	                options.Add( "Functional", "true" );
+	                functional = 2;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "nofunctional" ) != null )
-				{
-					options.Add( "Functional", "false" );
-					functional = 1;
-				}
+	            if (words.FirstOrDefault( x => x.ToLower( ) == "nofunctional" ) != null)
+	            {
+	                options.Add( "Functional", "false" );
+	                functional = 1;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "terminal" ) != null )
-				{
-					options.Add( "Terminal", "true" );
-					terminal = 2;
-				}
+	            if (words.FirstOrDefault( x => x.ToLower( ) == "terminal" ) != null)
+	            {
+	                options.Add( "Terminal", "true" );
+	                terminal = 2;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "noterminal" ) != null )
-				{
-					options.Add( "Terminal", "false" );
-					terminal = 1;
-				}
+	            if (words.FirstOrDefault( x => x.ToLower( ) == "noterminal" ) != null)
+	            {
+	                options.Add( "Terminal", "false" );
+	                terminal = 1;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "power" ) != null )
-				{
-					options.Add( "Has Power", "true" );
-					power = 2;
-				}
+	            if (words.FirstOrDefault( x => x.ToLower( ) == "power" ) != null)
+	            {
+	                options.Add( "Has Power", "true" );
+	                power = 2;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "nopower" ) != null )
-				{
-					options.Add( "Has Power", "false" );
-					power = 1;
-				}
+	            if (words.FirstOrDefault( x => x.ToLower( ) == "nopower" ) != null)
+	            {
+	                options.Add( "Has Power", "false" );
+	                power = 1;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "notonline" ) != null )
-				{
-					options.Add( "Online", "false" );
-					online = 1;
-				}
+	            if (words.FirstOrDefault( x => x.ToLower( ) == "notonline" ) != null)
+	            {
+	                options.Add( "Online", "false" );
+	                online = 1;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ) == "online" ) != null )
-				{
-					options.Add( "Online", "true" );
-					online = 2;
-				}
+	            if (words.FirstOrDefault( x => x.ToLower( ) == "online" ) != null)
+	            {
+	                options.Add( "Online", "true" );
+	                online = 2;
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ) != null )
-				{
-					string[ ] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ).Split( ':' );
-					if ( parts.Length > 1 )
-					{
-						hasDisplayName = true;
-						displayName = parts[ 1 ];
-						options.Add( "Matches Display Name Text", "true:" + displayName );
-						//Console.WriteLine("Here: {0}", parts[2]);
-						if ( parts.Length > 2 && parts[ 2 ].ToLower( ) == "exact" )
-						{
-							hasDisplayNameExact = true;
-							options.Add( "Matches Display Exactly", "true" );
-						}
-					}
-				}
+	            if (words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ) != null)
+	            {
+	                string[] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ).Split( ':' );
+	                if (parts.Length > 1)
+	                {
+	                    hasDisplayName = true;
+	                    displayName = parts[1];
+	                    options.Add( "Matches Display Name Text", "true:" + displayName );
+	                    //Console.WriteLine("Here: {0}", parts[2]);
+	                    if (parts.Length > 2 && parts[2].ToLower( ) == "exact")
+	                    {
+	                        hasDisplayNameExact = true;
+	                        options.Add( "Matches Display Exactly", "true" );
+	                    }
+	                }
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hascustomname:" ) ) != null )
-				{
-					string[ ] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hascustomname:" ) ).Split( ':' );
-					if ( parts.Length > 1 )
-					{
-						hasCustomName = true;
-						customName = parts[ 1 ];
-						options.Add( "Matches Custom Name Text", "true:" + displayName );
-						//Console.WriteLine("Here: {0}", parts[2]);
-						if ( parts.Length > 2 && parts[ 2 ].ToLower( ) == "exact" )
-						{
-							hasCustomNameExact = true;
-							options.Add( "Matches Custom Name Exactly", "true" );
-						}
-					}
-				}
+	            if (words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hascustomname:" ) ) != null)
+	            {
+	                string[] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hascustomname:" ) ).Split( ':' );
+	                if (parts.Length > 1)
+	                {
+	                    hasCustomName = true;
+	                    customName = parts[1];
+	                    options.Add( "Matches Custom Name Text", "true:" + displayName );
+	                    //Console.WriteLine("Here: {0}", parts[2]);
+	                    if (parts.Length > 2 && parts[2].ToLower( ) == "exact")
+	                    {
+	                        hasCustomNameExact = true;
+	                        options.Add( "Matches Custom Name Exactly", "true" );
+	                    }
+	                }
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "includesblocksubtype:" ) ) != null )
-				{
-					string[ ] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "includesblocksubtype:" ) ).Split( ':' );
-					hasBlockSubType = true;
-					options.Add( "Has Sub Block Type", "true" );
+	            if (words.FirstOrDefault( x => x.ToLower( ).StartsWith( "includesblocksubtype:" ) ) != null)
+	            {
+	                string[] parts =
+	                    words.FirstOrDefault( x => x.ToLower( ).StartsWith( "includesblocksubtype:" ) ).Split( ':' );
+	                hasBlockSubType = true;
+	                options.Add( "Has Sub Block Type", "true" );
 
-					if ( parts.Length < 3 )
-					{
-						blockSubTypes.Add( parts[ 1 ], 1 );
-						options.Add( "Sub Block Type: " + parts[ 1 ], "1" );
-					}
-					else
-					{
-						int count = 1;
-						int.TryParse( parts[ 2 ], out count );
-						blockSubTypes.Add( parts[ 1 ], count );
-						options.Add( "Sub Block Type: " + parts[ 1 ], count.ToString( ) );
-					}
-				}
+	                if (parts.Length < 3)
+	                {
+	                    blockSubTypes.Add( parts[1], 1 );
+	                    options.Add( "Sub Block Type: " + parts[1], "1" );
+	                }
+	                else
+	                {
+	                    int count = 1;
+	                    int.TryParse( parts[2], out count );
+	                    blockSubTypes.Add( parts[1], count );
+	                    options.Add( "Sub Block Type: " + parts[1], count.ToString( ) );
+	                }
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "excludesblocksubtype:" ) ) != null )
-				{
-					string[ ] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "excludesblocksubtype:" ) ).Split( ':' );
-					hasBlockSubTypeLimits = true;
-					options.Add( "Exclude Has Sub Block Type", "true" );
+	            if (words.FirstOrDefault( x => x.ToLower( ).StartsWith( "excludesblocksubtype:" ) ) != null)
+	            {
+	                string[] parts =
+	                    words.FirstOrDefault( x => x.ToLower( ).StartsWith( "excludesblocksubtype:" ) ).Split( ':' );
+	                hasBlockSubTypeLimits = true;
+	                options.Add( "Exclude Has Sub Block Type", "true" );
 
-					if ( parts.Length < 3 )
-					{
-						blockSubTypes.Add( parts[ 1 ], 1 );
-						options.Add( "Sub Block Type Limit: " + parts[ 1 ], "1" );
-					}
-					else
-					{
-						int count = 1;
-						int.TryParse( parts[ 2 ], out count );
-						blockSubTypes.Add( parts[ 1 ], count );
-						options.Add( "Sub Block Type Limit: " + parts[ 1 ], count.ToString( ) );
-					}
-				}
+	                if (parts.Length < 3)
+	                {
+	                    blockSubTypes.Add( parts[1], 1 );
+	                    options.Add( "Sub Block Type Limit: " + parts[1], "1" );
+	                }
+	                else
+	                {
+	                    int count = 1;
+	                    int.TryParse( parts[2], out count );
+	                    blockSubTypes.Add( parts[1], count );
+	                    options.Add( "Sub Block Type Limit: " + parts[1], count.ToString( ) );
+	                }
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "ownedby:" ) ) != null )
-				{
-					string[ ] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "ownedby:" ) ).Split( ':' );
-					if ( parts.Length > 1 )
-					{
-						isOwnedBy = true;
-						string ownedBy = parts[ 1 ];
-						if ( PlayerMap.Instance.GetPlayerItemsFromPlayerName( ownedBy ).Count > 0 )
-							ownedByPlayerId = PlayerMap.Instance.GetPlayerItemsFromPlayerName( ownedBy ).First( ).PlayerId;
+	            if (words.FirstOrDefault( x => x.ToLower( ).StartsWith( "ownedby:" ) ) != null)
+	            {
+	                string[] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "ownedby:" ) ).Split( ':' );
+	                if (parts.Length > 1)
+	                {
+	                    isOwnedBy = true;
+	                    string ownedBy = parts[1];
+	                    if (PlayerMap.Instance.GetPlayerItemsFromPlayerName( ownedBy ).Count > 0)
+	                        ownedByPlayerId = PlayerMap.Instance.GetPlayerItemsFromPlayerName( ownedBy ).First( ).PlayerId;
 
-						options.Add( "Owned By", ownedBy );
-					}
-				}
+	                    options.Add( "Owned By", ownedBy );
+	                }
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "includesblocktype:" ) ) != null )
-				{
-					string[ ] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "includesblocktype:" ) ).Split( ':' );
-					includesBlockType = true;
-					options.Add( "Includes Block Type", "true" );
+	            if (words.FirstOrDefault( x => x.ToLower( ).StartsWith( "includesblocktype:" ) ) != null)
+	            {
+	                string[] parts =
+	                    words.FirstOrDefault( x => x.ToLower( ).StartsWith( "includesblocktype:" ) ).Split( ':' );
+	                includesBlockType = true;
+	                options.Add( "Includes Block Type", "true" );
 
-					if ( parts.Length < 3 )
-					{
-						blockTypes.Add( parts[ 1 ], 1 );
-						options.Add( "Includes Block Type Count: " + parts[ 1 ], "1" );
-					}
-					else
-					{
-						int count = 1;
-						int.TryParse( parts[ 2 ], out count );
-						blockTypes.Add( parts[ 1 ], count );
-						options.Add( "Includes Block Type Count: " + parts[ 1 ], count.ToString( ) );
-					}
-				}
+	                if (parts.Length < 3)
+	                {
+	                    blockTypes.Add( parts[1], 1 );
+	                    options.Add( "Includes Block Type Count: " + parts[1], "1" );
+	                }
+	                else
+	                {
+	                    int count = 1;
+	                    int.TryParse( parts[2], out count );
+	                    blockTypes.Add( parts[1], count );
+	                    options.Add( "Includes Block Type Count: " + parts[1], count.ToString( ) );
+	                }
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "excludesblocktype:" ) ) != null )
-				{
-					string[ ] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "excludesblocktype:" ) ).Split( ':' );
-					excludesBlockType = true;
-					options.Add( "Excludes Block Type", "true" );
+	            if (words.FirstOrDefault( x => x.ToLower( ).StartsWith( "excludesblocktype:" ) ) != null)
+	            {
+	                string[] parts =
+	                    words.FirstOrDefault( x => x.ToLower( ).StartsWith( "excludesblocktype:" ) ).Split( ':' );
+	                excludesBlockType = true;
+	                options.Add( "Excludes Block Type", "true" );
 
-					if ( parts.Length < 3 )
-					{
-						blockTypesExcluded.Add( parts[ 1 ], 1 );
-						options.Add( "Excludes Block Type Count: " + parts[ 1 ], "1" );
-					}
-					else
-					{
-						int count = 1;
-						int.TryParse( parts[ 2 ], out count );
-						blockTypesExcluded.Add( parts[ 1 ], count );
-						options.Add( "Excludes Block Type Count: " + parts[ 1 ], count.ToString( ) );
-					}
-				}
+	                if (parts.Length < 3)
+	                {
+	                    blockTypesExcluded.Add( parts[1], 1 );
+	                    options.Add( "Excludes Block Type Count: " + parts[1], "1" );
+	                }
+	                else
+	                {
+	                    int count = 1;
+	                    int.TryParse( parts[2], out count );
+	                    blockTypesExcluded.Add( parts[1], count );
+	                    options.Add( "Excludes Block Type Count: " + parts[1], count.ToString( ) );
+	                }
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "blockcount:" ) ) != null )
-				{
-					string[ ] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "blockcount:" ) ).Split( ':' );
-					requireBlockCount = true;
-					options.Add( "Requires Block Count", "true" );
+	            if (words.FirstOrDefault( x => x.ToLower( ).StartsWith( "blockcount:" ) ) != null)
+	            {
+	                string[] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "blockcount:" ) ).Split( ':' );
+	                requireBlockCount = true;
+	                options.Add( "Requires Block Count", "true" );
 
-					if ( parts.Length < 2 )
-					{
-						blockCount = 1;
-						options.Add( "Block Count:", "1" );
-					}
-					else
-					{
-						int count = 1;
-						int.TryParse( parts[ 1 ], out count );
-						blockCount = count;
-						options.Add( "Block Count:", blockCount.ToString( ) );
-					}
-				}
+	                if (parts.Length < 2)
+	                {
+	                    blockCount = 1;
+	                    options.Add( "Block Count:", "1" );
+	                }
+	                else
+	                {
+	                    int count = 1;
+	                    int.TryParse( parts[1], out count );
+	                    blockCount = count;
+	                    options.Add( "Block Count:", blockCount.ToString( ) );
+	                }
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "blockcountlessthan:" ) ) != null )
-				{
-					string[ ] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "blockcountlessthan:" ) ).Split( ':' );
-					requireBlockCountLess = true;
-					options.Add( "Requires Block Count Less Than", "true" );
+	            if (words.FirstOrDefault( x => x.ToLower( ).StartsWith( "blockcountlessthan:" ) ) != null)
+	            {
+	                string[] parts =
+	                    words.FirstOrDefault( x => x.ToLower( ).StartsWith( "blockcountlessthan:" ) ).Split( ':' );
+	                requireBlockCountLess = true;
+	                options.Add( "Requires Block Count Less Than", "true" );
 
-					if ( parts.Length < 2 )
-					{
-						blockCountLess = 1;
-						options.Add( "Block Count:", "1" );
-					}
-					else
-					{
-						int count = 1;
-						int.TryParse( parts[ 1 ], out count );
-						blockCountLess = count;
-						options.Add( "Block Count:", blockCount.ToString( ) );
-					}
-				}
+	                if (parts.Length < 2)
+	                {
+	                    blockCountLess = 1;
+	                    options.Add( "Block Count:", "1" );
+	                }
+	                else
+	                {
+	                    int count = 1;
+	                    int.TryParse( parts[1], out count );
+	                    blockCountLess = count;
+	                    options.Add( "Block Count:", blockCount.ToString( ) );
+	                }
+	            }
 
-				if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "blocksize:" ) ) != null )
-				{
-					string[ ] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "blocksize:" ) ).Split( ':' );
+	            if (words.FirstOrDefault( x => x.ToLower( ).StartsWith( "blocksize:" ) ) != null)
+	            {
+	                string[] parts = words.FirstOrDefault( x => x.ToLower( ).StartsWith( "blocksize:" ) ).Split( ':' );
 
-					if ( parts[ 1 ].ToLower( ) == "small" )
-					{
-						options.Add( "Is Block Size", "small" );
-						isBlockSize = true;
-						blockSize = MyCubeSize.Small;
-					}
-					else if ( parts[ 1 ].ToLower( ) == "large" )
-					{
-						options.Add( "Is Block Size", "large" );
-						isBlockSize = true;
-						blockSize = MyCubeSize.Large;
-					}
-					else if ( parts[ 1 ].ToLower( ) == "station" )
-					{
-						options.Add( "Is Block Size", "station" );
-						isBlockSize = true;
-						blockSize = MyCubeSize.Large;
-					    testStatic = true;
-					}
-					else if ( parts[ 1 ].ToLower( ) == "largeship" )
-					{
-						options.Add( "Is Block Size", "largeship" );
-						isBlockSize = true;
-						blockSize = MyCubeSize.Large;
-					}
-				}
+	                if (parts[1].ToLower( ) == "small")
+	                {
+	                    options.Add( "Is Block Size", "small" );
+	                    isBlockSize = true;
+	                    blockSize = MyCubeSize.Small;
+	                }
+	                else if (parts[1].ToLower( ) == "large")
+	                {
+	                    options.Add( "Is Block Size", "large" );
+	                    isBlockSize = true;
+	                    blockSize = MyCubeSize.Large;
+	                }
+	                else if (parts[1].ToLower( ) == "station")
+	                {
+	                    options.Add( "Is Block Size", "station" );
+	                    isBlockSize = true;
+	                    blockSize = MyCubeSize.Large;
+	                    testStatic = true;
+	                }
+	                else if (parts[1].ToLower( ) == "largeship")
+	                {
+	                    options.Add( "Is Block Size", "largeship" );
+	                    isBlockSize = true;
+	                    blockSize = MyCubeSize.Large;
+	                }
+	            }
 
-			}
+	        }
 
-			if ( options.Count < 1 && quiet )
-			{
-				Communication.SendPrivateInformation( userId, "No options supplied for quiet scan, cancelling due to possible error" );
-				return new HashSet<MyEntity>( );
-			}
+	        if (options.Count < 1 && quiet)
+	        {
+	            Communication.SendPrivateInformation( userId,
+	                                                  "No options supplied for quiet scan, cancelling due to possible error" );
+	            return new HashSet<GridGroup>( );
+	        }
 
-			if ( words.Length > options.Count )
-			{
-				Communication.SendPrivateInformation( userId, "Possible problem with your parameters (options provided is larger than options found).  Not returning any results in case of error" );
-				return new HashSet<MyEntity>( );
-			}
+	        if (words.Length > options.Count)
+	        {
+	            Communication.SendPrivateInformation( userId,
+	                                                  "Possible problem with your parameters (options provided is larger than options found).  Not returning any results in case of error" );
+	            return new HashSet<GridGroup>( );
+	        }
 
-			if ( !quiet )
-				Communication.SendPrivateInformation( userId, $"Scanning for ships with options: {GetOptionsText( options )}" );
-                        
-			HashSet<MyEntity> entitiesFound = new HashSet<MyEntity>( );
-            HashSet<GridGroup> groupsFound = new HashSet<GridGroup>();
-            HashSet<List<MyCubeGrid>> groupsToConfirm = new HashSet<List<MyCubeGrid>>();
-		    Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
-			Dictionary<string, int> typeDict = new Dictionary<string, int>( );
-			List<string> checkList = new List<string>( );
+	        if (!quiet)
+	            Communication.SendPrivateInformation( userId,
+	                                                  $"Scanning for ships with options: {GetOptionsText( options )}" );
 
-		    HashSet<MyEntity> entities = new HashSet<MyEntity>( );
-		    Wrapper.GameAction( ()=> entities = MyEntities.GetEntities(  ) );
-            HashSet<GridGroup> groups = GridGroup.GetGroups( entities, connectionType );
+	        HashSet<MyEntity> entitiesFound = new HashSet<MyEntity>( );
+	        HashSet<GridGroup> groupsFound = new HashSet<GridGroup>( );
+	        HashSet<List<MyCubeGrid>> groupsToConfirm = new HashSet<List<MyCubeGrid>>( );
+	        Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
+	        Dictionary<string, int> typeDict = new Dictionary<string, int>( );
+	        List<string> checkList = new List<string>( );
 
-		    foreach ( GridGroup group in groups )
-		    {
-		        if ( power == 1 && !DoesGroupHavePowerSupply( group ) )
-		            groupsFound.Add( group );
-		        if ( power == 2 && DoesGroupHavePowerSupply( group ) )
-		            groupsFound.Add( group );
+	        HashSet<MyEntity> entities = new HashSet<MyEntity>( );
+	        Wrapper.GameAction( ( ) => entities = MyEntities.GetEntities( ) );
+	        HashSet<GridGroup> groups = GridGroup.GetGroups( entities, connectionType );
 
-		        if ( owner == 1 && group.BigOwners.Count == 0 )
-		            groupsFound.Add( group );
-		        if ( owner == 2 && group.BigOwners.Count > 0 )
-		            groupsFound.Add( group );
+	        foreach (GridGroup group in groups)
+	        {
+	            if (power == 1 && !DoesGroupHavePowerSupply( group ))
+	                groupsFound.Add( group );
+	            if (power == 2 && DoesGroupHavePowerSupply( group ))
+	                groupsFound.Add( group );
 
-		        if ( functional == 1 && !IsGroupFunctional( group ) )
-		            groupsFound.Add( group );
-		        if ( functional == 2 && IsGroupFunctional( group ) )
-		            groupsFound.Add( group );
+	            if (owner == 1 && group.BigOwners.Count == 0)
+	                groupsFound.Add( group );
+	            if (owner == 2 && group.BigOwners.Count > 0)
+	                groupsFound.Add( group );
 
-		        if ( terminal == 1 && !DoesGroupHaveTerminal( group ) )
-		            groupsFound.Add( group );
-		        if ( terminal == 2 && DoesGroupHaveTerminal( group ) )
-		            groupsFound.Add( group );
+	            if (functional == 1 && !IsGroupFunctional( group ))
+	                groupsFound.Add( group );
+	            if (functional == 2 && IsGroupFunctional( group ))
+	                groupsFound.Add( group );
 
-		        if ( online == 1 && !AreOwnersOnline( group ) )
-		            groupsFound.Add( group );
-		        if ( online == 2 && AreOwnersOnline( group ) )
-		            groupsFound.Add( group );
+	            if (terminal == 1 && !DoesGroupHaveTerminal( group ))
+	                groupsFound.Add( group );
+	            if (terminal == 2 && DoesGroupHaveTerminal( group ))
+	                groupsFound.Add( group );
 
-		        if ( hasDisplayName && DoesGroupHaveDisplayName( group, displayName, hasDisplayNameExact ) )
-		            groupsFound.Add( group );
+	            if (online == 1 && !AreOwnersOnline( group ))
+	                groupsFound.Add( group );
+	            if (online == 2 && AreOwnersOnline( group ))
+	                groupsFound.Add( group );
 
-		        if ( hasCustomName && DoesGroupHaveCustomName( group, customName, hasCustomNameExact ) )
-		            groupsFound.Add( group );
+	            if (hasDisplayName && DoesGroupHaveDisplayName( group, displayName, hasDisplayNameExact ))
+	                groupsFound.Add( group );
 
-		        if ( isBlockSize && IsGroupGridSize( group, blockSize, testStatic ) )
-		            groupsFound.Add( group );
+	            if (hasCustomName && DoesGroupHaveCustomName( group, customName, hasCustomNameExact ))
+	                groupsFound.Add( group );
 
-		        if ( isOwnedBy && group.BigOwners.Count == 1 && group.BigOwners[0] == ownedByPlayerId )
-		            groupsFound.Add( group );
+	            if (isBlockSize && IsGroupGridSize( group, blockSize, testStatic ))
+	                groupsFound.Add( group );
 
-		        if ( requireBlockCount && group.CubeBlocks.Count > blockCount )
-		            groupsFound.Add( group );
+	            if (isOwnedBy && group.BigOwners.Count == 1 && group.BigOwners[0] == ownedByPlayerId)
+	                groupsFound.Add( group );
 
-		        if ( requireBlockCountLess && group.CubeBlocks.Count < blockCountLess )
-		            groupsFound.Add( group );
+	            if (requireBlockCount && group.BlocksCount > blockCount)
+	                groupsFound.Add( group );
 
-		        if ( hasBlockSubType && blockSubTypes.Keys.Any( x => DoesGroupHaveBlockSubtype( group, x ) ) )
-		            groupsFound.Add( group );
+	            if (requireBlockCountLess && group.BlocksCount < blockCountLess)
+	                groupsFound.Add( group );
 
-		        if ( excludesBlockType && !blockSubTypes.Keys.Any( x => DoesGroupHaveBlockSubtype( group, x ) ) )
-		            groupsFound.Add( group );
-		    }
-            
-            /*
+	            if (hasBlockSubType && blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ))
+	                groupsFound.Add( group );
+
+	            if (excludesBlockType && !blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ))
+	                groupsFound.Add( group );
+
+	            if (includesBlockType && blockTypes.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value ) ))
+	                groupsFound.Add( group );
+
+	            if (hasBlockSubTypeLimits &&
+	                blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value + 1 ) ))
+	                groupsFound.Add( group );
+	        }
+
+	        int gridCount = 0;
+	        int groupCount = groupsFound.Count;
+	        foreach (GridGroup group in groupsFound)
+	        {
+	            if (!quiet)
+	                Communication.SendPrivateInformation( userId,
+	                                                      $"Found group with parent {group.Parent.DisplayName}, owner {group.BigOwners[0]}" );
+
+	            gridCount += group.Grids.Count;
+	        }
+
+	        if (!quiet)
+	            Communication.SendPrivateInformation( userId, $"Found {gridCount} grids in {groupCount} grups" );
+
+	        return groupsFound;
+	    }
+
+	    /*
 		    foreach ( var group in GetGroups( connectionType, entities ) )
 		    {
 		        foreach ( MyCubeGrid grid in group )
@@ -1108,12 +1140,13 @@
 		            entitiesFound.Add( entity );
 		        }
 		    }
-            */
+            
 		    if ( !quiet )
 				Communication.SendPrivateInformation( userId, $"Found {entitiesFound.Count} grids" );
 
 			return entitiesFound;
-		}
+            */
+		//}
 
 		private static bool ApplyBlockSubTypeExclusionFilter( ulong userId, Dictionary<string, int> subTypeDict, Dictionary<string, int> blockSubTypes, bool found, bool quiet, bool debug, MyEntity entity )
 		{
@@ -1446,7 +1479,7 @@
 
 		    if (block is IMyBatteryBlock)
 		    {
-		        IMyBatteryBlock battery = block as IMyBatteryBlock;
+		        IMyBatteryBlock battery = (IMyBatteryBlock) block;
 		        if (battery.CurrentStoredPower > 0f)
 		            return true;
 		    }
@@ -1509,51 +1542,67 @@
 	    public static bool DoesGroupHaveDisplayName( GridGroup group, string displayName, bool partial = true )
 	    {
 	        if ( partial )
-	            return group.CubeBlocks.Any( x => x?.FatBlock != null && x.FatBlock.Name.ToLower( ).Contains( displayName.ToLower()));
+	            return group.CubeBlocks.Any( x => x?.FatBlock != null && x.FatBlock.Name.ToLower( ).Contains( displayName));
 	        else
-	            return ( group.CubeBlocks.Any( x => x?.FatBlock != null && x.FatBlock.Name.ToLower( ) == displayName.ToLower( ) ) );
+	            return group.CubeBlocks.Any( x => x?.FatBlock != null && x.FatBlock.Name.ToLower( ) == displayName);
 	    }
 
 	    public static bool DoesGroupHaveCustomName( GridGroup group, string customName, bool partial = true )
 	    {
 	        if ( partial )
-	            return group.Nodes.Any( x => x.Name.ToLower( ).Contains( customName.ToLower( ) ) );
+	            return group.Grids.Any( x => x.Name.ToLower( ).Contains( customName.ToLower( ) ) );
 	        else
-	            return group.Nodes.Any( x => x.Name.ToLower( ) == customName.ToLower( ) );
+	            return group.Grids.Any( x => x.Name.ToLower( ) == customName);
 	    }
 
 	    public static bool IsGroupGridSize( GridGroup group, MyCubeSize size, bool isStatic = false )
 	    {
 	        if( isStatic )
-	            return group.Nodes.Any( x => x.Physics!=null && x.Physics.IsStatic );
+	            return group.Grids.Any( x => x?.Physics !=null && x.Physics.IsStatic );
             else
-	            return group.Nodes.Any( x => x.GridSizeEnum == size );
+	            return group.Grids.Any( x => x.GridSizeEnum == size );
 	    }
 
-	    public static bool DoesGroupHaveBlockSubtype( GridGroup group, string subtype )
+	    public static bool DoesGroupHaveBlockSubtype( GridGroup group, string subtype, int count )
 	    {
-	        return group.CubeBlocks.Any( x => ( x?.FatBlock as IMyCubeBlock ) != null && ( (IMyCubeBlock)x.FatBlock ).BlockDefinition.SubtypeName.ToLower( ).Contains( subtype ) );
+            int result = 0;
+            
+            foreach (MySlimBlock slimBlock in group.CubeBlocks)
+            {
+                IMyCubeBlock block = slimBlock?.FatBlock;
+
+                if (block == null)
+                    continue;
+
+                if (block.BlockDefinition.SubtypeId.ToLower().Contains(subtype))
+                    result++;
+
+                if (result >= count)
+                    return true;
+            }
+	        return false;
 	    }
 
-	    public static int GroupBlockSubtypeCount( GridGroup group, string subtype )
-	    {
-	        int result = 0;
+        public static bool DoesGroupHaveBlockType(GridGroup group, string type, int count)
+        {
+            int result = 0;
 
-	        foreach ( MySlimBlock slimBlock in group.CubeBlocks )
-	        {
-	            IMyCubeBlock block = slimBlock?.FatBlock as IMyCubeBlock;
+            foreach (MySlimBlock slimBlock in group.CubeBlocks)
+            {
+                IMyCubeBlock block = slimBlock?.FatBlock;
 
-	            if ( block == null )
-	                continue;
+                if (block == null)
+                    continue;
 
-	            if ( block.BlockDefinition.SubtypeName.ToLower( ).Contains( subtype ) )
-	                result++;
-	        }
+                if (block.BlockDefinition.TypeIdString.ToLower().Contains( type ))
+                    result++;
 
-	        return result;
-	    }
-
-		/*public static MyObjectBuilder_CubeGrid SafeGetObjectBuilder( IMyCubeGrid grid )
+                if (result >= count)
+                    return true;
+            }
+            return false;
+        }
+        /*public static MyObjectBuilder_CubeGrid SafeGetObjectBuilder( IMyCubeGrid grid )
 		{
 			MyObjectBuilder_CubeGrid gridBuilder = null;
 			try
@@ -1723,7 +1772,7 @@
 			grid.GetBlocks( blocks, collect );
 			blockList.AddRange( blocks );
 		}*/
-	}
+    }
 
     
 }

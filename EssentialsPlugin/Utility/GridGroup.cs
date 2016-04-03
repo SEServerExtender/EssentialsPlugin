@@ -8,20 +8,25 @@
 
     public class GridGroup
     {
-        private readonly HashSet<MyCubeGrid> _nodes = new HashSet<MyCubeGrid>( );
+        private readonly HashSet<MyCubeGrid> _grids = new HashSet<MyCubeGrid>( );
         private readonly HashSet<MySlimBlock> _cubeBlocks; 
         private readonly List<long> _bigOwners; 
         private readonly List<long> _smallOwners;
         private readonly MyCubeGrid _parent;
 
-        public HashSet<MyCubeGrid> Nodes
+        public HashSet<MyCubeGrid> Grids
         {
-            get { return _nodes; }
+            get { return _grids; }
         }
 
         public HashSet<MySlimBlock> CubeBlocks
         {
             get {return _cubeBlocks;}
+        }
+
+        public int BlocksCount
+        {
+            get { return _cubeBlocks.Count; }
         }
 
         public List<long> BigOwners
@@ -46,7 +51,7 @@
             Wrapper.GameAction( ( ) =>tmpList= MyCubeGridGroups.Static.GetGroups( linkType ).GetGroupNodes( grid ) );
 
             foreach ( MyCubeGrid node in tmpList )
-                _nodes.Add( node );
+                _grids.Add( node );
 
             _parent = GetParent( );
             _cubeBlocks = GetCubeBlocks( );
@@ -64,7 +69,7 @@
                 if ( grid == null )
                     continue;
 
-                if ( !result.Any( x => x.Nodes.Contains( grid ) ) )
+                if ( !result.Any( x => x.Grids.Contains( grid ) ) )
                     result.Add( new GridGroup( grid, linkType ) );
             }
 
@@ -75,21 +80,23 @@
         {
             Wrapper.GameAction( ( ) =>
                                 {
-                                    foreach ( MyCubeGrid grid in _nodes )
+                                    foreach (MyCubeGrid grid in _grids)
                                     {
-                                        if ( !grid.Closed )
-                                            grid.Close( );
+                                        if (grid?.Physics == null || grid.Closed)
+                                            continue;
+
+                                        grid.Close( );
                                     }
                                 } );
         }
 
         private MyCubeGrid GetParent( )
         {
-            if ( _nodes.Count < 1 )
+            if ( _grids.Count < 1 )
                 return null;
 
             MyCubeGrid result = null;
-            foreach ( MyCubeGrid grid in _nodes )
+            foreach ( MyCubeGrid grid in _grids )
             {
                 if ( result == null || grid.BlocksCount > result.BlocksCount )
                     result = grid;
@@ -100,7 +107,7 @@
         private List<long> GetBigOwners( )
         {
             HashSet<long> result = new HashSet<long>( );
-            foreach ( long owner in _nodes.SelectMany( grid => grid.BigOwners ).Where( x => x > 0 ) )
+            foreach ( long owner in _grids.SelectMany( grid => grid.BigOwners ).Where( x => x > 0 ) )
                 result.Add( owner );
             return result.ToList( );
         }
@@ -108,7 +115,7 @@
         private List<long> GetSmallOwners( )
         {
             HashSet<long> result = new HashSet<long>( );
-            foreach ( long owner in _nodes.SelectMany( grid => grid.SmallOwners ).Where( x => x > 0 ) )
+            foreach ( long owner in _grids.SelectMany( grid => grid.SmallOwners ).Where( x => x > 0 ) )
                 result.Add( owner );
             return result.ToList( );
         }
@@ -117,7 +124,7 @@
         {
             HashSet<MySlimBlock> result = new HashSet<MySlimBlock>( );
 
-            foreach ( MyCubeGrid grid in _nodes )
+            foreach ( MyCubeGrid grid in _grids )
             {
                 foreach ( MySlimBlock block in grid.CubeBlocks )
                     result.Add( block );
