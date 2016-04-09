@@ -162,7 +162,8 @@
 
             //kick the player with the "Server is full" message
             //too bad we can't send a custom message, but they're hardcoded into the client
-            ( MyMultiplayer.Static as MyDedicatedServerBase ).SendJoinResult( remoteUserId, JoinResult.ServerFull );
+            MyDedicatedServerBase myDedicatedServerBase = MyMultiplayer.Static as MyDedicatedServerBase;
+            if ( myDedicatedServerBase != null ) myDedicatedServerBase.SendJoinResult( remoteUserId, JoinResult.ServerFull );
             /*
         VRage.Library.Collections.BitStream m_sendStream = new VRage.Library.Collections.BitStream();
         Essentials.Log.Info( "Player denied: " + remoteUserId );
@@ -216,9 +217,11 @@
 
         private static void RefreshPlayers( List<IMyPlayer> connectedPlayers )
         {
+            /*
             List<ulong> steamIds = connectedPlayers.Select( x => x.SteamUserId ).ToList( );
             _reservedPlayers.Clear( );
             _reservedPlayers = steamIds.Where( x => PluginSettings.Instance.ReservedSlotsPlayers.Contains( x.ToString(  ) ) ).ToList( );
+            */
         }
     }
 }

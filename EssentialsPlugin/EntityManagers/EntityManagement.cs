@@ -846,9 +846,8 @@
                             foreach ( ulong connectedPlayer in Online )
                             {
                                 long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( connectedPlayer );
-                                IMyPlayer cryoUser = (IMyPlayer) cryo.Pilot;
 
-                                if ( cryoUser.PlayerID == playerId )
+                                if (cryo.Pilot.GetPlayerIdentityId() == playerId )
                                 {
                                     reason = string.Format( "Grid has cryopod and player is inside - playerid: {0}", playerId );
                                     //return true;
