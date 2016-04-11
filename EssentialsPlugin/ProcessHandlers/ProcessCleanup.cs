@@ -65,9 +65,16 @@
 			if ( itemTime - DateTime.Now < _oneSecond && DateTime.Now - item.LastRan > _oneMinute )
 			{
 				string command = string.Format( "{0} quiet", item.ScanCommand );
-				HashSet<MyEntity> entities = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
-				CubeGrids.DeleteGrids( entities );
-				Communication.SendPublicInformation( string.Format( "[NOTICE]: Timed cleanup has run.  {0} entities removed.  Have a nice day.", entities.Count ) );
+				HashSet<GridGroup> groups = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
+                
+			    int groupCount = groups.Count;
+			    int gridCount = 0;
+			    foreach ( var group in groups )
+			    {
+			        gridCount += group.Grids.Count;
+                    group.Close(  );
+			    }
+				Communication.SendPublicInformation( $"[NOTICE]: Timed cleanup has run. {gridCount} grids in {groupCount} removed." );
 				item.LastRan = DateTime.Now;
 				item.NotificationItemsRan.Clear( );
 				return;
@@ -124,9 +131,16 @@
 				if ( DateTime.Now - item.LastRan > TimeSpan.FromMinutes( item.MinutesAfterCapacity ) )
 				{
 					string command = item.ScanCommand + " quiet";
-					HashSet<MyEntity> entities = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
-					CubeGrids.DeleteGrids( entities );
-					Communication.SendPublicInformation( string.Format( "[NOTICE]: Triggered cleanup has run.  {0} entities removed.  Have a nice day.", entities.Count ) );
+					HashSet<GridGroup> groups = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
+
+                    int groupCount = groups.Count;
+                    int gridCount = 0;
+                    foreach (var group in groups)
+                    {
+                        gridCount += group.Grids.Count;
+                        group.Close();
+                    }
+                    Communication.SendPublicInformation( $"[NOTICE]: Triggered cleanup has run. {gridCount} grids in {groups} removed." );
 					_triggerdItem = null;
 					return;
 				}

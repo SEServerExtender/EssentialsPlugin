@@ -9,9 +9,10 @@
     public class GridGroup
     {
         private readonly HashSet<MyCubeGrid> _grids = new HashSet<MyCubeGrid>( );
-        private readonly HashSet<MySlimBlock> _cubeBlocks; 
-        private readonly List<long> _bigOwners; 
-        private readonly List<long> _smallOwners;
+        private readonly HashSet<MySlimBlock> _cubeBlocks = new HashSet<MySlimBlock>(); 
+        private readonly List<MyCubeBlock> _fatBlocks = new List<MyCubeBlock>(); 
+        private readonly List<long> _bigOwners = new List<long>(); 
+        private readonly List<long> _smallOwners = new List<long>();
         private readonly MyCubeGrid _parent;
 
         public HashSet<MyCubeGrid> Grids
@@ -24,21 +25,38 @@
             get {return _cubeBlocks;}
         }
 
+        public List<MyCubeBlock> GetFatBlocks()
+        {
+            return _fatBlocks;
+        } 
+
+        /// <summary>
+        /// The number of blocks in the group
+        /// </summary>
         public int BlocksCount
         {
             get { return _cubeBlocks.Count; }
         }
 
+        /// <summary>
+        /// Players which own a majority of all blocks in the group
+        /// </summary>
         public List<long> BigOwners
         {
             get {return _bigOwners;}
         }
 
+        /// <summary>
+        /// Players which own any blocks in the group
+        /// </summary>
         public List<long> SmallOwners
         {
             get {return _smallOwners;}
         }
 
+        /// <summary>
+        /// Largest grid in the group
+        /// </summary>
         public MyCubeGrid Parent
         {
             get { return _parent; }
@@ -48,15 +66,16 @@
         {
             List<MyCubeGrid> tmpList = new List<MyCubeGrid>();
 
-            Wrapper.GameAction( ( ) =>tmpList= MyCubeGridGroups.Static.GetGroups( linkType ).GetGroupNodes( grid ) );
+            Wrapper.GameAction( ( ) => tmpList = MyCubeGridGroups.Static.GetGroups( linkType ).GetGroupNodes( grid ) );
 
             foreach ( MyCubeGrid node in tmpList )
                 _grids.Add( node );
 
-            _parent = GetParent( );
-            _cubeBlocks = GetCubeBlocks( );
-            _bigOwners = GetBigOwners( );
-            _smallOwners = GetSmallOwners( );
+            GetParent( ref _parent );
+            GetCubeBlocks( ref _cubeBlocks );
+            _GetFatBlocks( ref _fatBlocks );
+            GetBigOwners( ref _bigOwners);
+            GetSmallOwners( ref _smallOwners );
         }
 
         public static HashSet<GridGroup> GetGroups( HashSet<MyEntity> entities, GridLinkTypeEnum linkType = GridLinkTypeEnum.Logical )
@@ -76,6 +95,13 @@
             return result;
         }
 
+        public static HashSet<GridGroup> GetAllGroups( GridLinkTypeEnum linkType = GridLinkTypeEnum.Logical )
+        {
+            HashSet<MyEntity> entities = new HashSet<MyEntity>();
+            Wrapper.GameAction( () => entities = MyEntities.GetEntities(  ) );
+            return GetGroups( entities, linkType );
+        }
+
         public void Close( )
         {
             Wrapper.GameAction( ( ) =>
@@ -90,46 +116,59 @@
                                 } );
         }
 
-        private MyCubeGrid GetParent( )
+        private void GetParent( ref MyCubeGrid parent )
         {
             if ( _grids.Count < 1 )
-                return null;
-
-            MyCubeGrid result = null;
+                return;
+            
             foreach ( MyCubeGrid grid in _grids )
             {
-                if ( result == null || grid.BlocksCount > result.BlocksCount )
-                    result = grid;
+                if ( parent == null || (grid.BlocksCount > parent.BlocksCount) )
+                    parent = grid;
             }
-            return result;
         }
 
-        private List<long> GetBigOwners( )
+        private void GetBigOwners(ref List<long> bigOwners)
         {
-            HashSet<long> result = new HashSet<long>( );
+            bigOwners.Clear(  );
+            Dictionary<long, int> owners = new Dictionary<long, int>();
             foreach ( long owner in _grids.SelectMany( grid => grid.BigOwners ).Where( x => x > 0 ) )
-                result.Add( owner );
-            return result.ToList( );
+                if(!owners.Keys.Contains( owner ))
+                    owners.Add( owner, 0 );
+            
+            foreach ( MyCubeBlock block in _fatBlocks )
+            {
+                if ( owners.ContainsKey( block.OwnerId ) )
+                    owners[block.OwnerId]++;
+            }
+
+            int maxCount = owners.Values.Max( );
+            foreach ( long owner in owners.Keys )
+            {
+                if(owners[owner] == maxCount)
+                    bigOwners.Add( owner );
+            }
         }
 
-        private List<long> GetSmallOwners( )
+        private void GetSmallOwners( ref List<long> smallOwners )
         {
+            smallOwners.Clear(  );
             HashSet<long> result = new HashSet<long>( );
             foreach ( long owner in _grids.SelectMany( grid => grid.SmallOwners ).Where( x => x > 0 ) )
                 result.Add( owner );
-            return result.ToList( );
+            smallOwners = result.ToList( );
         }
 
-        private HashSet<MySlimBlock> GetCubeBlocks( )
+        private void GetCubeBlocks( ref HashSet<MySlimBlock> blocks )
         {
-            HashSet<MySlimBlock> result = new HashSet<MySlimBlock>( );
-
             foreach ( MyCubeGrid grid in _grids )
-            {
-                foreach ( MySlimBlock block in grid.CubeBlocks )
-                    result.Add( block );
-            }
-            return result;
+                blocks.UnionWith( grid.CubeBlocks );
+        }
+
+        private void _GetFatBlocks( ref List<MyCubeBlock> blocks )
+        {
+            blocks.Clear(  );
+            blocks =  _cubeBlocks.Select( b => b?.FatBlock ).Where( f => f != null ).ToList(  );
         }
     }
 }
