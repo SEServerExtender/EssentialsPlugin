@@ -2,6 +2,7 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using EssentialsPlugin.Utility;
 	using Sandbox.Common.ObjectBuilders;
 	using Sandbox.Game.Entities;
@@ -28,12 +29,16 @@
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
-            DialogItem.title = "Help";
-            DialogItem.header = "";
-            DialogItem.content = GetHelp( );
-            DialogItem.buttonText = "close";
-            return DialogItem;
+            return new Communication.ServerDialogItem
+            {
+                title = "Help",
+                header = "/admin scan nobeacon",
+                buttonText = "close",
+                content = "This command will scan for grids without a beacon. ||" +
+                "If you run this command with the 'physical' argument, grids without a beacon attached" +
+                "by landing gear to another grid wich does have a beacon will not be counted. ||" +
+                "Usage: /admin scan nobeacon (physical)"
+            };
         }
 
         public override bool IsAdminCommand()
@@ -49,62 +54,38 @@
 		// admin nobeacon scan
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			try
-			{
-				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
-				HashSet<MyEntity> entitiesToConfirm = new HashSet<MyEntity>();
-				HashSet<IMyEntity> entitiesConnected = new HashSet<IMyEntity>();
-                HashSet<List<MyCubeGrid>> groupsToConfirm = new HashSet<List<MyCubeGrid>>();
-				HashSet<IMyEntity> entitiesFound = new HashSet<IMyEntity>();
-				Wrapper.GameAction(() =>
-				{
-					MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
-				});
+            GridLinkTypeEnum connectionType = GridLinkTypeEnum.Logical;
+		    if ( words.Length > 0 && words[0].ToLower( ) == "physical" )
+		        connectionType = GridLinkTypeEnum.Physical;
 
-				foreach (IMyEntity entity in entities)
-				{
-					if (!(entity is MyCubeGrid))
-						continue;
+		    try
+		    {
+		        HashSet<MyEntity> entities = new HashSet<MyEntity>( );
+		        Wrapper.GameAction( ( ) => entities = MyEntities.GetEntities( ) );
 
-					MyCubeGrid grid = (MyCubeGrid)entity;
+		        HashSet<GridGroup> groupsFound = new HashSet<GridGroup>( );
+		        HashSet<GridGroup> groups = GridGroup.GetGroups( entities, connectionType );
+		        int groupsCount = 0;
+		        int gridsCount = 0;
 
-					bool found = false;
-					foreach (MySlimBlock slimBlock in grid.CubeBlocks)
-					{
-					    IMyCubeBlock block = slimBlock?.FatBlock;
+		        foreach ( var group in groups )
+		        {
+		            if ( !group.CubeBlocks.Any( x => x?.FatBlock is IMyBeacon ) )
+		            {
+		                groupsCount++;
+		                gridsCount += group.Grids.Count;
+		                Communication.SendPrivateInformation( userId, $"Found group with parent {group.Parent.DisplayName} ({group.Parent.EntityId}) at {group.Parent.PositionComp.GetPosition( )} with no beacon." );
+		            }
+		        }
 
-						if(block is IMyBeacon)
-						{
-							found = true;
-							break;
-						}
-					}
+		        Communication.SendPrivateInformation( userId, $"Found {gridsCount} grids in {groupsCount} groups with no beacon." );
+		    }
+		    catch ( Exception ex )
+		    {
+		        Log.Info( string.Format( "Scan error: {0}", ex.ToString( ) ) );
+		    }
 
-					if(!found)
-						entitiesToConfirm.Add(grid);
-				}
-
-			    groupsToConfirm = CubeGrids.GetGroups( GridLinkTypeEnum.Logical, entitiesToConfirm );
-				
-				foreach (IMyEntity entity in entitiesFound)
-				{
-					CubeGridEntity gridEntity = (CubeGridEntity)GameEntityManager.GetEntity(entity.EntityId);
-                    if (gridEntity == null)
-                    {
-                        Log.Info("A found entity gridEntity was null!");
-                        continue;
-                    }
-                    Communication.SendPrivateInformation(userId, string.Format("Found entity '{0}' ({1}) at {2} with no beacon.", gridEntity.Name, gridEntity.EntityId, General.Vector3DToString(entity.GetPosition())));
-				}
-
-				Communication.SendPrivateInformation(userId, string.Format("Found {0} grids with no beacons", entitiesFound.Count));
-			}
-			catch (Exception ex)
-			{
-				Log.Info(string.Format("Scan error: {0}", ex.ToString()));
-			}
-
-			return true;
+		    return true;
 		}
 	}
 }

@@ -1,6 +1,9 @@
 ﻿namespace EssentialsPlugin.Utility
 {
+    using Sandbox.Game.Entities;
+    using Sandbox.Game.World;
     using VRage.Game.Entity;
+    using VRage.Game.ModAPI;
     using VRage.ModAPI;
     using VRageMath;
 
@@ -20,6 +23,23 @@
         public static void Stop(this MyEntity entity)
         {
             ((IMyEntity)entity).Stop(  );
+        }
+
+        public static string GetOwner( this IMyCubeGrid grid )
+        {
+            if (grid.BigOwners.Count > 0 && grid.BigOwners[0] > 0)
+            {
+                MyIdentity ownerIdentity = MySession.Static.Players.TryGetIdentity( grid.BigOwners[0] );
+
+                if (ownerIdentity != null)
+                    return ownerIdentity.DisplayName;
+            }
+            return "";
+        }
+
+        public static string GetOwner( this MyCubeGrid grid )
+        {
+            return ((IMyCubeGrid)grid).GetOwner(  );
         }
     }
 }

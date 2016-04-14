@@ -1,98 +1,71 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.AdminDelete
 {
-	using System.Collections.Generic;
-	using System.Linq;
-	using EssentialsPlugin.Utility;
-	using Sandbox.Common.ObjectBuilders;
-	using Sandbox.Game.Entities;
-	using Sandbox.Game.Entities.Cube;
-	using Sandbox.ModAPI;
-	using Sandbox.ModAPI.Ingame;
-	using SEModAPIInternal.API.Common;
-    using SEModAPIInternal.API.Entity.Sector.SectorObject;
-	using VRage.Game;
-	using VRage.Game.Entity;
-	using VRage.Game.ModAPI;
-	using VRage.ModAPI;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Sandbox.Game.Entities;
+    using Sandbox.ModAPI.Ingame;
+    using Utility;
 
-	public class HandleAdminDeleteNoBeacon : ChatHandlerBase
-	{
-		public override string GetHelp()
-		{
-			return "This command allows you to delete all stations from an area defined by x, y, z, and radius.  Usage: /admin delete ships area [X] [Y] [Z] [RADIUS]";
-		}
-        
-		public override string GetCommandText()
-		{
-			return "/admin delete nobeacon";
-		}
+    public class HandleAdminDeleteNoBeacon : ChatHandlerBase
+    {
+        public override string GetHelp( )
+        {
+            return "This command allows you to delete all grids without a beacon. Run the command with 'physical' to include grids connected by landing gear.";
+        }
+
+        public override string GetCommandText( )
+        {
+            return "/admin delete nobeacon";
+        }
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
-            DialogItem.title = "Help";
-            DialogItem.header = "";
-            DialogItem.content = GetHelp( );
-            DialogItem.buttonText = "close";
-            return DialogItem;
+            return new Communication.ServerDialogItem
+            {
+                title = "Help",
+                header = "/admin delete nobeacon",
+                buttonText = "close",
+                content = "This command will delete all grids without a beacon. ||" +
+                "If you run this command with the 'physical' argument, grids without a beacon attached" +
+                "by landing gear to another grid wich does have a beacon will not be deleted. ||" +
+                "Usage: /admin delete nobeacon (physical)"
+            };
         }
 
-        public override bool IsAdminCommand()
-		{
-			return true;
-		}
+        public override bool IsAdminCommand( )
+        {
+            return true;
+        }
 
-		public override bool AllowedInConsole()
-		{
-			return true;
-		}
+        public override bool AllowedInConsole( )
+        {
+            return true;
+        }
+        
+        public override bool HandleCommand( ulong userId, string[] words )
+        {
+            GridLinkTypeEnum connectionType = GridLinkTypeEnum.Logical;
+            if ( words.FirstOrDefault( x => x.ToLower( ) == "physical" ) != null )
+                connectionType = GridLinkTypeEnum.Physical;
+            
+            HashSet<GridGroup> groups = GridGroup.GetAllGroups( connectionType );
+            int groupsCount = 0;
+            int gridsCount = 0;
 
-		// admin deletearea x y z radius
-		public override bool HandleCommand(ulong userId, string[] words)
-		{
-			HashSet<MyEntity> entities = new HashSet<MyEntity>();
-			HashSet<MyEntity> entitiesToConfirm = new HashSet<MyEntity>();
-			HashSet<MyEntity> entitiesConnected = new HashSet<MyEntity>();
-			HashSet<MyEntity> entitiesFound = new HashSet<MyEntity>();
-            HashSet<List<MyCubeGrid>> groupsFound = new HashSet<List<MyCubeGrid>>();
+            foreach ( GridGroup group in groups )
+            {
+                if ( !group.CubeBlocks.Any( x => x?.FatBlock is IMyBeacon ) )
+                {
+                    groupsCount++;
+                    gridsCount += group.Grids.Count;
+                    group.Close( );
+                    Communication.SendPrivateInformation( userId, $"Found group with parent {group.Parent.DisplayName} ({group.Parent.EntityId}) at {group.Parent.PositionComp.GetPosition( )} with no beacon." );
+                }
+            }
 
-			Wrapper.GameAction(() =>entities = MyEntities.GetEntities(  ));
+            Communication.SendPrivateInformation( userId, $"Removed {gridsCount} grids in {groupsCount} groups with no beacon." );
 
-			foreach (MyEntity entity in entities)
-			{
-				if (!(entity is MyCubeGrid))
-					continue;
-
-				MyCubeGrid grid = (MyCubeGrid)entity;
-
-				bool found = false;
-				foreach (MySlimBlock block in grid.CubeBlocks)
-				{
-					if (block.FatBlock is IMyBeacon)
-					{
-						found = true;
-						break;
-					}
-				}
-
-				if (!found)
-					entitiesToConfirm.Add(grid);
-			}
-
-			//CubeGrids.GetGridsUnconnected(entitiesFound, entitiesToConfirm);
-		    groupsFound = CubeGrids.GetGroups( GridLinkTypeEnum.Logical, entitiesToConfirm );
-
-		    foreach ( var group in groupsFound )
-		    {
-		        foreach ( MyCubeGrid grid in group )
-		        {
-		            Communication.SendPrivateInformation( userId, $"Found entity '{grid.DisplayName}' ({grid.EntityId}) at {grid.PositionComp.GetPosition( ).ToString( )} with no beacon." );
-		        Wrapper.GameAction( ()=>grid.Close(  ) );
-		        }
-		    }
-		    Communication.SendPrivateInformation(userId, $"Removed {entitiesFound.Count} grids with no beacons" );
-
-			return true;
-		}
-	}
+            return true;
+        }
+    }
 }

@@ -2,6 +2,7 @@
 {
     using System;
     using EssentialsPlugin.Utility;
+    using Sandbox.Game.Entities.Cube;
 
     public class HandleAdminScanGrids : ChatHandlerBase
 	{

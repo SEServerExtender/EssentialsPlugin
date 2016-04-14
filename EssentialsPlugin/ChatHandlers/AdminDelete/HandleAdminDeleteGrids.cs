@@ -65,7 +65,6 @@
 	                if (group.BigOwners.Count > 0)
 	                {
 	                    ownerId = group.BigOwners.First( );
-                    //TODO
 	                    ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
 	                }
 

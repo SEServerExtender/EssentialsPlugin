@@ -132,10 +132,19 @@
         {
             bigOwners.Clear(  );
             Dictionary<long, int> owners = new Dictionary<long, int>();
-            foreach ( long owner in _grids.SelectMany( grid => grid.BigOwners ).Where( x => x > 0 ) )
-                if(!owners.Keys.Contains( owner ))
-                    owners.Add( owner, 0 );
-            
+            //foreach ( long ownerId in _grids.SelectMany( grid => grid.BigOwners ).Where( x => x > 0 ) )
+            //    owners[ownerId] = 0;
+
+            foreach ( var grid in _grids )
+            {
+                foreach ( var ownerId in grid.BigOwners )
+                {
+                    if ( ownerId > 0 && !bigOwners.Contains( ownerId ))
+                        bigOwners.Add( ownerId );
+                }
+            }
+            return;
+
             foreach ( MyCubeBlock block in _fatBlocks )
             {
                 if ( owners.ContainsKey( block.OwnerId ) )
