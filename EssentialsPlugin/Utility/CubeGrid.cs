@@ -476,7 +476,7 @@
 	        int blockCountLess = 0;
 	        bool testStatic = false;
 	        MyCubeSize blockSize = MyCubeSize.Large;
-	        GridLinkTypeEnum connectionType = GridLinkTypeEnum.Physical;
+	        GridLinkTypeEnum connectionType = GridLinkTypeEnum.Logical;
 
 	        if (words.Any( ))
 	        {
