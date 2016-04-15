@@ -5,6 +5,7 @@
     using System.Diagnostics.Eventing.Reader;
     using System.Linq;
     using System.Threading;
+    using System.Windows.Input;
     using NLog;
     using Sandbox.Common;
     using Sandbox.Common.ObjectBuilders;
@@ -100,32 +101,7 @@
             //return entities.FirstOrDefault( entity => entity.DisplayName.ToLower( ).Contains( displayName.ToLower( ) ) );
             return entities.FirstOrDefault( entity => entity is MyCubeGrid && entity.DisplayName.ToLower( ).Contains( displayName.ToLower( ) ) );
 		}
-
-        /// <summary>
-        /// Gets groups from a list of entities. Pass entities as null to get all groups in the world.
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <param name="linkType"></param>
-        /// <returns></returns>
-	    public static HashSet<List<MyCubeGrid>> GetGroups(GridLinkTypeEnum linkType, HashSet<MyEntity> entities = null)
-	    {
-            if(entities==null)
-                Wrapper.GameAction( ()=>entities=MyEntities.GetEntities(  ) );
-
-            HashSet<List<MyCubeGrid>> result = new HashSet<List<MyCubeGrid>>();
-
-	        foreach(MyEntity entity in entities)
-	        {
-                MyCubeGrid grid = entity as MyCubeGrid;
-
-                if (grid == null || grid.Closed)
-                    continue;
-
-	            result.Add( MyCubeGridGroups.Static.GetGroups( linkType ).GetGroupNodes( grid ) );
-	        }
-	        return result;
-	    }
-
+        
 	    public static MyCubeGrid GetLargestInGroup( List<MyCubeGrid> group )
 	    {
 	        MyCubeGrid result = null;
@@ -280,7 +256,7 @@
 	        HashSet<MyEntity> entitiesToConfirm = new HashSet<MyEntity>( );
 	        HashSet<MyEntity> entitiesUnconnected = new HashSet<MyEntity>( );
 	        HashSet<MyEntity> entitiesFound = new HashSet<MyEntity>( );
-	        HashSet<List<MyCubeGrid>> groupsFound = new HashSet<List<MyCubeGrid>>( );
+	        HashSet<GridGroup> groupsFound = new HashSet<GridGroup>( );
 	        foreach ( MyEntity entity in entities.Where( x => x is MyCubeGrid ) )
 	        {
 	            MyCubeGrid grid = entity as MyCubeGrid;
@@ -316,14 +292,14 @@
 
 	        Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
 
-	        groupsFound = GetGroups( linkType, entitiesToConfirm );
+	        groupsFound = GridGroup.GetGroups( entitiesToConfirm, linkType );
+	        //groupsFound = GetGroups( linkType, entitiesToConfirm );
 
 	        foreach ( var group in groupsFound )
 	        {
-	            foreach ( MyCubeGrid grid in group )
+	            foreach ( MyCubeGrid grid in group.Grids )
 	            {
 	                subTypeDict.Clear( );
-	                MyEntity entity = (MyEntity)grid;
 	                bool found = false;
 	                foreach ( MySlimBlock slimBlock in grid.CubeBlocks )
 	                {
@@ -337,7 +313,7 @@
 	                        if ( block is MyFunctionalBlock )
 	                        {
 	                            if ( debug && !found )
-	                                Communication.SendPrivateInformation( userId, $"Found grid '{entity.DisplayName}' ({entity.EntityId}) which has a functional block.  BlockCount={( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count}" );
+	                                Communication.SendPrivateInformation( userId, $"Found grid '{grid.DisplayName}' ({grid.EntityId}) which has a functional block.  BlockCount={( (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder( ) ).CubeBlocks.Count}" );
 
 	                            found = true;
 	                        }
@@ -348,7 +324,7 @@
 	                        if ( block is MyTerminalBlock )
 	                        {
 	                            if ( debug && !found )
-	                                Communication.SendPrivateInformation( userId, $"Found grid '{entity.DisplayName}' ({entity.EntityId}) which has a terminal block.  BlockCount={( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count}" );
+	                                Communication.SendPrivateInformation( userId, $"Found grid '{grid.DisplayName}' ({grid.EntityId}) which has a terminal block.  BlockCount={( (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder( ) ).CubeBlocks.Count}" );
 
 	                            found = true;
 	                        }
@@ -360,7 +336,7 @@
 	                        if ( DoesBlockSupplyPower( block ) )
 	                        {
 	                            if ( debug && !found )
-	                                Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which has power.  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count ) );
+	                                Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which has power.  BlockCount={2}", grid.DisplayName, grid.EntityId, ( (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder( ) ).CubeBlocks.Count ) );
 
 	                            found = true;
 	                        }
@@ -387,7 +363,7 @@
 	                                if ( p.Value >= s.Value )
 	                                {
 	                                    if ( debug )
-	                                        Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which contains at least {4} of block type {3} ({5}).  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count, p.Key, s.Value, p.Value ) );
+	                                        Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which contains at least {4} of block type {3} ({5}).  BlockCount={2}", grid.DisplayName, grid.EntityId, ( (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder( ) ).CubeBlocks.Count, p.Key, s.Value, p.Value ) );
 
 	                                    found = true;
 	                                    break;
@@ -410,7 +386,7 @@
 	                                    if ( found )
 	                                        found = false;
 
-	                                    Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which is over limit of block type {3} at {4}.  BlockCount={2}", entity.DisplayName, entity.EntityId, ( (MyObjectBuilder_CubeGrid)entity.GetObjectBuilder( ) ).CubeBlocks.Count, s.Key, p.Value ) );
+	                                    Communication.SendPrivateInformation( userId, string.Format( "Found grid '{0}' ({1}) which is over limit of block type {3} at {4}.  BlockCount={2}", grid.DisplayName, grid.EntityId, ( (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder( ) ).CubeBlocks.Count, s.Key, p.Value ) );
 	                                    break;
 	                                }
 	                            }
@@ -419,7 +395,7 @@
 	                }
 
 	                if ( !found )
-	                    entitiesFound.Add( entity );
+	                    entitiesFound.Add( grid );
 	            }
 	        }
 
@@ -576,7 +552,7 @@
 	                    if (parts.Length > 2 && parts[2].ToLower( ) == "exact")
 	                    {
 	                        hasDisplayNameExact = true;
-	                        options.Add( "Matches Display Exactly", "true" );
+	                        options.Add( "Matches Display Name Exactly", "true" );
 	                    }
 	                }
 	            }
@@ -588,7 +564,7 @@
 	                {
 	                    hasCustomName = true;
 	                    customName = parts[1];
-	                    options.Add( "Matches Custom Name Text", "true:" + displayName );
+	                    options.Add( "Matches Custom Name Text", "true:" + customName );
 	                    //Console.WriteLine("Here: {0}", parts[2]);
 	                    if (parts.Length > 2 && parts[2].ToLower( ) == "exact")
 	                    {
@@ -1098,16 +1074,25 @@
 
 		    if (block is IMyBatteryBlock)
 		    {
-		        IMyBatteryBlock battery = (IMyBatteryBlock) block;
-		        if (battery.CurrentStoredPower > 0f)
+		        if (((IMyBatteryBlock)block).CurrentStoredPower > 0f)
 		            return true;
 		    }
 
 		    if (block is IMyReactor)
 		    {
-		        IMyReactor reactor = (IMyReactor) block;
 		        //reactors in creative mode provide power without uranium
-		        if (reactor.GetInventory( 0 ).GetItems(  ).Count > 0 || Server.Instance.Config.GameMode == MyGameModeEnum.Creative)
+		        bool found = false;
+
+                //check creative mode before entering the game thread
+		        if ( Server.Instance.Config.GameMode == MyGameModeEnum.Creative )
+		            return true;
+
+		        Wrapper.GameAction( ( ) =>
+		                            {
+		                                if ( ((IMyReactor)block).GetInventory( 0 ).GetItems( ).Count > 0 )
+		                                    found = true;
+		                            } );
+		        if ( found )
 		            return true;
 		    }
 
@@ -1157,20 +1142,50 @@
 	        return false;
 	    }
 
-	    public static bool DoesGroupHaveDisplayName( GridGroup group, string displayName, bool partial = true )
-	    {
-	        if ( partial )
-	            return group.CubeBlocks.Any( x => x?.FatBlock != null && x.FatBlock.Name.ToLower( ).Contains( displayName));
-	        else
-	            return group.CubeBlocks.Any( x => x?.FatBlock != null && x.FatBlock.Name.ToLower( ) == displayName);
-	    }
-
 	    public static bool DoesGroupHaveCustomName( GridGroup group, string customName, bool partial = true )
 	    {
+	        string customNameLower = customName.ToLower( );
+	        foreach ( MyCubeBlock cubeBlock in group.GetFatBlocks( ) )
+	        {
+	            MyFunctionalBlock block = cubeBlock as MyFunctionalBlock;
+	            if ( block?.CustomName == null )
+	                continue;
+
+	            if ( partial && block.CustomName.ToString(  ).ToLower(  ).Contains( customNameLower ) )
+	                return true;
+	            if ( !partial && block.CustomName.ToString(  ).ToLower( ) == customNameLower )
+	                return true;
+	        }
+	        return false;
+	        /*
 	        if ( partial )
-	            return group.Grids.Any( x => x.Name.ToLower( ).Contains( customName.ToLower( ) ) );
+	            return group.CubeBlocks.Any( x => x?.FatBlock != null && x.FatBlock.Name.ToLower( ).Contains( customName));
 	        else
-	            return group.Grids.Any( x => x.Name.ToLower( ) == customName);
+	            return group.CubeBlocks.Any( x => x?.FatBlock != null && x.FatBlock.Name.ToLower( ) == customName);
+	    */
+	    }
+
+	    public static bool DoesGroupHaveDisplayName( GridGroup group, string displayName, bool partial = true )
+	    {
+	        string displayNameLower = displayName.ToLower( );
+	        foreach ( MyCubeGrid grid in group.Grids )
+	        {
+	            if ( grid?.DisplayName == null )
+	                continue;
+
+	            if ( partial && grid.DisplayName.ToLower( ).Contains( displayNameLower ) )
+	                return true;
+	            if ( !partial && grid.DisplayName.ToLower( ) == displayNameLower )
+	                return true;
+            }
+	        return false;
+
+	        /*
+	        if ( partial )
+	            return group.Grids.Any( x => x != null && x.Name.ToLower( ).Contains( displayName ) );
+	        else
+	            return group.Grids.Any( x => x != null && x.Name.ToLower( ) == displayName);
+                */
 	    }
 
 	    public static bool IsGroupGridSize( GridGroup group, MyCubeSize size, bool isStatic = false )
@@ -1371,6 +1386,124 @@
 			}
 			return found;
 		}
+
+        //TODO: KILL THIS
+        public static void GetGridsUnconnected(HashSet<IMyEntity> connectedList, HashSet<IMyEntity> entitiesToConfirm)
+        {
+            foreach (IMyEntity entity in entitiesToConfirm)
+            {
+                if (!(entity is IMyCubeGrid))
+                    continue;
+
+                IMyCubeGrid grid = (IMyCubeGrid)entity;
+                MyObjectBuilder_CubeGrid gridBuilder = SafeGetObjectBuilder(grid);
+                if (gridBuilder == null)
+                    continue;
+
+                bool result = false;
+                foreach (MyObjectBuilder_CubeBlock block in gridBuilder.CubeBlocks)
+                {
+                    if (block.TypeId == typeof(MyObjectBuilder_ShipConnector))
+                    {
+                        MyObjectBuilder_ShipConnector connector = (MyObjectBuilder_ShipConnector)block;
+                        if (connector.Connected)
+                        {
+                            IMyEntity connectedEntity;
+                            MyAPIGateway.Entities.TryGetEntityById(connector.ConnectedEntityId, out connectedEntity);
+
+                            if (connectedEntity != null)
+                            {
+                                result = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (block.TypeId == typeof(MyObjectBuilder_PistonBase))
+                    {
+                        result = true;
+                        break;
+                    }
+
+                    if (block.TypeId == typeof(MyObjectBuilder_ExtendedPistonBase))
+                    {
+                        result = true;
+                        break;
+                    }
+
+                    if (block.TypeId == typeof(MyObjectBuilder_PistonTop))
+                    {
+                        result = true;
+                        break;
+                    }
+
+                    if (block.TypeId == typeof(MyObjectBuilder_MotorAdvancedStator))
+                    {
+                        MyObjectBuilder_MotorAdvancedStator stator = (MyObjectBuilder_MotorAdvancedStator)block;
+                        if (stator.RotorEntityId != 0)
+                        {
+                            IMyEntity connectedEntity = null;
+
+                            if (stator.RotorEntityId != null)
+                                MyAPIGateway.Entities.TryGetEntityById((long)stator.RotorEntityId, out connectedEntity);
+
+                            if (connectedEntity != null)
+                            {
+                                result = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (block.TypeId == typeof(MyObjectBuilder_MotorAdvancedRotor))
+                    {
+                        result = true;
+                        break;
+                    }
+
+                    if (block.TypeId == typeof(MyObjectBuilder_MotorStator))
+                    {
+                        MyObjectBuilder_MotorStator stator = (MyObjectBuilder_MotorStator)block;
+                        if (stator.RotorEntityId != 0)
+                        {
+                            IMyEntity connectedEntity = null;
+
+                            if (stator.RotorEntityId != null)
+                                MyAPIGateway.Entities.TryGetEntityById((long)stator.RotorEntityId, out connectedEntity);
+
+                            if (connectedEntity != null)
+                            {
+                                result = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (block.TypeId == typeof(MyObjectBuilder_MotorRotor))
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+
+                if (!result)
+                    connectedList.Add(entity);
+            }
+        }
+
+        public static MyObjectBuilder_CubeGrid SafeGetObjectBuilder(IMyCubeGrid grid)
+        {
+            MyObjectBuilder_CubeGrid gridBuilder = null;
+            try
+            {
+                gridBuilder = (MyObjectBuilder_CubeGrid)grid.GetObjectBuilder();
+            }
+            catch
+            {
+            }
+
+            return gridBuilder;
+        }
 
     }
 }

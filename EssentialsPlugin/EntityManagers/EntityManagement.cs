@@ -168,7 +168,7 @@
 				}
 
 				DateTime getGridsStart = DateTime.Now;
-				//CubeGrids.GetGridsUnconnected( entitiesFound, entitiesFiltered );
+				CubeGrids.GetGridsUnconnected( entitiesFound, entitiesFiltered );
 				getGrids += ( DateTime.Now - getGridsStart ).TotalMilliseconds;
 
 				HashSet<IMyEntity> entitiesToConceal = new HashSet<IMyEntity>( );
@@ -485,7 +485,10 @@
 			int pos = 0;
             //RemovedGrids.Clear( );
             try
-			{
+            {
+                if ( entity?.Physics == null )
+                    return;
+
 				if ( !entity.InScene )
 					return;
 
@@ -496,7 +499,8 @@
                 pos = 1;
 			    long ownerId = grid.BigOwners.FirstOrDefault( );
 				string ownerName = string.Empty;
-
+                if ( ownerId > 0 )
+                {
                     ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId( ownerId ).Name;
 
                     if ( !PluginSettings.Instance.DynamicConcealPirates )
@@ -508,7 +512,7 @@
                             return;
                         }
                     }
-                
+                }
                 Essentials.Log.Info( grid.EntityId.ToString() + " " + ownerId.ToString() + " " + ownerName );
 
 				pos = 2;
@@ -584,7 +588,7 @@
 			}
 			catch ( Exception ex )
 			{
-				Essentials.Log.Error( "Failure while concealing entity {0}.", pos, ex );
+				Essentials.Log.Error( ex, $"Failure while concealing entity {pos}." );
 			}
 		}
 
@@ -1158,7 +1162,7 @@
 					return false;
 				}
 
-				//.GetGridsUnconnected( entitiesFound, entities );
+				CubeGrids.GetGridsUnconnected( entitiesFound, entities );
 
 				HashSet<IMyEntity> entitiesToConceal = new HashSet<IMyEntity>( );
 				FilterEntitiesForMedbayCheck( steamId, entitiesFound, entitiesToConceal );

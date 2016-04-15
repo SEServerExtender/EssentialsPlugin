@@ -145,13 +145,13 @@
 				Communication.SendPrivateInformation(userId, string.Format("Total unconnected revealed entities: {0}", count));
 
 				Communication.SendPrivateInformation(userId, "==== Connected Entities ===");
-			    var groups = CubeGrids.GetGroups( GridLinkTypeEnum.Logical );
+			    var groups = GridGroup.GetAllGroups( GridLinkTypeEnum.Logical );
 				//Console.WriteLine("Here: {0} : {1} {2}", connectedFound.Intersect(entitiesFound).Count(), entitiesFound.Count, connectedFound.Count);
 				count = 0;
 
 			    foreach ( var group in groups )
 			    {
-			        foreach ( MyCubeGrid grid in group )
+			        foreach ( MyCubeGrid grid in group.Grids )
 			        {
 			            MyEntity entity = (MyEntity)grid;
 
@@ -161,7 +161,7 @@
 			            if ( !entity.InScene )
 			                continue;
 
-			            if ( group.Count < 2 )
+			            if ( group.Grids.Count < 2 )
 			                continue;
 
 			            long ownerId = 0;
@@ -175,7 +175,7 @@
 			            if ( ownerName == "" )
 			                ownerName = "No one";
 
-			            Communication.SendPrivateInformation( userId, $"Id: {entity.EntityId} Display: {entity.DisplayName} OwnerId: {ownerId} OwnerName: {ownerName} Position: {grid.PositionComp.GetPosition( )} BlockCount: {grid.BlocksCount} Connections: {@group.Count}" );
+			            Communication.SendPrivateInformation( userId, $"Id: {entity.EntityId} Display: {entity.DisplayName} OwnerId: {ownerId} OwnerName: {ownerName} Position: {grid.PositionComp.GetPosition( )} BlockCount: {grid.BlocksCount} Connections: {@group.Grids.Count}" );
 			            //Communication.SendPrivateInformation(userId, string.Format("Id: {0} Display: {1} OwnerId: {2} OwnerName: {3} Position: {4} BlockCount: {5} Connections: {6}", entity.EntityId, entity.DisplayName, ownerId, ownerName, General.Vector3DToString(entity.GetPosition()), slimBlocks.Count));
 			            count++;
 			        }

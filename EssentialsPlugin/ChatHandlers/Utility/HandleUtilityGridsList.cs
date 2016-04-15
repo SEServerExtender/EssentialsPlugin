@@ -25,16 +25,6 @@
 			return "/utility grids list";
 		}
 
-        public override Communication.ServerDialogItem GetHelpDialog( )
-        {
-            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
-            DialogItem.title = "Help";
-            DialogItem.header = "";
-            DialogItem.content = GetHelp( );
-            DialogItem.buttonText = "close";
-            return DialogItem;
-        }
-
         public override bool IsAdminCommand()
 		{
 			return false;
@@ -74,8 +64,8 @@
 			Wrapper.GameAction(() =>
 			{
 				MyAPIGateway.Entities.GetEntities(entities, x => x is IMyCubeGrid);
-				MyAPIGateway.Players.GetPlayers(players);
 			});
+				MyAPIGateway.Players.GetPlayers(players);
 
 			IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == userId);			
 
@@ -95,8 +85,8 @@
 
 					if(CubeGrids.IsFullOwner(grid, playerId, player) && !dialog)
 						result += string.Format("Grid '{0}' at {2}", grid.DisplayName, grid.EntityId, ShowCoordinates(entity.GetPosition()));
-					//else if (CubeGrids.IsFullOwner(grid, playerId, player) && dialog)
-						//result += string.Format("{0} - {1} - {2}bl - {3}", grid.DisplayName, ShowCoordinates(entity.GetPosition()), gridBuilder.CubeBlocks.Count, gridBuilder.GridSizeEnum);
+					else if (CubeGrids.IsFullOwner(grid, playerId, player) && dialog)
+						result += string.Format("{0} - {1} - {2}bl - {3}", grid.DisplayName, ShowCoordinates(entity.GetPosition()), grid.CubeBlocks.Count, grid.GridSizeEnum);
 					else
 						result += string.Format("Grid '{0}'", grid.DisplayName, grid.EntityId);
 

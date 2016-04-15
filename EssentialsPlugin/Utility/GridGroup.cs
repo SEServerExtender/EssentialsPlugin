@@ -82,13 +82,13 @@
         {
             HashSet<GridGroup> result = new HashSet<GridGroup>();
 
-            foreach ( MyEntity entity in entities.Where( x => x is MyCubeGrid  ) )
+            foreach ( MyEntity entity in entities )
             {
                 MyCubeGrid grid = entity as MyCubeGrid;
                 if ( grid == null )
                     continue;
 
-                if ( !result.Any( x => x.Grids.Contains( grid ) ) )
+                //if ( !result.Any( x => x.Grids.Contains( grid ) ) )
                     result.Add( new GridGroup( grid, linkType ) );
             }
 
@@ -139,7 +139,7 @@
             {
                 foreach ( var ownerId in grid.BigOwners )
                 {
-                    if ( ownerId > 0 && !bigOwners.Contains( ownerId ))
+                    if (!bigOwners.Contains( ownerId ) && ownerId > 0 )
                         bigOwners.Add( ownerId );
                 }
             }
