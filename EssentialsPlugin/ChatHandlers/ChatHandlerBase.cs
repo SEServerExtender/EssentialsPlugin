@@ -3,6 +3,8 @@
     using System;
     using System.Linq;
     using NLog;
+    using Sandbox.Engine.Multiplayer;
+    using Sandbox.Game.World;
     using SEModAPIInternal.API.Common;
     using Utility;
     public abstract class ChatHandlerBase
@@ -18,12 +20,17 @@
 			// Administrator Command
 			if (IsAdminCommand())
 			{
-
-
-                if (!PlayerManager.Instance.IsUserAdmin(steamId) && steamId != 0)
-					return false;
-
-            }
+			    if ( PluginSettings.Instance.PromotedAdminCommands )  //promoted (Space Master) players can use admin commands
+			    {
+			        if ( steamId != 0 && !MySession.Static.HasPlayerAdminRights( steamId ) )
+			            return false;
+			    }
+			    else
+			    {
+			        if ( steamId != 0 && !MyMultiplayer.Static.IsAdmin( steamId ) )
+			            return false;
+			    }
+			}
 
 			// Check if this command has multiple commands that do the same thing
 			if (GetMultipleCommandText().Length < 1)

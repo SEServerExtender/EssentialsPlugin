@@ -132,6 +132,19 @@
             }
         }
 
+        [Category("General")]
+        [Description("Promoted (Space Master) players can use admin chat commands")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public bool PromotedAdminCommands
+        {
+            get { return PluginSettings.Instance.PromotedAdminCommands; }
+            set
+            {
+                PluginSettings.Instance.PromotedAdminCommands = value;
+            }
+        }
+
         [Category( "Chat" )]
         [Description( "Name that users see when the server sends a chat message" )]
         [Browsable( true )]

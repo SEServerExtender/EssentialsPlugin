@@ -27,6 +27,7 @@
         private bool _serverUtilityGridsShowCoords;
         private bool _serverRespawnMenuOverride;
         private bool _stopShipsOnStart;
+        private bool _promotedAdminCommands;
 
         private string _serverChatName;
         private bool _factionChatPrefix;
@@ -175,6 +176,16 @@
             {
                 _stopShipsOnStart = value;
                 Save();
+            }
+        }
+
+        public bool PromotedAdminCommands
+        {
+            get { return _promotedAdminCommands; }
+            set
+            {
+                _promotedAdminCommands = value;
+                Save( );
             }
         }
 
@@ -1045,6 +1056,7 @@
             _reservedSlotsAdmins = false;
 
             _stopShipsOnStart = false;
+            _promotedAdminCommands = true;
 
             _serverChatName = "Server";
             _factionChatPrefix = true;
