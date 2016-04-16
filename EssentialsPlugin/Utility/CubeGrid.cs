@@ -778,7 +778,7 @@
 	            if (power == 2 && DoesGroupHavePowerSupply( group ))
 	                groupsToConfirm.Add( group );
 
-	            if (owner == 1 && group.BigOwners.Count == 0)
+	            if ( owner == 1 && group.BigOwners.Count == 0 || ( group.BigOwners.Count == 1 && group.BigOwners[0] == 0 ) )
 	                groupsToConfirm.Add( group );
 	            if (owner == 2 && group.BigOwners.Count > 0)
 	                groupsToConfirm.Add( group );
@@ -1004,10 +1004,10 @@
 			bool found = false;
 			foreach ( MySlimBlock slimBlock in grid.CubeBlocks )
 			{
-			    if ( slimBlock?.FatBlock == null )
+				MyTerminalBlock functional = slimBlock?.FatBlock as MyFunctionalBlock;
+			    if ( functional == null )
 			        continue;
-                
-				MyTerminalBlock functional = (MyTerminalBlock)slimBlock.FatBlock;
+
 				if ( factionPlayer == null )
 				{
 					if ( functional.OwnerId != 0)
@@ -1503,6 +1503,43 @@
             }
 
             return gridBuilder;
+        }
+
+        public static List<long> GetBigOwners(MyObjectBuilder_CubeGrid grid)
+        {
+            Dictionary<long, int> ownerList = new Dictionary<long, int>();
+            foreach (MyObjectBuilder_CubeBlock block in grid.CubeBlocks)
+            {
+                if (block.Owner == 0)
+                    continue;
+
+                if (ownerList.ContainsKey(block.Owner))
+                    ownerList[block.Owner] = ownerList[block.Owner] + 1;
+                else
+                    ownerList.Add(block.Owner, 1);
+            }
+
+            int count = ownerList.OrderBy(x => x.Value).Select(x => x.Value).FirstOrDefault();
+            return ownerList.OrderBy(x => x.Value).Where(x => x.Value == count).Select(x => x.Key).ToList();
+        }
+
+        public static bool GetOwner(MyObjectBuilder_CubeGrid grid, out long ownerId)
+        {
+            ownerId = 0;
+            foreach (MyObjectBuilder_CubeBlock block in grid.CubeBlocks)
+            {
+                if (!(block is MyObjectBuilder_TerminalBlock))
+                    continue;
+
+                MyObjectBuilder_TerminalBlock functional = (MyObjectBuilder_TerminalBlock)block;
+                if (functional.Owner != 0)
+                {
+                    ownerId = functional.Owner;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
     }
