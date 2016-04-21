@@ -784,9 +784,9 @@
 	            if ( power == 2 && DoesGroupHavePowerSupply( group ) )
 	                found = true;
 
-	            if ( owner == 1 && group.BigOwners.Count == 0 || ( group.BigOwners.Count == 1 && group.BigOwners[0] == 0 ) )
+                if (owner == 1 && group.SmallOwners.Count == 0 || (group.SmallOwners.Count == 1 && group.SmallOwners[0] == 0 ) )
 	                found = true;
-	            if ( owner == 2 && group.BigOwners.Count > 0 )
+	            if ( owner == 2 && group.SmallOwners.Count > 0 )
 	                found = true;
 
 	            if ( functional == 1 && !IsGroupFunctional( group ) )
@@ -854,21 +854,26 @@
 	            subTypeDict.Clear( );
 	            typeDict.Clear( );
 	            checkList.Clear( );
+                
+	            bool found = true;
 
 	            if ( online == 1 ) // notonline
 	            {
 	                if ( AreOwnersOnline( group ) )
-	                    continue;
+	                    found=false;
 	            }
 	            else if ( online == 2 ) // online
 	            {
 	                if ( !AreOwnersOnline( group ) )
-	                    continue;
+	                    found=false;
 	            }
 
-	            bool found = true;
+                if (owner == 1 && group.SmallOwners.Count == 0 || (group.SmallOwners.Count == 1 && group.SmallOwners[0] == 0))
+                    continue;
+	            if ( owner == 2 && group.SmallOwners.Count > 0 )
+	                continue;
 
-	            if ( functional != 0 )
+                if ( functional != 0 )
 	            {
 	                if ( IsGroupFunctional( group ) )
 	                {
@@ -972,22 +977,22 @@
 	            if ( excludesBlockType && found )
 	                found = ApplyBlockExclusionFilter( userId, typeDict, blockTypes, quiet, debug, group );
 
-	            if ( requireBlockCount && found && group.CubeBlocks.Count < blockCount )
+	            if ( requireBlockCount && group.CubeBlocks.Count < blockCount )
 	            {
 	                found = false;
 	            }
 
-	            if ( requireBlockCountLess && found && group.CubeBlocks.Count >= blockCountLess )
+	            if ( requireBlockCountLess && group.CubeBlocks.Count >= blockCountLess )
 	            {
 	                found = false;
 	            }
 
-	            if ( isBlockSize && found && blockSize == MyCubeSize.Small && !IsGroupGridSize( group, MyCubeSize.Small ) )
+	            if ( isBlockSize && blockSize == MyCubeSize.Small && !IsGroupGridSize( group, MyCubeSize.Small ) )
 	            {
 	                found = false;
 	            }
 
-	            if ( isBlockSize && found && blockSize == MyCubeSize.Large &&
+	            if ( isBlockSize && blockSize == MyCubeSize.Large &&
 	                 !IsGroupGridSize( group, MyCubeSize.Large, testStatic ) )
 	            {
 	                found = false;
