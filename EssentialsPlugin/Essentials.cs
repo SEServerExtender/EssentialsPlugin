@@ -1171,7 +1171,6 @@
                                    new ProcessCleanup( ),
                                    new ProcessBlockEnforcement( ),
                                    new ProcessSpawnShipTracking( ),
-                                   new ProcessVoxels(  ),
                                    new ProcessReservedSlots(),
                                    new ProcessTimedCommands(  ),
                                    new ProcessSpeed(  ),

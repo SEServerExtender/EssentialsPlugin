@@ -60,11 +60,7 @@
 
 		    try
 		    {
-		        HashSet<MyEntity> entities = new HashSet<MyEntity>( );
-		        Wrapper.GameAction( ( ) => entities = MyEntities.GetEntities( ) );
-
-		        HashSet<GridGroup> groupsFound = new HashSet<GridGroup>( );
-		        HashSet<GridGroup> groups = GridGroup.GetGroups( entities, connectionType );
+		        HashSet<GridGroup> groups = GridGroup.GetAllGroups( connectionType );
 		        int groupsCount = 0;
 		        int gridsCount = 0;
 

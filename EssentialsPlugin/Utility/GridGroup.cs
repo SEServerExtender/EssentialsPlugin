@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Sandbox.Game.Entities;
     using Sandbox.Game.Entities.Cube;
     using VRage.Game.Entity;
@@ -9,11 +10,11 @@
     public class GridGroup
     {
         private readonly HashSet<MyCubeGrid> _grids = new HashSet<MyCubeGrid>( );
-        private readonly HashSet<MySlimBlock> _cubeBlocks = new HashSet<MySlimBlock>(); 
-        private readonly List<MyCubeBlock> _fatBlocks = new List<MyCubeBlock>(); 
-        private readonly List<long> _bigOwners = new List<long>(); 
-        private readonly List<long> _smallOwners = new List<long>();
-        private readonly MyCubeGrid _parent;
+        private HashSet<MySlimBlock> _cubeBlocks = new HashSet<MySlimBlock>(); 
+        private List<MyCubeBlock> _fatBlocks = new List<MyCubeBlock>(); 
+        private List<long> _bigOwners = new List<long>(); 
+        private List<long> _smallOwners = new List<long>();
+        private MyCubeGrid _parent;
 
         public HashSet<MyCubeGrid> Grids
         {
@@ -71,27 +72,38 @@
             foreach ( MyCubeGrid node in tmpList )
                 _grids.Add( node );
 
-            GetParent( ref _parent );
-            GetCubeBlocks( ref _cubeBlocks );
-            _GetFatBlocks( ref _fatBlocks );
-            GetBigOwners( ref _bigOwners);
-            GetSmallOwners( ref _smallOwners );
+            //Task.Run( ( ) =>
+            //          {
+                          GetParent( );
+                          GetCubeBlocks( );
+                          _GetFatBlocks( );
+                          GetBigOwners( );
+                          GetSmallOwners( );
+            //          } );
         }
 
         public static HashSet<GridGroup> GetGroups( HashSet<MyEntity> entities, GridLinkTypeEnum linkType = GridLinkTypeEnum.Logical )
         {
             HashSet<GridGroup> result = new HashSet<GridGroup>();
+            
+            //Create a copy of the entities list;
+            //group processing can take so long that the internal list of entities can change
+            //which is Bad.
+            MyEntity[] entitiesCopy = new MyEntity[entities.Count];
+            entities.CopyTo( entitiesCopy );
+            //List<Task> groupTasks = new List<Task>();
 
-            foreach ( MyEntity entity in entities )
+            foreach ( MyEntity entity in entitiesCopy )
             {
                 MyCubeGrid grid = entity as MyCubeGrid;
-                if ( grid == null )
+
+                //TODO: InScene check is here because of a bug in the game. Remove it when fixed?
+                if ( grid?.Physics == null || grid.Closed || !grid.InScene)
                     continue;
-
-                //if ( !result.Any( x => x.Grids.Contains( grid ) ) )
-                    result.Add( new GridGroup( grid, linkType ) );
+                
+                result.Add(new GridGroup(grid, linkType));
             }
-
+            
             return result;
         }
 
@@ -116,21 +128,21 @@
                                 } );
         }
 
-        private void GetParent( ref MyCubeGrid parent )
+        private void GetParent(  )
         {
             if ( _grids.Count < 1 )
                 return;
             
             foreach ( MyCubeGrid grid in _grids )
             {
-                if ( parent == null || (grid.BlocksCount > parent.BlocksCount) )
-                    parent = grid;
+                if ( _parent == null || (grid.BlocksCount > _parent.BlocksCount) )
+                    _parent = grid;
             }
         }
 
-        private void GetBigOwners(ref List<long> bigOwners)
+        private void GetBigOwners( )
         {
-            bigOwners.Clear(  );
+            _bigOwners.Clear(  );
             Dictionary<long, int> owners = new Dictionary<long, int>();
             //foreach ( long ownerId in _grids.SelectMany( grid => grid.BigOwners ).Where( x => x > 0 ) )
             //    owners[ownerId] = 0;
@@ -139,8 +151,8 @@
             {
                 foreach ( var ownerId in grid.BigOwners )
                 {
-                    if (!bigOwners.Contains( ownerId ) && ownerId > 0 )
-                        bigOwners.Add( ownerId );
+                    if (!_bigOwners.Contains( ownerId ) && ownerId > 0 )
+                        _bigOwners.Add( ownerId );
                 }
             }
             return;
@@ -155,29 +167,30 @@
             foreach ( long owner in owners.Keys )
             {
                 if(owners[owner] == maxCount)
-                    bigOwners.Add( owner );
+                    _bigOwners.Add( owner );
             }
         }
 
-        private void GetSmallOwners( ref List<long> smallOwners )
+        private void GetSmallOwners( )
         {
-            smallOwners.Clear(  );
+            _smallOwners.Clear(  );
             HashSet<long> result = new HashSet<long>( );
             foreach ( long owner in _grids.SelectMany( grid => grid.SmallOwners ).Where( x => x > 0 ) )
                 result.Add( owner );
-            smallOwners = result.ToList( );
+            _smallOwners = result.ToList( );
         }
 
-        private void GetCubeBlocks( ref HashSet<MySlimBlock> blocks )
+        private void GetCubeBlocks( )
         {
+            _cubeBlocks.Clear(  );
             foreach ( MyCubeGrid grid in _grids )
-                blocks.UnionWith( grid.CubeBlocks );
+                _cubeBlocks.UnionWith( grid.CubeBlocks );
         }
 
-        private void _GetFatBlocks( ref List<MyCubeBlock> blocks )
+        private void _GetFatBlocks(  )
         {
-            blocks.Clear(  );
-            blocks =  _cubeBlocks.Select( b => b?.FatBlock ).Where( f => f != null ).ToList(  );
+            _fatBlocks.Clear(  );
+            _fatBlocks =  _cubeBlocks.Select( b => b?.FatBlock ).Where( f => f != null ).ToList(  );
         }
     }
 }

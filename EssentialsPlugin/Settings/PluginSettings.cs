@@ -91,8 +91,6 @@
         private bool _dynamicTurretAllowExemption;
         private bool _dynamicBlockManagementEnabled;
         private DynamicTurretManagementMode _mDynamicTurretManagementMode;
-        private bool _dynamicVoxelManagementEnabled;
-        private int _dynamicVoxelDistance;
 
         private bool _dynamicConcealServerOnly;
         private bool _dynamicClientConcealEnabled;
@@ -757,27 +755,7 @@
 				Save();
 			}
 		}
-
-        public bool DynamicVoxelManagementEnabled
-        {
-            get { return _dynamicVoxelManagementEnabled; }
-            set
-            {
-                _dynamicVoxelManagementEnabled = value;
-                Save();
-            }
-        }
-
-        public int DynamicVoxelDistance
-        {
-            get { return _dynamicVoxelDistance; }
-            set
-            {
-                _dynamicVoxelDistance = value;
-                Save();
-            }
-        }
-
+        
 		public bool DynamicBlockManagementEnabled
 		{
 			get { return _dynamicBlockManagementEnabled; }
@@ -1056,7 +1034,7 @@
             _reservedSlotsAdmins = false;
 
             _stopShipsOnStart = false;
-            _promotedAdminCommands = true;
+            _promotedAdminCommands = false;
 
             _serverChatName = "Server";
             _factionChatPrefix = true;
@@ -1073,8 +1051,6 @@
             _dynamicShowMessages = false;
 			_dynamicTurretTargetDistance = 2000;
 			_dynamicTurretManagementEnabled = false;
-            _dynamicVoxelManagementEnabled = false;
-            _dynamicVoxelDistance = 20000;
 
 			_dockingShipsPerZone = 1;
 

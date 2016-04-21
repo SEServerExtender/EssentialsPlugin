@@ -140,7 +140,6 @@
     <Compile Include="ChatHandlers\HandleInfo.cs" />
     <Compile Include="ChatHandlers\Utility\HandleUtilityGridsList.cs" />
     <Compile Include="ChatHandlers\Utility\HandleUtilityExportServer.cs" />
-    <Compile Include="EntityManagers\VoxelManagement.cs" />
     <Compile Include="Essentials.cs" />
     <Compile Include="EntityManagers\BlockManagement.cs" />
     <Compile Include="EntityManagers\TurretManagement.cs" />
@@ -160,7 +159,6 @@
     <Compile Include="ProcessHandlers\ProcessConquest.cs" />
     <Compile Include="ProcessHandlers\ProcessLoginTracking.cs" />
     <Compile Include="ProcessHandlers\ProcessSpawnShipTracking.cs" />
-    <Compile Include="ProcessHandlers\ProcessVoxels.cs" />
     <Compile Include="ProcessHandlers\ProcessWaypoints.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -318,7 +316,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y E:\GitHub\EssentialsPlugin\EssentialsPlugin\bin\x64\Debug\Essentials.dll c:\programdata\SpaceEngineersDedicated\SESEDevTest\Mods\Essentials</PostBuildEvent>
+    <PostBuildEvent>copy /Y E:\GitHub\EssentialsPlugin\EssentialsPlugin\bin\x64\Debug\Essentials.dll "c:\programdata\SpaceEngineersDedicated\SESEDevTest\Mods\Essentials"
+copy /Y E:\GitHub\EssentialsPlugin\EssentialsPlugin\bin\x64\Debug\Essentials.dll "C:\ProgramData\SpaceEngineersDedicated\OGG Roids Jan29\Mods\Essentials"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
