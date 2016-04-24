@@ -1,7 +1,10 @@
 ﻿namespace EssentialsPlugin.Utility
 {
+    using System;
     using System.Collections.Generic;
+    using System.Drawing.Drawing2D;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using Sandbox.Game.Entities;
     using Sandbox.Game.Entities.Cube;
@@ -65,23 +68,30 @@
 
         public GridGroup( MyCubeGrid grid, GridLinkTypeEnum linkType = GridLinkTypeEnum.Logical )
         {
-            List<MyCubeGrid> tmpList = new List<MyCubeGrid>();
+            //HACK: Manually create a group for out of scene grids because pulling them from the server crashes
+            if ( grid.InScene )
+            {
+                List<MyCubeGrid> tmpList = new List<MyCubeGrid>( );
 
-            Wrapper.GameAction( ( ) => tmpList = MyCubeGridGroups.Static.GetGroups( linkType ).GetGroupNodes( grid ) );
+                //find the group containing this grid with the given link type
+                Wrapper.GameAction( ( ) => tmpList = MyCubeGridGroups.Static.GetGroups( linkType ).GetGroupNodes( grid ) );
 
-            foreach ( MyCubeGrid node in tmpList )
-                _grids.Add( node );
+                foreach ( MyCubeGrid node in tmpList )
+                    _grids.Add( node );
+            }
+            else
+            {
+                _grids.Add( grid );
+            }
 
-            //Task.Run( ( ) =>
-            //          {
-                          GetParent( );
-                          GetCubeBlocks( );
-                          _GetFatBlocks( );
-                          GetBigOwners( );
-                          GetSmallOwners( );
-            //          } );
+            //populate our internal lists
+            GetParent( );
+            GetCubeBlocks( );
+            _GetFatBlocks( );
+            GetBigOwners( );
+            GetSmallOwners( );
         }
-
+        
         public static HashSet<GridGroup> GetGroups( HashSet<MyEntity> entities, GridLinkTypeEnum linkType = GridLinkTypeEnum.Logical )
         {
             HashSet<GridGroup> result = new HashSet<GridGroup>();
@@ -91,19 +101,29 @@
             //which is Bad.
             MyEntity[] entitiesCopy = new MyEntity[entities.Count];
             entities.CopyTo( entitiesCopy );
-            //List<Task> groupTasks = new List<Task>();
+            List<Task> groupTasks = new List<Task>();
 
             foreach ( MyEntity entity in entitiesCopy )
             {
                 MyCubeGrid grid = entity as MyCubeGrid;
-
-                //TODO: InScene check is here because of a bug in the game. Remove it when fixed?
-                if ( grid?.Physics == null || grid.Closed || !grid.InScene)
+                
+                if ( grid?.Physics == null || grid.Closed )
                     continue;
                 
-                result.Add(new GridGroup(grid, linkType));
+                //on large servers this can run into the tens of seconds, so parallelize it
+                groupTasks.Add( Task.Run( ( ) =>
+                                          {
+                                              if ( result.Any( x => x.Grids.Contains( grid ) ) )
+                                                  return;
+
+                                              lock ( result )
+                                              {
+                                                  result.Add( new GridGroup( grid, linkType ) );
+                                              }
+                                          } ) );
             }
-            
+
+            Task.WaitAll( groupTasks.ToArray(  ) );
             return result;
         }
 
@@ -142,6 +162,7 @@
 
         private void GetBigOwners( )
         {
+            //TODO: Actually process the list of owners to get the big owner of the entire group
             _bigOwners.Clear(  );
             Dictionary<long, int> owners = new Dictionary<long, int>();
             //foreach ( long ownerId in _grids.SelectMany( grid => grid.BigOwners ).Where( x => x > 0 ) )

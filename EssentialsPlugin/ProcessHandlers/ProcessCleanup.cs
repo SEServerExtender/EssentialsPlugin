@@ -3,13 +3,11 @@
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
-	using EssentialsPlugin.Settings;
-	using EssentialsPlugin.Utility;
+	using Settings;
+	using Utility;
 	using SEModAPI.API.Utility;
-	using VRage.Game.Entity;
-	using VRage.ModAPI;
 
-	class ProcessCleanup : ProcessHandlerBase
+    class ProcessCleanup : ProcessHandlerBase
 	{
 		private SettingsCleanupTriggerItem _triggerdItem;
 		private DateTime _start = DateTime.Now;
@@ -64,7 +62,7 @@
 
 			if ( itemTime - DateTime.Now < _oneSecond && DateTime.Now - item.LastRan > _oneMinute )
 			{
-				string command = string.Format( "{0} quiet", item.ScanCommand );
+				string command = $"{item.ScanCommand} quiet";
 				HashSet<GridGroup> groups = CubeGrids.ScanGrids( 0, CommandParser.GetCommandParts( command ).ToArray( ) );
                 
 			    int groupCount = groups.Count;
@@ -74,7 +72,7 @@
 			        gridCount += group.Grids.Count;
                     group.Close(  );
 			    }
-				Communication.SendPublicInformation( $"[NOTICE]: Timed cleanup has run. {gridCount} grids in {groupCount} removed." );
+				Communication.SendPublicInformation( $"[NOTICE]: Timed cleanup has run. {gridCount} grids in {groupCount} groups removed." );
 				item.LastRan = DateTime.Now;
 				item.NotificationItemsRan.Clear( );
 				return;
@@ -120,7 +118,7 @@
 
                     if ( gridsCount >= item.MaxCapacity )
 					{
-						Communication.SendPublicInformation( string.Format( "[NOTICE]: Cleanup triggered.  ({0} of {1}) triggered grids found.  Cleanup will run in {2} minutes.  Reason: {3}", gridsCount, item.MaxCapacity, item.MinutesAfterCapacity, item.Reason ) );
+						Communication.SendPublicInformation( $"[NOTICE]: Cleanup triggered.  ({gridsCount} of {item.MaxCapacity}) triggered grids found.  Cleanup will run in {item.MinutesAfterCapacity} minutes.  Reason: {item.Reason}" );
 						item.NotificationItemsRan.Clear( );
 						_triggerdItem = item;
 					}
@@ -140,7 +138,7 @@
                         gridCount += group.Grids.Count;
                         group.Close();
                     }
-                    Communication.SendPublicInformation( $"[NOTICE]: Triggered cleanup has run. {gridCount} grids in {groups} removed." );
+                    Communication.SendPublicInformation( $"[NOTICE]: Triggered cleanup has run. {gridCount} grids in {groupCount} groups removed." );
 					_triggerdItem = null;
 					return;
 				}

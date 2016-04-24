@@ -404,6 +404,13 @@
 			return entitiesFound;
 		}
 
+	    public enum StateEnum
+	    {
+	        Ignore,
+            RequiresNo,
+            RequiresYes
+	    }
+
 	    public static HashSet<GridGroup> ScanGrids( ulong userId, string[] words )
 	    {
 	        Dictionary<string, string> options = new Dictionary<string, string>( );
@@ -413,17 +420,17 @@
 	        // terminal
 	        // ownership
 	        // power
-	        int functional = 0;
-	        int terminal = 0;
-	        int power = 0;
-	        int owner = 0;
-	        int online = 0;
+	        var functional = StateEnum.Ignore;
+	        var terminal = StateEnum.Ignore;
+	        var power = StateEnum.Ignore;
+	        var owner = StateEnum.Ignore;
+	        var online = StateEnum.Ignore;
 
-	        // debug
-	        // hasdisplayname
-	        // blocksubtype
-	        // blocksubtypelimit
-	        bool hasDisplayName = false;
+            // debug
+            // hasdisplayname
+            // blocksubtype
+            // blocksubtypelimit
+            bool hasDisplayName = false;
 	        bool hasDisplayNameExact = false;
 	        bool displayNameGroup = false;
 	        bool hasBlockSubType = false;
@@ -480,61 +487,61 @@
 	            if ( words.SingleOrDefault( x => x.ToLower( ) == "ownership" ) != null )
 	            {
 	                options.Add( "Ownership", "true" );
-	                owner = 2;
+	                owner = StateEnum.RequiresYes;
 	            }
 
 	            if ( words.SingleOrDefault( x => x.ToLower( ) == "noownership" ) != null )
 	            {
 	                options.Add( "Ownership", "false" );
-	                owner = 1;
+	                owner = StateEnum.RequiresNo;
 	            }
 
 	            if ( words.FirstOrDefault( x => x.ToLower( ) == "functional" ) != null )
 	            {
 	                options.Add( "Functional", "true" );
-	                functional = 2;
+	                functional = StateEnum.RequiresYes;
 	            }
 
 	            if ( words.FirstOrDefault( x => x.ToLower( ) == "nofunctional" ) != null )
 	            {
 	                options.Add( "Functional", "false" );
-	                functional = 1;
+	                functional = StateEnum.RequiresNo;
 	            }
 
 	            if ( words.FirstOrDefault( x => x.ToLower( ) == "terminal" ) != null )
 	            {
 	                options.Add( "Terminal", "true" );
-	                terminal = 2;
+	                terminal = StateEnum.RequiresYes;
 	            }
 
 	            if ( words.FirstOrDefault( x => x.ToLower( ) == "noterminal" ) != null )
 	            {
 	                options.Add( "Terminal", "false" );
-	                terminal = 1;
+	                terminal = StateEnum.RequiresNo;
 	            }
 
 	            if ( words.FirstOrDefault( x => x.ToLower( ) == "power" ) != null )
 	            {
 	                options.Add( "Has Power", "true" );
-	                power = 2;
+	                power = StateEnum.RequiresYes;
 	            }
 
 	            if ( words.FirstOrDefault( x => x.ToLower( ) == "nopower" ) != null )
 	            {
 	                options.Add( "Has Power", "false" );
-	                power = 1;
+	                power = StateEnum.RequiresNo;
 	            }
 
 	            if ( words.FirstOrDefault( x => x.ToLower( ) == "notonline" ) != null )
 	            {
 	                options.Add( "Online", "false" );
-	                online = 1;
+	                online = StateEnum.RequiresNo;
 	            }
 
 	            if ( words.FirstOrDefault( x => x.ToLower( ) == "online" ) != null )
 	            {
 	                options.Add( "Online", "true" );
-	                online = 2;
+	                online = StateEnum.RequiresYes;
 	            }
 
 	            if ( words.FirstOrDefault( x => x.ToLower( ).StartsWith( "hasdisplayname:" ) ) != null )
@@ -767,246 +774,86 @@
 	                                                  $"Scanning for ships with options: {GetOptionsText( options )}" );
 
 	        HashSet<GridGroup> groupsToConfirm = new HashSet<GridGroup>( );
-
 	        HashSet<GridGroup> groups = GridGroup.GetAllGroups( connectionType );
 	        HashSet<GridGroup> groupsFound = new HashSet<GridGroup>( );
-	        List<Task> scanTasks = new List<Task>( );
-
-	        if ( !words.Any( ) )
-	            return groups;
-
+            List<Task> scanTasks = new List<Task>();
+            
+            /*
+            * invert scan logic here
+            * if we find a group that fails any of the checks, break
+            * everything else implicitly goes into the found list
+            * 
+            * on large servers this can run into the tens of seconds,
+            * so parallelize it
+            */
 	        foreach ( GridGroup group in groups )
 	        {
-	            bool found = false;
+	            scanTasks.Add( Task.Run( ( ) =>
+	                                     {
+	                                         if ( power == StateEnum.RequiresYes && !DoesGroupHavePowerSupply( group ) )
+	                                             return;
+	                                         if ( power == StateEnum.RequiresNo && DoesGroupHavePowerSupply( group ) )
+	                                             return;
 
-	            if ( power == 1 && !DoesGroupHavePowerSupply( group ) )
-	                found = true;
-	            if ( power == 2 && DoesGroupHavePowerSupply( group ) )
-	                found = true;
+	                                         if ( owner == StateEnum.RequiresYes && group.SmallOwners.Count == 0 || ( group.SmallOwners.Count == 1 && group.SmallOwners[0] == 0 ) )
+	                                             return;
+	                                         if ( owner == StateEnum.RequiresNo && group.SmallOwners.Count > 0 )
+	                                             return;
 
-                if (owner == 1 && group.SmallOwners.Count == 0 || (group.SmallOwners.Count == 1 && group.SmallOwners[0] == 0 ) )
-	                found = true;
-	            if ( owner == 2 && group.SmallOwners.Count > 0 )
-	                found = true;
+	                                         if ( functional == StateEnum.RequiresYes && !IsGroupFunctional( group ) )
+	                                             return;
+	                                         if ( functional == StateEnum.RequiresNo && IsGroupFunctional( group ) )
+	                                             return;
 
-	            if ( functional == 1 && !IsGroupFunctional( group ) )
-	                found = true;
-	            if ( functional == 2 && IsGroupFunctional( group ) )
-	                found = true;
+	                                         if ( terminal == StateEnum.RequiresYes && !DoesGroupHaveTerminal( group ) )
+	                                             return;
+	                                         if ( terminal == StateEnum.RequiresNo && DoesGroupHaveTerminal( group ) )
+	                                             return;
 
-	            if ( terminal == 1 && !DoesGroupHaveTerminal( group ) )
-	                found = true;
-	            if ( terminal == 2 && DoesGroupHaveTerminal( group ) )
-	                found = true;
+	                                         if ( online == StateEnum.RequiresYes && !AreOwnersOnline( group ) )
+	                                             return;
+	                                         if ( online == StateEnum.RequiresNo && AreOwnersOnline( group ) )
+	                                             return;
 
-	            if ( online == 1 && !AreOwnersOnline( group ) )
-	                found = true;
-	            if ( online == 2 && AreOwnersOnline( group ) )
-	                found = true;
+	                                         if ( hasDisplayName && !DoesGroupHaveDisplayName( group, displayName, hasDisplayNameExact, displayNameGroup ) )
+	                                             return;
 
-	            if ( hasDisplayName && DoesGroupHaveDisplayName( group, displayName, hasDisplayNameExact, displayNameGroup ) )
-	                found = true;
+	                                         if ( hasCustomName && !DoesGroupHaveCustomName( group, customName, hasCustomNameExact ) )
+	                                             return;
 
-	            if ( hasCustomName && DoesGroupHaveCustomName( group, customName, hasCustomNameExact ) )
-	                found = true;
+	                                         if ( isBlockSize && !IsGroupGridSize( group, blockSize, testStatic ) )
+	                                             return;
 
-	            if ( isBlockSize && IsGroupGridSize( group, blockSize, testStatic ) )
-	                found = true;
+	                                         if ( isOwnedBy && !( group.BigOwners.Count == 1 && group.BigOwners[0] == ownedByPlayerId ) )
+	                                             return;
 
-	            if ( isOwnedBy && group.BigOwners.Count == 1 && group.BigOwners[0] == ownedByPlayerId )
-	                found = true;
+	                                         if ( requireBlockCount && !( group.BlocksCount > blockCount ) )
+	                                             return;
 
-	            if ( requireBlockCount && group.BlocksCount > blockCount )
-	                found = true;
+	                                         if ( requireBlockCountLess && !( group.BlocksCount < blockCountLess ) )
+	                                             return;
 
-	            if ( requireBlockCountLess && group.BlocksCount < blockCountLess )
-	                found = true;
+	                                         if ( hasBlockSubType && !blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ) )
+	                                             return;
 
-	            if ( hasBlockSubType && blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ) )
-	                found = true;
+	                                         if ( excludesBlockType && blockSubTypes.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value + 1 ) ) )
+	                                             return;
 
-	            if ( excludesBlockType && !blockSubTypes.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value + 1 ) ) )
-	                found = true;
+	                                         if ( includesBlockType && !blockTypes.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value ) ) )
+	                                             return;
 
-	            if ( includesBlockType && blockTypes.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value ) ) )
-	                found = true;
+	                                         if ( hasBlockSubTypeLimits &&
+	                                              !blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value + 1 ) ) )
+	                                             return;
 
-	            if ( hasBlockSubTypeLimits &&
-	                 blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value + 1 ) ) )
-	                found = true;
-
-	            if ( !found )
-	                continue;
-
-	            lock ( groupsToConfirm )
-	            {
-	                groupsToConfirm.Add( group );
-	            }
+	                                         lock ( groupsFound )
+	                                         {
+	                                             groupsFound.Add( group );
+	                                         }
+	                                     } ) );
 	        }
-	    
-
-	    Dictionary<string, int> subTypeDict = new Dictionary<string, int>( );
-	        Dictionary<string, int> typeDict = new Dictionary<string, int>( );
-	        List<string> checkList = new List<string>( );
-
-	        foreach ( GridGroup group in groupsToConfirm )
-	        {
-	            subTypeDict.Clear( );
-	            typeDict.Clear( );
-	            checkList.Clear( );
-                
-	            bool found = true;
-
-	            if ( online == 1 ) // notonline
-	            {
-	                if ( AreOwnersOnline( group ) )
-	                    found=false;
-	            }
-	            else if ( online == 2 ) // online
-	            {
-	                if ( !AreOwnersOnline( group ) )
-	                    found=false;
-	            }
-
-                if (owner == 1 && group.SmallOwners.Count == 0 || (group.SmallOwners.Count == 1 && group.SmallOwners[0] == 0))
-                    continue;
-	            if ( owner == 2 && group.SmallOwners.Count > 0 )
-	                continue;
-
-                if ( functional != 0 )
-	            {
-	                if ( IsGroupFunctional( group ) )
-	                {
-	                    //							if (debug && !found)
-	                    //								Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which has a functional block.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count));
-
-	                    if ( !checkList.Contains( "functional" ) )
-	                        checkList.Add( "functional" );
-	                }
-	            }
-
-	            if ( terminal != 0 )
-	            {
-	                if ( DoesGroupHaveTerminal( group ) )
-	                {
-	                    //if (debug && !found)
-	                    //	Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which has a terminal block.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count));
-
-	                    if ( !checkList.Contains( "terminal" ) )
-	                        checkList.Add( "terminal" );
-	                }
-	            }
-
-	            if ( power != 0 )
-	            {
-	                if ( DoesGroupHavePowerSupply( group ) )
-	                {
-	                    //if (debug && !found)
-	                    //	Communication.SendPrivateInformation(userId, string.Format("Found grid '{0}' ({1}) which has power.  BlockCount={2}", entity.DisplayName, entity.EntityId, ((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder()).CubeBlocks.Count));
-
-	                    if ( !checkList.Contains( "power" ) )
-	                        checkList.Add( "power" );
-	                }
-	            }
-
-	            foreach ( MySlimBlock block in group.CubeBlocks )
-	            {
-
-	                if ( hasBlockSubType || hasBlockSubTypeLimits )
-	                {
-	                    string subTypeName = block.BlockDefinition.Id.SubtypeName;
-	                    if ( subTypeDict.ContainsKey( subTypeName ) )
-	                        subTypeDict[subTypeName] = subTypeDict[subTypeName] + 1;
-	                    else
-	                        subTypeDict.Add( subTypeName, 1 );
-	                }
-
-	                if ( includesBlockType || excludesBlockType )
-	                {
-	                    string typeName = block.BlockDefinition.Id.SubtypeName;
-	                    if ( typeDict.ContainsKey( typeName ) )
-	                        typeDict[typeName] = typeDict[typeName] + 1;
-	                    else
-	                        typeDict.Add( typeName, 1 );
-	                }
-	            }
-
-
-	            if ( functional != 0 )
-	            {
-	                if ( !checkList.Contains( "functional" ) && functional == 2 )
-	                    found = false;
-
-	                if ( checkList.Contains( "functional" ) && functional == 1 )
-	                    found = false;
-	            }
-
-	            if ( terminal != 0 )
-	            {
-	                if ( !checkList.Contains( "terminal" ) && terminal == 2 )
-	                    found = false;
-
-	                if ( checkList.Contains( "terminal" ) && terminal == 1 )
-	                    found = false;
-	            }
-
-	            if ( power != 0 )
-	            {
-	                if ( !checkList.Contains( "power" ) && power == 2 )
-	                    found = false;
-
-	                if ( checkList.Contains( "power" ) && power == 1 )
-	                    found = false;
-	            }
-
-	            if ( hasBlockSubType )
-	            {
-	                found = ApplyBlockSubTypeFilter( userId, subTypeDict, blockSubTypes, debug, quiet, group, found );
-	            }
-
-	            if ( includesBlockType )
-	            {
-	                found = ApplyBlockInclusionFilter( userId, typeDict, blockTypes, debug, quiet, group, found );
-	            }
-
-	            if ( hasBlockSubTypeLimits && found )
-	            {
-	                found = ApplyBlockSubTypeExclusionFilter( userId, subTypeDict, blockSubTypes, found, quiet, debug, group );
-	            }
-
-	            if ( excludesBlockType && found )
-	                found = ApplyBlockExclusionFilter( userId, typeDict, blockTypes, quiet, debug, group );
-
-	            if ( requireBlockCount && group.CubeBlocks.Count < blockCount )
-	            {
-	                found = false;
-	            }
-
-	            if ( requireBlockCountLess && group.CubeBlocks.Count >= blockCountLess )
-	            {
-	                found = false;
-	            }
-
-	            if ( isBlockSize && blockSize == MyCubeSize.Small && !IsGroupGridSize( group, MyCubeSize.Small ) )
-	            {
-	                found = false;
-	            }
-
-	            if ( isBlockSize && blockSize == MyCubeSize.Large &&
-	                 !IsGroupGridSize( group, MyCubeSize.Large, testStatic ) )
-	            {
-	                found = false;
-	            }
-
-	            if ( found )
-	            {
-	                lock ( groupsFound )
-	                {
-	                    groupsFound.Add( group );
-	                }
-	            }
-	        }
-
+	        Task.WaitAll( scanTasks.ToArray(  ) );
+            
 	        int gridCount = 0;
 	        int groupCount = groupsFound.Count;
 	        foreach (GridGroup group in groupsFound)
@@ -1017,7 +864,7 @@
 	            gridCount += group.Grids.Count;
 	        }
 
-	        if (!quiet)
+	        //if (!quiet)
 	            Communication.SendPrivateInformation( userId, $"Found {gridCount} grids in {groupCount} groups" );
 
 	        return groupsToConfirm;
@@ -1223,167 +1070,6 @@
             }
             return false;
         }
-
-		private static bool ApplyBlockSubTypeExclusionFilter( ulong userId, Dictionary<string, int> subTypeDict, Dictionary<string, int> blockSubTypes, bool found, bool quiet, bool debug, GridGroup group)
-		{
-			foreach ( KeyValuePair<string, int> pairBlockTypesInGrid in subTypeDict )
-			{
-				foreach ( KeyValuePair<string, int> pairBlockTypesFilter in blockSubTypes )
-				{
-					if ( pairBlockTypesInGrid.Key.ToLower( ).Contains( pairBlockTypesFilter.Key.ToLower( ) ) )
-					{
-						if ( pairBlockTypesInGrid.Value >= pairBlockTypesFilter.Value )
-						{
-							if ( found )
-							{
-								found = false;
-							}
-
-							if ( !quiet && debug )
-							{
-								Communication.SendPrivateInformation( userId,
-								                                      string.Format( "Exclusion: Found group with parent '{0}' ({1}) which excludes block type of {3} at {4}.  BlockCount={2}",
-								                                                     group.Parent.DisplayName,
-								                                                     group.Parent.EntityId,
-								                                                     group.CubeBlocks.Count,
-								                                                     pairBlockTypesFilter.Key,
-								                                                     pairBlockTypesInGrid.Value ) );
-							}
-
-							break;
-						}
-					}
-				}
-			}
-			return found;
-		}
-
-		private static bool ApplyBlockSubTypeFilter( ulong userId, Dictionary<string, int> subTypeDict, Dictionary<string, int> blockSubTypes, bool debug, bool quiet, GridGroup group, bool found )
-		{
-			bool hasType = false;
-			foreach ( KeyValuePair<string, int> pairBlockTypesInGrid in subTypeDict )
-			{
-				foreach ( KeyValuePair<string, int> pairBlockTypesFilter in blockSubTypes )
-				{
-					if ( pairBlockTypesInGrid.Key.ToLower( ).Contains( pairBlockTypesFilter.Key.ToLower( ) ) )
-					{
-						if ( pairBlockTypesInGrid.Value >= pairBlockTypesFilter.Value )
-						{
-							if ( debug && !quiet )
-							{
-								Communication.SendPrivateInformation( userId,
-								                                      string.Format( "Found group with parent '{0}' ({1}) which contains at least {4} of block type {3} ({5}).  BlockCount={2}",
-								                                                     group.Parent.DisplayName,
-								                                                     group.Parent.EntityId,
-								                                                     group.CubeBlocks.Count,
-								                                                     pairBlockTypesInGrid.Key,
-								                                                     pairBlockTypesFilter.Value,
-								                                                     pairBlockTypesInGrid.Value ) );
-							}
-
-							hasType = true;
-							break;
-						}
-					}
-				}
-			}
-
-			if ( !hasType )
-			{
-				if ( debug && !quiet )
-				{
-					Communication.SendPrivateInformation( userId,
-					                                      string.Format( "Found group with parent '{0}' ({1}) which does not contain block type.  BlockCount={2}",
-					                                                     group.Parent.DisplayName,
-					                                                     group.Parent.EntityId,
-					                                                     group.CubeBlocks.Count ) );
-				}
-
-				found = false;
-			}
-			return found;
-		}
-
-		private static bool ApplyBlockInclusionFilter( ulong userId, Dictionary<string, int> typeDict, Dictionary<string, int> blockTypes, bool debug, bool quiet, GridGroup group, bool found )
-		{
-			bool hasType = false;
-			foreach ( KeyValuePair<string, int> pairBlockTypesInGrid in typeDict )
-			{
-				foreach ( KeyValuePair<string, int> pairBlockTypesFilter in blockTypes )
-				{
-					if ( pairBlockTypesInGrid.Key.ToLower( ).Contains( pairBlockTypesFilter.Key.ToLower( ) ) )
-					{
-						if ( pairBlockTypesInGrid.Value >= pairBlockTypesFilter.Value )
-						{
-							if ( debug && !quiet )
-							{
-								Communication.SendPrivateInformation( userId,
-								                                      string.Format( "Found group with parent '{0}' ({1}) which contains at least {4} of block type {3} ({5}).  BlockCount={2}",
-								                                                     group.Parent.DisplayName,
-								                                                     group.Parent.EntityId,
-								                                                     group.CubeBlocks.Count,
-								                                                     pairBlockTypesInGrid.Key,
-								                                                     pairBlockTypesFilter.Value,
-								                                                     pairBlockTypesInGrid.Value ) );
-							}
-
-							hasType = true;
-							break;
-						}
-					}
-				}
-			}
-
-			if ( !hasType )
-			{
-				if ( debug && !quiet )
-				{
-					Communication.SendPrivateInformation( userId,
-					                                      string.Format( "Found group with parent '{0}' ({1}) which does not contain block type.  BlockCount={2}",
-					                                                     group.Parent.DisplayName,
-					                                                     group.Parent.EntityId,
-					                                                     group.CubeBlocks.Count ) );
-				}
-
-				found = false;
-			}
-			return found;
-		}
-
-		private static bool ApplyBlockExclusionFilter( ulong userId, Dictionary<string, int> typeDict, Dictionary<string, int> blockTypes, bool quiet, bool debug, GridGroup group )
-		{
-			bool found = true;
-			foreach ( KeyValuePair<string, int> blockTypesInGrid in typeDict )
-			{
-				foreach ( KeyValuePair<string, int> pairBlockTypesFilter in blockTypes )
-				{
-					if ( blockTypesInGrid.Key.ToLower( ).Contains( pairBlockTypesFilter.Key.ToLower( ) ) )
-					{
-						if ( blockTypesInGrid.Value >= pairBlockTypesFilter.Value )
-						{
-							if ( found )
-							{
-								found = false;
-							}
-
-							if ( !quiet && debug )
-							{
-								Communication.SendPrivateInformation( userId,
-																	  string.Format( "Exclusion: Found group with parent '{0}' ({1}) which excludes block type of {3} at {4}.  BlockCount={2}",
-																					 group.Parent.DisplayName,
-																					 group.Parent.EntityId,
-																					 group.CubeBlocks.Count,
-																					 pairBlockTypesFilter.Key,
-																					 blockTypesInGrid.Value ) );
-							}
-
-							break;
-						}
-					}
-				}
-			}
-			return found;
-		}
 
         //TODO: KILL THESE
         //these are left over to retain concealment compatiblity until I can rewrite that mess

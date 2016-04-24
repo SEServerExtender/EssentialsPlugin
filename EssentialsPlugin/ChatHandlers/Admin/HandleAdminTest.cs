@@ -1,5 +1,6 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
+    using Sandbox.Definitions;
     using Utility;
     public class HandleAdminTest : ChatHandlerBase
 	{
@@ -36,7 +37,15 @@
 
         public override bool HandleCommand( ulong userId, string[ ] words )
         {
-            CargoShips.SpawnCargoShip( );
+            //CargoShips.SpawnCargoShip( );
+            foreach ( var material in MyDefinitionManager.Static.GetTransparentMaterialDefinitions( ) )
+            {
+                Essentials.Log.Info( material.Texture );
+            }
+            foreach (var material in MyDefinitionManager.Static.GetTransparentMaterialDefinitions())
+            {
+                Essentials.Log.Info(material.ToString);
+            }
             return true;
         }
 

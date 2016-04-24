@@ -9,6 +9,7 @@
 	using Sandbox.Game.Entities.Cube;
 	using Sandbox.ModAPI;
 	using Sandbox.ModAPI.Ingame;
+	using SEModAPI.API.Utility;
 	using SEModAPIInternal.API.Common;
 	using SEModAPIInternal.API.Entity.Sector.SectorObject;
 	using VRage.Game;
@@ -55,23 +56,25 @@
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
             GridLinkTypeEnum connectionType = GridLinkTypeEnum.Logical;
+		    string linkType = "";
 		    if ( words.Length > 0 && words[0].ToLower( ) == "physical" )
-		        connectionType = GridLinkTypeEnum.Physical;
+		        linkType = " physical";
 
 		    try
-		    {
-		        HashSet<GridGroup> groups = GridGroup.GetAllGroups( connectionType );
-		        int groupsCount = 0;
+            {
+                string command = $"excludesblocksubtype:beacon{linkType} quiet";
+                HashSet<GridGroup> groups = CubeGrids.ScanGrids(0, CommandParser.GetCommandParts(command).ToArray());
+                int groupsCount = 0;
 		        int gridsCount = 0;
 
 		        foreach ( var group in groups )
 		        {
-		            if ( !group.CubeBlocks.Any( x => x?.FatBlock is IMyBeacon ) )
-		            {
-		                groupsCount++;
-		                gridsCount += group.Grids.Count;
-		                Communication.SendPrivateInformation( userId, $"Found group with parent {group.Parent.DisplayName} ({group.Parent.EntityId}) at {group.Parent.PositionComp.GetPosition( )} with no beacon." );
-		            }
+		            if ( group.GetFatBlocks( ).Any( x =>  x is IMyBeacon ) )
+                        continue;
+
+		            groupsCount++;
+		            gridsCount += group.Grids.Count;
+		            Communication.SendPrivateInformation( userId, $"Found group with parent {group.Parent.DisplayName} ({group.Parent.EntityId}) at {group.Parent.PositionComp.GetPosition( )} with no beacon." );
 		        }
 
 		        Communication.SendPrivateInformation( userId, $"Found {gridsCount} grids in {groupsCount} groups with no beacon." );

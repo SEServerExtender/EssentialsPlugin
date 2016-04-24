@@ -1030,9 +1030,9 @@
 									 ownerId,
 									 ownerName,
 									 reason );
-				BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
-                MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( entity ) );
-            }
+			    entity.Close( );
+			    //MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( entity ) );
+			}
 			else
 			{
 				if ( !PluginSettings.Instance.DynamicConcealServerOnly )
@@ -1047,9 +1047,10 @@
 					RemovedGrids.Add( entity.EntityId );
                     entity.InScene = true;
                     entity.OnAddedToScene( entity );
-                    BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+				    entity.Physics.Enabled = false;
+				    entity.Close( );
                     MyAPIGateway.Entities.AddEntity( newEntity );
-                    MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
+                    //MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
                     entity.Physics.LinearVelocity = Vector3.Zero;
                     entity.Physics.AngularVelocity = Vector3.Zero;
 
@@ -1272,3 +1273,21 @@
 		}
 	}
 }
+/*private static void UnregisterHierarchy(MyEntity entity)
+        {
+            if (entity.Hierarchy != null)
+            {
+                foreach (var child in entity.Hierarchy.Children)
+                {
+                    MyEntity childEntity = (MyEntity)child.Container.Entity;
+                    UnregisterHierarchy(childEntity);
+                    MyEntities.UnregisterForUpdate(childEntity);
+                    childEntity.RemoveFromGamePruningStructure();
+
+                    //child.Container.Entity.InScene = false;
+                    //if (child.Container.Entity.Physics != null)
+                    //    child.Container.Entity.Physics.Enabled = false;
+                }
+            }
+        }
+*/
