@@ -1,6 +1,10 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
+    using System;
+    using Sandbox.Game.World;
     using Utility;
+    using VRage.Game;
+
     public class HandleAdminSpawnCargo : ChatHandlerBase
 	{
 
@@ -36,7 +40,24 @@
 
         public override bool HandleCommand( ulong userId, string[ ] words )
         {
-            CargoShips.SpawnCargoShip( );
+            if ( words.Length == 1 && words[0].ToLower( ) == "atmosphere" )
+            {
+                CargoShips.SpawnCargoShip( false );
+                return true;
+            }
+
+            var cargoShipEvent = MyGlobalEvents.GetEventById(new MyDefinitionId(typeof(MyObjectBuilder_GlobalEventBase), "SpawnCargoShip"));
+            if (cargoShipEvent == null )
+            {
+                //we can't force the game to spawn a ship if the option is off, so use our own method
+                CargoShips.SpawnCargoShip( true );
+            }
+            else
+            {
+                MyGlobalEvents.RemoveGlobalEvent(cargoShipEvent);
+                cargoShipEvent.SetActivationTime(TimeSpan.Zero);
+                MyGlobalEvents.AddGlobalEvent(cargoShipEvent);
+            }
             return true;
         }
 

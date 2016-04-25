@@ -1105,15 +1105,15 @@
         }
 
         [Category( "Cargo Ships" )]
-        [Description( "This enables or disables random cargo ships." )]
+        [Description( "This enables or disables cargo ships spawning in gravity." )]
         [Browsable( true )]
         [ReadOnly( false )]
-        public bool CargoShipsEnabled {
+        public bool AtmosphericCargoShipsEnabled {
             get {
-                return PluginSettings.Instance.CargoShipsEnabled;
+                return PluginSettings.Instance.AtmosphericCargoShipsEnabled;
             }
             set {
-                PluginSettings.Instance.CargoShipsEnabled = value;
+                PluginSettings.Instance.AtmosphericCargoShipsEnabled = value;
             }
         }
 
@@ -1121,12 +1121,12 @@
         [Description( "The amount of time, in minutes, between ship spawn." )]
         [Browsable( true )]
         [ReadOnly( false )]
-        public float CargoShipSpawnTime {
+        public float AtmosphericCargoShipSpawnTime {
             get {
-                return PluginSettings.Instance.CargoShipSpawnTime;
+                return PluginSettings.Instance.AtmosphericCargoShipSpawnTime;
             }
             set {
-                PluginSettings.Instance.CargoShipSpawnTime = value;
+                PluginSettings.Instance.AtmosphericCargoShipSpawnTime = value;
             }
         }
         /*

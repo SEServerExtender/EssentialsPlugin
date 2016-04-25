@@ -9,6 +9,7 @@
     using Sandbox.Game.Entities;
     using Sandbox.Game.Entities.Cube;
     using VRage.Game.Entity;
+    using VRageMath;
 
     public class GridGroup
     {
@@ -146,6 +147,14 @@
                                         grid.Close( );
                                     }
                                 } );
+        }
+
+        public void Stop( )
+        {
+            foreach ( MyCubeGrid grid in _grids )
+            {
+                Wrapper.GameAction( ( ) => grid.Stop(  ) );
+            }
         }
 
         private void GetParent(  )

@@ -70,58 +70,8 @@
                 m_spawnGroupCumulativeFrequencies.Add(m_spawnGroupTotalFrequencies);
             }
         }
-
-        public static bool DoesTrajectoryIntersect( Vector3D start, Vector3D end, float spawnRadius )
-        {
-            Ray trajectory = new Ray( start, (end - start) );
-            return DoesTrajectoryIntersect( trajectory, spawnRadius );
-        }
-
-        public static bool DoesTrajectoryIntersect( Ray trajectory, float spawnRadius )
-        {
-            if ( ExtenderOptions.IsDebugging )
-                Essentials.Log.Info( "Checking gravity intersect" );
-
-            foreach ( IMyGravityProvider provider in MyGravityProviderSystem.NaturalGravityProviders )
-            {
-                MyPlanet planet = provider as MyPlanet;
-                if ( planet == null )
-                    continue;
-                BoundingSphereD gravitySphere = new BoundingSphereD( planet.PositionComp.GetPosition(  ), planet.GravityLimit + spawnRadius);
-                
-                float? intersect = trajectory.Intersects( gravitySphere );
-                if ( intersect.HasValue && intersect.Value > 0 )
-                    return true;
-            }
-            /*
-            foreach ( BoundingSphereD sphere in gravitySphereList )
-            {
-                if ( trajectory.Intersects( sphere ).HasValue )
-                    return true;
-            }
-            */
-            return false;
-        }
-
-        public static bool IsPointInGravity( Vector3D testPoint )
-        {
-            if ( ExtenderOptions.IsDebugging )
-                Essentials.Log.Info( "Checking point gravity intersect" );
-            
-            return !Vector3D.IsZero( MyGravityProviderSystem.CalculateNaturalGravityInPoint( testPoint, true ) );
-
-            /*
-            foreach ( BoundingSphereD sphere in gravitySphereList )
-            {
-                if ( sphere.Contains( testPoint ) == ContainmentType.Contains)
-                    return true;
-            }
-
-            return false;
-            */
-        }
         
-        public static void SpawnCargoShip()
+        public static void SpawnCargoShip( bool checkGravity )
         {
             Init(  );
             Wrapper.GameAction( ( ) =>
@@ -245,22 +195,26 @@
                                         Vector3D shipDestination = shipPosition + directionMult;
                                         float radius = prefabDef == null ? 10.0f : prefabDef.BoundingSphere.Radius;
 
-                                        if ( IsPointInGravity( shipPosition ) )
+                                        if ( checkGravity )
                                         {
-                                            if(ExtenderOptions.IsDebugging)
-                                                Essentials.Log.Info( "Failed to spawn cargo ship: Spawn location is in gravity well" );
-                                            return;
-                                        }
-                                        if ( IsPointInGravity( shipDestination ) )
-                                        {
-                                            if(ExtenderOptions.IsDebugging)
-                                                Essentials.Log.Info( "Failed to spawn cargo ship: Destination is in gravity well" );
-                                        }
-                                        if ( DoesTrajectoryIntersect( shipPosition, shipDestination, spawnGroup.SpawnRadius ) )
-                                        {
-                                            if ( ExtenderOptions.IsDebugging )
-                                                Essentials.Log.Info( "Failed to spawn cargo ship: Ship path intersects gravity well" );
-                                            return;
+                                            //these point checks could be done in the trajectory intersect, but checking points is faster than ray intersect
+                                            if ( MyGravityProviderSystem.IsPositionInNaturalGravity( shipPosition, spawnGroup.SpawnRadius ) )
+                                            {
+                                                if ( ExtenderOptions.IsDebugging )
+                                                    Essentials.Log.Info( "Failed to spawn cargo ship: Spawn location is in gravity well" );
+                                                return;
+                                            }
+                                            if ( MyGravityProviderSystem.IsPositionInNaturalGravity( shipDestination, spawnGroup.SpawnRadius ) )
+                                            {
+                                                if ( ExtenderOptions.IsDebugging )
+                                                    Essentials.Log.Info( "Failed to spawn cargo ship: Destination is in gravity well" );
+                                            }
+                                            if ( MyGravityProviderSystem.DoesTrajectoryIntersectNaturalGravity( shipPosition, shipDestination, spawnGroup.SpawnRadius + 500 ))
+                                            {
+                                                if ( ExtenderOptions.IsDebugging )
+                                                    Essentials.Log.Info( "Failed to spawn cargo ship: Ship path intersects gravity well" );
+                                                return;
+                                            }
                                         }
 
                                         MyPhysics.CastRay( shipPosition, shipDestination, m_raycastHits, MyPhysics.CollisionLayers.ObjectDetectionCollisionLayer );

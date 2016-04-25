@@ -88,7 +88,27 @@
         {            
             float result = (m_random.Next( minDist, maxDist )) * (m_random.Next( 2 ) == 0 ? -1 : 1);
             return result;
+        }
 
+        public static Vector3D? TraceVector(Vector3D position, Vector3D velocity, int distance, int radius = 100)
+        {
+            Vector3D normVelocity = Vector3D.Normalize(velocity);
+            Vector3D result = normVelocity * distance + position;
+
+            //make sure the point is clear
+            int trycount = 1;
+            BoundingSphereD checkSphere = new BoundingSphereD(result, radius);
+            while (MyAPIGateway.Entities.GetIntersectionWithSphere(ref checkSphere) != null)
+            {
+                //try to find a location 20 times, increasing distance from start each try                
+                trycount++;
+                result = normVelocity * (distance * trycount) + position;
+                checkSphere = new BoundingSphereD(result, radius);
+
+                if (trycount > 20)
+                    return null;
+            }
+            return result;
         }
     }
 }

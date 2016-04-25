@@ -121,8 +121,8 @@
 	    private bool _timedCommandsEnabled;
 	    private MTObservableCollection<TimedCommandItem> _TimedCommandsItem;
 
-	    private bool _cargoShipsEnabled;
-	    private float _cargoShipSpawnTime;
+	    private bool _atmosphericCargoShipsEnabled;
+	    private float _atmosphericCargoShipSpawnTime;
 
         private List<TicketPlayerItem> _ticketPlayers; 
         
@@ -970,22 +970,22 @@
 	        }
 	    }
 
-	    public bool CargoShipsEnabled
+	    public bool AtmosphericCargoShipsEnabled
 	    {
-	        get { return _cargoShipsEnabled; }
+	        get { return _atmosphericCargoShipsEnabled; }
 	        set
 	        {
-	            _cargoShipsEnabled = value;
+	            _atmosphericCargoShipsEnabled = value;
 	            Save( );
 	        }
 	    }
 
-	    public float CargoShipSpawnTime
+	    public float AtmosphericCargoShipSpawnTime
 	    {
-	        get { return _cargoShipSpawnTime; }
+	        get { return _atmosphericCargoShipSpawnTime; }
 	        set
 	        {
-	            _cargoShipSpawnTime = value;
+	            _atmosphericCargoShipSpawnTime = value;
 	            Save( );
 	        }
 	    }
@@ -1075,8 +1075,8 @@
             _TimedCommandsItem = new MTObservableCollection<TimedCommandItem>(  );
             _TimedCommandsItem.CollectionChanged += ItemsCollectionChanged;
 
-            _cargoShipsEnabled = false;
-            _cargoShipSpawnTime = 10.0f;
+            _atmosphericCargoShipsEnabled = false;
+            _atmosphericCargoShipSpawnTime = 10.0f;
             
             _ticketPlayers = new List<TicketPlayerItem>();
 		}

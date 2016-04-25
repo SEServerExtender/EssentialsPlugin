@@ -11,7 +11,7 @@
     {
         public static void Stop(this IMyEntity entity)
         {
-            if (entity?.Physics == null)
+            if (entity?.Physics == null || entity.Closed)
                 return;
 
             Wrapper.GameAction(() =>
