@@ -62,17 +62,17 @@
 
 		    try
             {
-                string command = $"excludesblocksubtype:beacon{linkType} quiet";
+                string command = $"excludesblocksubtype:beacon quiet{linkType}";
                 HashSet<GridGroup> groups = CubeGrids.ScanGrids(0, CommandParser.GetCommandParts(command).ToArray());
-                int groupsCount = 0;
+                int groupsCount = groups.Count;
 		        int gridsCount = 0;
 
 		        foreach ( var group in groups )
 		        {
-		            if ( group.GetFatBlocks( ).Any( x =>  x is IMyBeacon ) )
-                        continue;
+		            //if ( group.GetFatBlocks( ).Any( x =>  x is IMyBeacon ) )
+                    //    continue;
 
-		            groupsCount++;
+		            //groupsCount++;
 		            gridsCount += group.Grids.Count;
 		            Communication.SendPrivateInformation( userId, $"Found group with parent {group.Parent.DisplayName} ({group.Parent.EntityId}) at {group.Parent.PositionComp.GetPosition( )} with no beacon." );
 		        }

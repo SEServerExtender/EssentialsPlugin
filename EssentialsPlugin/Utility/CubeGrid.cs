@@ -867,7 +867,7 @@
 	        //if (!quiet)
 	            Communication.SendPrivateInformation( userId, $"Found {gridCount} grids in {groupCount} groups" );
 
-	        return groupsToConfirm;
+	        return groupsFound;
 	    }
 
 		public static bool IsFullOwner( MyCubeGrid grid, long ownerId, IMyPlayer factionPlayer = null )

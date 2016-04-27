@@ -9,6 +9,7 @@
     using Sandbox.Game.Entities;
     using Sandbox.Game.Entities.Cube;
     using VRage.Game.Entity;
+    using VRage.ModAPI;
     using VRageMath;
 
     public class GridGroup
@@ -69,20 +70,28 @@
 
         public GridGroup( MyCubeGrid grid, GridLinkTypeEnum linkType = GridLinkTypeEnum.Logical )
         {
-            //HACK: Manually create a group for out of scene grids because pulling them from the server crashes
             if ( grid.InScene )
             {
                 List<MyCubeGrid> tmpList = new List<MyCubeGrid>( );
 
                 //find the group containing this grid with the given link type
                 Wrapper.GameAction( ( ) => tmpList = MyCubeGridGroups.Static.GetGroups( linkType ).GetGroupNodes( grid ) );
-
-                foreach ( MyCubeGrid node in tmpList )
-                    _grids.Add( node );
+                
+                _grids.UnionWith( tmpList );
             }
+            //HACK: Manually create a group for out of scene grids because pulling them from the server crashes
             else
             {
-                _grids.Add( grid );
+                //use the old method to filter out grids with pisons or rotors, for safety
+                HashSet<IMyEntity> thisEntity = new HashSet<IMyEntity>();
+                HashSet<IMyEntity> returnSet = new HashSet<IMyEntity>();
+                thisEntity.Add( grid );
+                CubeGrids.GetGridsUnconnected( thisEntity, returnSet );
+                
+                if ( returnSet.Count != 0 )
+                    _grids.Add( (MyCubeGrid)returnSet.First( ) );
+                else
+                    return;
             }
 
             //populate our internal lists
@@ -114,12 +123,12 @@
                 //on large servers this can run into the tens of seconds, so parallelize it
                 groupTasks.Add( Task.Run( ( ) =>
                                           {
-                                              if ( result.Any( x => x.Grids.Contains( grid ) ) )
-                                                  return;
+                                              var newGroup = new GridGroup( grid, linkType );
 
                                               lock ( result )
                                               {
-                                                  result.Add( new GridGroup( grid, linkType ) );
+                                                  if ( !result.Any( x => x.Grids.Contains( grid ) ) )
+                                                      result.Add( newGroup );
                                               }
                                           } ) );
             }
