@@ -567,11 +567,11 @@
 
                         pos = 6;
                         RemovedGrids.Add( entity.EntityId );
-                        entity.InScene = false;
-                        entity.OnRemovedFromScene( entity );
-						BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+                        newEntity.InScene = false;
+						//BaseEntityNetworkManager.BroadcastRemoveEntity( entity, false );
+                        entity.Close( );
 						MyAPIGateway.Entities.AddEntity( newEntity, false );
-                        MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
+                        //MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
 
                         pos = 7;
                         if ( PluginSettings.Instance.DynamicShowMessages )
@@ -1044,15 +1044,19 @@
 						return;
 					}
 
+				    newEntity.Physics.Enabled = false;
+
 					RemovedGrids.Add( entity.EntityId );
-                    entity.InScene = true;
-                    entity.OnAddedToScene( entity );
 				    entity.Physics.Enabled = false;
 				    entity.Close( );
+
+                    Thread.Sleep( 50 );
+				    newEntity.Physics.Enabled = true;
+                    newEntity.InScene = true;
                     MyAPIGateway.Entities.AddEntity( newEntity );
                     //MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( newEntity ) );
-                    entity.Physics.LinearVelocity = Vector3.Zero;
-                    entity.Physics.AngularVelocity = Vector3.Zero;
+                    newEntity.Physics.LinearVelocity = Vector3.Zero;
+                    newEntity.Physics.AngularVelocity = Vector3.Zero;
 
                     if ( PluginSettings.Instance.DynamicShowMessages )
 						Essentials.Log.Info( "Revealed - Id: {0} -> {4} Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {5}",

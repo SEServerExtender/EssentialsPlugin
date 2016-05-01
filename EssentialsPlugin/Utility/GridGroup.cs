@@ -85,10 +85,10 @@
                 //use the old method to filter out grids with pisons or rotors, for safety
                 HashSet<IMyEntity> thisEntity = new HashSet<IMyEntity>();
                 HashSet<IMyEntity> returnSet = new HashSet<IMyEntity>();
-                thisEntity.Add( grid );
-                CubeGrids.GetGridsUnconnected( thisEntity, returnSet );
+                thisEntity.Add( (IMyEntity)grid );
+                CubeGrids.GetGridsUnconnected( returnSet, thisEntity );
                 
-                if ( returnSet.Count != 0 )
+                if ( returnSet.Count > 0 )
                     _grids.Add( (MyCubeGrid)returnSet.First( ) );
                 else
                     return;

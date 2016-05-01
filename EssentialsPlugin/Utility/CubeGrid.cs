@@ -772,22 +772,24 @@
 	        if ( !quiet )
 	            Communication.SendPrivateInformation( userId,
 	                                                  $"Scanning for ships with options: {GetOptionsText( options )}" );
-
-	        HashSet<GridGroup> groupsToConfirm = new HashSet<GridGroup>( );
+            
 	        HashSet<GridGroup> groups = GridGroup.GetAllGroups( connectionType );
 	        HashSet<GridGroup> groupsFound = new HashSet<GridGroup>( );
             List<Task> scanTasks = new List<Task>();
             
             /*
-            * invert scan logic here
-            * if we find a group that fails any of the checks, break
-            * everything else implicitly goes into the found list
+            * Invert scan logic here.
+            * If we find a group that fails any of the checks, break.
+            * Everything else implicitly goes into the found list.
             * 
-            * on large servers this can run into the tens of seconds,
-            * so parallelize it
+            * On large servers this can run into the tens of seconds,
+            * so parallelize it.
             */
 	        foreach ( GridGroup group in groups )
 	        {
+	            if ( group?.Parent == null )
+	                continue;
+
 	            scanTasks.Add( Task.Run( ( ) =>
 	                                     {
 	                                         if ( power == StateEnum.RequiresYes && !DoesGroupHavePowerSupply( group ) )
@@ -836,14 +838,14 @@
 	                                         if ( hasBlockSubType && !blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ) )
 	                                             return;
 
-	                                         if ( excludesBlockType && blockSubTypes.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value + 1 ) ) )
+	                                         if ( excludesBlockType && blockSubTypes.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value ) ) )
 	                                             return;
 
 	                                         if ( includesBlockType && !blockTypes.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value ) ) )
 	                                             return;
 
 	                                         if ( hasBlockSubTypeLimits &&
-	                                              !blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value + 1 ) ) )
+	                                              !blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ) )
 	                                             return;
 
 	                                         lock ( groupsFound )
@@ -859,7 +861,7 @@
 	        foreach (GridGroup group in groupsFound)
 	        {
 	            if (!quiet)
-	                Communication.SendPrivateInformation( userId, $"Found group with parent {group.Parent.DisplayName}, owner {group.Parent.GetOwner(  )}" );
+	                Communication.SendPrivateInformation( userId, $"Found group with parent {group.Parent.DisplayName}, owner: {group.Parent.GetOwner(  ) ?? "none"}" );
 
 	            gridCount += group.Grids.Count;
 	        }

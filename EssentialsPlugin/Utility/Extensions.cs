@@ -34,7 +34,7 @@
                 if (ownerIdentity != null)
                     return ownerIdentity.DisplayName;
             }
-            return "";
+            return null;
         }
 
         public static string GetOwner( this MyCubeGrid grid )
