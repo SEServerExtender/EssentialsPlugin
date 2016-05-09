@@ -95,8 +95,9 @@
 		private void DoRestart()
 		{
             // Tell SE to shut down
-            Wrapper.GameAction( ()=>MySandboxGame.Static.Exit(  ) );
-            Thread.Sleep( 15000 );
+            //Wrapper.GameAction( ()=>MySandboxGame.Static.Exit(  ) );
+            MySandboxGame.Static.Exit(  );
+            //Thread.Sleep( 5000 );
 			// If we're not a service, restart with a .bat otherwise just exit and let the service be restarted
 			if (Environment.UserInteractive)
 			{

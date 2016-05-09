@@ -61,7 +61,7 @@
 					{
 						Essentials.Log.Info( "Removed old backup: {0}", file );
 						File.Delete(file);
-						Directory.Delete(path);
+						Directory.Delete(path, true);
 						break;
 					}
 				}

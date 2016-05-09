@@ -433,8 +433,8 @@
             bool hasDisplayName = false;
 	        bool hasDisplayNameExact = false;
 	        bool displayNameGroup = false;
-	        bool hasBlockSubType = false;
-	        bool hasBlockSubTypeLimits = false;
+	        bool includesBlockSubType = false;
+	        bool excludesBlockSubType = false;
 	        bool includesBlockType = false;
 	        bool excludesBlockType = false;
 	        bool debug = false;
@@ -587,7 +587,7 @@
 	            {
 	                string[] parts =
 	                    words.FirstOrDefault( x => x.ToLower( ).StartsWith( "includesblocksubtype:" ) ).Split( ':' );
-	                hasBlockSubType = true;
+	                includesBlockSubType = true;
 	                options.Add( "Has Sub Block Type", "true" );
 
 	                if ( parts.Length < 3 )
@@ -608,7 +608,7 @@
 	            {
 	                string[] parts =
 	                    words.FirstOrDefault( x => x.ToLower( ).StartsWith( "excludesblocksubtype:" ) ).Split( ':' );
-	                hasBlockSubTypeLimits = true;
+	                excludesBlockSubType = true;
 	                options.Add( "Exclude Has Sub Block Type", "true" );
 
 	                if ( parts.Length < 3 )
@@ -835,17 +835,16 @@
 	                                         if ( requireBlockCountLess && !( group.BlocksCount < blockCountLess ) )
 	                                             return;
 
-	                                         if ( hasBlockSubType && !blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ) )
-	                                             return;
-
-	                                         if ( excludesBlockType && blockSubTypes.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value ) ) )
+	                                         if ( excludesBlockType && blockTypesExcluded.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value ) ) )
 	                                             return;
 
 	                                         if ( includesBlockType && !blockTypes.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value ) ) )
 	                                             return;
+                                             
+	                                         if ( includesBlockSubType && !blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ) )
+	                                             return;
 
-	                                         if ( hasBlockSubTypeLimits &&
-	                                              !blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ) )
+	                                         if ( excludesBlockSubType && blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ) )
 	                                             return;
 
 	                                         lock ( groupsFound )
@@ -1018,9 +1017,9 @@
 	    public static bool DoesGroupHaveCustomName( GridGroup group, string customName, bool exact = false )
 	    {
 	        if ( !exact )
-	            return group.CubeBlocks.Any( x => x?.FatBlock?.DisplayName != null && x.FatBlock.Name.Contains( customName, StringComparison.CurrentCultureIgnoreCase));
+	            return group.CubeBlocks.Any( x => x?.FatBlock?.DisplayNameText != null && x.FatBlock.DisplayNameText.Contains( customName, StringComparison.CurrentCultureIgnoreCase));
 	        else
-	            return group.CubeBlocks.Any( x => x?.FatBlock?.DisplayName != null && x.FatBlock.Name.Equals( customName,StringComparison.CurrentCultureIgnoreCase ));
+	            return group.CubeBlocks.Any( x => x?.FatBlock?.DisplayNameText != null && x.FatBlock.DisplayNameText.Equals( customName,StringComparison.CurrentCultureIgnoreCase ));
 	    }
 
 	    public static bool DoesGroupHaveDisplayName( GridGroup group, string displayName, bool exact = false, bool grouped = false )

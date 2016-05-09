@@ -9,7 +9,7 @@
 
     class ProcessCleanup : ProcessHandlerBase
 	{
-		private SettingsCleanupTriggerItem _triggerdItem;
+		private SettingsCleanupTriggerItem _triggeredItem;
 		private DateTime _start = DateTime.Now;
 		private readonly TimeSpan _oneSecond = new TimeSpan( 0, 0, 1 );
 		private readonly TimeSpan _twentySeconds = new TimeSpan( 0, 0, 20 );
@@ -50,14 +50,19 @@
 		private void ProcessTimedItem( SettingsCleanupTimedItem item )
 		{
 			_start = DateTime.Now; // this needs to be updated for each run so multi-day runtimes are handled properly
+		    DateTime itemTime;
 
-			DateTime itemTime = new DateTime( _start.Year, _start.Month, _start.Day, item.Restart.Hour, item.Restart.Minute, 0 );
-			if (  DateTime.Now - itemTime > _twentySeconds )
-			{
-				itemTime = itemTime.AddDays( 1 );
-			}
+		    if ( !item.Interval )
+		        itemTime = new DateTime( _start.Year, _start.Month, _start.Day, item.Restart.Hour, item.Restart.Minute, 0 );
+		    else
+		        itemTime = new DateTime( _start.Year, _start.Month, _start.Day, _start.Hour, item.Restart.Minute, 0 );
 
-			if ( DateTime.Now - item.LastRan < _oneMinute )
+		    if ( DateTime.Now - itemTime > _twentySeconds )
+		    {
+		        itemTime = itemTime.AddDays( 1 );
+		    }
+
+		    if ( DateTime.Now - item.LastRan < _oneMinute )
 				return;
 
 			if ( itemTime - DateTime.Now < _oneSecond && DateTime.Now - item.LastRan > _oneMinute )
@@ -101,10 +106,10 @@
 		/// <exception cref="OverflowException"></exception>
 		private void ProcessTriggerItem( SettingsCleanupTriggerItem item )
 		{
-			if ( _triggerdItem != null && _triggerdItem != item )
+			if ( _triggeredItem != null && _triggeredItem != item )
 				return;
 
-			if ( _triggerdItem == null )
+			if ( _triggeredItem == null )
 			{
 				// Increase to 5 minutes
 				if ( DateTime.Now - item.LastRan > _fiveMinutes )
@@ -118,9 +123,9 @@
 
                     if ( gridsCount >= item.MaxCapacity )
 					{
-						Communication.SendPublicInformation( $"[NOTICE]: Cleanup triggered.  ({gridsCount} of {item.MaxCapacity}) triggered grids found.  Cleanup will run in {item.MinutesAfterCapacity} minutes.  Reason: {item.Reason}" );
+						Communication.SendPublicInformation( $"[NOTICE]: Cleanup triggered.  ({gridsCount} of {item.MaxCapacity}) triggered grids found.  Cleanup will run in {item.MinutesAfterCapacity} minutes.{(item.Reason == string.Empty ? "" : $"  Reason: {item.Reason}")}" );
 						item.NotificationItemsRan.Clear( );
-						_triggerdItem = item;
+						_triggeredItem = item;
 					}
 				}
 			}
@@ -139,7 +144,7 @@
                         group.Close();
                     }
                     Communication.SendPublicInformation( $"[NOTICE]: Triggered cleanup has run. {gridCount} grids in {groupCount} groups removed." );
-					_triggerdItem = null;
+					_triggeredItem = null;
 					return;
 				}
 
