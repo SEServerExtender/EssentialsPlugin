@@ -1045,10 +1045,10 @@
 	    public static bool DoesGroupHaveBlockSubtype( GridGroup group, string subtype, int count )
 	    {
             int result = 0;
-            
+
             foreach (MyCubeBlock block in group.GetFatBlocks())
             {
-                if (block.BlockDefinition.Id.SubtypeName.ToLower().Contains(subtype))
+                if (block.BlockDefinition.Id.SubtypeName.ToLower().Contains(subtype, StringComparison.CurrentCultureIgnoreCase))
                     result++;
 
                 if (result >= count)
@@ -1063,7 +1063,7 @@
 
             foreach (MyCubeBlock block in group.GetFatBlocks())
             {
-                if (block.BlockDefinition.Id.TypeId.ToString(  ).ToLower().Contains( type ))
+                if (block.BlockDefinition.Id.TypeId.ToString(  ).ToLower().Contains( type, StringComparison.CurrentCultureIgnoreCase ))
                     result++;
 
                 if (result >= count)
