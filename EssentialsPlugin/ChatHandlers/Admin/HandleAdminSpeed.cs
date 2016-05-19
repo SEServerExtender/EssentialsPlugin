@@ -11,6 +11,7 @@
     using SEModAPIInternal.API.Entity.Sector.SectorObject;
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+    using VRage.Game.ModAPI;
     using VRage.ModAPI;
     public class HandleAdminSpeed : ChatHandlerBase
     {
@@ -42,8 +43,7 @@
         {
             return true;
         }
-
-        // /admin ownership change name gridId
+        
         public override bool HandleCommand( ulong userId, string[ ] words )
         {
             if ( words.Length < 2 )
@@ -56,14 +56,15 @@
             ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerName( name, true );
             if ( steamId == 0 )
             {
-                Communication.SendPrivateInformation( userId, string.Format( "Couldn't find player with name '{1}'", words[0] ) );
+                Communication.SendPrivateInformation( userId, $"Couldn't find player with name '{words[0]}'" );
                 return true;
             }
+            
             long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId( steamId ).First( );
             IMyEntity player;
             if ( !MyAPIGateway.Entities.TryGetEntityById( PlayerMap.Instance.GetPlayerEntityId( steamId ), out player ) )
             {
-                Communication.SendPrivateInformation( userId, string.Format( "Couldn't find player with name '{1}'", words[0] ) );
+                Communication.SendPrivateInformation( userId, $"Couldn't find player with name '{words[0]}'" );
                 return true;
             }
 
@@ -74,19 +75,21 @@
                 return true;
             }
 
-                int setTime=0;
+            int setMinutes = int.MaxValue;
             if ( words.Length > 2 )
             {
-                if ( !int.TryParse( words[2], out setTime ) )
+                if ( !int.TryParse( words[2], out setMinutes ) )
                 {
                     Communication.SendPrivateInformation( userId, GetHelp( ) );
                     return true;
                 }
             }
-            byte[ ] data = Encoding.UTF8.GetBytes( MyAPIGateway.Utilities.SerializeToXML<float>( setSpeed ) );
-            Communication.SendDataMessage( steamId, Communication.DataMessageType.MaxSpeed, data );
-            //ProcessSpeed.SpeedPlayers.Add( new Tuple<IMyPlayer, double, int>( (IMyPlayer)player, setSpeed, setTime) );
-            Communication.SendPrivateInformation( userId, string.Format( "Set maximum speed of player {0} to {1}m/s.", words[0], setSpeed ) );
+            DateTime setTime = DateTime.Now + TimeSpan.FromMinutes( setMinutes );
+           // byte[ ] data = Encoding.UTF8.GetBytes( MyAPIGateway.Utilities.SerializeToXML<float>( setSpeed ) );
+           // Communication.SendDataMessage( steamId, Communication.DataMessageType.MaxSpeed, data );
+           lock(ProcessSpeed.SpeedPlayers)
+            { ProcessSpeed.SpeedPlayers[playerId] = new Tuple< float, DateTime>( setSpeed, setTime);}
+            Communication.SendPrivateInformation( userId, $"Set maximum speed of player {words[0]} to {setSpeed}m/s{( setMinutes == int.MaxValue ? "." : $" for {setMinutes} minutes." )}" );
             return true;
         }
     }

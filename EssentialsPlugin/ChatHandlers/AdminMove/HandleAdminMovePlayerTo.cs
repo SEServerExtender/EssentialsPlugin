@@ -6,8 +6,11 @@
     using System.Threading;
     using EntityManagers;
     using EssentialsPlugin.Utility;
+    using Sandbox.Game.Entities;
     using Sandbox.ModAPI;
     using SEModAPIInternal.API.Common;
+    using VRage.Game.Entity;
+    using VRage.Game.ModAPI;
     using VRage.ModAPI;
     using VRageMath;
 
@@ -60,13 +63,23 @@
 			{
 				parse = float.TryParse(words[words.Count() - 1], out distance);
 			}
-            if ( distance < 10 )
-            {
-                Communication.SendPrivateInformation( userId, string.Format( "Minimum distance is 10m" ) );
-                distance = 10;
-            }
 
-			string targetName;
+            List<IMyPlayer> players = new List<IMyPlayer>();
+            MyAPIGateway.Players.GetPlayers(players, x => x.DisplayName.Contains(sourceName, StringComparison.CurrentCultureIgnoreCase));
+            if (players[0] == null)
+            {
+                Communication.SendPrivateInformation(userId, $"Couldn't find player with name {sourceName}.");
+                return true;
+            }
+            var controlledEntity = players[0].Controller.ControlledEntity;
+
+            //kick the player out of their cockpit if they're in one
+		    if ( controlledEntity is MyShipController )
+		    {
+		        Wrapper.GameAction(()=>((MyShipController)controlledEntity).RemoveUsers( false ));
+		    }
+
+            string targetName;
 			if(parse)
 				targetName = string.Join(" ", words.Skip(1).Take(words.Count() - 2).ToArray());
 			else
@@ -78,44 +91,29 @@
 				entity = CubeGrids.Find(targetName);
 				if(entity == null)
 				{
-					Communication.SendPrivateInformation(userId, string.Format("Can not find user or grid with the name: {0}", targetName));
+					Communication.SendPrivateInformation(userId, $"Can not find user or grid with the name: {targetName}" );
 					return true;
 				}
 			}            
 
             Vector3D position = entity.GetPosition();
 
-			Communication.SendPrivateInformation(userId, string.Format("Trying to move {0} to within {1}m of {2}.  This may take about 20 seconds.", sourceName, distance, targetName));
+			Communication.SendPrivateInformation(userId, $"Trying to move {sourceName} to within {distance}m of {targetName}." );
 			Vector3D startPosition = MathUtility.RandomPositionFromPoint((Vector3)position, distance);
 
             //make sure we aren't moving the player inside a planet or something
-            int tryCount = 0;
-            BoundingSphereD positionSphere = new BoundingSphereD( startPosition, 5 );
-            while ( MyAPIGateway.Entities.GetIntersectionWithSphere( ref positionSphere ) != null )
+            Vector3D? testPos = null;
+
+            Wrapper.GameAction(() => testPos = MyEntities.FindFreePlace(startPosition, 2.5f + distance));
+
+            if (testPos == null)
             {
-                startPosition = MathUtility.RandomPositionFromPoint( (Vector3)position, distance );
-                positionSphere = new BoundingSphereD( startPosition, 5 );
-
-                tryCount++;
-                if ( tryCount > 20 )
-                {
-                    Communication.SendPrivateInformation( userId, string.Format( "Could not find valid location to move player: {0}. Try increasing distance.", sourceName ) );
-                    return true;
-                }
+                Communication.SendPrivateInformation( userId, $"Could not find valid location to move player: {sourceName}. Try increasing distance." );
+                return true;
             }
-
-            //it's much better to have the client move the player, so we're doing that
-            ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerName( sourceName );
-            //send blank move type to pop the user out of any seat they're in
-            Communication.MoveMessage( steamId, " ", startPosition );
-
-            /*
-            if (!Player.Move(sourceName, startPosition))
-			{
-				Communication.SendPrivateInformation(userId, string.Format("Can not move user: {0} (Is user in a cockpit or not in game?)", sourceName));
-				return true;
-			}
-            */
+            
+            //server controls movement now
+            Wrapper.GameAction(() => ((MyEntity)players[0].Controller.ControlledEntity).PositionComp.SetPosition(testPos.Value));
 
             Communication.SendPrivateInformation(userId, string.Format("Moved {0} to within {1}m of {2}", sourceName, (int)Math.Round(Vector3D.Distance(startPosition, position)), targetName));
 			return true;

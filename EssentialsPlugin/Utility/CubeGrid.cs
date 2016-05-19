@@ -21,6 +21,7 @@
     using VRage.Groups;
     using Sandbox.Game.GameSystems;
     using Sandbox.Game.Entities.Cube;
+    using Sandbox.Game.Gui;
     using Sandbox.Game.World;
     using Sandbox.ModAPI.Ingame;
     using SEModAPI.API;
@@ -632,8 +633,9 @@
 	                {
 	                    isOwnedBy = true;
 	                    string ownedBy = parts[1];
-	                    if ( PlayerMap.Instance.GetPlayerItemsFromPlayerName( ownedBy ).Count > 0 )
-	                        ownedByPlayerId = PlayerMap.Instance.GetPlayerItemsFromPlayerName( ownedBy ).First( ).PlayerId;
+	                    var player = MySession.Static.Players.GetAllIdentities( ).FirstOrDefault( x => x.DisplayName.Contains( ownedBy, StringComparison.CurrentCultureIgnoreCase ) );
+                        if (player!=null)
+	                        ownedByPlayerId = player.IdentityId;
 
 	                    options.Add( "Owned By", ownedBy );
 	                }
@@ -1050,7 +1052,6 @@
             {
                 if (block.BlockDefinition.Id.SubtypeName.ToLower().Contains(subtype, StringComparison.CurrentCultureIgnoreCase))
                     result++;
-
                 if (result >= count)
                     return true;
             }

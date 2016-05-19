@@ -1,9 +1,15 @@
 ﻿namespace EssentialsPlugin.ChatHandlers
 {
+    using System;
+    using System.Collections.Generic;
     using System.Linq;
     using EssentialsPlugin.Utility;
+    using Sandbox.Game.Entities;
     using Sandbox.ModAPI;
     using SEModAPIInternal.API.Common;
+    using VRage.Audio;
+    using VRage.Game.Entity;
+    using VRage.Game.ModAPI;
     using VRageMath;
 
     public class HandleAdminMovePlayerPosition : ChatHandlerBase
@@ -63,76 +69,35 @@
 			string userName = words[0];
 			Vector3D startPosition = new Vector3D(double.Parse(words[1]), double.Parse(words[2]), double.Parse(words[3]));
 
+            List<IMyPlayer> players = new List<IMyPlayer>();
+            MyAPIGateway.Players.GetPlayers( players, x=>x.DisplayName.Contains( userName, StringComparison.CurrentCultureIgnoreCase ) );
+		    if ( players[0] == null )
+		    {
+		        Communication.SendPrivateInformation( userId, $"Couldn't find player with name {userName}." );
+		        return true;
+		    }
+		    MyEntity controlledEntity = ((MyEntity)players[0].Controller.ControlledEntity).GetTopMostParent( );
+
+		    float size = 2.5f;
+		    if ( controlledEntity is MyCubeGrid )
+		    {
+		        size = (float)( (MyCubeGrid)controlledEntity ).PositionComp.WorldAABB.Extents.Max(  );
+		    }
             //make sure we aren't moving the player inside a planet or something
-            BoundingSphereD positionSphere = new BoundingSphereD( );
-            positionSphere = new BoundingSphereD( startPosition, 5 );
-            if ( MyAPIGateway.Entities.GetIntersectionWithSphere( ref positionSphere ) != null )
+		    Vector3D? testPos = null;
+            
+            Wrapper.GameAction( ()=> testPos = MyEntities.FindFreePlace( startPosition, size ));
+
+            if ( testPos == null )
             {
-                Communication.SendPrivateInformation( userId, string.Format( "Could not move player: {0}. Position is not empty, try another.", userName ) );
+                Communication.SendPrivateInformation( userId, $"Could not move player: {userName}. Position is not empty, try another." );
                 return true;
             }
 
-            //it's much better to have the client move the player, so we're doing that
-            ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerName( userName );
-            Communication.MoveMessage( steamId, "normal", startPosition );
+            //server controls movement now
+            Wrapper.GameAction(()=>controlledEntity.PositionComp.SetPosition( testPos.Value ));
 
-            /*
-                if (!Player.Move(userName, startPosition))
-			{
-				Communication.SendPrivateInformation(userId, string.Format("Unable to move player: {0}", userName));
-			}
-            */
-			/*
-			CharacterEntity charEntity = SectorObjectManager.Instance.GetTypedInternalData<CharacterEntity>().Where(x => x.DisplayName.ToLower() == userName.ToLower() && x.Health > 0).First();
-			CubeGridEntity gridEntity = new CubeGridEntity(new FileInfo(Essentials.PluginPath + "MovePlayer.sbc"));
-			gridEntity.EntityId = BaseEntity.GenerateEntityId();
-			foreach (MyObjectBuilder_CubeBlock block in gridEntity.BaseCubeBlocks)
-			{
-				// set ownership
-				if(block is MyObjectBuilder_Cockpit)
-				{
-					MyObjectBuilder_Cockpit cockpit = (MyObjectBuilder_Cockpit)block;
-					cockpit.Pilot = (MyObjectBuilder_Character)charEntity.Export();								
-				}
-			}
-
-			gridEntity.PositionAndOrientation = new MyPositionAndOrientation(startPosition, Vector3.Forward, Vector3.Up);
-
-			Wrapper.GameAction(() =>
-			{
-				MyObjectBuilder_EntityBase baseEntity = gridEntity.Export();
-				IMyEntity entity = MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd(baseEntity);
-				Type someManager = SandboxGameAssemblyWrapper.Instance.GetAssemblyType(SectorObjectManager.EntityBaseNetManagerNamespace, SectorObjectManager.EntityBaseNetManagerClass);
-				Wrapper.InvokeStaticMethod(someManager, SectorObjectManager.EntityBaseNetManagerSendEntity, new object[] { entity.GetObjectBuilder() });
-				gridEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
-			});
-
-
-			int count = 0;
-			while (gridEntity.IsLoading)
-			{
-				Thread.Sleep(100);
-				count++;
-				if (count > 10)
-					break;
-			}
-
-			if (gridEntity.IsLoading)
-				return true;
-
-			foreach (CubeBlockEntity block in gridEntity.CubeBlocks)
-			{
-				if(block is CockpitEntity)
-				{
-					block.IntegrityPercent = 0.1f;
-					Log.Info("Removing User From Cockpit");
-				}
-			}
-			
-			gridEntity.Dispose();
-			*/
-
-			return true;
+            return true;
 		}
 	}
 }

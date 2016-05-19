@@ -73,59 +73,26 @@
 			Vector3D difference = startPosition - movePosition;
 			float radius = float.Parse(words[6]);
 
-			Communication.SendPrivateInformation(userId, string.Format("Moving all grids in a radius of {0} near {1} to {2}", radius, General.Vector3DToString(startPosition), General.Vector3DToString(movePosition)));
-
-			List<MyObjectBuilder_CubeGrid> gridsToMove = new List<MyObjectBuilder_CubeGrid>();
+			Communication.SendPrivateInformation(userId, $"Moving all grids in a radius of {radius} near {startPosition} to {movePosition}" );
+            
 			BoundingSphereD sphere = new BoundingSphereD(startPosition, radius);
 			List<IMyEntity> entitiesToMove = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
+		    int moveCount = 0;
+		    foreach ( IMyEntity entity in entitiesToMove )
+		    {
+		        if ( !( entity is IMyCubeGrid ) )
+		            continue;
 
-//			Wrapper.GameAction(() =>
-//			{
-				foreach (IMyEntity entity in entitiesToMove)
-				{
-					if (!(entity is IMyCubeGrid))
-						continue;
+		        Vector3D target = entity.GetPosition( ) + difference;
 
-					Communication.SendPrivateInformation(userId, string.Format("Moving '{0}' from {1} to {2}", entity.DisplayName, General.Vector3DToString(entity.GetPosition()), General.Vector3DToString(entity.GetPosition() + difference)));
+		        Communication.SendPrivateInformation( userId, $"Moving '{entity.DisplayName}' from {entity.GetPosition( )} to {target}" );
 
-					gridsToMove.Add((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder());
-					//MyAPIGateway.Entities.RemoveEntity(entity);
-					CubeGridEntity gridEntity = new CubeGridEntity((MyObjectBuilder_CubeGrid)entity.GetObjectBuilder(), entity);
-					gridEntity.Dispose();
-				}
-//			});
+		        //position can be set directly on the server
+		        Wrapper.GameAction( ( ) => entity.SetPosition( target ) );
+		        moveCount++;
+		    }
 
-			Log.Info("Entities Removed ... pausing");
-			Thread.Sleep(5000);
-			Log.Info("Removing entities from closed entities");
-
-			Wrapper.GameAction(() =>
-			{
-				foreach(IMyEntity entity in entitiesToMove)
-				{
-					if (!(entity is IMyCubeGrid))
-						continue;
-
-					Log.Info(string.Format("Removing '{0}' for move", entity.DisplayName));
-					MyAPIGateway.Entities.RemoveFromClosedEntities(entity);
-				}
-			});
-
-			Thread.Sleep(10000);
-
-			Wrapper.GameAction(() =>
-			{
-				foreach(MyObjectBuilder_CubeGrid grid in gridsToMove)
-				{
-					grid.PositionAndOrientation = new MyPositionAndOrientation(grid.PositionAndOrientation.Value.Position + difference, grid.PositionAndOrientation.Value.Forward, grid.PositionAndOrientation.Value.Up);
-					//Log.Info(string.Format("Adding '{0}' for move", grid.DisplayName));
-					Communication.SendPrivateInformation(userId, string.Format("Adding grid '{0}' back to world.", grid.DisplayName));
-					SectorObjectManager.Instance.AddEntity(new CubeGridEntity(grid));
-					Thread.Sleep(1000);
-				}
-			});
-
-			Communication.SendPrivateInformation(userId, string.Format("Moved {0} grids", gridsToMove.Count));
+		    Communication.SendPrivateInformation(userId, $"Moved {moveCount} grids" );
 
 			return true;
 		}

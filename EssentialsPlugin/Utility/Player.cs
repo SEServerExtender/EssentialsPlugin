@@ -14,6 +14,7 @@
     using Sandbox.Common.ObjectBuilders.Definitions;
     using Sandbox.Engine.Multiplayer;
     using Sandbox.Game.Replication;
+    using Sandbox.Game.World;
     using Sandbox.ModAPI;
     using SEModAPIInternal.API.Common;
     using SEModAPIInternal.API.Entity;
@@ -207,7 +208,10 @@
 			if (compareId == playerId)
 				return true;
 
-			MyObjectBuilder_FactionCollection m_factionCollection = (MyObjectBuilder_FactionCollection)InvokeEntityMethod(FactionsManager.Instance.BackingObject, FactionsManager.FactionManagerGetFactionCollectionMethod);
+			//MyObjectBuilder_FactionCollection m_factionCollection = (MyObjectBuilder_FactionCollection)InvokeEntityMethod(FactionsManager.Instance.BackingObject, FactionsManager.FactionManagerGetFactionCollectionMethod);
+
+            //TODO: replace this
+		    MyObjectBuilder_FactionCollection m_factionCollection = MySession.Static.Factions.GetObjectBuilder( );
 
 			if (m_factionCollection == null)
 			{

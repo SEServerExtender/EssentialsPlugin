@@ -6,6 +6,7 @@
     using EssentialsPlugin.Utility;
     using Sandbox.Common.ObjectBuilders;
     using Sandbox.Engine.Multiplayer;
+    using Sandbox.Game.Entities;
     using Sandbox.Game.Replication;
     using Sandbox.ModAPI;
     using SEModAPIInternal.API.Entity;
@@ -71,7 +72,7 @@
 			else
 				targetName = string.Join(" ", words.Skip(1).ToArray());
 
-			Communication.SendPrivateInformation(userId, string.Format("Moving {0} to within {1}m of {2}.  This may take about 20 seconds.", sourceName, distance, targetName));
+			Communication.SendPrivateInformation(userId, $"Moving {sourceName} to within {distance}m of {targetName}." );
 
 			Vector3D position;
             MyEntity entity = (MyEntity)Player.FindControlledEntity( targetName );
@@ -80,7 +81,7 @@
                 entity = CubeGrids.Find( targetName );
                 if ( entity == null )
                 {
-                    Communication.SendPrivateInformation( userId, string.Format( "Can not find user or grid with the name: {0}", targetName ) );
+                    Communication.SendPrivateInformation( userId, $"Can not find user or grid with the name: {targetName}" );
                     return true;
                 }
                 position = entity.PositionComp.GetPosition();
@@ -88,41 +89,25 @@
 			else
 				position = entity.PositionComp.GetPosition();
 
-			Vector3D startPosition = MathUtility.RandomPositionFromPoint((Vector3)position, distance);
             MyEntity gridToMove = CubeGrids.Find( sourceName );
             if (gridToMove == null)
 			{
-				Communication.SendPrivateInformation(userId, string.Format("Unable to find: {0}", sourceName));
+				Communication.SendPrivateInformation(userId, $"Unable to find: {sourceName}" );
 				return true;
 			}
+            Vector3D? testPos = null;
+
+            Wrapper.GameAction(() => testPos = MyEntities.FindFreePlace(position, (float)gridToMove.PositionComp.WorldAABB.Extents.Max(  ) + distance));
+
+            if (testPos == null)
+            {
+                Communication.SendPrivateInformation(userId, $"Could not find valid location to move: {sourceName}. Try increasing distance.");
+                return true;
+            }
             
-            Communication.MoveMessage( 0, "normal", startPosition.X, startPosition.Y, startPosition.Z, gridToMove.EntityId );
-
-            //Wrapper.GameAction( ( ) =>
-             //{
-             //    gridToMove.GetTopMostParent( ).SetPosition( startPosition );
-             //    Log.Info( string.Format( "Moving '{0}' from {1} to {2}", gridToMove.DisplayName, gridToMove.GetPosition( ), startPosition ) );
-                // MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( gridToMove.GetTopMostParent() ) );
-            //} );
-            /*
-                        Thread.Sleep(5000);
-
-                        Wrapper.GameAction(() =>
-                        {
-                            MyAPIGateway.Entities.RemoveFromClosedEntities(entity);
-                            Log.Info(string.Format("Removing '{0}' for move", entity.DisplayName));
-                        });
-
-                        Thread.Sleep(10000);
-
-                        Wrapper.GameAction(() =>
-                        {
-                            gridBuilder.PositionAndOrientation = new MyPositionAndOrientation(startPosition, gridBuilder.PositionAndOrientation.Value.Forward, gridBuilder.PositionAndOrientation.Value.Up);
-                            Log.Info(string.Format("Adding '{0}' for move", gridBuilder.DisplayName));
-                            SectorObjectManager.Instance.AddEntity(new CubeGridEntity(gridBuilder));
-                        });*/
-
-            Communication.SendPrivateInformation(userId, string.Format("Moved {0} to within {1}m of {2}", sourceName, (int)Math.Round(Vector3D.Distance(startPosition, position)), targetName));
+            Wrapper.GameAction( ()=>gridToMove.PositionComp.SetPosition( testPos.Value ) );
+            
+            Communication.SendPrivateInformation(userId, $"Moved {sourceName} to within {(int)Math.Round( Vector3D.Distance(testPos.Value, position ) )}m of {targetName}" );
 			return true;
 		}
 	}

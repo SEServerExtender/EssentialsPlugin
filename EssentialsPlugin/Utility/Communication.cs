@@ -17,8 +17,11 @@
     using VRageMath;
     using SEModAPI.API.Definitions;
     using System.Text;
+    using System.Threading.Tasks;
+    using Sandbox.Game.Entities;
     using Settings;
     using VRage.Game;
+    using VRage.ModAPI;
 
     public static class Communication
     {
@@ -215,8 +218,7 @@
         {
             //this may be unsafe, but whatever, my sanity requires the enum
             long msgId = (long)messageType;
-
-            //TODO: Check for max message size of 4kB
+            
             string msgIdString = msgId.ToString( );
             byte[ ] newData = new byte[data.Length + msgIdString.Length + 1];
             newData[0] = (byte)msgIdString.Length;
@@ -224,6 +226,12 @@
                 newData[r + 1] = (byte)msgIdString[r];
 
             Buffer.BlockCopy( data, 0, newData, msgIdString.Length + 1, data.Length );
+
+            if ( newData.Length > 4096 )
+            {
+                SendMessagePartsTo( steamId, msgId, newData );
+                return;
+            }
 
             Wrapper.GameAction( ( ) =>
                                 {
@@ -245,10 +253,110 @@
 
             Buffer.BlockCopy( data, 0, newData, msgIdString.Length + 1, data.Length );
 
+            if (newData.Length > 4096)
+            {
+                BroadcastMessageParts(msgId, newData);
+                return;
+            }
+
             Wrapper.GameAction( ( ) =>
                                 {
                                     MyAPIGateway.Multiplayer.SendMessageToOthers( 9000, newData );
                                 } );
+        }
+
+        public static void SendMessagePartsTo(ulong steamId, long dataId, byte[] data)
+        {
+            List<byte> byteList = data.ToList();
+            while (byteList.Count > 0)
+            {
+                int count = Math.Min(byteList.Count, 3500);
+                byte[] dataPart = byteList.GetRange(0, count).ToArray();
+                byteList.RemoveRange(0, count);
+
+                var partItem = new MessagePartItem
+                {
+                    DataId = dataId,
+                    Data = dataPart,
+                    LastPart = byteList.Count == 0
+                };
+
+                var message = MyAPIGateway.Utilities.SerializeToXML(partItem);
+                var outData = Encoding.UTF8.GetBytes(message);
+
+                MyAPIGateway.Multiplayer.SendMessageTo(9006, outData, steamId);
+            }
+        }
+
+        public static void BroadcastMessageParts( long dataId, byte[] data)
+        {
+            List<byte> byteList = data.ToList();
+            while (byteList.Count > 0)
+            {
+                int count = Math.Min(byteList.Count, 3500);
+                byte[] dataPart = byteList.GetRange(0, count).ToArray();
+                byteList.RemoveRange(0, count);
+
+                var partItem = new MessagePartItem
+                {
+                    DataId = dataId,
+                    Data = dataPart,
+                    LastPart = byteList.Count == 0
+                };
+
+                var message = MyAPIGateway.Utilities.SerializeToXML(partItem);
+                var outData = Encoding.UTF8.GetBytes(message);
+
+                MyAPIGateway.Multiplayer.SendMessageToOthers(9006, outData);
+            }
+        }
+        private static List<MessagePartItem> receiveParts = new List<MessagePartItem>();
+
+        public static void ReveiveMessageParts(byte[] data)
+        {
+            Task.Run( ( ) =>
+                      {
+                          var message = Encoding.UTF8.GetString( data );
+                          var item = MyAPIGateway.Utilities.SerializeFromXML<MessagePartItem>( message );
+
+                          receiveParts.Add( item );
+
+                          if ( !item.LastPart )
+                              return;
+
+                          byte[] result = receiveParts.SelectMany( part => part.Data ).ToArray( );
+
+                          if ( item.DataId == (long)DataMessageType.ToolbarIn )
+                              HandleToolbarData( result );
+                      } );
+        }
+
+        public static void HandleToolbarData( byte[] data )
+        {
+            Wrapper.GameAction( ( ) =>
+                                {
+                                    Log.Debug( "Update toolbar" );
+                                    var message = Encoding.UTF8.GetString( data );
+                                    var item = MyAPIGateway.Utilities.SerializeFromXML<Communication.ServerToolbarItem>( message );
+                                    IMyEntity controllerEntity;
+                                    if ( !MyAPIGateway.Entities.TryGetEntityById( item.EntityID, out controllerEntity ) )
+                                    {
+                                        Log.Error( "Failed to get cockpit for toolbar update." );
+                                        return;
+                                    }
+                                    var controller = controllerEntity as MyShipController;
+                                    if ( controller == null )
+                                    {
+                                        Log.Error( "Failed to get cockpit for toolbar update. 1" );
+                                        return;
+                                    }
+                                    var oldName = ( (IMyTerminalBlock)controller ).CustomName;
+                                    var cockpitBuilder = (MyObjectBuilder_ShipController)controller.GetObjectBuilderCubeBlock( );
+                                    cockpitBuilder.Toolbar = item.Toolbar;
+                                    controller.Init( cockpitBuilder, controller.CubeGrid );
+                                    ( (IMyTerminalBlock)controller ).SetCustomName( oldName );
+                                } );
+            Communication.BroadcastDataMessage( DataMessageType.ToolbarOut, data );
         }
 
         public class ServerMessageItem
@@ -323,6 +431,19 @@
             }
         }
 
+        public class ServerToolbarItem
+        {
+            public long EntityID;
+            public MyObjectBuilder_Toolbar Toolbar;
+        }
+
+        public class MessagePartItem
+        {
+            public long DataId;
+            public bool LastPart;
+            public byte[] Data;
+        }
+
         public enum DataMessageType
         {
             Test = 5000,
@@ -341,7 +462,9 @@
             Notification,
             MaxSpeed,
             ServerInfo,
-            Waypoint
+            Waypoint,
+            ToolbarOut,
+            ToolbarIn
         }
     }
 }

@@ -11,18 +11,18 @@
     using System.Runtime.InteropServices;
     using System.Threading;
     using System.Windows.Forms.Design;
-    using EssentialsPlugin.ChatHandlers;
-    using EssentialsPlugin.ChatHandlers.Admin;
-    using EssentialsPlugin.ChatHandlers.AdminConceal;
-    using EssentialsPlugin.ChatHandlers.AdminDelete;
-    using EssentialsPlugin.ChatHandlers.AdminScan;
-    using EssentialsPlugin.ChatHandlers.Dock;
-    using EssentialsPlugin.ChatHandlers.Waypoints;
-    using EssentialsPlugin.ChatHandlers.Settings;
-    using EssentialsPlugin.ProcessHandlers;
-    using EssentialsPlugin.Settings;
-    using EssentialsPlugin.Utility;
-    using EssentialsPlugin.UtilityClasses;
+    using ChatHandlers;
+    using ChatHandlers.Admin;
+    using ChatHandlers.AdminConceal;
+    using ChatHandlers.AdminDelete;
+    using ChatHandlers.AdminScan;
+    using ChatHandlers.Dock;
+    using ChatHandlers.Waypoints;
+    using ChatHandlers.Settings;
+    using ProcessHandlers;
+    using Settings;
+    using Utility;
+    using UtilityClasses;
     using NLog;
     using Sandbox.ModAPI;
     using SEModAPI.API.Utility;
@@ -35,7 +35,7 @@
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
     using VRage.ModAPI;
     using System.Diagnostics;
-    using System.Text;
+
     public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
     {
         public static Logger Log;
@@ -1301,7 +1301,8 @@
             
             Protection.Init( );
             ProcessReservedSlots.Init( );
-
+            
+            //MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReveiveMessageParts);
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
         }
         
