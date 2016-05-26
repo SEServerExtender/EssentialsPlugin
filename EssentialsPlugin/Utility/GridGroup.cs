@@ -14,12 +14,13 @@
 
     public class GridGroup
     {
-        private readonly HashSet<MyCubeGrid> _grids = new HashSet<MyCubeGrid>( );
+        private HashSet<MyCubeGrid> _grids = new HashSet<MyCubeGrid>( );
         private HashSet<MySlimBlock> _cubeBlocks = new HashSet<MySlimBlock>(); 
         private List<MyCubeBlock> _fatBlocks = new List<MyCubeBlock>(); 
         private List<long> _bigOwners = new List<long>(); 
         private List<long> _smallOwners = new List<long>();
         private MyCubeGrid _parent;
+        private GridLinkTypeEnum _linkType;
 
         public HashSet<MyCubeGrid> Grids
         {
@@ -68,8 +69,15 @@
             get { return _parent; }
         }
 
+        public GridLinkTypeEnum LinkType
+        {
+            get { return _linkType; }
+        }
+
         public GridGroup( MyCubeGrid grid, GridLinkTypeEnum linkType = GridLinkTypeEnum.Logical )
         {
+            _linkType = linkType;
+
             if ( grid.InScene )
             {
                 List<MyCubeGrid> tmpList = new List<MyCubeGrid>( );
@@ -89,17 +97,17 @@
                 CubeGrids.GetGridsUnconnected( returnSet, thisEntity );
                 
                 if ( returnSet.Count > 0 )
-                    _grids.Add( (MyCubeGrid)returnSet.First( ) );
+                    _grids.Add( grid );
                 else
                     return;
             }
 
             //populate our internal lists
-            GetParent( );
-            GetCubeBlocks( );
-            _GetFatBlocks( );
-            GetBigOwners( );
-            GetSmallOwners( );
+            ComputeParent( );
+            ComputeCubeBlocks( );
+            ComputeFatBlocks( );
+            ComputeSmallOwners( );
+            ComputeBigOwners( );
         }
         
         public static HashSet<GridGroup> GetGroups( HashSet<MyEntity> entities, GridLinkTypeEnum linkType = GridLinkTypeEnum.Logical )
@@ -111,29 +119,25 @@
             //which is Bad.
             MyEntity[] entitiesCopy = new MyEntity[entities.Count];
             entities.CopyTo( entitiesCopy );
-            List<Task> groupTasks = new List<Task>();
 
-            foreach ( MyEntity entity in entitiesCopy )
-            {
-                MyCubeGrid grid = entity as MyCubeGrid;
-                
-                if ( grid?.Physics == null || grid.Closed )
-                    continue;
-                
                 //on large servers this can run into the tens of seconds, so parallelize it
-                groupTasks.Add( Task.Run( ( ) =>
-                                          {
-                                              var newGroup = new GridGroup( grid, linkType );
+            Parallel.ForEach( entitiesCopy, ( entity ) =>
+                                            {
+                                                MyCubeGrid grid = entity as MyCubeGrid;
 
-                                              lock ( result )
-                                              {
-                                                  if ( !result.Any( x => x.Grids.Contains( grid ) ) )
-                                                      result.Add( newGroup );
-                                              }
-                                          } ) );
-            }
+                                                if (grid?.Physics == null || grid.Closed)
+                                                    return;
 
-            Task.WaitAll( groupTasks.ToArray(  ) );
+                                                lock (result)
+                                                    if (result.Any( x => x.Grids.Contains( grid ) ))
+                                                        return;
+
+                                                var newGroup = new GridGroup( grid, linkType );
+
+                                                lock (result)
+                                                    result.Add( newGroup );
+                                            } );
+            
             return result;
         }
 
@@ -150,7 +154,7 @@
                                 {
                                     foreach (MyCubeGrid grid in _grids)
                                     {
-                                        if (grid?.Physics == null || grid.Closed)
+                                        if (grid.Physics == null || grid.Closed)
                                             continue;
 
                                         grid.Close( );
@@ -166,7 +170,27 @@
             }
         }
 
-        private void GetParent(  )
+        public void UpdateGroup()
+        {
+            HashSet<MyCubeGrid> newGrids = new HashSet<MyCubeGrid>();
+
+            foreach (var newGrid in MyCubeGridGroups.Static.GetGroups( _linkType ).GetGroupNodes( _parent ))
+                newGrids.Add( newGrid );
+
+            if (_grids != newGrids)
+            {
+                _grids = newGrids;
+
+                //populate our internal lists
+                ComputeParent();
+                ComputeCubeBlocks();
+                ComputeFatBlocks();
+                ComputeSmallOwners();
+                ComputeBigOwners();
+            }
+        }
+
+        private void ComputeParent(  )
         {
             if ( _grids.Count < 1 )
                 return;
@@ -178,58 +202,64 @@
             }
         }
 
-        private void GetBigOwners( )
+        private void ComputeBigOwners( )
         {
-            //TODO: Actually process the list of owners to get the big owner of the entire group
             _bigOwners.Clear(  );
             Dictionary<long, int> owners = new Dictionary<long, int>();
-            //foreach ( long ownerId in _grids.SelectMany( grid => grid.BigOwners ).Where( x => x > 0 ) )
-            //    owners[ownerId] = 0;
-
-            foreach ( var grid in _grids )
-            {
-                foreach ( var ownerId in grid.BigOwners )
-                {
-                    if (!_bigOwners.Contains( ownerId ) && ownerId > 0 )
-                        _bigOwners.Add( ownerId );
-                }
-            }
-            return;
 
             foreach ( MyCubeBlock block in _fatBlocks )
             {
+                if (block.OwnerId == 0) //block owned by nobody, don't process it
+                    continue;
+
                 if ( owners.ContainsKey( block.OwnerId ) )
                     owners[block.OwnerId]++;
+                else
+                    owners.Add( block.OwnerId, 1 );
             }
 
-            int maxCount = owners.Values.Max( );
-            foreach ( long owner in owners.Keys )
+            int mostBlocks = 0;
+            foreach ( var owner in owners )
             {
-                if(owners[owner] == maxCount)
-                    _bigOwners.Add( owner );
+                if (owner.Value > mostBlocks)
+                    mostBlocks = owner.Value;
+            }
+
+            foreach (var owner in owners)
+            {
+                if(owner.Value == mostBlocks)
+                    _bigOwners.Add( owner.Key );
             }
         }
 
-        private void GetSmallOwners( )
+        private void ComputeSmallOwners( )
         {
             _smallOwners.Clear(  );
-            HashSet<long> result = new HashSet<long>( );
-            foreach ( long owner in _grids.SelectMany( grid => grid.SmallOwners ).Where( x => x > 0 ) )
-                result.Add( owner );
-            _smallOwners = result.ToList( );
+            foreach (MyCubeGrid grid in _grids)
+            {
+                foreach (long owner in grid.SmallOwners)
+                {
+                    if (!_smallOwners.Contains( owner ))
+                        _smallOwners.Add( owner );
+                }
+            }
         }
 
-        private void GetCubeBlocks( )
+        private void ComputeCubeBlocks( )
         {
             _cubeBlocks.Clear(  );
             foreach ( MyCubeGrid grid in _grids )
                 _cubeBlocks.UnionWith( grid.CubeBlocks );
         }
 
-        private void _GetFatBlocks(  )
+        private void ComputeFatBlocks(  )
         {
             _fatBlocks.Clear(  );
-            _fatBlocks =  _cubeBlocks.Select( b => b?.FatBlock ).Where( f => f != null ).ToList(  );
+            foreach (MyCubeGrid grid in _grids)
+            {
+                foreach(MyCubeBlock block in grid.GetFatBlocks())
+                    _fatBlocks.Add( block );
+            }
         }
     }
 }

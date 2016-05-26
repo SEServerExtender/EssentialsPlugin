@@ -79,9 +79,9 @@
         private int _dockingShipsPerZone;
 
         private bool _dynamicConcealEnabled;
-        private int _dynamicConcealUpdateSpeed;
         private float _dynamicConcealDistance;
         private bool _dynamicConcealIncludeLargeGrids;
+        private bool _dynamicConcealIncludeStations;
         private string[] _dynamicConcealIgnoreSubTypeList = { };
         private bool _dynamicConcealIncludeMedBays;
         private bool _dynamicShowMessages;
@@ -91,11 +91,7 @@
         private bool _dynamicTurretAllowExemption;
         private bool _dynamicBlockManagementEnabled;
         private DynamicTurretManagementMode _mDynamicTurretManagementMode;
-
-        private bool _dynamicConcealServerOnly;
-        private bool _dynamicClientConcealEnabled;
-        private float _dynamicClientConcealDistance;
-
+        
         private bool _waypointsEnabled;
         private int _waypointsMaxPerPlayer;
         private MTObservableCollection<ServerWaypointItem> _waypointServerItems;
@@ -608,20 +604,7 @@
                 Save( );
             }
         }
-
-        public int DynamicConcealUpdateSpeed
-        {
-            get
-            {
-                return _dynamicConcealUpdateSpeed;
-            }
-            set
-            {
-                _dynamicConcealUpdateSpeed = value;
-                Save( );
-            }
-        }
-
+        
         public bool DynamicConcealPirates
         {
             get
@@ -655,6 +638,16 @@
 			}
 		}
 
+        public bool ConcealIncludeStations
+        {
+            get { return _dynamicConcealIncludeStations; }
+            set
+            {
+                _dynamicConcealIncludeStations = value;
+                Save();
+            }
+        }
+
 		public string[] DynamicConcealIgnoreSubTypeList
 		{
 			get { return _dynamicConcealIgnoreSubTypeList; }
@@ -674,37 +667,7 @@
 				Save();
 			}
 		}
-
-		public bool DynamicConcealServerOnly
-		{
-			get { return _dynamicConcealServerOnly; }
-			set 
-			{ 
-				_dynamicConcealServerOnly = value;
-				Save();
-			}
-		}
-
-		public bool DynamicClientConcealEnabled
-		{
-			get { return _dynamicClientConcealEnabled; }
-			set 
-			{ 
-				_dynamicClientConcealEnabled = value;
-				Save();
-			}
-		}
-
-		public float DynamicClientConcealDistance
-		{
-			get { return _dynamicClientConcealDistance; }
-			set 
-			{ 
-				_dynamicClientConcealDistance = value;
-				Save();
-			}
-		}
-		
+        
 		public bool DynamicShowMessages
 		{
 			get { return _dynamicShowMessages; }
@@ -1044,8 +1007,7 @@
 			_backupDateFormatSubDirectory = "MM-dd-yyyy";
 
 			_greetingMessage = "";
-
-            _dynamicConcealUpdateSpeed = 500;
+            
 			_dynamicConcealDistance = 8000;
             _dynamicConcealPirates = false;
             _dynamicShowMessages = false;

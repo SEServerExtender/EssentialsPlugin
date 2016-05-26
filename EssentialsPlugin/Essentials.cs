@@ -633,23 +633,6 @@
         }
 
         [Category( "Dynamic Entity Management" )]
-        [DisplayName( "UpdateTime" )]
-        [Description( "How often, in milliseconds, Essentials will process the list of entities to be concealed or revealed." )]
-        [Browsable( true )]
-        [ReadOnly( false )]
-        public int DynamicConcealUpdateSpeed
-        {
-            get
-            {
-                return PluginSettings.Instance.DynamicConcealUpdateSpeed;
-            }
-            set
-            {
-                PluginSettings.Instance.DynamicConcealUpdateSpeed = value;
-            }
-        }
-
-        [Category( "Dynamic Entity Management" )]
         [DisplayName( "ConcealPirates" )]
         [Description( "Concealing grids owned by pirates can cause problems with drones and cargo ships." )]
         [Browsable( true )]
@@ -686,6 +669,17 @@
         {
             get { return PluginSettings.Instance.ConcealIncludeLargeGrids; }
             set { PluginSettings.Instance.ConcealIncludeLargeGrids = value; }
+        }
+
+        [Category("Dynamic Entity Management")]
+        [DisplayName("Include Large Grids")]
+        [Description("Enable / Disable management of stations, independent of other large block grids.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public bool DynamicConcealIncludeStations
+        {
+            get { return PluginSettings.Instance.ConcealIncludeStations; }
+            set { PluginSettings.Instance.ConcealIncludeStations = value; }
         }
 
         [Category( "Dynamic Entity Management" )]
@@ -1159,7 +1153,7 @@
             // Setup process handlers
             _processHandlers = new List<ProcessHandlerBase>
                                {
-                                   new ProcessNewUserTransport( ),
+                                   //new ProcessNewUserTransport( ),
                                    new ProcessGreeting( ),
                                    new ProcessRestart( ),
                                    new ProcessInfo( ),
@@ -1271,7 +1265,6 @@
                                 //Utility
 				                new HandleUtilityExportServer( ),
                                 new HandleUtilityGridsList( ),
-                                new HandleUtilityGridsRefresh( ),
                                 new HandleUtilityGridsCompare( ),
 
                                 //Misc
@@ -1471,7 +1464,6 @@
 
             if ( obj.Message[0] != '/' )
             {
-                //one day this will work. today is not that day :(
                 //ChatHistory.AddChat( obj );
                 return;
             }

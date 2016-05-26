@@ -122,7 +122,6 @@
     <Compile Include="ChatHandlers\Ticket\HandleTicketAdd.cs" />
     <Compile Include="ChatHandlers\Ticket\HandleTicketTimeleft.cs" />
     <Compile Include="ChatHandlers\Utility\HandleUtilityGridsCompare.cs" />
-    <Compile Include="ChatHandlers\Utility\HandleUtilityGridsRefresh.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointFactionRemove.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointFactionAdd.cs" />
     <Compile Include="ChatHandlers\Waypoints\HandleWaypointGroupRemove.cs" />
@@ -167,7 +166,6 @@
     </Compile>
     <Compile Include="Settings\PluginSettings.cs" />
     <Compile Include="ProcessHandlers\ProcessRespawn.cs" />
-    <Compile Include="ProcessHandlers\ProcessNewUserTransport.cs" />
     <Compile Include="ProcessHandlers\ProcessGreeting.cs" />
     <Compile Include="ProcessHandlers\ProcessHandlerBase.cs" />
     <Compile Include="ProcessHandlers\ProcessInfo.cs" />
