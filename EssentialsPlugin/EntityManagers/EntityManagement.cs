@@ -72,12 +72,6 @@ namespace EssentialsPlugin.EntityManagers
 			_checkConceal = true;
 			try
 			{
-				DateTime start = DateTime.Now;
-				double distCheck = 0d;
-				double blockRules = 0d;
-				double getGrids = 0d;
-				double co = 0f;
-
 			    List<MyPlayer> players;
 				HashSet<MyEntity> entities;
 				HashSet<MyEntity> entitiesFiltered = new HashSet<MyEntity>( );
@@ -119,7 +113,7 @@ namespace EssentialsPlugin.EntityManagers
 			    {
                     if(PluginSettings.Instance.DynamicConcealPirates)
                     {
-                        if ( group.Parent.BigOwners.Count < 2 && MySession.Static.Players.GetNPCIdentities().Contains( group.Parent.BigOwners[0] ) )
+                        if ( group.Parent.GetOwner() == "Space Pirates" )
                         {
                             if (PluginSettings.Instance.DynamicShowMessages)
                                 Essentials.Log.Info( $"Not concealing pirate owned grid {group.Parent.EntityId} -> {group.Parent.DisplayName}.");
@@ -258,7 +252,7 @@ namespace EssentialsPlugin.EntityManagers
 				long ownerId = ((MyCubeGrid)entity).BigOwners.First();
 				string ownerName = PlayerMap.Instance.GetPlayerNameFromPlayerId( ownerId );
                 
-			    if ( !PluginSettings.Instance.DynamicConcealPirates )
+			    if ( PluginSettings.Instance.DynamicShowMessages )
 			        Essentials.Log.Info($"{entity.EntityId} {ownerId} {ownerName}" );
 
 				pos = 2;
@@ -268,21 +262,21 @@ namespace EssentialsPlugin.EntityManagers
 					entity.Physics.AngularVelocity = Vector3.Zero;
 				}
 
-				pos = 3;
-                if ( UnregisteredEntities.Contains( entity ) )
-				{
-					Essentials.Log.Info( $"Concealing - Id: {entity.EntityId} DUPE FOUND - Display: {entity.DisplayName} OwnerId: {ownerId} OwnerName: {ownerName}");
-				    Wrapper.GameAction( entity.Close );
+				//pos = 3;
+                //if ( UnregisteredEntities.Contains( entity ) )
+				//{
+				//	Essentials.Log.Info( $"Concealing - Id: {entity.EntityId} DUPE FOUND - Display: {entity.DisplayName} OwnerId: {ownerId} OwnerName: {ownerName}");
+				//    Wrapper.GameAction( entity.Close );
+                //}
                 pos = 4;
-                }
-				else
-                {
+				//else
+                //{
                     UnregisteredEntities.Add( entity );
                     Wrapper.GameAction( () => UnregisterHierarchy( entity ) );
                     if ( PluginSettings.Instance.DynamicShowMessages )
                         Essentials.Log.Info( $"Concealed - Id: {entity.EntityId} -> Display: {entity.DisplayName} OwnerId: {ownerId} OwnerName: {ownerName}" );
 
-                }
+                //}
 			}
 			catch ( Exception ex )
 			{
@@ -400,7 +394,7 @@ namespace EssentialsPlugin.EntityManagers
 
 					if ( found )
 					{
-						ReregisterHierarchy( entity );
+					    Wrapper.GameAction( () => ReregisterHierarchy( entity ) );
 
                         if (PluginSettings.Instance.DynamicShowMessages)
                             Essentials.Log.Info("Revealed - Id: {0} -> Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
@@ -650,7 +644,6 @@ namespace EssentialsPlugin.EntityManagers
 
 		    foreach ( var entity in UnregisteredEntities )
 		    {
-
                 if (PluginSettings.Instance.DynamicShowMessages)
                     Essentials.Log.Info("Revealed - Id: {0} -> Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
                                      entity.EntityId,
@@ -659,7 +652,7 @@ namespace EssentialsPlugin.EntityManagers
                                      PlayerMap.Instance.GetPlayerNameFromPlayerId(((MyCubeGrid)entity).BigOwners.FirstOrDefault()),
                                      "Force reveal");
 
-                ReregisterHierarchy( entity );
+		        Wrapper.GameAction( () => ReregisterHierarchy( entity ) );
 		    }
 
 		    _checkReveal = false;

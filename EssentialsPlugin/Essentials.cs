@@ -672,7 +672,7 @@
         }
 
         [Category("Dynamic Entity Management")]
-        [DisplayName("Include Large Grids")]
+        [DisplayName("Include Stations")]
         [Description("Enable / Disable management of stations, independent of other large block grids.")]
         [Browsable(true)]
         [ReadOnly(false)]
