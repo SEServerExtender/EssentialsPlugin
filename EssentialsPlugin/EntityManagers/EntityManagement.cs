@@ -249,7 +249,7 @@ namespace EssentialsPlugin.EntityManagers
             try
 			{
                 pos = 1;
-				long ownerId = ((MyCubeGrid)entity).BigOwners.First();
+				long ownerId = ((MyCubeGrid)entity).BigOwners.FirstOrDefault();
 				string ownerName = PlayerMap.Instance.GetPlayerNameFromPlayerId( ownerId );
                 
 			    if ( PluginSettings.Instance.DynamicShowMessages )
