@@ -106,6 +106,10 @@
         private bool _blockEnforcementEnabled;
         private MTObservableCollection<SettingsBlockEnforcementItem> _blockEnforcementItems;
 
+        private bool _playerBlockEnforcementEnabled;
+        private MTObservableCollection<SettingsBlockEnforcementItem> _playerBlockEnforcementItems;
+        private bool _changeBlockOwnerNearest;
+
         private bool _gameModeConquestEnabled;
 
         private bool _reservedSlotsEnabled;
@@ -115,7 +119,7 @@
         private bool _reservedSlotsAdmins;
 
 	    private bool _timedCommandsEnabled;
-	    private MTObservableCollection<TimedCommandItem> _TimedCommandsItem;
+	    private MTObservableCollection<TimedCommandItem> _timedCommandsItem;
 
 	    private bool _atmosphericCargoShipsEnabled;
 	    private float _atmosphericCargoShipSpawnTime;
@@ -830,9 +834,39 @@
                 _blockEnforcementItems = value;
                 Save();
             }
-		}
+        }
 
-		public bool GameModeConquestEnabled
+        public bool PlayerBlockEnforcementEnabled
+        {
+            get { return _playerBlockEnforcementEnabled; }
+            set
+            {
+                _playerBlockEnforcementEnabled = value;
+                Save();
+            }
+        }
+
+        public bool PlayerBlockEnforcementChangeOwner
+        {
+            get { return _changeBlockOwnerNearest; }
+            set
+            {
+                _changeBlockOwnerNearest = value;
+                Save();
+            }
+        }
+
+        public MTObservableCollection<SettingsBlockEnforcementItem> PlayerBlockEnforcementItems
+        {
+            get { return _playerBlockEnforcementItems; }
+            set
+            {
+                _playerBlockEnforcementItems = value;
+                Save();
+            }
+        }
+
+        public bool GameModeConquestEnabled
 		{
 			get { return _gameModeConquestEnabled; }
 			set 
@@ -925,10 +959,10 @@
 
 	    public MTObservableCollection<TimedCommandItem> TimedCommandsItems
 	    {
-	        get { return _TimedCommandsItem; }
+	        get { return _timedCommandsItem; }
 	        set
 	        {
-	            _TimedCommandsItem = value;
+	            _timedCommandsItem = value;
 	            Save(  );
 	        }
 	    }
@@ -1033,9 +1067,12 @@
 			_blockEnforcementItems = new MTObservableCollection<SettingsBlockEnforcementItem>();
 			_blockEnforcementItems.CollectionChanged += ItemsCollectionChanged;
 
+            _playerBlockEnforcementItems = new MTObservableCollection<SettingsBlockEnforcementItem>();
+            _playerBlockEnforcementItems.CollectionChanged += ItemsCollectionChanged;
+
             _timedCommandsEnabled = false;
-            _TimedCommandsItem = new MTObservableCollection<TimedCommandItem>(  );
-            _TimedCommandsItem.CollectionChanged += ItemsCollectionChanged;
+            _timedCommandsItem = new MTObservableCollection<TimedCommandItem>(  );
+            _timedCommandsItem.CollectionChanged += ItemsCollectionChanged;
 
             _atmosphericCargoShipsEnabled = false;
             _atmosphericCargoShipSpawnTime = 10.0f;

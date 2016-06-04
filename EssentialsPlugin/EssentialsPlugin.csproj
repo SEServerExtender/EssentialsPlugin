@@ -201,6 +201,7 @@
     <Compile Include="Utility\DockingItem.cs" />
     <Compile Include="Utility\Extensions.cs" />
     <Compile Include="Utility\GridGroup.cs" />
+    <Compile Include="Utility\PlayerBlockEnforcement.cs" />
     <Compile Include="Utility\Protection.cs" />
     <Compile Include="Utility\TimedEntityCleanup.cs" />
     <Compile Include="Utility\Communication.cs" />
@@ -208,7 +209,6 @@
     <Compile Include="Utility\DockingZone.cs" />
     <Compile Include="Utility\Entity.cs" />
     <Compile Include="EntityManagers\EntityManagement.cs" />
-    <Compile Include="Utility\Faction.cs" />
     <Compile Include="Utility\MathUtility.cs" />
     <Compile Include="Utility\Player.cs" />
     <Compile Include="Utility\Utility.cs" />

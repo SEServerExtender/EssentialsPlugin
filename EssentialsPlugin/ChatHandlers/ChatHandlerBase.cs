@@ -5,6 +5,7 @@
     using NLog;
     using Sandbox.Engine.Multiplayer;
     using Sandbox.Game.World;
+    using SEModAPI.API;
     using SEModAPIInternal.API.Common;
     using Utility;
     public abstract class ChatHandlerBase
@@ -12,7 +13,8 @@
 		protected static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		public ChatHandlerBase( )
 		{
-			Log.Debug(string.Format("Added chat handler: {0}", GetCommandText()));
+		    if ( ExtenderOptions.IsDebugging )
+		        Log.Debug( $"Added chat handler: {GetCommandText()}" );
 		}
 
 		public virtual Boolean CanHandle(ulong steamId, String[] words, ref int commandCount)

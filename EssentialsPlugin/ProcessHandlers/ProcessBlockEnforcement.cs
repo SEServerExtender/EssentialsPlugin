@@ -5,6 +5,7 @@
 	using System.Linq;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
+	using Sandbox.Game.World;
 	using Sandbox.ModAPI;
 	using Sandbox.ModAPI.Ingame;
 	using SEModAPIInternal.API.Common;
@@ -172,7 +173,7 @@
                         }
                         if ( !foundAdmin )
                         {
-                            foreach ( long playerId in grid.BigOwners )
+                            foreach ( long playerId in grid.SmallOwners )
                             {
                                 ulong steamId = PlayerMap.Instance.GetSteamIdFromPlayerId( playerId );
                                 if ( steamId > 0 )

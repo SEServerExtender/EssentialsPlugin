@@ -87,10 +87,10 @@
                 
                 _grids.UnionWith( tmpList );
             }
-            //HACK: Manually create a group for out of scene grids because pulling them from the server crashes
+            //manually create a group for out of scene grids because they have a null group (yay Dusan fixed the crash)
             else
             {
-                //use the old method to filter out grids with pisons or rotors, for safety
+                //use the old method to filter out grids with pistons or rotors, for safety
                 HashSet<IMyEntity> thisEntity = new HashSet<IMyEntity>();
                 HashSet<IMyEntity> returnSet = new HashSet<IMyEntity>();
                 thisEntity.Add( (IMyEntity)grid );

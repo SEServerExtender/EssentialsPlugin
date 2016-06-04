@@ -78,27 +78,21 @@
 
 				Communication.SendPrivateInformation(userId, "==== Concealed Entities ===");
 				int count = 0;
-				foreach (IMyEntity entity in entities)
+				foreach (MyEntity entity in EntityManagement.UnregisteredEntities)
 				{
-					if (!(entity is IMyCubeGrid))
+					if (!(entity is MyCubeGrid))
 						continue;
-
-					if (entity.InScene)
-						continue;
-
-					IMyCubeGrid grid = (IMyCubeGrid)entity;
+                    
+					MyCubeGrid grid = (MyCubeGrid)entity;
 					long ownerId = 0;
 					string ownerName = "";
 					if (grid.BigOwners.Count > 0)
 					{
 						ownerId = grid.BigOwners.First();
-						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
+						ownerName = PlayerMap.Instance.GetPlayerNameFromPlayerId( ownerId );
 					}
-
-					if (ownerName == "")
-						ownerName = "No one";
-
-					Communication.SendPrivateInformation(userId, string.Format("Id: {0} Display: {1} OwnerId: {2} OwnerName: {3} Position: {4}", entity.EntityId, entity.DisplayName, ownerId, ownerName, General.Vector3DToString(entity.GetPosition())));
+                    
+					Communication.SendPrivateInformation(userId, string.Format("Id: {0} Display: {1} OwnerId: {2} OwnerName: {3} Position: {4}", entity.EntityId, entity.DisplayName, ownerId, ownerName, General.Vector3DToString(entity.PositionComp.GetPosition())));
 					count++;
 				}
 

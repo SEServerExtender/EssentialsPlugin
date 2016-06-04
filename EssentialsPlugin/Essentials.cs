@@ -959,7 +959,7 @@
         }
 
         [Category( "Block Enforcement System" )]
-        [Description( "Enforcement Items.  These are how block enforcements are defined.  Each item is a block that is scanned for." )]
+        [Description( "Enforcement Items. These are how block enforcements are defined. Each item is a block that is scanned for." )]
         [Browsable( true )]
         [ReadOnly( false )]
         public MTObservableCollection<SettingsBlockEnforcementItem> BlockEnforcementItems
@@ -967,6 +967,35 @@
             get { return PluginSettings.Instance.BlockEnforcementItems; }
         }
         
+        [Category("Block Enforcement System")]
+        [Description("This functions like the normal block enforcement, except blocks are counted per player instead of per grid.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public bool PlayerBlockEnforcementEnabled
+        {
+            get { return PluginSettings.Instance.PlayerBlockEnforcementEnabled; }
+            set { PluginSettings.Instance.PlayerBlockEnforcementEnabled = value; }
+        }
+
+        [Category("Block Enforcement System")]
+        [Description("If a block in player enforcement is created with no owner, it will be changed to the nearest player or the owner of the grid if there are no players.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public bool PlayerBlockEnforcementChangeOwner
+        {
+            get { return PluginSettings.Instance.PlayerBlockEnforcementChangeOwner; }
+            set { PluginSettings.Instance.PlayerBlockEnforcementChangeOwner = value; }
+        }
+
+        [Category("Block Enforcement System")]
+        [Description("Enforcement Items. These are how block enforcements are defined. Each item is a block that is scanned for.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public MTObservableCollection<SettingsBlockEnforcementItem> PlayerBlockEnforcementItems
+        {
+            get { return PluginSettings.Instance.PlayerBlockEnforcementItems; }
+        }
+
         [Category( "Reserved Slots" )]
         [Description( "This reserves slots for whitelisted players or groups." )]
         [Browsable( true )]
@@ -1294,8 +1323,10 @@
             
             Protection.Init( );
             ProcessReservedSlots.Init( );
+            PlayerBlockEnforcement.Init();
             
-            //MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReveiveMessageParts);
+            MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReceiveMessageParts);
+            MyAPIGateway.Multiplayer.RegisterMessageHandler( 9007, Communication.HandleAddConcealExempt );
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
         }
         
@@ -1425,6 +1456,8 @@
                 thread.Abort( );
 
             _processThread.Abort( );
+            MyAPIGateway.Multiplayer.UnregisterMessageHandler(9005, Communication.ReceiveMessageParts);
+            MyAPIGateway.Multiplayer.UnregisterMessageHandler( 9007, Communication.HandleAddConcealExempt );
         }
 
         public void Update( )
