@@ -372,7 +372,7 @@
                       } );
         }
 
-        private static Dictionary<int, PartialMessage> messages = new Dictionary<int, PartialMessage>();
+    private static Dictionary<int, PartialMessage> messages = new Dictionary<int, PartialMessage>();
     private const int PACKET_SIZE = 4096;
     private const int META_SIZE = sizeof(int) * 2;
     private const int DATA_LENGTH = PACKET_SIZE - META_SIZE;

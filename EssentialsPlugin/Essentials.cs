@@ -649,6 +649,23 @@
             }
         }
 
+        [Category("Dynamic Entity Management")]
+        [DisplayName("ConcealPhysics")]
+        [Description("Setting this option will turn off physics on concealed grids.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public bool DynamicConcealPhysics
+        {
+            get
+            {
+                return PluginSettings.Instance.DynamicConcealPhysics;
+            }
+            set
+            {
+                PluginSettings.Instance.DynamicConcealPhysics = value;
+            }
+        }
+
         [Category( "Dynamic Entity Management" )]
         [DisplayName( "Conceal Distance" )]
         [Description( "The distance a player must be from a grid for it to be revealed due to distance.  The smaller this value is, the longer a grid will be hidden from sight.  Default is 8000m (max view distance)" )]

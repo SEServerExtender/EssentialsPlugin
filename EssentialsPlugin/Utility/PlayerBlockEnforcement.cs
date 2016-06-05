@@ -27,6 +27,9 @@ namespace EssentialsPlugin.Utility
 
         public static void Init()
         {
+            if ( !PluginSettings.Instance.PlayerBlockEnforcementEnabled )
+                return;
+
             if (_init)
                 return;
 
@@ -168,7 +171,7 @@ namespace EssentialsPlugin.Utility
             
             Task.Run( () =>
                       {
-                          Essentials.Log.Debug( "process enforcement" );
+                          //Essentials.Log.Debug( "process enforcement" );
                           foreach ( var item in PluginSettings.Instance.PlayerBlockEnforcementItems )
                           {
                               string blockSearch;
@@ -226,11 +229,11 @@ namespace EssentialsPlugin.Utility
                                       if ( ( searchSubType && cubeBlock.BlockDefinition.Id.SubtypeId.ToString().Contains( blockSearch ) )
                                            || ( !searchSubType && cubeBlock.BlockDefinition.Id.TypeId.ToString().Contains( blockSearch ) ) )
                                       {
-                                          Essentials.Log.Debug( $"found block: {cubeBlock.BlockDefinition.Id.SubtypeName}" );
+                                          //Essentials.Log.Debug( $"found block: {cubeBlock.BlockDefinition.Id.SubtypeName}" );
 
                                           if ( MySession.Static.Players.IdentityIsNpc( cubeBlock.OwnerId ) )
                                           {
-                                              Essentials.Log.Debug( "not processing NPC owned block" );
+                                              //Essentials.Log.Debug( "not processing NPC owned block" );
                                               continue;
                                           }
 

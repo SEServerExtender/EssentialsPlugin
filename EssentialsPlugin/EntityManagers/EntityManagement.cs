@@ -1,58 +1,27 @@
-﻿using Sandbox.Game.Entities;
-using VRage.Game.Entity;
-
-namespace EssentialsPlugin.EntityManagers
+﻿namespace EssentialsPlugin.EntityManagers
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using EssentialsPlugin.ProcessHandlers;
     using EssentialsPlugin.Utility;
-    using Sandbox.Common;
-    using Sandbox.Common.ObjectBuilders;
     using Sandbox.ModAPI;
     using Sandbox.ModAPI.Ingame;
     using SEModAPIInternal.API.Common;
-    using SEModAPIInternal.API.Entity;
     using VRage.ModAPI;
     using VRage.ObjectBuilders;
     using VRageMath;
-    using IMyFunctionalBlock = Sandbox.ModAPI.Ingame.IMyFunctionalBlock;
     using IMyProductionBlock = Sandbox.ModAPI.Ingame.IMyProductionBlock;
-    using IMyTerminalBlock = Sandbox.ModAPI.Ingame.IMyTerminalBlock;
-    using Sandbox.Engine.Multiplayer;
-    using Sandbox.Game.Replication;
     using Sandbox.Game.Entities;
-    using Sandbox.Game.Multiplayer;
     using Sandbox.Game.World;
-    using VRage.Collections;
     using Sandbox.Game.Entities.Blocks;
-    using Sandbox.Game.Entities.Character;
     using Sandbox.Game.Entities.Cube;
     using SpaceEngineers.Game.ModAPI.Ingame;
     using VRage.Game;
     using VRage.Game.Entity;
     using VRage.Game.ModAPI;
-
-    class ConcealItem
-    {
-        public ConcealItem( IMyEntity _entity, string _reason )
-        {
-            this.entity = _entity;
-            this.reason = _reason;
-        }
-        public ConcealItem( KeyValuePair<IMyEntity, string> kvp )
-        {
-            this.entity = kvp.Key;
-            this.reason = kvp.Value;
-        }
-
-        public IMyEntity entity;
-        public string reason;
-    }
-
+    
     public class EntityManagement
     {
         private static volatile bool _checkReveal;
@@ -322,7 +291,7 @@ namespace EssentialsPlugin.EntityManagers
                     if (entity.InScene)
                         continue;
 
-                    RevealEntityObsolete(new KeyValuePair<IMyEntity, string>(entity, "Obsolete Reveal"));
+                    Wrapper.GameAction( () => RevealEntityObsolete( new KeyValuePair<IMyEntity, string>( entity, "Obsolete Reveal" ) ) );
                 }
 
                 DateTime reStart = DateTime.Now;
@@ -696,8 +665,12 @@ namespace EssentialsPlugin.EntityManagers
                 childEntity.RemoveFromGamePruningStructure();
 
                 //child.Container.Entity.InScene = false;
-                //if (child.Container.Entity.Physics != null)
-                //    child.Container.Entity.Physics.Enabled = false;
+
+                if ( !PluginSettings.Instance.DynamicConcealPhysics )
+                    continue;
+
+                if (child.Container.Entity.Physics != null)
+                    child.Container.Entity.Physics.Enabled = false;
             }
 
             UnregisteredEntities.Add( entity );
@@ -715,14 +688,16 @@ namespace EssentialsPlugin.EntityManagers
                 MyEntities.RegisterForUpdate(childEntity);
                 childEntity.AddToGamePruningStructure();
 
-                //child.Container.Entity.InScene = false;
-                //if (child.Container.Entity.Physics != null)
-                //    child.Container.Entity.Physics.Enabled = false;
+                //child.Container.Entity.InScene = true;
+
+                if (!PluginSettings.Instance.DynamicConcealPhysics)
+                    continue;
+
+                if (child.Container.Entity.Physics != null)
+                    child.Container.Entity.Physics.Enabled = true;
             }
 
             UnregisteredEntities.Remove( entity );
         }
     }
 }
- 
-    //TODO: command to remove dead owners from grid

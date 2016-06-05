@@ -86,6 +86,7 @@
         private bool _dynamicConcealIncludeMedBays;
         private bool _dynamicShowMessages;
         private bool _dynamicConcealPirates;
+        private bool _dynamicConcealPhysics;
         private bool _dynamicTurretManagementEnabled;
         private int _dynamicTurretTargetDistance;
         private bool _dynamicTurretAllowExemption;
@@ -622,6 +623,16 @@
             }
         }
 
+        public bool DynamicConcealPhysics
+        {
+            get {return _dynamicConcealPhysics;}
+            set
+            {
+                _dynamicConcealPhysics = value;
+                Save();
+            }
+        }
+
         public float DynamicConcealDistance
 		{
 			get { return _dynamicConcealDistance; }
@@ -842,6 +853,8 @@
             set
             {
                 _playerBlockEnforcementEnabled = value;
+                if(value)
+                    PlayerBlockEnforcement.Init();
                 Save();
             }
         }
@@ -1044,6 +1057,7 @@
             
 			_dynamicConcealDistance = 8000;
             _dynamicConcealPirates = false;
+            _dynamicConcealPhysics = false;
             _dynamicShowMessages = false;
 			_dynamicTurretTargetDistance = 2000;
 			_dynamicTurretManagementEnabled = false;

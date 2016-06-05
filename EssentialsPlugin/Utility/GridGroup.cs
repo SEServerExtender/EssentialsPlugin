@@ -129,8 +129,9 @@
                                                     return;
 
                                                 lock (result)
-                                                    if (result.Any( x => x.Grids.Contains( grid ) ))
-                                                        return;
+                                                    foreach(var item in result)
+                                                        if ( item._grids.Contains( grid ) )
+                                                            return;
 
                                                 var newGroup = new GridGroup( grid, linkType );
 
