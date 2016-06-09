@@ -87,6 +87,7 @@
         private bool _dynamicShowMessages;
         private bool _dynamicConcealPirates;
         private bool _dynamicConcealPhysics;
+        private bool _dynamicConcealProduction;
         private bool _dynamicTurretManagementEnabled;
         private int _dynamicTurretTargetDistance;
         private bool _dynamicTurretAllowExemption;
@@ -633,6 +634,16 @@
             }
         }
 
+        public bool DynamicConcealProduction 
+        {
+            get { return _dynamicConcealProduction; }
+            set
+            {
+                _dynamicConcealProduction = value;
+                Save();
+            }
+        }
+
         public float DynamicConcealDistance
 		{
 			get { return _dynamicConcealDistance; }
@@ -1058,6 +1069,7 @@
 			_dynamicConcealDistance = 8000;
             _dynamicConcealPirates = false;
             _dynamicConcealPhysics = false;
+            _dynamicConcealProduction = true;
             _dynamicShowMessages = false;
 			_dynamicTurretTargetDistance = 2000;
 			_dynamicTurretManagementEnabled = false;

@@ -51,98 +51,101 @@
 			return 1001;
 		}
 
-		public override void Handle()
-		{
-			if (PluginSettings.Instance.GreetingMessage != "")
-			{
-				if (MyAPIGateway.Players == null)
-					return;
-                
-                try
-				{
-					List<IMyPlayer> players = new List<IMyPlayer>();
-					bool result = false;
-                    
-                    //Wrapper.GameAction(() =>
-                    //{
-                    try
-						{
-							MyAPIGateway.Players.GetPlayers(players);
-							result = true;
-                    }
-						catch (Exception ex)
-						{
-							Essentials.Log.Error( ex );
-						}
-					//});
+	    public override void Handle()
+	    {
+	        if ( !PluginSettings.Instance.GreetingEnabled )
+	            return;
 
-					if(!result)
-						return;
+	        if ( MyAPIGateway.Players == null )
+	            return;
 
-                    lock (m_greetingList)
-					{
-						for (int r = m_greetingList.Count - 1; r >= 0; r--)
-                        {
-                            GreetingItem item = m_greetingList[r];
-							if(DateTime.Now - item.Start > item.Timeout)
-                            {
-                                m_greetingList.RemoveAt(r);
-								continue;
-                            }
-                            IMyPlayer player = players.FirstOrDefault(x => x.SteamUserId == item.SteamId && x.Controller != null && x.Controller.ControlledEntity != null);
-							if (player != null)
-                            {
-                                m_greetingList.RemoveAt(r);
+	        try
+	        {
+	            List<IMyPlayer> players = new List<IMyPlayer>();
+	            bool result = false;
 
-								string message;
+	            //Wrapper.GameAction(() =>
+	            //{
+	            try
+	            {
+	                MyAPIGateway.Players.GetPlayers( players );
+	                result = true;
+	            }
+	            catch ( Exception ex )
+	            {
+	                Essentials.Log.Error( ex );
+	            }
+	            //});
 
-								if (item.IsNewUser)
-									message = PluginSettings.Instance.GreetingNewUserMessage.Replace("%name%", player.DisplayName);
-								else
-									message = PluginSettings.Instance.GreetingMessage.Replace("%name%", player.DisplayName);
-                                
-                                message = message.Replace("%name%", player.DisplayName);
-								message = message.Replace("%players%", players.Count.ToString());
-								message = message.Replace("%maxplayers%", MyAPIGateway.Session.SessionSettings.MaxPlayers.ToString());
+	            if ( !result )
+	                return;
 
-								string finalMessage = message;
+	            lock ( m_greetingList )
+	            {
+	                for ( int r = m_greetingList.Count - 1; r >= 0; r-- )
+	                {
+	                    GreetingItem item = m_greetingList[r];
+	                    if ( DateTime.Now - item.Start > item.Timeout )
+	                    {
+	                        m_greetingList.RemoveAt( r );
+	                        continue;
+	                    }
+	                    IMyPlayer player = players.FirstOrDefault( x => x.SteamUserId == item.SteamId && x.Controller != null && x.Controller.ControlledEntity != null );
+	                    if ( player != null )
+	                    {
+	                        m_greetingList.RemoveAt( r );
 
-								if(PluginSettings.Instance.GreetingPublic)
-									Communication.SendPublicInformation(finalMessage);
-								else
-									Communication.SendPrivateInformation(item.SteamId, finalMessage);
-                                
-                                if (item.IsNewUser)
-								{
-									if (PluginSettings.Instance.GreetingNewUserItem.Enabled)
-									{
-										SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingNewUserItem;
-										Communication.DisplayDialog(item.SteamId, gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText);
-                                    }
-                                }
-								else
-                                {
-                                    if (PluginSettings.Instance.GreetingItem.Enabled)
-                                    {
-                                        SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingItem;
-                                        Communication.DisplayDialog(item.SteamId, gItem.Title.Replace("%name%", player.DisplayName), gItem.Header.Replace("%name%", player.DisplayName), gItem.Contents.Replace("%name%", player.DisplayName).Replace("\r", "").Replace("\n", "|").Replace("\"", "'"), gItem.ButtonText);
-									}
-								}
+	                        if ( PluginSettings.Instance.GreetingMessage != "" )
+	                        {
+	                            string message;
 
-							}
-						}
-					}
-				}
-				catch (Exception ex)
-				{
-					Essentials.Log.Error( ex );
-				}
-			}
+	                            if ( item.IsNewUser )
+	                                message = PluginSettings.Instance.GreetingNewUserMessage.Replace( "%name%", player.DisplayName );
+	                            else
+	                                message = PluginSettings.Instance.GreetingMessage.Replace( "%name%", player.DisplayName );
 
-			base.Handle();
-		}
+	                            message = message.Replace( "%name%", player.DisplayName );
+	                            message = message.Replace( "%players%", players.Count.ToString() );
+	                            message = message.Replace( "%maxplayers%", MyAPIGateway.Session.SessionSettings.MaxPlayers.ToString() );
 
-		public override void OnPlayerJoined(ulong remoteUserId)
+	                            string finalMessage = message;
+
+	                            if ( PluginSettings.Instance.GreetingPublic )
+	                                Communication.SendPublicInformation( finalMessage );
+	                            else
+	                                Communication.SendPrivateInformation( item.SteamId, finalMessage );
+	                        }
+
+	                        if ( item.IsNewUser )
+	                        {
+	                            if ( PluginSettings.Instance.GreetingNewUserItem.Enabled )
+	                            {
+	                                SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingNewUserItem;
+	                                Communication.DisplayDialog( item.SteamId, gItem.Title.Replace( "%name%", player.DisplayName ), gItem.Header.Replace( "%name%", player.DisplayName ), gItem.Contents.Replace( "%name%", player.DisplayName ).Replace( "\r", "" ).Replace( "\n", "|" ).Replace( "\"", "'" ), gItem.ButtonText );
+	                            }
+	                        }
+	                        else
+	                        {
+	                            if ( PluginSettings.Instance.GreetingItem.Enabled )
+	                            {
+	                                SettingsGreetingDialogItem gItem = PluginSettings.Instance.GreetingItem;
+	                                Communication.DisplayDialog( item.SteamId, gItem.Title.Replace( "%name%", player.DisplayName ), gItem.Header.Replace( "%name%", player.DisplayName ), gItem.Contents.Replace( "%name%", player.DisplayName ).Replace( "\r", "" ).Replace( "\n", "|" ).Replace( "\"", "'" ), gItem.ButtonText );
+	                            }
+	                        }
+
+	                    }
+	                }
+	            }
+	        }
+	        catch ( Exception ex )
+	        {
+	            Essentials.Log.Error( ex );
+	        }
+
+	        base.Handle();
+	    }
+
+	    public override void OnPlayerJoined(ulong remoteUserId)
 		{
 			GreetingItem item = new GreetingItem();
 			item.SteamId = remoteUserId;

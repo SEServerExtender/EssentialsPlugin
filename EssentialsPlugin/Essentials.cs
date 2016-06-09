@@ -712,7 +712,7 @@
 
         [Category( "Dynamic Entity Management" )]
         [DisplayName( "Include MedBays" )]
-        [Description( "The list of subtype blocks that will make the entity manager ignore a grid.  If a grid contains any of these block subtypes, it will automatically not include it when deciding whether to conceal the grid or not" )]
+        [Description( "If any online player has access to a working medbay on a grid, it will be ignored." )]
         [Browsable( true )]
         [ReadOnly( false )]
         public bool DynamicConcealIncludeMedBays
@@ -721,47 +721,18 @@
             set { PluginSettings.Instance.DynamicConcealIncludeMedBays = value; }
         }
 
-        /*  Experiments not working yet */
-        /*
-		[Category("Dynamic Entity Management")]
-		[Description("")]
-		[Browsable(true)]
-		[ReadOnly(false)]
-		public bool DynamicConcealServerOnly
-		{
-			get { return PluginSettings.Instance.DynamicConcealServerOnly; }
-			set
-			{
-				PluginSettings.Instance.DynamicConcealServerOnly = value;
-			}
-		}
 
-		[Category("Dynamic Entity Management")]
-		[Description("")]
-		[Browsable(true)]
-		[ReadOnly(false)]
-		public bool DynamicClientConcealEnabled
-		{
-			get { return PluginSettings.Instance.DynamicClientConcealEnabled; }
-			set
-			{
-				PluginSettings.Instance.DynamicClientConcealEnabled = value;
-			}
-		}
-
-		[Category("Dynamic Entity Management")]
-		[Description("")]
-		[Browsable(true)]
-		[ReadOnly(false)]
-		public float DynamicClientConcealDistance
-		{
-			get { return PluginSettings.Instance.DynamicClientConcealDistance; }
-			set
-			{
-				PluginSettings.Instance.DynamicClientConcealDistance = value;
-			}
-		}
-		/**/
+        [Category("Dynamic Entity Management")]
+        [DisplayName("Include Active Production")]
+        [Description("Ships with active production blocks will be concealed.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public bool DynamicConcealProduction
+        {
+            get { return PluginSettings.Instance.DynamicConcealIncludeMedBays; }
+            set { PluginSettings.Instance.DynamicConcealIncludeMedBays = value; }
+        }
+        
         [Category( "Dynamic Entity Management" )]
         [DisplayName( "Log Actions" )]
         [Description( "Enable / Disable console messages that display whether an entity is concealed or revealed.  Should be off if you don't care about seeing how many entities get revealed/concealed." )]

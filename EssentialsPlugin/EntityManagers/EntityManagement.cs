@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.Remoting;
     using System.Threading;
     using EssentialsPlugin.ProcessHandlers;
     using EssentialsPlugin.Utility;
@@ -42,8 +43,6 @@
 			try
 			{
 			    List<MyPlayer> players;
-				HashSet<MyEntity> entities;
-				HashSet<MyEntity> entitiesFiltered = new HashSet<MyEntity>( );
 
 				try
 				{
@@ -54,39 +53,18 @@
 					Essentials.Log.Error( ex, "Error getting players list.  Check and Conceal failed: {0}");
 					return;
 				}
-
-				try
-				{
-				    entities = MyEntities.GetEntities();
-				}
-				catch ( Exception ex )
-				{
-					Essentials.Log.Error( ex, "Error getting entity list, skipping check" );
-					return;
-				}
-
-				foreach (MyEntity entity in entities )
-				{
-					if ( !( entity is MyCubeGrid ) )
-						continue;
-
-				    if ( UnregisteredEntities.Contains( entity ) )
-				        continue;
-
-					entitiesFiltered.Add( entity );
-				}
                 
-			    var groups = GridGroup.GetGroups( entitiesFiltered, GridLinkTypeEnum.Physical );
-
-			    foreach ( GridGroup group in groups )
+                foreach ( GridGroup group in GridGroup.GetAllGroups( GridLinkTypeEnum.Logical ) )
 			    {
+                    //we're using grid groups so that multi-part pirate ships don't lose pieces
                     if(PluginSettings.Instance.DynamicConcealPirates)
                     {
                         if ( group.Parent.GetOwner() == "Space Pirates" )
                         {
                             if (PluginSettings.Instance.DynamicShowMessages)
                                 Essentials.Log.Info( $"Not concealing pirate owned grid {group.Parent.EntityId} -> {group.Parent.DisplayName}.");
-                            continue;}
+                            continue;
+                        }
                     }
 			        foreach ( MyCubeGrid grid in group.Grids )
 			        {
@@ -98,21 +76,21 @@
 			                if ( grid.IsStatic && !PluginSettings.Instance.ConcealIncludeStations )
 			                    continue;
 			                if ( !PluginSettings.Instance.ConcealIncludeLargeGrids )
-			                    continue;
-			            }
+                                continue;
+                        }
 
 			            if ( players.Any( x => Vector3D.Distance( x.GetPosition(), grid.PositionComp.GetPosition() ) < PluginSettings.Instance.DynamicConcealDistance ) )
-			                continue;
+                            continue;
 
-			            if ( ProcessDockingZone.ZoneCache.Any( x => Vector3D.Distance( x.GetPosition(), grid.PositionComp.GetPosition() ) < 100d ) )
-			                continue;
+                        if ( ProcessDockingZone.ZoneCache.Any( x => Vector3D.Distance( x.GetPosition(), grid.PositionComp.GetPosition() ) < 100 ) )
+                            continue;
 
 			            if ( CheckConcealBlockRules( grid ) )
 			                continue;
 
 			            ConcealEntity( grid );
 			        }
-			    }
+                }
 			}
 			catch ( Exception ex )
 			{
@@ -137,12 +115,13 @@
 			    var beacon = cubeBlock as IMyBeacon;
 			    if ( beacon != null)
 				{
-					beaconCount++;
+					//beaconCount++;
 					// Keep this return here, as 4 beacons always means true
-					if ( beaconCount >= 4 )
-					{
-						return true;
-					}
+                    //DON'T TELL ME WHAT TO DO
+					//if ( beaconCount >= 4 )
+					//{
+					//	return true;
+					//}
 
 				    if ( !beacon.Enabled )
 				        continue;
@@ -185,21 +164,18 @@
 						return true;
 					}
 				}
-
-                //TODO
-                /*
+                
 			    var cryo = cubeBlock as MyCryoChamber;
 			    if ( cryo?.Pilot != null )
 			        return true;
-                */
 
 			    var production = cubeBlock as IMyProductionBlock;
-			    if ( production != null )
+			    if ( production != null && PluginSettings.Instance.DynamicConcealProduction )
 			    {
 					if ( !production.Enabled )
 						continue;
 
-					if ( production.IsProducing )
+					if ( !production.IsQueueEmpty )
 						return true;
 				}
 
@@ -459,7 +435,7 @@
 
 								if ( medical.HasPlayerAccess( playerId ) )
 								{
-									reason = $"Grid has medbay and player is factionshare - playerid: {playerId}";
+									reason = $"Grid has medbay and player has access - playerid: {playerId}";
                                     return true;
                                 }
 							}
@@ -473,50 +449,26 @@
                 }
 
 			    var cryo = cubeBlock as MyCryoChamber;
-                if ( cryo != null )
-                {
-                    if ( cryo.Pilot == null )
-                        continue;
-                        
-                    if ( !cryo.IsFunctional )
-                        continue;                    
+			    if ( cryo != null )
+			    {
+			        if ( cryo.Pilot == null )
+			            continue;
 
-                    if ( PluginSettings.Instance.DynamicConcealIncludeMedBays )
-                    {
-                        lock ( Online )
-                        {
-                            foreach ( ulong connectedPlayer in Online )
-                            {
-                                long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( connectedPlayer );
+			        if ( !cryo.IsFunctional )
+			            continue;
 
-                                if (cryo.Pilot.GetPlayerIdentityId() == playerId )
-                                {
-                                    reason = $"Grid has cryopod and player is inside - playerid: {playerId}";
-                                    return true;
-                                }
+			        reason = $"Grid has cryopod and player is inside - player: {cryo.Pilot.DisplayName}";
+			        return true;
+			    }
 
-                                if ( cryo.HasPlayerAccess( playerId ) )
-                                {
-                                    reason = $"Grid has cryopod and player can use - playerid: {playerId}";
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        reason = "Grid has cryopod and conceal can not include cryopods";
-                        return true;
-                    }
-                }
-
+                //don't check conceal settings for production blocks, we always want them to reveal
 			    var production = cubeBlock as MyProductionBlock;
 			    if ( production != null )
 			    {
 			        if ( !production.Enabled )
 			            continue;
 
-			        if ( production.Queue.Any() )
+			        if ( !production.IsQueueEmpty )
 			        {
 			            reason = "Grid has production facility that has a queue";
 			            return true;
@@ -655,6 +607,9 @@
         private static void UnregisterHierarchy( MyEntity entity )
         {
             if ( entity.Hierarchy == null )
+                return;
+
+            if ( UnregisteredEntities.Contains( entity ) )
                 return;
 
             foreach ( var child in entity.Hierarchy.Children )

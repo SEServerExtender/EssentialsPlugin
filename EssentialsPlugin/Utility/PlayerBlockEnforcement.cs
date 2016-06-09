@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace EssentialsPlugin.Utility
 {
     using System.Net;
+    using System.Threading;
     using Sandbox.Definitions;
     using Sandbox.Game.Entities;
     using Sandbox.Game.Entities.Cube;
@@ -298,7 +299,6 @@ namespace EssentialsPlugin.Utility
                                   
                                   if ( disabledPlayers.ContainsKey( steamId ) )
                                   {
-                                      Essentials.Log.Info("3");
                                       if ( disabledPlayers[steamId].Contains( blockSearch ) )
                                       {
                                           disabledPlayers[steamId].Remove( blockSearch );
@@ -416,6 +416,14 @@ namespace EssentialsPlugin.Utility
 
         private static void FatBlock_OwnershipChanged(MyTerminalBlock block)
         {
+            if ( block?.CubeGrid?.Physics == null || block.Closed )
+            {
+                //idfk
+                Thread.Sleep( 500 );
+                if ( block?.CubeGrid?.Physics == null || block.Closed )
+                    return;
+            }
+
             Task.Run( () =>
                       {
                           if ( block.OwnerId != 0 )
