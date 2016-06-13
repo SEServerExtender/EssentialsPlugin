@@ -83,6 +83,7 @@
     <Compile Include="ChatHandlers\Admin\HandleAdminIdentityCleanup.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminSpawnCargo.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminVersion.cs" />
+    <Compile Include="ChatHandlers\HandleRevoke.cs" />
     <Compile Include="ChatHandlers\HandleLastSeen.cs" />
     <Compile Include="ChatHandlers\Settings\HandleSettingsEnableBlockEnforcement.cs" />
     <Compile Include="ChatHandlers\Settings\HandleSettingsGetBlockEnforcement.cs" />

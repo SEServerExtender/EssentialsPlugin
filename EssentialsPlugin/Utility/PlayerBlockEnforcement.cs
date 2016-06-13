@@ -22,7 +22,7 @@ namespace EssentialsPlugin.Utility
     public static class PlayerBlockEnforcement
     {
         private static bool _init;
-        private static Dictionary<MyTerminalBlock, long> _blockOwners = new Dictionary<MyTerminalBlock, long>();
+        public static Dictionary<MyTerminalBlock, long> BlockOwners = new Dictionary<MyTerminalBlock, long>();
         private static Dictionary<ulong, HashSet<string>> disabledPlayers = new Dictionary<ulong, HashSet<string>>();
         private static DateTime _lastRun = DateTime.MinValue;
 
@@ -91,8 +91,8 @@ namespace EssentialsPlugin.Utility
                             }
 
                             if (fatBlock.OwnerId != 0)
-                                lock (_blockOwners)
-                                    _blockOwners[fatBlock] = fatBlock.OwnerId;
+                                lock (BlockOwners)
+                                    BlockOwners[fatBlock] = fatBlock.OwnerId;
                         }
                         break;
 
@@ -117,8 +117,8 @@ namespace EssentialsPlugin.Utility
                             }
 
                             if (fatBlock.OwnerId != 0)
-                                lock (_blockOwners)
-                                    _blockOwners[fatBlock] = fatBlock.OwnerId;
+                                lock (BlockOwners)
+                                    BlockOwners[fatBlock] = fatBlock.OwnerId;
                         }
                         break;
                 }
@@ -263,8 +263,8 @@ namespace EssentialsPlugin.Utility
                               foreach ( var block in razeBlocks )
                               {
                                   Wrapper.GameAction( () => block.CubeGrid.RazeBlock( block.Position ) );
-                                  lock ( _blockOwners )
-                                      _blockOwners.Remove( (MyTerminalBlock)block );
+                                  lock ( BlockOwners )
+                                      BlockOwners.Remove( (MyTerminalBlock)block );
                               }
                               
                               foreach ( var entry in ownedBlocks )
@@ -367,10 +367,10 @@ namespace EssentialsPlugin.Utility
                               if ( fatBlock == null )
                                   continue;
 
-                              lock ( _blockOwners )
+                              lock ( BlockOwners )
                               {
-                                  if ( _blockOwners.ContainsKey( fatBlock ) )
-                                      _blockOwners.Remove( fatBlock );
+                                  if ( BlockOwners.ContainsKey( fatBlock ) )
+                                      BlockOwners.Remove( fatBlock );
                               }
                           }
                       } );
@@ -384,10 +384,10 @@ namespace EssentialsPlugin.Utility
                           if ( fatBlock == null )
                               return;
 
-                          lock ( _blockOwners )
+                          lock ( BlockOwners )
                           {
-                              if ( _blockOwners.ContainsKey( fatBlock ) )
-                                  _blockOwners.Remove( fatBlock );
+                              if ( BlockOwners.ContainsKey( fatBlock ) )
+                                  BlockOwners.Remove( fatBlock );
                           }
                       } );
             ProcessEnforcement();
@@ -407,8 +407,8 @@ namespace EssentialsPlugin.Utility
                           if ( fatBlock.OwnerId == 0 )
                               return;
 
-                          lock ( _blockOwners )
-                              _blockOwners[fatBlock] = fatBlock.OwnerId;
+                          lock ( BlockOwners )
+                              BlockOwners[fatBlock] = fatBlock.OwnerId;
                       } );
 
                           ProcessEnforcement(fatBlock);
@@ -433,17 +433,17 @@ namespace EssentialsPlugin.Utility
                               {
                                   if ( owner.DisplayName != "Space Pirates" )
                                   {
-                                      lock ( _blockOwners )
-                                          _blockOwners[block] = block.OwnerId;
+                                      lock ( BlockOwners )
+                                          BlockOwners[block] = block.OwnerId;
                                       return;
                                   }
                               }
                           }
 
-                          lock ( _blockOwners )
+                          lock ( BlockOwners )
                           {
-                              if ( _blockOwners.ContainsKey( block ) )
-                                  Wrapper.GameAction( () => block.ChangeBlockOwnerRequest( _blockOwners[block], MyOwnershipShareModeEnum.Faction ) );
+                              if ( BlockOwners.ContainsKey( block ) )
+                                  Wrapper.GameAction( () => block.ChangeBlockOwnerRequest( BlockOwners[block], MyOwnershipShareModeEnum.Faction ) );
                               else if ( PluginSettings.Instance.PlayerBlockEnforcementChangeOwner )
                               {
                                   ChangeOwnershipToNearestPlayer( block );
@@ -451,7 +451,7 @@ namespace EssentialsPlugin.Utility
                                       block.ChangeBlockOwnerRequest( block.CubeGrid.BigOwners[0], MyOwnershipShareModeEnum.Faction );
 
                                   if ( block.OwnerId != 0 )
-                                      _blockOwners[block] = block.OwnerId;
+                                      BlockOwners[block] = block.OwnerId;
                               }
                           }
                       } );

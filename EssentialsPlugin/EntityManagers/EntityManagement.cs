@@ -57,7 +57,7 @@
                 foreach ( GridGroup group in GridGroup.GetAllGroups( GridLinkTypeEnum.Logical ) )
 			    {
                     //we're using grid groups so that multi-part pirate ships don't lose pieces
-                    if(PluginSettings.Instance.DynamicConcealPirates)
+                    if(!PluginSettings.Instance.DynamicConcealPirates)
                     {
                         if ( group.Parent.GetOwner() == "Space Pirates" )
                         {
@@ -69,6 +69,9 @@
 			        foreach ( MyCubeGrid grid in group.Grids )
 			        {
 			            if ( grid.Physics == null ) //projection
+			                continue;
+
+			            if ( UnregisteredEntities.Contains( grid ) )
 			                continue;
 
 			            if ( grid.GridSizeEnum != MyCubeSize.Small )
@@ -566,7 +569,9 @@
 
 		    _checkReveal = true;
 
-		    foreach ( var entity in UnregisteredEntities )
+            CheckAndRevealEntitiesObsolete();
+
+		    foreach ( var entity in UnregisteredEntities.ToArray() )
 		    {
                 if (PluginSettings.Instance.DynamicShowMessages)
                     Essentials.Log.Info("Revealed - Id: {0} -> Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
@@ -609,8 +614,8 @@
             if ( entity.Hierarchy == null )
                 return;
 
-            if ( UnregisteredEntities.Contains( entity ) )
-                return;
+            //if ( UnregisteredEntities.Contains( entity ) )
+            //    return;
 
             foreach ( var child in entity.Hierarchy.Children )
             {

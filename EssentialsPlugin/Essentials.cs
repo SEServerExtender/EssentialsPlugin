@@ -1292,6 +1292,7 @@
                                 new HandleFaction( ),
                                 new HandleFactionF( ),
                                 new HandleMotd( ),
+                                new HandleRevoke( ),
 
                                 //Tickets
                                 new HandleTicketAdd(  ),
@@ -1501,12 +1502,12 @@
             if (commandParts[0].ToLower() == "/help")
             {
                 //user wants some help
-                if (commandParts.Count > 1 && commandParts[1].ToLower() == "dialog")
-                    HandleHelpDialog(remoteUserId, commandParts);
+                if (commandParts.Count > 1 && commandParts[1].ToLower() == "chat")
+                    HandleHelpCommand(remoteUserId, commandParts);
                 //do we want help in a dialog window?
 
                 else
-                    HandleHelpCommand(remoteUserId, commandParts);
+                    HandleHelpDialog(remoteUserId, commandParts);
 
                 return;
             }
