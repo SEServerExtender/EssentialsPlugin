@@ -571,9 +571,16 @@
 
             CheckAndRevealEntitiesObsolete();
 
-		    foreach ( var entity in UnregisteredEntities.ToArray() )
+		    HashSet<MyEntity> entities = new HashSet<MyEntity>();
+            Wrapper.GameAction( ()=>entities = MyEntities.GetEntities() );
+
+		    foreach ( var entity in entities )
 		    {
-                if (PluginSettings.Instance.DynamicShowMessages)
+		        var grid = entity as MyCubeGrid;
+		        if ( grid == null )
+		            continue;
+
+                if (PluginSettings.Instance.DynamicShowMessages && UnregisteredEntities.Contains( entity ))
                     Essentials.Log.Info("Revealed - Id: {0} -> Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
                                      entity.EntityId,
                                      entity.DisplayName.Replace("\r", "").Replace("\n", ""),
@@ -584,6 +591,7 @@
 		        Wrapper.GameAction( () => ReregisterHierarchy( entity ) );
 		    }
 
+		    UnregisteredEntities.Clear();
 		    _checkReveal = false;
 		}
 

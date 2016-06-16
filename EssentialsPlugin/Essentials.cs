@@ -729,8 +729,8 @@
         [ReadOnly(false)]
         public bool DynamicConcealProduction
         {
-            get { return PluginSettings.Instance.DynamicConcealIncludeMedBays; }
-            set { PluginSettings.Instance.DynamicConcealIncludeMedBays = value; }
+            get { return PluginSettings.Instance.DynamicConcealProduction; }
+            set { PluginSettings.Instance.DynamicConcealProduction = value; }
         }
         
         [Category( "Dynamic Entity Management" )]
