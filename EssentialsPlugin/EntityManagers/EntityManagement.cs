@@ -3,35 +3,35 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Runtime.Remoting;
     using System.Threading;
     using EssentialsPlugin.ProcessHandlers;
     using EssentialsPlugin.Utility;
     using Sandbox.ModAPI;
-    using Sandbox.ModAPI.Ingame;
     using SEModAPIInternal.API.Common;
     using VRage.ModAPI;
     using VRage.ObjectBuilders;
     using VRageMath;
-    using IMyProductionBlock = Sandbox.ModAPI.Ingame.IMyProductionBlock;
     using Sandbox.Game.Entities;
     using Sandbox.Game.World;
     using Sandbox.Game.Entities.Blocks;
     using Sandbox.Game.Entities.Cube;
+    using Sandbox.ModAPI.Ingame;
+    using SpaceEngineers.Game.ModAPI;
     using SpaceEngineers.Game.ModAPI.Ingame;
     using VRage.Game;
     using VRage.Game.Entity;
     using VRage.Game.ModAPI;
-    
+    using IMyProductionBlock = Sandbox.ModAPI.IMyProductionBlock;
+
     public class EntityManagement
     {
         private static volatile bool _checkReveal;
         private static volatile bool _checkConceal;
         private static bool _oldInit;
-        private static readonly List<long> RemovedGrids = new List<long>( );
+        public static readonly HashSet<long> RemovedGrids = new HashSet<long>( );
         private static readonly List<ulong> Online = new List<ulong>( );
 
-        public static HashSet<MyEntity> UnregisteredEntities = new HashSet<MyEntity>();
+        //public static HashSet<MyEntity> UnregisteredEntities = new HashSet<MyEntity>();
 
 
         public static void CheckAndConcealEntities( )
@@ -71,7 +71,10 @@
 			            if ( grid.Physics == null ) //projection
 			                continue;
 
-			            if ( UnregisteredEntities.Contains( grid ) )
+			            //if ( UnregisteredEntities.Contains( (MyEntity)grid ) )
+			            //    continue;
+
+			            if ( RemovedGrids.Contains( grid.EntityId ) )
 			                continue;
 
 			            if ( grid.GridSizeEnum != MyCubeSize.Small )
@@ -222,8 +225,8 @@
                 pos = 4;
 				//else
                 //{
-                    UnregisteredEntities.Add( entity );
-                    Wrapper.GameAction( () => UnregisterHierarchy( entity ) );
+                    //UnregisteredEntities.Add( entity );
+                    Wrapper.GameAction( () => UnregisterHierarchy( entity.GetTopMostParent(  ) ) );
                     if ( PluginSettings.Instance.DynamicShowMessages )
                         Essentials.Log.Info( $"Concealed - Id: {entity.EntityId} -> Display: {entity.DisplayName} OwnerId: {ownerId} OwnerName: {ownerName}" );
 
@@ -311,9 +314,11 @@
 			_checkReveal = true;
 			try
 			{
-				foreach ( MyEntity entity in UnregisteredEntities)
+                HashSet<MyEntity> entities = new HashSet<MyEntity>();
+                MyAPIGateway.Utilities.InvokeOnGameThread( () => entities=MyEntities.GetEntities());
+				foreach ( MyEntity entity in entities.ToArray())
 				{
-					if ( entity.Closed || entity.MarkedForClose )
+					if ( entity.Closed || entity.MarkedForClose || !RemovedGrids.Contains( entity.EntityId ))
 						continue;
 
 					if ( !( entity is MyCubeGrid ) )
@@ -345,7 +350,7 @@
 
 					if ( found )
 					{
-					    Wrapper.GameAction( () => ReregisterHierarchy( entity ) );
+					    Wrapper.GameAction( () => ReregisterHierarchy( entity.GetTopMostParent(  ) ) );
 
                         if (PluginSettings.Instance.DynamicShowMessages)
                             Essentials.Log.Info("Revealed - Id: {0} -> Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
@@ -563,10 +568,6 @@
 
 		static public void RevealAll( )
 		{
-		    while ( _checkReveal )
-		    {
-		    }
-
 		    _checkReveal = true;
 
             CheckAndRevealEntitiesObsolete();
@@ -574,13 +575,13 @@
 		    HashSet<MyEntity> entities = new HashSet<MyEntity>();
             Wrapper.GameAction( ()=>entities = MyEntities.GetEntities() );
 
-		    foreach ( var entity in entities )
+		    foreach ( var entity in entities.ToArray() )
 		    {
 		        var grid = entity as MyCubeGrid;
 		        if ( grid == null )
 		            continue;
 
-                if (PluginSettings.Instance.DynamicShowMessages && UnregisteredEntities.Contains( entity ))
+                if (PluginSettings.Instance.DynamicShowMessages && RemovedGrids.Contains( entity.EntityId ))
                     Essentials.Log.Info("Revealed - Id: {0} -> Display: {1} OwnerId: {2} OwnerName: {3}  Reason: {4}",
                                      entity.EntityId,
                                      entity.DisplayName.Replace("\r", "").Replace("\n", ""),
@@ -588,10 +589,10 @@
                                      PlayerMap.Instance.GetPlayerNameFromPlayerId(((MyCubeGrid)entity).BigOwners.FirstOrDefault()),
                                      "Force reveal");
 
-		        Wrapper.GameAction( () => ReregisterHierarchy( entity ) );
+		        Wrapper.GameAction( () => ReregisterHierarchy( entity.GetTopMostParent(  ) ) );
 		    }
 
-		    UnregisteredEntities.Clear();
+		    RemovedGrids.Clear();
 		    _checkReveal = false;
 		}
 
@@ -617,55 +618,69 @@
 			}
 		}
 
-        private static void UnregisterHierarchy( MyEntity entity )
+        private static void UnregisterHierarchy( MyEntity entity, bool top = true )
         {
             if ( entity.Hierarchy == null )
                 return;
 
-            //if ( UnregisteredEntities.Contains( entity ) )
-            //    return;
+            if (RemovedGrids.Contains(entity.EntityId))
+                return;
 
             foreach ( var child in entity.Hierarchy.Children )
             {
                 MyEntity childEntity = (MyEntity)child.Container.Entity;
-                UnregisterHierarchy( childEntity );
+                UnregisterHierarchy( childEntity, false );
                 MyEntities.UnregisterForUpdate( childEntity );
-                childEntity.RemoveFromGamePruningStructure();
+                //childEntity.RemoveFromGamePruningStructure();
 
                 //child.Container.Entity.InScene = false;
 
-                if ( !PluginSettings.Instance.DynamicConcealPhysics )
-                    continue;
-
-                if (child.Container.Entity.Physics != null)
-                    child.Container.Entity.Physics.Enabled = false;
             }
 
-            UnregisteredEntities.Add( entity );
+            if ( !top )
+                return;
+            
+            RemovedGrids.Add( entity.EntityId );
+
+            MyEntities.UnregisterForUpdate( entity );
+            entity.RemoveFromGamePruningStructure();
+            if ( !PluginSettings.Instance.DynamicConcealPhysics )
+                return;
+
+            if ( entity.Physics != null )
+                entity.Physics.Enabled = false;
+            
         }
 
-        private static void ReregisterHierarchy( MyEntity entity )
+        private static void ReregisterHierarchy( MyEntity entity, bool top = true )
         {
             if ( entity.Hierarchy == null )
                 return;
-            
-            foreach (var child in entity.Hierarchy.Children)
+
+            RemovedGrids.Remove( entity.EntityId );
+
+            foreach ( var child in entity.Hierarchy.Children )
             {
                 MyEntity childEntity = (MyEntity)child.Container.Entity;
-                ReregisterHierarchy(childEntity);
-                MyEntities.RegisterForUpdate(childEntity);
-                childEntity.AddToGamePruningStructure();
+                ReregisterHierarchy( childEntity, false );
+                MyEntities.RegisterForUpdate( childEntity );
+                //childEntity.AddToGamePruningStructure();
 
                 //child.Container.Entity.InScene = true;
 
-                if (!PluginSettings.Instance.DynamicConcealPhysics)
-                    continue;
-
-                if (child.Container.Entity.Physics != null)
-                    child.Container.Entity.Physics.Enabled = true;
             }
+            if ( !top )
+                return;
 
-            UnregisteredEntities.Remove( entity );
+            MyEntities.RegisterForUpdate( entity );
+            entity.AddToGamePruningStructure();
+
+            if ( !PluginSettings.Instance.DynamicConcealPhysics )
+                return;
+
+            if ( entity.Physics != null )
+                entity.Physics.Enabled = true;
+            //UnregisteredEntities.Remove( entity );
         }
     }
 }

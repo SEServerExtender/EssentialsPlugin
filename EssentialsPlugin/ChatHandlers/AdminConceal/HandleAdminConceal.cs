@@ -70,17 +70,17 @@
 
             if (showConcealed)
 			{
-				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+				HashSet<MyEntity> entities = new HashSet<MyEntity>();
 				Wrapper.GameAction(() =>
 				{
-				    MyAPIGateway.Entities.GetEntities(entities);
+				    entities=MyEntities.GetEntities();
 				});
 
 				Communication.SendPrivateInformation(userId, "==== Concealed Entities ===");
 				int count = 0;
-				foreach (MyEntity entity in EntityManagement.UnregisteredEntities)
+				foreach (MyEntity entity in entities)
 				{
-					if (!(entity is MyCubeGrid))
+					if (!EntityManagement.RemovedGrids.Contains( entity.EntityId ))
 						continue;
                     
 					MyCubeGrid grid = (MyCubeGrid)entity;

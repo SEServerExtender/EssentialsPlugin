@@ -1,22 +1,8 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.AdminConceal
 {
-    using System.Collections.Generic;
     using System.Linq;
     using EntityManagers;
     using EssentialsPlugin.Utility;
-    using Sandbox.Common.ObjectBuilders;
-    using Sandbox.Engine.Multiplayer;
-    using Sandbox.Game.Entities;
-    using Sandbox.Game.Replication;
-    using Sandbox.ModAPI;
-    using SEModAPIInternal.API.Common;
-    using SEModAPIInternal.API.Entity;
-    using VRage.Game;
-    using VRage.Game.Entity;
-    using VRage.Game.ModAPI;
-    using VRage.ModAPI;
-    using VRage.ObjectBuilders;
-    using VRageMath;
 
     public class HandleAdminReveal : ChatHandlerBase
 	{
@@ -32,14 +18,15 @@
 
         public override Communication.ServerDialogItem GetHelpDialog( )
         {
-            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
-            DialogItem.title = "Help";
-            DialogItem.header = "Admin Reveal";
-            DialogItem.content =
-                " This command allows you to reveal concealed grids.|" +
-                "Usage: /admin reveal (force) - this command without 'force' only show you how many grids would be revealed.||" +
-                "This command will run when concealment is disabled, and respects the update time setting.";
-            DialogItem.buttonText = "close";
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem
+                                                        {
+                                                            title = "Help",
+                                                            header = "Admin Reveal",
+                                                            content = " This command allows you to reveal concealed grids.|" +
+                                                                      "Usage: /admin reveal (force) - this command without 'force' only show you how many grids would be revealed.||" +
+                                                                      "This command will run when concealment is disabled, and respects the update time setting.",
+                                                            buttonText = "close"
+                                                        };
             return DialogItem;
         }        
 
@@ -63,7 +50,7 @@
             else
             {
                    Communication.SendPrivateInformation( userId,
-                                                         $"Command would reveal {EntityManagement.UnregisteredEntities.Count} grids.  Type /admin reveal force to reveal them." );
+                                                         $"Command would reveal {EntityManagement.RemovedGrids.Count} grids.  Type /admin reveal force to reveal them." );
             }
             return true;
         }
