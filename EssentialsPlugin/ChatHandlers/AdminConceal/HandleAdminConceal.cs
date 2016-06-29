@@ -70,29 +70,35 @@
 
             if (showConcealed)
 			{
-				HashSet<MyEntity> entities = new HashSet<MyEntity>();
+				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
 				Wrapper.GameAction(() =>
 				{
-				    entities=MyEntities.GetEntities();
+				    MyAPIGateway.Entities.GetEntities(entities);
 				});
 
 				Communication.SendPrivateInformation(userId, "==== Concealed Entities ===");
 				int count = 0;
-				foreach (MyEntity entity in entities)
+				foreach (IMyEntity entity in entities)
 				{
-					if (!EntityManagement.RemovedGrids.Contains( entity.EntityId ))
+					if (!(entity is IMyCubeGrid))
 						continue;
-                    
-					MyCubeGrid grid = (MyCubeGrid)entity;
+
+					if (entity.InScene)
+						continue;
+
+					IMyCubeGrid grid = (IMyCubeGrid)entity;
 					long ownerId = 0;
 					string ownerName = "";
 					if (grid.BigOwners.Count > 0)
 					{
 						ownerId = grid.BigOwners.First();
-						ownerName = PlayerMap.Instance.GetPlayerNameFromPlayerId( ownerId );
+						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
 					}
-                    
-					Communication.SendPrivateInformation(userId, string.Format("Id: {0} Display: {1} OwnerId: {2} OwnerName: {3} Position: {4}", entity.EntityId, entity.DisplayName, ownerId, ownerName, General.Vector3DToString(entity.PositionComp.GetPosition())));
+
+					if (ownerName == "")
+						ownerName = "No one";
+
+					Communication.SendPrivateInformation(userId, string.Format("Id: {0} Display: {1} OwnerId: {2} OwnerName: {3} Position: {4}", entity.EntityId, entity.DisplayName, ownerId, ownerName, General.Vector3DToString(entity.GetPosition())));
 					count++;
 				}
 

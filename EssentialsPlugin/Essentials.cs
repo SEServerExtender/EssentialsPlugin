@@ -648,23 +648,7 @@
                 PluginSettings.Instance.DynamicConcealPirates = value;
             }
         }
-
-        [Category("Dynamic Entity Management")]
-        [DisplayName("ConcealPhysics")]
-        [Description("Setting this option will turn off physics on concealed grids.")]
-        [Browsable(true)]
-        [ReadOnly(false)]
-        public bool DynamicConcealPhysics
-        {
-            get
-            {
-                return PluginSettings.Instance.DynamicConcealPhysics;
-            }
-            set
-            {
-                PluginSettings.Instance.DynamicConcealPhysics = value;
-            }
-        }
+        
 
         [Category( "Dynamic Entity Management" )]
         [DisplayName( "Conceal Distance" )]
@@ -688,16 +672,7 @@
             set { PluginSettings.Instance.ConcealIncludeLargeGrids = value; }
         }
 
-        [Category("Dynamic Entity Management")]
-        [DisplayName("Include Stations")]
-        [Description("Enable / Disable management of stations, independent of other large block grids.")]
-        [Browsable(true)]
-        [ReadOnly(false)]
-        public bool DynamicConcealIncludeStations
-        {
-            get { return PluginSettings.Instance.ConcealIncludeStations; }
-            set { PluginSettings.Instance.ConcealIncludeStations = value; }
-        }
+       
 
         [Category( "Dynamic Entity Management" )]
         [DisplayName( "Block Subtype Ignore List" )]
@@ -723,14 +698,14 @@
 
 
         [Category("Dynamic Entity Management")]
-        [DisplayName("Include Active Production")]
-        [Description("Ships with active production blocks will be concealed.")]
+        [DisplayName("Update Speed")]
+        [Description("")]
         [Browsable(true)]
         [ReadOnly(false)]
-        public bool DynamicConcealProduction
+        public int DynamicConcealUpdateSoeed
         {
-            get { return PluginSettings.Instance.DynamicConcealProduction; }
-            set { PluginSettings.Instance.DynamicConcealProduction = value; }
+            get { return PluginSettings.Instance.DynamicConcealUpdateSpeed; }
+            set { PluginSettings.Instance.DynamicConcealUpdateSpeed = value; }
         }
         
         [Category( "Dynamic Entity Management" )]
