@@ -50,9 +50,7 @@
 
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-			bool showConcealed = true;
-			if (words.Length > 0 && words[0].ToLower() == "revealed")
-				showConcealed = false;
+			bool showConcealed = !( words.Length > 0 && words[0].ToLower() == "revealed" );
 
             if ( words.Length > 0 && words[0].ToLower( ) == "force" )
             {
@@ -70,35 +68,29 @@
 
             if (showConcealed)
 			{
-				HashSet<IMyEntity> entities = new HashSet<IMyEntity>();
+				HashSet<MyEntity> entities = new HashSet<MyEntity>();
 				Wrapper.GameAction(() =>
 				{
-				    MyAPIGateway.Entities.GetEntities(entities);
+				    entities=MyEntities.GetEntities();
 				});
 
 				Communication.SendPrivateInformation(userId, "==== Concealed Entities ===");
 				int count = 0;
-				foreach (IMyEntity entity in entities)
+				foreach (MyEntity entity in entities)
 				{
-					if (!(entity is IMyCubeGrid))
+					if (!EntityManagement.RemovedGrids.Contains( entity.EntityId ))
 						continue;
-
-					if (entity.InScene)
-						continue;
-
-					IMyCubeGrid grid = (IMyCubeGrid)entity;
+                    
+					MyCubeGrid grid = (MyCubeGrid)entity;
 					long ownerId = 0;
 					string ownerName = "";
 					if (grid.BigOwners.Count > 0)
 					{
 						ownerId = grid.BigOwners.First();
-						ownerName = PlayerMap.Instance.GetPlayerItemFromPlayerId(ownerId).Name;
+						ownerName = PlayerMap.Instance.GetPlayerNameFromPlayerId( ownerId );
 					}
-
-					if (ownerName == "")
-						ownerName = "No one";
-
-					Communication.SendPrivateInformation(userId, string.Format("Id: {0} Display: {1} OwnerId: {2} OwnerName: {3} Position: {4}", entity.EntityId, entity.DisplayName, ownerId, ownerName, General.Vector3DToString(entity.GetPosition())));
+                    
+					Communication.SendPrivateInformation(userId, string.Format("Id: {0} Display: {1} OwnerId: {2} OwnerName: {3} Position: {4}", entity.EntityId, entity.DisplayName, ownerId, ownerName, General.Vector3DToString(entity.PositionComp.GetPosition())));
 					count++;
 				}
 

@@ -12,42 +12,20 @@
 		private static DateTime m_lastConcealCheck;
 		private static DateTime m_lastRevealCheck;
         private static DateTime m_lastConcealProcess;
-        //private static int updateSpeed = PluginSettings.Instance.DynamicConcealUpdateSpeed;
-        public static bool ForceReveal = false;
-
+        
         public static DateTime LastRevealCheck
 		{
 			get { return m_lastRevealCheck; }
 			set { m_lastRevealCheck = value; }
 		}
-
-		public ProcessConceal()
-		{
-			//EntityManagement.RevealAll();
-		}
-
+        
 		public override int GetUpdateResolution()
         {
-            int updateSpeed = PluginSettings.Instance.DynamicConcealUpdateSpeed;
-
-            if ( updateSpeed < 100 )
-                return updateSpeed;
-            else
-                return 100;
+                return 5000;
         }
 
 		public override void Handle()
 		{
-            int updateSpeed = PluginSettings.Instance.DynamicConcealUpdateSpeed;
-
-            //force reveal bypasses the plugin setting. useful to recover grids after you turn it off
-            if ( ForceReveal && DateTime.Now - m_lastConcealProcess > TimeSpan.FromMilliseconds( updateSpeed ) )
-            {
-                //Essentials.Log.Info( "Process force reveal" );
-                EntityManagement.ProcessConcealment( true );
-                m_lastConcealProcess = DateTime.Now;
-            }
-
             if (!PluginSettings.Instance.DynamicConcealEnabled )
 				return;
 
@@ -64,13 +42,6 @@
 				EntityManagement.CheckAndRevealEntities();
 				m_lastRevealCheck = DateTime.Now;
 			}
-
-            if ( DateTime.Now - m_lastConcealProcess > TimeSpan.FromMilliseconds( updateSpeed ) )
-            {
-                //Essentials.Log.Info( "Process concealment" );
-                EntityManagement.ProcessConcealment( );
-                m_lastConcealProcess = DateTime.Now;
-            }
 
 			base.Handle();
 		}

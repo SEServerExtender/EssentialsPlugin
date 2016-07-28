@@ -1211,23 +1211,5 @@
             int count = ownerList.OrderBy(x => x.Value).Select(x => x.Value).FirstOrDefault();
             return ownerList.OrderBy(x => x.Value).Where(x => x.Value == count).Select(x => x.Key).ToList();
         }
-        public static bool GetOwner(MyObjectBuilder_CubeGrid grid, out long ownerId)
-        {
-            ownerId = 0;
-            foreach (MyObjectBuilder_CubeBlock block in grid.CubeBlocks)
-            {
-                if (!(block is MyObjectBuilder_TerminalBlock))
-                    continue;
-
-                MyObjectBuilder_TerminalBlock functional = (MyObjectBuilder_TerminalBlock)block;
-                if (functional.Owner != 0)
-                {
-                    ownerId = functional.Owner;
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
 }
