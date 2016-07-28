@@ -54,6 +54,9 @@
         #endregion
 
         #region Properties
+
+        public static bool StableBuild = false;
+
         public static string PluginPath
         {
             get { return _pluginPath; }
@@ -648,8 +651,25 @@
                 PluginSettings.Instance.DynamicConcealPirates = value;
             }
         }
-        
 
+        /*
+        [Category("Dynamic Entity Management")]
+        [DisplayName("ConcealPhysics")]
+        [Description("Setting this option will turn off physics on concealed grids.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public bool DynamicConcealPhysics
+        {
+            get
+            {
+                return PluginSettings.Instance.DynamicConcealPhysics;
+            }
+            set
+            {
+                PluginSettings.Instance.DynamicConcealPhysics = value;
+            }
+        }
+        */
         [Category( "Dynamic Entity Management" )]
         [DisplayName( "Conceal Distance" )]
         [Description( "The distance a player must be from a grid for it to be revealed due to distance.  The smaller this value is, the longer a grid will be hidden from sight.  Default is 8000m (max view distance)" )]
@@ -672,7 +692,16 @@
             set { PluginSettings.Instance.ConcealIncludeLargeGrids = value; }
         }
 
-       
+        [Category("Dynamic Entity Management")]
+        [DisplayName("Include Stations")]
+        [Description("Enable / Disable management of stations, independent of other large block grids.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public bool DynamicConcealIncludeStations
+        {
+            get { return PluginSettings.Instance.ConcealIncludeStations; }
+            set { PluginSettings.Instance.ConcealIncludeStations = value; }
+        }
 
         [Category( "Dynamic Entity Management" )]
         [DisplayName( "Block Subtype Ignore List" )]
@@ -698,14 +727,14 @@
 
 
         [Category("Dynamic Entity Management")]
-        [DisplayName("Update Speed")]
-        [Description("")]
+        [DisplayName("Include Active Production")]
+        [Description("Ships with active production blocks will be concealed.")]
         [Browsable(true)]
         [ReadOnly(false)]
-        public int DynamicConcealUpdateSoeed
+        public bool DynamicConcealProduction
         {
-            get { return PluginSettings.Instance.DynamicConcealUpdateSpeed; }
-            set { PluginSettings.Instance.DynamicConcealUpdateSpeed = value; }
+            get { return PluginSettings.Instance.DynamicConcealProduction; }
+            set { PluginSettings.Instance.DynamicConcealProduction = value; }
         }
         
         [Category( "Dynamic Entity Management" )]
@@ -1115,6 +1144,23 @@
                 PluginSettings.Instance.AtmosphericCargoShipSpawnTime = value;
             }
         }
+        
+        [Category("Programmable Block Blacklist")]
+        [Description("Types and members in this list will be unavailable to all programmable blocks. Ask on the KSH forum if you're unsure how to use this!!")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public MTObservableCollection<BlacklistItem> BlacklistItems
+        {
+            get
+            {
+                return PluginSettings.Instance.BlacklistItems;
+            }
+            set
+            {
+                PluginSettings.Instance.BlacklistItems = value;
+            }
+        }
+
         /*
 		[Category("Game Modes")]
 		[Description("Conquest Game Mode - This mode tracks asteroid owners by counting owned blocks near an asteroid to determine the owner.  Includes a leaderboard")]
@@ -1285,12 +1331,13 @@
             MyAPIGateway.Entities.OnEntityAdd += OnEntityAdd;
             MyAPIGateway.Entities.OnEntityRemove += OnEntityRemove;
             
-            Protection.Init( );
+            Protection.Instance.Init( );
             ProcessReservedSlots.Init( );
             PlayerBlockEnforcement.Init();
             
             MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReceiveMessageParts);
             MyAPIGateway.Multiplayer.RegisterMessageHandler( 9007, Communication.HandleAddConcealExempt );
+            BlacklistManager.Instance.UpdateBlacklist();
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
         }
         
