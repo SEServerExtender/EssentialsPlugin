@@ -1,24 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
+using Sandbox.Game.Entities;
+using Sandbox.Game.Entities.Cube;
+using Sandbox.Game.World;
+using Sandbox.ModAPI;
+using EssentialsPlugin.Settings;
+using SEModAPIInternal.API.Common;
+using VRage.Game;
+using VRage.Game.Entity;
+using VRageMath;
 
 namespace EssentialsPlugin.Utility
 {
-    using System.Net;
-    using System.Threading;
-    using Sandbox.Definitions;
-    using Sandbox.Game.Entities;
-    using Sandbox.Game.Entities.Cube;
-    using Sandbox.Game.World;
-    using Settings;
-    using SEModAPIInternal.API.Common;
-    using VRage.Game;
-    using VRage.Game.Entity;
-    using VRage.Game.ModAPI;
-    using VRageMath;
-
     public static class PlayerBlockEnforcement
     {
         private static bool _init;
@@ -85,7 +81,7 @@ namespace EssentialsPlugin.Utility
                             if (fatBlock.OwnerId == 0)
                             {
                                 if (fatBlock.CubeGrid.BigOwners.Count > 0 && PluginSettings.Instance.PlayerBlockEnforcementChangeOwner)
-                                    Wrapper.GameAction(() => fatBlock.ChangeBlockOwnerRequest(fatBlock.CubeGrid.BigOwners.First(), MyOwnershipShareModeEnum.Faction));
+                                    MyAPIGateway.Utilities.InvokeOnGameThread(() => fatBlock.ChangeBlockOwnerRequest(fatBlock.CubeGrid.BigOwners.First(), MyOwnershipShareModeEnum.Faction));
                                 else if (PluginSettings.Instance.PlayerBlockEnforcementChangeOwner)
                                     ChangeOwnershipToNearestPlayer(fatBlock);
                             }
@@ -111,7 +107,7 @@ namespace EssentialsPlugin.Utility
                             if (fatBlock.OwnerId == 0)
                             {
                                 if (fatBlock.CubeGrid.BigOwners.Count > 0 && PluginSettings.Instance.PlayerBlockEnforcementChangeOwner)
-                                    Wrapper.GameAction(() => fatBlock.ChangeBlockOwnerRequest(fatBlock.CubeGrid.BigOwners.First(), MyOwnershipShareModeEnum.Faction));
+                                    MyAPIGateway.Utilities.InvokeOnGameThread(() => fatBlock.ChangeBlockOwnerRequest(fatBlock.CubeGrid.BigOwners.First(), MyOwnershipShareModeEnum.Faction));
                                 else if (PluginSettings.Instance.PlayerBlockEnforcementChangeOwner)
                                     ChangeOwnershipToNearestPlayer(fatBlock);
                             }
@@ -147,7 +143,7 @@ namespace EssentialsPlugin.Utility
 
                                     if ( nearest == null )
                                         return;
-                                    block.ChangeBlockOwnerRequest( nearest.Identity.IdentityId, MyOwnershipShareModeEnum.Faction );
+                                    MyAPIGateway.Utilities.InvokeOnGameThread(()=>block.ChangeBlockOwnerRequest( nearest.Identity.IdentityId, MyOwnershipShareModeEnum.Faction ));
                                 } );
         }
 
@@ -443,12 +439,12 @@ namespace EssentialsPlugin.Utility
                           lock ( BlockOwners )
                           {
                               if ( BlockOwners.ContainsKey( block ) )
-                                  Wrapper.GameAction( () => block.ChangeBlockOwnerRequest( BlockOwners[block], MyOwnershipShareModeEnum.Faction ) );
+                                  MyAPIGateway.Utilities.InvokeOnGameThread( () => block.ChangeBlockOwnerRequest( BlockOwners[block], MyOwnershipShareModeEnum.Faction ) );
                               else if ( PluginSettings.Instance.PlayerBlockEnforcementChangeOwner )
                               {
                                   ChangeOwnershipToNearestPlayer( block );
                                   if ( block.OwnerId == 0 && block.CubeGrid.BigOwners.Count > 0 )
-                                      block.ChangeBlockOwnerRequest( block.CubeGrid.BigOwners[0], MyOwnershipShareModeEnum.Faction );
+                                      MyAPIGateway.Utilities.InvokeOnGameThread(()=>block.ChangeBlockOwnerRequest( block.CubeGrid.BigOwners[0], MyOwnershipShareModeEnum.Faction ));
 
                                   if ( block.OwnerId != 0 )
                                       BlockOwners[block] = block.OwnerId;
