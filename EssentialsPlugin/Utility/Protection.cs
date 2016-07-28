@@ -3,49 +3,86 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
     using EssentialsPlugin.Settings;
-    using Sandbox.Common.ObjectBuilders.Definitions;
     using Sandbox.Game.Entities;
     using Sandbox.Game.Entities.Cube;
+    using Sandbox.Game.World;
     using Sandbox.ModAPI;
-    using Sandbox.Game.Weapons;
-    using Sandbox.ModAPI.Interfaces;
     using SEModAPIInternal.API.Common;
     using VRage.Game;
+    using VRage.Game.Entity.EntityComponents;
     using VRage.Game.ModAPI;
-    using VRage.Game.ModAPI.Interfaces;
-    using VRage.ModAPI;
-    using VRage.ObjectBuilders;
-    using VRage.Utils;
 
-    public static class Protection
+    public class Protection
     {
-        private static bool _init = false;
-        private static DateTime _lastLog;
-        private static SortedList<IMySlimBlock, float> toDamage = new SortedList<IMySlimBlock, float>( );
+        private static Protection _instance;
+        private bool _init = false;
+        private DateTime _lastLog;
 
-        public static void Init( )
+        public static Protection Instance
+        {
+            get
+            {
+                if(_instance == null)
+                    _instance = new Protection();
+                return _instance;
+            }
+        }
+
+        public void Init( )
         {
             if ( _init )
                 return;
 
             _init = true;
             MyAPIGateway.Session.DamageSystem.RegisterBeforeDamageHandler( 0, DamageHandler );
+            RegisterGridHandlers();
         }
 
-        private static void DamageHandler( object target, ref MyDamageInformation info )
+        public void RegisterGridHandlers()
+        {
+            foreach ( var item in PluginSettings.Instance.ProtectedItems )
+            {
+                var grid = MyEntities.GetEntityById( item.EntityId ) as MyCubeGrid;
+                if ( grid == null )
+                {
+                    Essentials.Log.Error( $"Error getting entity in Protection.RegisterGridHandlers. ID: {item.EntityId}" );
+                    continue;
+                }
+                
+                grid.OnBlockAdded -= OnBlockAdded;
+                grid.OnBlockAdded += OnBlockAdded;
+            }
+        }
+
+        private void OnBlockAdded( MySlimBlock block )
+        {
+            var protectionItem = PluginSettings.Instance.ProtectedItems.FirstOrDefault( x => x.EntityId == block.CubeGrid.EntityId );
+            if ( protectionItem == null || !protectionItem.Enabled || !protectionItem.ProtectBockAdd )
+                return;
+
+            if ( block.OwnerId != 0 )
+            {
+                var steamId = PlayerMap.Instance.GetSteamIdFromPlayerId( block.OwnerId );
+                //if ( PlayerManager.Instance.IsUserAdmin( steamId ) )
+                //    return;
+
+                Communication.Notification( steamId, MyFontEnum.Red, 5, protectionItem.ProtectBlockWarning ?? "You cannot add blocks to this grid!" );
+            }
+            MyAPIGateway.Utilities.InvokeOnGameThread(()=>block.CubeGrid.RazeBlock( block.Position ));
+            Essentials.Log.Info( $"Removed block from protected grid {protectionItem.EntityId}. Block owner: {PlayerMap.Instance.GetPlayerNameFromPlayerId( block.OwnerId )}" );
+        }
+
+        private void DamageHandler( object target, ref MyDamageInformation info )
         {
             if ( !PluginSettings.Instance.ProtectedEnabled )
                 return;
 
-            IMySlimBlock block = target as IMySlimBlock;
+            MySlimBlock block = target as MySlimBlock;
             if ( block == null )
                 return;
             
-            IMyCubeGrid grid = block.CubeGrid;
-            
-            ulong steamId = PlayerMap.Instance.GetSteamId( info.AttackerId );
+            MyCubeGrid grid = block.CubeGrid;
             
             foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
             {
@@ -59,7 +96,6 @@
                     }
                 }
             }
-
         }
     }
 }

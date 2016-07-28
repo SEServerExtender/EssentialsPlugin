@@ -18,5 +18,19 @@
 			get { return entityId; }
 			set { entityId = value; }
 		}
+
+	    private bool protectBlockAdd;
+	    public bool ProtectBockAdd
+	    {
+	        get { return protectBlockAdd; }
+            set { protectBlockAdd = value; }
+	    }
+
+	    private string protectBlockWarning;
+	    public string ProtectBlockWarning
+	    {
+	        get {return protectBlockWarning;}
+            set { protectBlockWarning = value; }
+	    }
 	}
 }

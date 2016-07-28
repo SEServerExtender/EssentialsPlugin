@@ -81,11 +81,13 @@
         private bool _dynamicConcealEnabled;
         private float _dynamicConcealDistance;
         private bool _dynamicConcealIncludeLargeGrids;
+        private bool _dynamicConcealIncludeStations;
         private string[] _dynamicConcealIgnoreSubTypeList = { };
         private bool _dynamicConcealIncludeMedBays;
         private bool _dynamicShowMessages;
         private bool _dynamicConcealPirates;
-        private int _dynamicConcealUpdateSpeed;
+        private bool _dynamicConcealPhysics;
+        private bool _dynamicConcealProduction;
         private bool _dynamicTurretManagementEnabled;
         private int _dynamicTurretTargetDistance;
         private bool _dynamicTurretAllowExemption;
@@ -124,7 +126,9 @@
 	    private bool _atmosphericCargoShipsEnabled;
 	    private float _atmosphericCargoShipSpawnTime;
 
-        private List<TicketPlayerItem> _ticketPlayers; 
+        private List<TicketPlayerItem> _ticketPlayers;
+
+        private MTObservableCollection<BlacklistItem> _blacklistItems;
         
         #endregion
 
@@ -621,7 +625,27 @@
                 Save( );
             }
         }
-        
+
+        public bool DynamicConcealPhysics
+        {
+            get {return _dynamicConcealPhysics;}
+            set
+            {
+                _dynamicConcealPhysics = value;
+                Save();
+            }
+        }
+
+        public bool DynamicConcealProduction 
+        {
+            get { return _dynamicConcealProduction; }
+            set
+            {
+                _dynamicConcealProduction = value;
+                Save();
+            }
+        }
+
         public float DynamicConcealDistance
 		{
 			get { return _dynamicConcealDistance; }
@@ -642,12 +666,12 @@
 			}
 		}
 
-        public int DynamicConcealUpdateSpeed
+        public bool ConcealIncludeStations
         {
-            get {return _dynamicConcealUpdateSpeed;}
+            get { return _dynamicConcealIncludeStations; }
             set
             {
-                _dynamicConcealUpdateSpeed = value;
+                _dynamicConcealIncludeStations = value;
                 Save();
             }
         }
@@ -1001,6 +1025,17 @@
                 Save(  );
             }
         }
+
+        public MTObservableCollection<BlacklistItem> BlacklistItems
+        {
+            get { return _blacklistItems; }
+            set
+            {
+                _blacklistItems = value;
+                BlacklistManager.Instance.UpdateBlacklist();
+                Save();
+            }
+        }
         #endregion
 
         #region Constructor
@@ -1046,7 +1081,8 @@
             
 			_dynamicConcealDistance = 8000;
             _dynamicConcealPirates = false;
-            _dynamicConcealUpdateSpeed = 500;
+            _dynamicConcealPhysics = false;
+            _dynamicConcealProduction = true;
             _dynamicShowMessages = false;
 			_dynamicTurretTargetDistance = 2000;
 			_dynamicTurretManagementEnabled = false;
@@ -1077,21 +1113,24 @@
             _timedCommandsItem = new MTObservableCollection<TimedCommandItem>(  );
             _timedCommandsItem.CollectionChanged += ItemsCollectionChanged;
 
+            _blacklistItems = new MTObservableCollection<BlacklistItem>();
+            _blacklistItems.CollectionChanged += ItemsCollectionChanged;
+            _blacklistItems.CollectionChanged += BlacklistManager.Instance._blacklistItems_CollectionChanged;
+
             _atmosphericCargoShipsEnabled = false;
             _atmosphericCargoShipSpawnTime = 10.0f;
             
             _ticketPlayers = new List<TicketPlayerItem>();
 		}
+        
+        #endregion
 
+        #region Loading and Saving
 
-		#endregion
-
-		#region Loading and Saving
-
-		/// <summary>
-		/// Loads our settings
-		/// </summary>
-		public void Load()
+        /// <summary>
+        /// Loads our settings
+        /// </summary>
+        public void Load()
 		{
 			_loading = true;
 
