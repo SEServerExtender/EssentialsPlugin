@@ -13,6 +13,7 @@
 	        set
 	        {
 	            _type = value;
+                /*
 	            switch ( BlacklistManager.Instance.ValidateBlacklistItem( this ) )
 	            {
 	                case BlacklistManager.BlacklistVerificationEnum.InvalidType:
@@ -22,8 +23,9 @@
 	                    throw new ArgumentException( $"{_member} is not a valid member of {_type}!" );
 
 	                case BlacklistManager.BlacklistVerificationEnum.NoType:
-	                    throw new ArgumentException( "You mus give a type if you specify a member!" );
+	                    throw new ArgumentException( "You mus give a type if you specify a member!" );                        
 	            }
+                */
 	        }
 		}
 
@@ -34,6 +36,7 @@
 			set
 			{
                 _member = value;
+                /*
                 switch (BlacklistManager.Instance.ValidateBlacklistItem(this))
                 {
                     case BlacklistManager.BlacklistVerificationEnum.InvalidType:
@@ -45,6 +48,7 @@
                     case BlacklistManager.BlacklistVerificationEnum.NoType:
                         throw new ArgumentException("You mus give a type if you specify a member!");
                 }
+                */
             }
 		}
 	}

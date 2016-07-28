@@ -178,6 +178,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Settings\SettingsBlacklistItem.cs" />
     <Compile Include="Settings\SettingsBlockEnforcementItem.cs" />
     <Compile Include="Settings\SettingsCleanupNotificationItem.cs" />
     <Compile Include="Settings\SettingsCleanupTriggerItem.cs" />
@@ -214,6 +215,7 @@
     <Compile Include="Utility\Player.cs" />
     <Compile Include="Utility\Utility.cs" />
     <Compile Include="Utility\Waypoints.cs" />
+    <Compile Include="Utility\BlacklistManager.cs" />
     <Compile Include="Utility\Wrapper.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -298,6 +300,9 @@
     <Reference Include="VRage.Math, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Math.dll</HintPath>
+    </Reference>
+    <Reference Include="VRage.Scripting">
+      <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Scripting.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>

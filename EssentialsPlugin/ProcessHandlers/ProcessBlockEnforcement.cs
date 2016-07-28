@@ -12,7 +12,6 @@
 	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 	using VRageMath;
-	using IMyGridTerminalSystem = Sandbox.ModAPI.IMyGridTerminalSystem;
 	using IMyTerminalBlock = Sandbox.ModAPI.Ingame.IMyTerminalBlock;
 
 	class ProcessBlockEnforcement : ProcessHandlerBase
