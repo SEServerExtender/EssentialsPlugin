@@ -10,7 +10,6 @@
     using Sandbox.ModAPI;
     using SEModAPIInternal.API.Common;
     using VRage.Game;
-    using VRage.Game.Entity.EntityComponents;
     using VRage.Game.ModAPI;
 
     public class Protection
@@ -61,16 +60,16 @@
             if ( protectionItem == null || !protectionItem.Enabled || !protectionItem.ProtectBockAdd )
                 return;
 
-            if ( block.OwnerId != 0 )
+            if ( block.FatBlock!=null && block.FatBlock.OwnerId != 0 )
             {
-                var steamId = PlayerMap.Instance.GetSteamIdFromPlayerId( block.OwnerId );
+                var steamId = PlayerMap.Instance.GetSteamIdFromPlayerId( block.FatBlock.OwnerId );
                 //if ( PlayerManager.Instance.IsUserAdmin( steamId ) )
                 //    return;
 
                 Communication.Notification( steamId, MyFontEnum.Red, 5, protectionItem.ProtectBlockWarning ?? "You cannot add blocks to this grid!" );
             }
             MyAPIGateway.Utilities.InvokeOnGameThread(()=>block.CubeGrid.RazeBlock( block.Position ));
-            Essentials.Log.Info( $"Removed block from protected grid {protectionItem.EntityId}. Block owner: {PlayerMap.Instance.GetPlayerNameFromPlayerId( block.OwnerId )}" );
+            Essentials.Log.Info( $"Removed block from protected grid {protectionItem.EntityId}. Block owner: {PlayerMap.Instance.GetPlayerNameFromPlayerId( block.FatBlock?.OwnerId ?? 0 )}" );
         }
 
         private void DamageHandler( object target, ref MyDamageInformation info )
