@@ -178,6 +178,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Settings\SettingsBlacklistItem.cs" />
     <Compile Include="Settings\SettingsBlockEnforcementItem.cs" />
     <Compile Include="Settings\SettingsCleanupNotificationItem.cs" />
     <Compile Include="Settings\SettingsCleanupTriggerItem.cs" />
@@ -196,6 +197,7 @@
     <Compile Include="UtilityClasses\SerializeableDictionary.cs" />
     <Compile Include="UtilityClasses\UIEditors.cs" />
     <Compile Include="Utility\Backup.cs" />
+    <Compile Include="Utility\BlacklistManager.cs" />
     <Compile Include="Utility\CargoShips.cs" />
     <Compile Include="Utility\ChatHistory.cs" />
     <Compile Include="Utility\Docking.cs" />
@@ -245,7 +247,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\Sandbox.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Sandbox.Game, Version=0.1.5556.30920, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="Sandbox.Game, Version=0.1.6047.25986, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\Sandbox.Game.dll</HintPath>
     </Reference>
@@ -267,11 +269,11 @@
     </Reference>
     <Reference Include="SpaceEngineers.ObjectBuilders, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Debug\SpaceEngineers.ObjectBuilders.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\SpaceEngineers.ObjectBuilders.dll</HintPath>
     </Reference>
     <Reference Include="SpaceEngineers.ObjectBuilders.XmlSerializers, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Debug\SpaceEngineers.ObjectBuilders.XmlSerializers.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\SpaceEngineers.ObjectBuilders.XmlSerializers.dll</HintPath>
     </Reference>
     <Reference Include="SteamSDK, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
@@ -288,8 +290,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.dll</HintPath>
     </Reference>
-    <Reference Include="VRage.Game">
+    <Reference Include="VRage.Game, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Game.dll</HintPath>
+    </Reference>
+    <Reference Include="VRage.Game.XmlSerializers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Game.XmlSerializers.dll</HintPath>
     </Reference>
     <Reference Include="VRage.Library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -298,6 +305,10 @@
     <Reference Include="VRage.Math, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Math.dll</HintPath>
+    </Reference>
+    <Reference Include="VRage.Scripting, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Scripting.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>

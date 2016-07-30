@@ -43,8 +43,8 @@
         {
             foreach ( var item in PluginSettings.Instance.ProtectedItems )
             {
-                var grid = MyEntities.GetEntityById( item.EntityId ) as MyCubeGrid;
-                if ( grid == null )
+                MyCubeGrid grid;
+                if ( !MyEntities.TryGetEntityById( item.EntityId, out grid ) || grid == null )
                 {
                     Essentials.Log.Error( $"Error getting entity in Protection.RegisterGridHandlers. ID: {item.EntityId}" );
                     continue;
