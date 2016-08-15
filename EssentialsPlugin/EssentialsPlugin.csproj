@@ -143,7 +143,21 @@
     <Compile Include="Essentials.cs" />
     <Compile Include="EntityManagers\BlockManagement.cs" />
     <Compile Include="EntityManagers\TurretManagement.cs" />
+    <Compile Include="Editors\GridPicker.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\GridPicker.Designer.cs">
+      <DependentUpon>GridPicker.cs</DependentUpon>
+    </Compile>
     <Compile Include="GameModes\Conquest.cs" />
+    <Compile Include="NetworkHandlers\BlockOwnHandler.cs" />
+    <Compile Include="NetworkHandlers\BlockNameHandler.cs" />
+    <Compile Include="NetworkHandlers\GridDeleteHandler.cs" />
+    <Compile Include="NetworkHandlers\GridNameHandler.cs" />
+    <Compile Include="NetworkHandlers\ConvertPhyiscsHandler.cs" />
+    <Compile Include="NetworkHandlers\RemoveBlockHandler.cs" />
+    <Compile Include="NetworkHandlers\BuildBlockHandler.cs" />
+    <Compile Include="NetworkHandlers\ColorBlockHandler.cs" />
     <Compile Include="ProcessHandlers\ProcessTicket.cs" />
     <Compile Include="ProcessHandlers\ProcessPlayerCleanup.cs" />
     <Compile Include="ProcessHandlers\ProcessCargoShips.cs" />
@@ -158,15 +172,19 @@
     <Compile Include="ProcessHandlers\ProcessTurrets.cs" />
     <Compile Include="ProcessHandlers\ProcessConquest.cs" />
     <Compile Include="ProcessHandlers\ProcessLoginTracking.cs" />
-    <Compile Include="ProcessHandlers\ProcessSpawnShipTracking.cs" />
     <Compile Include="ProcessHandlers\ProcessWaypoints.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Editors\ProtectionEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\ProtectionEditor.Designer.cs">
+      <DependentUpon>ProtectionEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Settings\PluginSettings.cs" />
-    <Compile Include="ProcessHandlers\ProcessRespawn.cs" />
     <Compile Include="ProcessHandlers\ProcessGreeting.cs" />
     <Compile Include="ProcessHandlers\ProcessHandlerBase.cs" />
     <Compile Include="ProcessHandlers\ProcessInfo.cs" />
@@ -192,11 +210,18 @@
     <Compile Include="Settings\SettingsRestartNotificationItem.cs" />
     <Compile Include="Settings\SettingsServerWaypointItem.cs" />
     <Compile Include="Settings\SettingsTimedCommandItem.cs" />
+    <Compile Include="Editors\StringEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\StringEditor.Designer.cs">
+      <DependentUpon>StringEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="UtilityClasses\MTObservableCollection.cs" />
     <Compile Include="UtilityClasses\OrientedBoundingBox.cs" />
     <Compile Include="UtilityClasses\SerializeableDictionary.cs" />
     <Compile Include="UtilityClasses\UIEditors.cs" />
     <Compile Include="Utility\Backup.cs" />
+    <Compile Include="Utility\BlacklistManager.cs" />
     <Compile Include="Utility\CargoShips.cs" />
     <Compile Include="Utility\ChatHistory.cs" />
     <Compile Include="Utility\Docking.cs" />
@@ -215,7 +240,6 @@
     <Compile Include="Utility\Player.cs" />
     <Compile Include="Utility\Utility.cs" />
     <Compile Include="Utility\Waypoints.cs" />
-    <Compile Include="Utility\BlacklistManager.cs" />
     <Compile Include="Utility\Wrapper.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -240,14 +264,14 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.1.2\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.3.7\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Sandbox.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\Sandbox.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Sandbox.Game, Version=0.1.5556.30920, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="Sandbox.Game, Version=0.1.6047.25986, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\Sandbox.Game.dll</HintPath>
     </Reference>
@@ -269,17 +293,18 @@
     </Reference>
     <Reference Include="SpaceEngineers.ObjectBuilders, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Debug\SpaceEngineers.ObjectBuilders.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\SpaceEngineers.ObjectBuilders.dll</HintPath>
     </Reference>
     <Reference Include="SpaceEngineers.ObjectBuilders.XmlSerializers, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SEServerExtender\SEServerExtender\bin\x64\Debug\SpaceEngineers.ObjectBuilders.XmlSerializers.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\GameLibraries\SpaceEngineers.ObjectBuilders.XmlSerializers.dll</HintPath>
     </Reference>
     <Reference Include="SteamSDK, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\SteamSDK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression.FileSystem" />
@@ -290,8 +315,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.dll</HintPath>
     </Reference>
-    <Reference Include="VRage.Game">
+    <Reference Include="VRage.Game, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Game.dll</HintPath>
+    </Reference>
+    <Reference Include="VRage.Game.XmlSerializers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Game.XmlSerializers.dll</HintPath>
     </Reference>
     <Reference Include="VRage.Library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -301,15 +331,25 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Math.dll</HintPath>
     </Reference>
-    <Reference Include="VRage.Scripting">
+    <Reference Include="VRage.Scripting, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Scripting.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Editors\GridPicker.resx">
+      <DependentUpon>GridPicker.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\ProtectionEditor.resx">
+      <DependentUpon>ProtectionEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\StringEditor.resx">
+      <DependentUpon>StringEditor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

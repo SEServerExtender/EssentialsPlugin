@@ -59,21 +59,13 @@
         private int _backupCleanupTime;
         private bool _backupAsteroids;
         private bool _backupEssentials;
-
-        private bool _newUserTransportEnabled;
-        private int _newUserTransportDistance;
-        private bool _newUserTransportMoveAllSpawnShips;
-        private int _newUserTransportAsteroidDistance;
-        private NewUserTransportSpawnPoint _newUserTransportSpawnType;
-        private string[] _newUserTransportSpawnShipNames = { };
-        private bool _newUserTransportStopRunawaySpawnShips;
-
+        
         private bool _loginEnabled;
         private string[] _loginEntityWhitelist = { };
         private string[] _loginPlayerIdWhitelist = { };
 
         private bool _protectedEnabled;
-        private MTObservableCollection<ProtectedItem> _protectedItems;
+        private List<ProtectedItem> _protectedItems;
 
         private bool _dockingEnabled;
         private int _dockingShipsPerZone;
@@ -458,76 +450,6 @@
 			}
 		}
 
-		public bool NewUserTransportEnabled
-		{
-			get { return _newUserTransportEnabled; }
-			set
-			{
-				_newUserTransportEnabled = value;
-				Save();
-			}
-		}
-
-		public int NewUserTransportDistance
-		{
-			get { return _newUserTransportDistance; }
-			set
-			{
-				_newUserTransportDistance = Math.Max(500, value);
-				Save(); 
-			}
-		}
-
-		public int NewUserTransportAsteroidDistance
-		{
-			get { return _newUserTransportAsteroidDistance; }
-			set 
-			{
-				_newUserTransportAsteroidDistance = value;
-				Save();
-			}
-		}
-
-		public bool NewUserTransportMoveAllSpawnShips
-		{
-			get { return _newUserTransportMoveAllSpawnShips; }
-			set 
-			{
-				_newUserTransportMoveAllSpawnShips = value;
-				Save();
-			}
-		}
-
-		public NewUserTransportSpawnPoint NewUserTransportSpawnType
-		{
-			get { return _newUserTransportSpawnType; }
-			set
-			{
-				_newUserTransportSpawnType = value;
-				Save();
-			}
-		}
-
-		public string[] NewUserTransportSpawnShipNames
-		{
-			get { return _newUserTransportSpawnShipNames; }
-			set 
-			{ 
-				_newUserTransportSpawnShipNames = value;
-				Save();
-			}
-		}
-
-		public bool NewUserTransportStopRunawaySpawnShips
-		{
-			get { return _newUserTransportStopRunawaySpawnShips; }
-			set
-			{ 
-				_newUserTransportStopRunawaySpawnShips = value;
-				Save();
-			}
-		}
-
 		public bool LoginEnabled
 		{
 			get { return _loginEnabled; }
@@ -573,7 +495,7 @@
 			}
 		}
 
-		public MTObservableCollection<ProtectedItem> ProtectedItems
+		public List<ProtectedItem> ProtectedItems
 		{
 			get { return _protectedItems; }
 			set { _protectedItems = value; }
@@ -1043,7 +965,6 @@
 		{
 			// Default is 12 hours
 			Start = DateTime.Now;
-			_newUserTransportDistance = 500;
 			_backupAsteroids = true;
 
 			_greetingItem = new SettingsGreetingDialogItem();
@@ -1055,12 +976,11 @@
 			_restartNotificationItems = new MTObservableCollection<RestartNotificationItem>();
 			_restartTimeItems = new MTObservableCollection<RestartTimeItem>();
 			_backupItems = new MTObservableCollection<BackupItem>();
-			_protectedItems = new MTObservableCollection<ProtectedItem>();
+			_protectedItems = new List<ProtectedItem>();
 			_informationItems.CollectionChanged += ItemsCollectionChanged;
 			_restartNotificationItems.CollectionChanged += ItemsCollectionChanged;
 			_restartTimeItems.CollectionChanged += ItemsCollectionChanged;
 			_backupItems.CollectionChanged += ItemsCollectionChanged;
-			_protectedItems.CollectionChanged += ItemsCollectionChanged;
 
             _reservedSlotsEnabled = false;
             _reservedSlotsCount = 5;
@@ -1088,8 +1008,6 @@
 			_dynamicTurretManagementEnabled = false;
 
 			_dockingShipsPerZone = 1;
-
-			_newUserTransportAsteroidDistance = 0;
 
 			_waypointServerItems = new MTObservableCollection<ServerWaypointItem>();
 			_waypointServerItems.CollectionChanged += ItemsCollectionChanged;
