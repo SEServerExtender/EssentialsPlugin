@@ -4,6 +4,7 @@
     using System.Linq;
     using EssentialsPlugin.Settings;
     using EssentialsPlugin.Utility;
+    using Sandbox.Engine.Multiplayer;
     using Sandbox.ModAPI;
     using SEModAPIInternal.API.Server;
     using VRage.Game.ModAPI;
@@ -51,7 +52,7 @@
                 if ( item.TicketId == steamId )
                 {
                     PluginSettings.Instance.TicketPlayers.Remove( item );
-                    ServerNetworkManager.Instance.KickPlayer( steamId );
+                    MyMultiplayer.Static.KickClient( steamId );
                     Communication.SendPrivateInformation( userId, $"Removed ticket {steamId}." );
                     return true;
                 }

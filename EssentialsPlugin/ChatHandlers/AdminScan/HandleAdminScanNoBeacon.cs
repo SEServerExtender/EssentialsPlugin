@@ -55,7 +55,6 @@
 		// admin nobeacon scan
 		public override bool HandleCommand(ulong userId, string[] words)
 		{
-            GridLinkTypeEnum connectionType = GridLinkTypeEnum.Logical;
 		    string linkType = "";
 		    if ( words.Length > 0 && words[0].ToLower( ) == "physical" )
 		        linkType = " physical";

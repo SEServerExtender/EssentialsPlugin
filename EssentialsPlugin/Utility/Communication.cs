@@ -19,6 +19,7 @@
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Sandbox;
     using Sandbox.Definitions;
     using Sandbox.Game.Entities;
     using Settings;
@@ -29,7 +30,7 @@
     public static class Communication
     {
         private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
-        private static Random m_random = new Random( );
+        private static Random _random = new Random( );
 
         public static void SendPublicInformation( string infoText )
         {
@@ -297,10 +298,18 @@
             Buffer.BlockCopy( data, 0, newData, msgIdString.Length + 1, data.Length );
             */
 
+            //hash a random long with the current time to make a decent quality guid for each message
+            byte[] randLong = new byte[sizeof(long)];
+            _random.NextBytes(randLong);
+            long uniqueId = 23;
+            uniqueId = uniqueId * 37 + BitConverter.ToInt64(randLong, 0);
+            uniqueId = uniqueId * 37 + DateTime.Now.GetHashCode();
+
             //this is a much more elegant and lightweight method
-            byte[] newData = new byte[sizeof(long) + data.Length];
-            BitConverter.GetBytes((long)messageType).CopyTo( newData, 0 );
-            data.CopyTo( newData, sizeof(long));
+            byte[] newData = new byte[sizeof(long)*2 + data.Length];
+            BitConverter.GetBytes( uniqueId ).CopyTo( newData, 0 );
+            BitConverter.GetBytes((long)messageType).CopyTo(newData, sizeof(long));
+            data.CopyTo( newData, sizeof(long)*2);
 
             if ( newData.Length > 4096 )
             {
@@ -308,10 +317,11 @@
                 return;
             }
 
-            Wrapper.GameAction( ( ) =>
-                                {
-                                    MyAPIGateway.Multiplayer.SendMessageTo( 9000, newData, steamId );
-                                } );
+            //Wrapper.GameAction( ( ) =>
+            MySandboxGame.Static.Invoke( () =>
+                                         {
+                                             MyAPIGateway.Multiplayer.SendMessageTo( 9000, newData, steamId );
+                                         } );
         }
 
         public static void BroadcastDataMessage( DataMessageType messageType, byte[ ] data )
@@ -327,10 +337,16 @@
 
             Buffer.BlockCopy( data, 0, newData, msgIdString.Length + 1, data.Length );
             */
-            
-            byte[] newData = new byte[sizeof(long) + data.Length];
-            BitConverter.GetBytes((long)messageType).CopyTo(newData, 0);
-            data.CopyTo(newData, sizeof(long));
+            byte[] randLong = new byte[sizeof(long)];
+            _random.NextBytes(randLong);
+            long uniqueId = 23;
+            uniqueId = uniqueId * 37 + BitConverter.ToInt64( randLong, 0 );
+            uniqueId = uniqueId * 37 + DateTime.Now.GetHashCode();
+
+            byte[] newData = new byte[sizeof(long) * 2 + data.Length];
+            BitConverter.GetBytes(uniqueId).CopyTo(newData, 0);
+            BitConverter.GetBytes((long)messageType).CopyTo(newData, sizeof(long));
+            data.CopyTo(newData, sizeof(long) * 2);
 
             if (newData.Length > 4096)
             {
@@ -338,8 +354,9 @@
                 return;
             }
 
-            Wrapper.GameAction( ( ) =>
-                                {
+            //Wrapper.GameAction( ( ) =>
+            MySandboxGame.Static.Invoke(() =>
+                               {
                                     MyAPIGateway.Multiplayer.SendMessageToOthers( 9000, newData );
                                 } );
         }

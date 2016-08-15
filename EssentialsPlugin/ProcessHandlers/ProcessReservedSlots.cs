@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using Sandbox.Engine.Multiplayer;
     using Sandbox.Game.World;
     using Sandbox.ModAPI;
@@ -27,12 +28,29 @@
                 return;
 
             _init = true;
+            //RemoveHandlers();
             SteamServerAPI.Instance.GameServer.UserGroupStatus += GameServer_UserGroupStatus;
             SteamServerAPI.Instance.GameServer.ValidateAuthTicketResponse += GameServer_ValidateAuthTicketResponse;
 
             Essentials.Log.Info( "Reserved slots initialized" );
         }
 
+        private static void RemoveHandlers()
+        {
+            var eventField = typeof(GameServer).GetField("<backing_store>ValidateAuthTicketResponse", BindingFlags.NonPublic | BindingFlags.Instance);
+            var eventDel = eventField?.GetValue(SteamServerAPI.Instance.GameServer) as MulticastDelegate;
+            if (eventDel != null)
+            {
+                foreach (var handle in eventDel.GetInvocationList())
+                {
+                    if (handle.Method.Name == "GameServer_ValidateAuthTicketResponse")
+                    {
+                        SteamServerAPI.Instance.GameServer.ValidateAuthTicketResponse -= handle as ValidateAuthTicketResponse;
+                        Essentials.Log.Warn("Removed handler from ValidateAuthTicketResponse");
+                    }
+                }
+            }
+        }
         private static void GameServer_ValidateAuthTicketResponse( ulong remoteUserId, AuthSessionResponseEnum response,
                                                                    ulong ownerSteamId )
         {
@@ -162,19 +180,9 @@
 
             //kick the player with the "Server is full" message
             //too bad we can't send a custom message, but they're hardcoded into the client
-            ( MyMultiplayer.Static as MyDedicatedServerBase ).SendJoinResult( remoteUserId, JoinResult.ServerFull );
-            /*
-        VRage.Library.Collections.BitStream m_sendStream = new VRage.Library.Collections.BitStream();
-        Essentials.Log.Info( "Player denied: " + remoteUserId );
-            JoinResultMsg msg = new JoinResultMsg
-                                {
-                                    JoinResult = JoinResult.ServerFull,
-                                    Admin = 0
-                                };
-            m_sendStream.ResetWrite();
-            m_sendStream.WriteUInt16((ushort)msg.JoinResult);
-            m_sendStream.WriteUInt64(msg.Admin);
-            ServerNetworkManager.Instance.SendStruct( remoteUserId, m_sendStream, m_sendStream.GetType(  ) );*/
+            Essentials.Log.Info("Player denied: " + remoteUserId);
+            var userRejectedMethod = typeof(MyDedicatedServerBase).GetMethod("UserRejected", BindingFlags.NonPublic | BindingFlags.Instance);
+            userRejectedMethod.Invoke(MyMultiplayer.Static, new object[] { remoteUserId, JoinResult.ServerFull });
         }
 
         private static void GameServer_UserGroupStatus( ulong userId, ulong groupId, bool member, bool officier )

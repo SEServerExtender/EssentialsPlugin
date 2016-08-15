@@ -35,6 +35,18 @@
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
     using VRage.ModAPI;
     using System.Diagnostics;
+    using System.Threading.Tasks;
+    using NetworkHandlers;
+    using Sandbox.Engine.Multiplayer;
+    using Sandbox.Game.Entities;
+    using Sandbox.Game.Multiplayer;
+    using SEModAPIInternal.API.Server;
+    using VRage;
+    using VRage.Game;
+    using VRage.Library.Collections;
+    using VRage.Network;
+    using VRage.Serialization;
+    using VRageMath;
 
     public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
     {
@@ -477,78 +489,7 @@
                 PluginSettings.Instance.BackupEssentials = value;
             }
         }
-
-        /*
-        [Category( "Automated New User Transport" )]
-        [Description( "Enable / Disable New User Transport.  This option will transport new user ships closer to asteroids.  It will randomly choose an appropriate asteroid that has enough resources inside it, and move them closer to that asteroid.  This helps on servers that have asteroids far apart." )]
-        [Browsable( true )]
-        [ReadOnly( false )]
-        public bool NewUserTransportEnabled
-        {
-            get { return PluginSettings.Instance.NewUserTransportEnabled; }
-            set { PluginSettings.Instance.NewUserTransportEnabled = value; }
-        }
-
-        [Category( "Automated New User Transport" )]
-        [Description( "New User Transport Distance from asteroid to transport the user." )]
-        [Browsable( true )]
-        [ReadOnly( false )]
-        public int NewUserTransportDistance
-        {
-            get { return PluginSettings.Instance.NewUserTransportDistance; }
-            set { PluginSettings.Instance.NewUserTransportDistance = value; }
-        }
-
-        [Category( "Automated New User Transport" )]
-        [Description( "Move all spawn ships no matter if the user is new or not (Only works on login for now)" )]
-        [Browsable( true )]
-        [ReadOnly( false )]
-        public bool NewUserTransportMoveAllSpawnShips
-        {
-            get { return PluginSettings.Instance.NewUserTransportMoveAllSpawnShips; }
-            set { PluginSettings.Instance.NewUserTransportMoveAllSpawnShips = value; }
-        }
-
-        [Category( "Automated New User Transport" )]
-        [Description( "Spawn only at asteroids that are this distance or less from center (0,0,0) - 0 means asteroids can be anywhere" )]
-        [Browsable( true )]
-        [ReadOnly( false )]
-        public int NewUserTransportAsteroidDistance
-        {
-            get { return PluginSettings.Instance.NewUserTransportAsteroidDistance; }
-            set { PluginSettings.Instance.NewUserTransportAsteroidDistance = value; }
-        }
-
-        [Category( "Automated New User Transport" )]
-        [Description( "Type of spawn point we use.  Asteroids = we spawn near asteroids.  Origin = we spawn near origin." )]
-        [Browsable( true )]
-        [ReadOnly( false )]
-        public NewUserTransportSpawnPoint NewUserTransportSpawnType
-        {
-            get { return PluginSettings.Instance.NewUserTransportSpawnType; }
-            set { PluginSettings.Instance.NewUserTransportSpawnType = value; }
-        }
-
-        [Category( "Automated New User Transport" )]
-        [Description( "The names of spawnships.  Used for automated spawn ship stopping." )]
-        [Browsable( true )]
-        [ReadOnly( false )]
-        public string[ ] NewUserTransportSpawnShipNames
-        {
-            get { return PluginSettings.Instance.NewUserTransportSpawnShipNames; }
-            set { PluginSettings.Instance.NewUserTransportSpawnShipNames = value; }
-        }
-
-        [Category( "Automated New User Transport" )]
-        [Description( "Enable / Disable automatic spawn ship stopping.  The theory is, they cause havok errors if they jump physics worlds." )]
-        [Browsable( true )]
-        [ReadOnly( false )]
-        public bool NewUserTransportStopRunawaySpawnShips
-        {
-            get { return PluginSettings.Instance.NewUserTransportStopRunawaySpawnShips; }
-            set { PluginSettings.Instance.NewUserTransportStopRunawaySpawnShips = value; }
-        }
-        */
+        
         [Category( "Player Login Tracking" )]
         [Description( "Enable / Disable Player Login Tracking.  This option tracks users login/logouts.  It also reads old logs to get player history.  It's recommended to enable this." )]
         [Browsable( true )]
@@ -593,9 +534,10 @@
         [Description( "This is the list of entities that are protected by the server" )]
         [Browsable( true )]
         [ReadOnly( false )]
-        public MTObservableCollection<ProtectedItem> ProtectedItems
+        [Editor(typeof(ProtectionEditButton), typeof(UITypeEditor))]
+        public string ProtectedItems
         {
-            get { return PluginSettings.Instance.ProtectedItems; }
+            get { return "Press the button to edit settings ---->"; }
         }
 
         [Category( "Docking Zones" )]
@@ -1191,7 +1133,6 @@
             // Setup process handlers
             _processHandlers = new List<ProcessHandlerBase>
                                {
-                                   //new ProcessNewUserTransport( ),
                                    new ProcessGreeting( ),
                                    new ProcessRestart( ),
                                    new ProcessInfo( ),
@@ -1202,7 +1143,6 @@
                                    new ProcessWaypoints( ),
                                    new ProcessCleanup( ),
                                    new ProcessBlockEnforcement( ),
-                                   new ProcessSpawnShipTracking( ),
                                    new ProcessReservedSlots(),
                                    new ProcessTimedCommands(  ),
                                    new ProcessSpeed(  ),
@@ -1321,6 +1261,18 @@
                                 new HandleTicketRemove(  ),
                                 new HandleTicketTimeleft(  )
                             };
+            
+            //TODO: These should be in an init function somehere so we don't intercept network unless the user really needs it
+            ServerNetworkManager.Instance.RegisterNetworkHandlers( new NetworkHandlerBase[]
+                                                                   {
+                                                                       new BlockNameHandler(),
+                                                                       new BlockOwnHandler(),
+                                                                       new BuildBlockHandler(),
+                                                                       new ColorBlockHandler(), 
+                                                                       new ConvertPhyiscsHandler(),
+                                                                       new GridDeleteHandler(), 
+                                                                       new RemoveBlockHandler(), 
+                                                                   } );
 
             _processThreads = new List<Thread>( );
             _processThread = new Thread( PluginProcessing );
@@ -1333,14 +1285,13 @@
             
             Protection.Instance.Init( );
             ProcessReservedSlots.Init( );
-            PlayerBlockEnforcement.Init();
-            
+            PlayerBlockEnforcement.Instance.Init();
+
             MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReceiveMessageParts);
             MyAPIGateway.Multiplayer.RegisterMessageHandler( 9007, Communication.HandleAddConcealExempt );
             BlacklistManager.Instance.UpdateBlacklist();
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
         }
-        
 
         #endregion
 

@@ -36,41 +36,6 @@
 
             _init = true;
             MyAPIGateway.Session.DamageSystem.RegisterBeforeDamageHandler( 0, DamageHandler );
-            RegisterGridHandlers();
-        }
-
-        public void RegisterGridHandlers()
-        {
-            foreach ( var item in PluginSettings.Instance.ProtectedItems )
-            {
-                MyCubeGrid grid;
-                if ( !MyEntities.TryGetEntityById( item.EntityId, out grid ) || grid == null )
-                {
-                    Essentials.Log.Error( $"Error getting entity in Protection.RegisterGridHandlers. ID: {item.EntityId}" );
-                    continue;
-                }
-                
-                grid.OnBlockAdded -= OnBlockAdded;
-                grid.OnBlockAdded += OnBlockAdded;
-            }
-        }
-
-        private void OnBlockAdded( MySlimBlock block )
-        {
-            var protectionItem = PluginSettings.Instance.ProtectedItems.FirstOrDefault( x => x.EntityId == block.CubeGrid.EntityId );
-            if ( protectionItem == null || !protectionItem.Enabled || !protectionItem.ProtectBockAdd )
-                return;
-
-            if ( block.OwnerId != 0 )
-            {
-                var steamId = PlayerMap.Instance.GetSteamIdFromPlayerId( block.OwnerId );
-                //if ( PlayerManager.Instance.IsUserAdmin( steamId ) )
-                //    return;
-
-                Communication.Notification( steamId, MyFontEnum.Red, 5, protectionItem.ProtectBlockWarning ?? "You cannot add blocks to this grid!" );
-            }
-            MyAPIGateway.Utilities.InvokeOnGameThread(()=>block.CubeGrid.RazeBlock( block.Position ));
-            Essentials.Log.Info( $"Removed block from protected grid {protectionItem.EntityId}. Block owner: {PlayerMap.Instance.GetPlayerNameFromPlayerId( block.OwnerId )}" );
         }
 
         private void DamageHandler( object target, ref MyDamageInformation info )
@@ -86,16 +51,75 @@
             
             foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
             {
-                if ( item.Enabled && item.EntityId == grid.EntityId )
+                if ( !item.Enabled || !item.ProtectDamage || item.EntityId != grid.EntityId )
+                    continue;
+
+                if ( DateTime.Now - _lastLog > TimeSpan.FromSeconds( 1 ) )
                 {
-                    info.Amount = 0;
-                    if ( DateTime.Now - _lastLog > TimeSpan.FromSeconds( 1 ) )
-                    {
-                        _lastLog = DateTime.Now;
-                        Essentials.Log.Info( "Protected entity {0}.", grid.DisplayName );
-                    }
+                    _lastLog = DateTime.Now;
+                    Essentials.Log.Info( $"Protected entity {grid.DisplayName}:{grid.EntityId}." );
                 }
+                    if ( !item.LogOnly )
+                        info.Amount = 0;
             }
+        }
+        
+        public bool CheckPlayerExempt(ProtectedItem.ProtectionSettings settings, MyCubeGrid grid, ulong remoteUserId )
+        {
+            if ( !settings.Enabled )
+                return true;
+
+            if (settings.AdminExempt && PlayerManager.Instance.IsUserAdmin(remoteUserId))
+                return true;
+
+            long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( remoteUserId );
+
+            if (settings.BigOwnerExempt)
+            {
+                //fast check to see if the player's current live identity is an owner
+                if (grid.BigOwners.Contains(playerId))
+                    return true;
+
+                //check old, dead identities. this is much slower
+                var playerIds = PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId, false);
+
+                foreach (var owner in grid.BigOwners)
+                    if (playerIds.Contains(owner))
+                        return true;
+            }
+
+            if ( settings.SmallOwnerExempt )
+            {
+                //fast check to see if the player's current live identity is an owner
+                if ( grid.SmallOwners.Contains( playerId ) )
+                    return true;
+
+                //check old, dead identities. this is much slower
+                var playerIds = PlayerMap.Instance.GetPlayerIdsFromSteamId( remoteUserId, false );
+
+                foreach ( var owner in grid.SmallOwners )
+                    if ( playerIds.Contains( owner ) )
+                        return true;
+            }
+
+            if ( settings.FactionExempt && grid.BigOwners.Count > 0)
+            {
+                var fac = MySession.Static.Factions.GetPlayerFaction( grid.BigOwners[0] );
+                if ( fac != null && fac.IsMember( playerId ) )
+                    return true;
+            }
+
+            foreach ( var facId in settings.Factions )
+            {
+                var fac = MySession.Static.Factions.TryGetFactionById( facId );
+                if ( fac != null && fac.IsMember( playerId ) )
+                    return true;
+            }
+
+            if ( settings.ExemptSteamIds.Contains( remoteUserId.ToString() ) )
+                return true;
+
+            return false;
         }
     }
 }
