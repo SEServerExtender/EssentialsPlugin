@@ -35,7 +35,7 @@
         [Serializable]
         public class ProtectionSettings
         {
-            public bool Enabled = false;
+            public bool AllExempt;
             public bool AdminExempt;
             public bool BigOwnerExempt;
             public bool SmallOwnerExempt;

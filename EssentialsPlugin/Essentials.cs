@@ -1285,7 +1285,7 @@
             
             Protection.Instance.Init( );
             ProcessReservedSlots.Init( );
-            PlayerBlockEnforcement.Instance.Init();
+            PlayerBlockEnforcement.Init();
 
             MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReceiveMessageParts);
             MyAPIGateway.Multiplayer.RegisterMessageHandler( 9007, Communication.HandleAddConcealExempt );

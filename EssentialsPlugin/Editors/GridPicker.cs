@@ -1,6 +1,7 @@
 ﻿namespace EssentialsPlugin.Editors
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Windows.Forms;
     using Sandbox.Game.Entities;
@@ -9,7 +10,6 @@
     public partial class GridPicker : Form
     {
         public long SelectedEntity;
-        private MyEntity[] _grids;
         public GridPicker()
         {
             InitializeComponent();
@@ -18,14 +18,22 @@
         private void GridPicker_Load(object sender, EventArgs e)
         {
             LST_Entities.DoubleClick += LST_Entities_DoubleClick;
-            _grids = MyEntities.GetEntities().Where( x => x is MyCubeGrid ).ToArray();
-            foreach ( var grid in _grids )
-                LST_Entities.Items.Add( $"{grid.DisplayName??""}:{grid.EntityId}" );
+            List<GridListItem> grids = new List<GridListItem>();
+            foreach (var entity in MyEntities.GetEntities( ))
+            {
+                if(entity is MyCubeGrid && !entity.Closed && entity.Physics!=null)
+                    grids.Add( new GridListItem( (MyCubeGrid)entity ) );
+            }
+
+            grids.Sort( (a,b) => string.Compare( a.ToString(  ), b.ToString(  ), StringComparison.Ordinal ) );
+
+            foreach ( var grid in grids )
+                LST_Entities.Items.Add( grid );
         }
 
         private void BTN_Ok_Click(object sender, EventArgs e)
         {
-            SelectedEntity = _grids[LST_Entities.SelectedIndex].EntityId;
+            SelectedEntity = ((GridListItem)LST_Entities.SelectedItem).Grid.EntityId;
             this.DialogResult = DialogResult.OK;
             this.Close();
         }

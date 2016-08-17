@@ -198,6 +198,7 @@
             this.LST_Factions.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
             this.LST_Factions.Size = new System.Drawing.Size(286, 95);
             this.LST_Factions.TabIndex = 28;
+            this.LST_Factions.SelectedIndexChanged += new System.EventHandler(this.LST_Factions_SelectedIndexChanged);
             // 
             // BTN_GroupId
             // 

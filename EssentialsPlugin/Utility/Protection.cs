@@ -66,12 +66,12 @@
         
         public bool CheckPlayerExempt(ProtectedItem.ProtectionSettings settings, MyCubeGrid grid, ulong remoteUserId )
         {
-            if ( !settings.Enabled )
+            if ( settings.AllExempt )
                 return true;
-
+            
             if (settings.AdminExempt && PlayerManager.Instance.IsUserAdmin(remoteUserId))
                 return true;
-
+            
             long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( remoteUserId );
 
             if (settings.BigOwnerExempt)
@@ -82,7 +82,7 @@
 
                 //check old, dead identities. this is much slower
                 var playerIds = PlayerMap.Instance.GetPlayerIdsFromSteamId(remoteUserId, false);
-
+                
                 foreach (var owner in grid.BigOwners)
                     if (playerIds.Contains(owner))
                         return true;
@@ -96,12 +96,12 @@
 
                 //check old, dead identities. this is much slower
                 var playerIds = PlayerMap.Instance.GetPlayerIdsFromSteamId( remoteUserId, false );
-
+                
                 foreach ( var owner in grid.SmallOwners )
                     if ( playerIds.Contains( owner ) )
                         return true;
             }
-
+            
             if ( settings.FactionExempt && grid.BigOwners.Count > 0)
             {
                 var fac = MySession.Static.Factions.GetPlayerFaction( grid.BigOwners[0] );
@@ -109,16 +109,19 @@
                     return true;
             }
 
+            if (settings.Factions == null)
+                return false;
+
             foreach ( var facId in settings.Factions )
             {
                 var fac = MySession.Static.Factions.TryGetFactionById( facId );
                 if ( fac != null && fac.IsMember( playerId ) )
                     return true;
             }
-
-            if ( settings.ExemptSteamIds.Contains( remoteUserId.ToString() ) )
-                return true;
-
+            
+            //if ( settings.ExemptSteamIds.Contains( remoteUserId.ToString() ) )
+            //    return true;
+                
             return false;
         }
     }

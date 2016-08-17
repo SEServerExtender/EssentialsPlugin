@@ -140,6 +140,7 @@
     <Compile Include="ChatHandlers\HandleInfo.cs" />
     <Compile Include="ChatHandlers\Utility\HandleUtilityGridsList.cs" />
     <Compile Include="ChatHandlers\Utility\HandleUtilityExportServer.cs" />
+    <Compile Include="Editors\ListItems.cs" />
     <Compile Include="Essentials.cs" />
     <Compile Include="EntityManagers\BlockManagement.cs" />
     <Compile Include="EntityManagers\TurretManagement.cs" />

@@ -789,7 +789,7 @@
             {
                 _playerBlockEnforcementEnabled = value;
                 if(value)
-                    PlayerBlockEnforcement.Instance.Init();
+                    PlayerBlockEnforcement.Init();
                 Save();
             }
         }
