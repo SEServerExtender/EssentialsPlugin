@@ -1,6 +1,8 @@
 ﻿namespace EssentialsPlugin.Editors
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Windows.Forms;
     using Sandbox.Game.Entities;
     using Sandbox.Game.World;
@@ -13,12 +15,12 @@
         {
             InitializeComponent();
         }
-
+        
         private readonly string[] _modeDesc = {
                                          "These players are allowed to add blocks to this grid.",
                                          "These players are allowed to remove blocks from this grid.",
                                          "These players are allowed to paint blocks on this grid.",
-                                         "These players are allowed to change ownership of blocks on this grid.",
+                                         "These players are allowed to change ownership of blocks.",
                                          "These players are allowed to rename blocks on this grid.",
                                          "These players are allowed to rename this grid.",
                                          "These players are allowed to convert this grid to a station.",
@@ -44,13 +46,28 @@
                                          "Grid Delete"
                                      } );
             //CMB_Mode.Items.AddRange( Enum.GetNames( typeof(ProtectedItem.ProtectionModeEnum) ) );
+            List<FactionListItem> factions = new List<FactionListItem>();
             foreach ( var faction in MySession.Static.Factions )
             {
-                LST_Factions.Items.Add( $"{faction.Value.Tag}: {faction.Value.Name}" );
+                if (faction.Value == null)
+                    continue;
+                factions.Add( new FactionListItem( faction.Value ) );
             }
 
-            LST_Entries.SelectedIndex = 0;
-            CMB_Mode.SelectedIndex = 0;
+            factions.Sort( (a,b)=>string.Compare( a.ToString(  ), b.ToString(  ), StringComparison.Ordinal ) );
+            
+            foreach (var fac in factions)
+            {
+                LST_Factions.Items.Add( fac );
+            }
+
+            if ( LST_Entries.Items.Count > 0 )
+            {
+                LST_Entries.SelectedIndex = 0;
+                CMB_Mode.SelectedIndex = 0;
+            }
+            else
+                splitContainer1.Panel2.Enabled = false;
         }
         
         private void UpdateListbox()
@@ -94,6 +111,7 @@
 
         private void BTN_AddItem_Click(object sender, EventArgs e)
         {
+            splitContainer1.Panel2.Enabled = true;
             PluginSettings.Instance.ProtectedItems.Add( new ProtectedItem() );
             UpdateListbox();
             LST_Entries.SelectedIndex = PluginSettings.Instance.ProtectedItems.Count - 1;
@@ -102,9 +120,17 @@
         private void BTN_RemoveItem_Click(object sender, EventArgs e)
         {
             PluginSettings.Instance.ProtectedItems.RemoveAt( LST_Entries.SelectedIndex );
-            if ( LST_Entries.SelectedIndex >= PluginSettings.Instance.ProtectedItems.Count )
+            if ( PluginSettings.Instance.ProtectedItems.Count == 0 )
+            {
+                LST_Entries.ClearSelected(  );
+                LST_Entries.Items.Clear(  );
+                splitContainer1.Panel2.Enabled = false;
+            }
+            else if ( LST_Entries.SelectedIndex >= PluginSettings.Instance.ProtectedItems.Count )
+            {
                 LST_Entries.SelectedIndex--;
-            UpdateListbox();
+                UpdateListbox( );
+            }
         }
 
         private void BTN_SaveItem_Click(object sender, EventArgs e)
@@ -125,7 +151,10 @@
 
         private void LoadCurrentSettings()
         {
-            CHK_Enabled.Checked = !_currentSettings.Enabled;
+            CHK_Enabled.Checked = _currentItem.Enabled;
+            CHK_Damage.Checked = _currentItem.ProtectDamage;
+            CHK_LogOnly.Checked = _currentItem.LogOnly;
+            CHK_Anyone.Checked = _currentSettings.AllExempt;
             CHK_BigOwner.Checked = _currentSettings.BigOwnerExempt;
             CHK_SmallOwner.Checked = _currentSettings.SmallOwnerExempt;
             CHK_Admin.Checked = _currentSettings.AdminExempt;
@@ -152,6 +181,20 @@
             }
             TXT_SpeedVal.Text = _currentSettings.SpeedLimit.ToString();
             TXT_SpeedTime.Text = _currentSettings.SpeedTime.ToString();
+            LST_Factions.SelectedIndexChanged -= LST_Factions_SelectedIndexChanged;
+            LST_Factions.SelectedItems.Clear(  );
+            if (_currentSettings.Factions != null)
+            {
+                var itemsCopy = new object[LST_Factions.Items.Count];
+                LST_Factions.Items.CopyTo( itemsCopy, 0 );
+                foreach (var facItem in itemsCopy)
+                {
+                    if (_currentSettings.Factions.Contains( ( (FactionListItem)facItem ).Faction.FactionId ))
+                        //LST_Factions.SelectedItems.Add( facItem );
+                        LST_Factions.SetSelected( LST_Factions.Items.IndexOf( facItem ), true );
+                }
+            }
+            LST_Factions.SelectedIndexChanged += LST_Factions_SelectedIndexChanged;
         }
 
         private void TXT_EntityId_TextChanged(object sender, EventArgs e)
@@ -189,7 +232,7 @@
 
         private void CHK_Anyone_CheckedChanged(object sender, EventArgs e)
         {
-            _currentSettings.Enabled = !CHK_Enabled.Checked;
+            _currentSettings.AllExempt = CHK_Anyone.Checked;
         }
 
         private void CHK_BigOwner_CheckedChanged(object sender, EventArgs e)
@@ -281,6 +324,14 @@
         private void TXT_SpeedTime_TextChanged(object sender, EventArgs e)
         {
             _currentSettings.SpeedTime = double.Parse( TXT_SpeedTime.Text );
+        }
+
+        private void LST_Factions_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            List<long> facIds = new List<long>();
+            foreach(var faction in LST_Factions.SelectedItems)
+                facIds.Add( ((FactionListItem)faction).Faction.FactionId );
+            _currentSettings.Factions = facIds.ToArray( );
         }
     }
 }

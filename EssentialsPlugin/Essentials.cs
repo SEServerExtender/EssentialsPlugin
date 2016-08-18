@@ -67,7 +67,7 @@
 
         #region Properties
 
-        public static bool StableBuild = true;
+        public static bool StableBuild = false;
 
         public static string PluginPath
         {
@@ -1087,7 +1087,6 @@
             }
         }
         
-        /*
         [Category("Programmable Block Blacklist")]
         [Description("Types and members in this list will be unavailable to all programmable blocks. Ask on the KSH forum if you're unsure how to use this!!")]
         [Browsable(true)]
@@ -1103,7 +1102,7 @@
                 PluginSettings.Instance.BlacklistItems = value;
             }
         }
-        */
+
         /*
 		[Category("Game Modes")]
 		[Description("Conquest Game Mode - This mode tracks asteroid owners by counting owned blocks near an asteroid to determine the owner.  Includes a leaderboard")]
@@ -1290,7 +1289,7 @@
 
             MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReceiveMessageParts);
             MyAPIGateway.Multiplayer.RegisterMessageHandler( 9007, Communication.HandleAddConcealExempt );
-            //BlacklistManager.Instance.UpdateBlacklist();
+            BlacklistManager.Instance.UpdateBlacklist();
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
         }
 

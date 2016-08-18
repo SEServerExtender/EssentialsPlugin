@@ -954,7 +954,7 @@
             set
             {
                 _blacklistItems = value;
-                //BlacklistManager.Instance.UpdateBlacklist();
+                BlacklistManager.Instance.UpdateBlacklist();
                 Save();
             }
         }
@@ -1033,7 +1033,7 @@
 
             _blacklistItems = new MTObservableCollection<BlacklistItem>();
             _blacklistItems.CollectionChanged += ItemsCollectionChanged;
-            //_blacklistItems.CollectionChanged += BlacklistManager.Instance._blacklistItems_CollectionChanged;
+            _blacklistItems.CollectionChanged += BlacklistManager.Instance._blacklistItems_CollectionChanged;
 
             _atmosphericCargoShipsEnabled = false;
             _atmosphericCargoShipSpawnTime = 10.0f;

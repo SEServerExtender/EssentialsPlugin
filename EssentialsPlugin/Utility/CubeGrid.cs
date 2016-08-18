@@ -32,6 +32,7 @@
     using VRage.Game.Entity;
     using VRage.Game.ModAPI;
     using VRage.Library.Utils;
+    using IMyBatteryBlock = Sandbox.ModAPI.IMyBatteryBlock;
     using IMyReactor = Sandbox.ModAPI.IMyReactor;
 
     public enum RemoveGridTypes

@@ -1,6 +1,9 @@
 ﻿namespace EssentialsPlugin.NetworkHandlers
 {
+    using System;
+    using System.Threading.Tasks;
     using System.Timers;
+    using ProcessHandlers;
     using Sandbox.Engine.Multiplayer;
     using Sandbox.Game.Entities;
     using Sandbox.Game.World;
@@ -117,24 +120,39 @@
                 
                 Essentials.Log.Info($"Intercepted block color request from user {PlayerMap.Instance.GetFastPlayerNameFromSteamId(remoteUserId)}:{remoteUserId} for grid {grid.DisplayNameText??"ID"}:{item.EntityId}" );
 
-                if (settings.PunishmentType == ProtectedItem.PunishmentEnum.Kick )
+                switch ( settings.PunishmentType )
                 {
-                    _kickTimer.Elapsed += ( sender, e ) =>
-                                         {
-                                             Essentials.Log.Info($"Kicked user {PlayerMap.Instance.GetFastPlayerNameFromSteamId(remoteUserId)}:{remoteUserId} for painting protected grid {grid.DisplayNameText ?? "ID"}:{item.EntityId}" );
-                                             MyMultiplayer.Static.KickClient( remoteUserId );
-                                         };
-                    _kickTimer.Start();
+                    case ProtectedItem.PunishmentEnum.Kick:
+                        _kickTimer.Elapsed += ( sender, e ) =>
+                                              {
+                                                  Essentials.Log.Info($"Kicked user {PlayerMap.Instance.GetFastPlayerNameFromSteamId(remoteUserId)}:{remoteUserId} for painting protected grid {grid.DisplayNameText ?? "ID"}:{item.EntityId}" );
+                                                  MyMultiplayer.Static.KickClient( remoteUserId );
+                                              };
+                        _kickTimer.AutoReset = false;
+                        _kickTimer.Start();
+                        break;
+                    case ProtectedItem.PunishmentEnum.Ban:
+                        _kickTimer.Elapsed += (sender, e) =>
+                                              {
+                                                  Essentials.Log.Info($"Banned user {PlayerMap.Instance.GetFastPlayerNameFromSteamId(remoteUserId)}:{remoteUserId} for painting protected grid {grid.DisplayNameText ?? "ID"}:{item.EntityId}");
+                                                  MyMultiplayer.Static.BanClient( remoteUserId, true );
+                                              };
+                        _kickTimer.AutoReset = false;
+                        _kickTimer.Start();
+                        break;
+                    case ProtectedItem.PunishmentEnum.Speed:
+                        Task.Run(() =>
+                                 {
+                                     lock (ProcessSpeed.SpeedPlayers)
+                                     {
+                                         long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(remoteUserId);
+                                         ProcessSpeed.SpeedPlayers[playerId] = new Tuple<float, DateTime>((float)settings.SpeedLimit, DateTime.Now + TimeSpan.FromMinutes(settings.SpeedTime));
+                                     }
+                                 });
+                        Essentials.Log.Info($"Limited user {PlayerMap.Instance.GetFastPlayerNameFromSteamId(remoteUserId)} to {settings.SpeedLimit}m/s for {settings.SpeedTime} minutes");
+                        break;
                 }
-                else if (settings.PunishmentType == ProtectedItem.PunishmentEnum.Ban)
-                {
-                    _kickTimer.Elapsed += (sender, e) =>
-                                         {
-                                             Essentials.Log.Info($"Banned user {PlayerMap.Instance.GetFastPlayerNameFromSteamId(remoteUserId)}:{remoteUserId} for painting protected grid {grid.DisplayNameText ?? "ID"}:{item.EntityId}");
-                                             MyMultiplayer.Static.BanClient( remoteUserId, true );
-                                         };
-                    _kickTimer.Start();
-                }
+
                 found = true;
             }
             return found;

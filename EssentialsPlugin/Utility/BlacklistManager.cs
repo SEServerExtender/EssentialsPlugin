@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace EssentialsPlugin.Utility
 {
-    /*
     using System.Collections.Specialized;
     using System.Reflection;
     using Settings;
@@ -125,5 +124,4 @@ namespace EssentialsPlugin.Utility
                 return BlacklistVerificationEnum.InvalidMember;
         }
     }
-    */
 }

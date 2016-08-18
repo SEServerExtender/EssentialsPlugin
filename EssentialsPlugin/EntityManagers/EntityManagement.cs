@@ -22,7 +22,10 @@
     using VRage.Game;
     using VRage.Game.Entity;
     using VRage.Game.ModAPI;
+    using IMyBeacon = Sandbox.ModAPI.IMyBeacon;
+    using IMyMedicalRoom = SpaceEngineers.Game.ModAPI.IMyMedicalRoom;
     using IMyProductionBlock = Sandbox.ModAPI.IMyProductionBlock;
+    using IMyRadioAntenna = Sandbox.ModAPI.IMyRadioAntenna;
 
     public class EntityManagement
     {

@@ -11,6 +11,7 @@
 	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 	using VRageMath;
+	using IMyBeacon = Sandbox.ModAPI.IMyBeacon;
 	using IMyTerminalBlock = Sandbox.ModAPI.IMyTerminalBlock;
 
 	public static class DockingZone
