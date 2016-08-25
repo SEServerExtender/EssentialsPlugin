@@ -282,8 +282,12 @@
 
         private void RAD_Speed_CheckedChanged(object sender, EventArgs e)
         {
-            _currentSettings.PunishmentType=ProtectedItem.PunishmentEnum.Speed;
-            _currentSettings.SpeedLimit = double.Parse( TXT_SpeedVal.Text );
+            _currentSettings.PunishmentType = ProtectedItem.PunishmentEnum.Speed;
+            if (string.IsNullOrEmpty(TXT_SpeedVal.Text))
+                TXT_SpeedVal.Text = "0";
+            _currentSettings.SpeedLimit = double.Parse(TXT_SpeedVal.Text);
+            if (string.IsNullOrEmpty(TXT_SpeedTime.Text))
+                TXT_SpeedTime.Text = "0";
             _currentSettings.SpeedTime = double.Parse( TXT_SpeedTime.Text );
         }
 
@@ -318,11 +322,15 @@
 
         private void TXT_SpeedVal_TextChanged(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty( TXT_SpeedVal.Text ))
+                TXT_SpeedVal.Text = "0";
             _currentSettings.SpeedLimit = double.Parse( TXT_SpeedVal.Text );
         }
 
         private void TXT_SpeedTime_TextChanged(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty( TXT_SpeedTime.Text ))
+                TXT_SpeedTime.Text = "0";
             _currentSettings.SpeedTime = double.Parse( TXT_SpeedTime.Text );
         }
 

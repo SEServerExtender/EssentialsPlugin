@@ -314,8 +314,7 @@
             Debug.Assert( i < m_spawnGroupCumulativeFrequencies.Count, "Could not sample a spawn group" );
             if ( i >= m_spawnGroupCumulativeFrequencies.Count )
                 i = m_spawnGroupCumulativeFrequencies.Count - 1;
-
-            ProfilerShort.End( );
+            
             return m_spawnGroups[i];
         }
 

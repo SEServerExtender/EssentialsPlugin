@@ -127,7 +127,7 @@ namespace EssentialsPlugin.NetworkHandlers
             if ( !PluginSettings.Instance.ProtectedEnabled )
                 return false;
 
-            Essentials.Log.Debug( "entering buildblockhandler" );
+            //Essentials.Log.Debug( "entering buildblockhandler" );
 
             var grid = obj as MyCubeGrid;
             if ( grid == null )
@@ -144,8 +144,8 @@ namespace EssentialsPlugin.NetworkHandlers
                 
                 if (item.EntityId != grid.EntityId)
                 {
-                Essentials.Log.Debug( item.EntityId );
-                    Essentials.Log.Debug( grid.EntityId );
+                    //Essentials.Log.Debug( item.EntityId );
+                    //Essentials.Log.Debug( grid.EntityId );
                     continue;
                 }
                 

@@ -67,7 +67,7 @@
 
         #region Properties
 
-        public static bool StableBuild = false;
+        //public static bool StableBuild = false;
 
         public static string PluginPath
         {

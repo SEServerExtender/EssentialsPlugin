@@ -332,6 +332,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Math.dll</HintPath>
     </Reference>
+    <Reference Include="VRage.Render, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Render.dll</HintPath>
+    </Reference>
     <Reference Include="VRage.Scripting, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\VRage.Scripting.dll</HintPath>

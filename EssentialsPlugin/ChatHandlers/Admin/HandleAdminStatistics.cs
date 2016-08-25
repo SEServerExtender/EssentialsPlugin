@@ -3,8 +3,9 @@
 	using System.Text;
 	using EssentialsPlugin.Utility;
 	using VRage.Utils;
+	using VRageRender.Utils;
 
-	public class HandleAdminStatistics : ChatHandlerBase
+    public class HandleAdminStatistics : ChatHandlerBase
 	{
 		public override string GetHelp()
 		{

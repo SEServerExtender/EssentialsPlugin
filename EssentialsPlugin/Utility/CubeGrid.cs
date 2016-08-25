@@ -27,7 +27,6 @@
     using SEModAPI.API;
     using SEModAPIExtensions.API;
     using SpaceEngineers.Game.ModAPI.Ingame;
-    using VRage.Animations;
     using VRage.Game;
     using VRage.Game.Entity;
     using VRage.Game.ModAPI;
