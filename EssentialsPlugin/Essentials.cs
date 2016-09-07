@@ -540,6 +540,7 @@
             get { return "Press the button to edit settings ---->"; }
         }
 
+        /*
         [Category( "Docking Zones" )]
         [Description( "Enable / Disable docking zones.  This allows players to safely dock in zones created by 4 beacons with the same name.  This removes the entity from the world when docked, and adds it back when undocked." )]
         [Browsable( true )]
@@ -559,7 +560,7 @@
             get { return PluginSettings.Instance.DockingShipsPerZone; }
             set { PluginSettings.Instance.DockingShipsPerZone = value; }
         }
-
+        */
         [Category( "Dynamic Entity Management" )]
         [DisplayName( "Enabled" )]
         [Description( "Enable / Disable dynamic entity concealment.  This option will automatically 'hide' ships that players are not close to, meaning they won't be processed by the physics engine.  This should improve performance." )]
@@ -1138,7 +1139,7 @@
                                    new ProcessInfo( ),
                                    new ProcessBackup( ),
                                    new ProcessLoginTracking( ),
-                                   new ProcessDockingZone( ),
+                                   //new ProcessDockingZone( ),
                                    new ProcessConceal( ),
                                    new ProcessWaypoints( ),
                                    new ProcessCleanup( ),
@@ -1220,13 +1221,13 @@
                                 new HandleSettingsSetBlockEnforcement( ),
                                 new HandleSettingsSetMOTD( ),
                                 
-
+                                /*
                                 //Dock
                                 new HandleDockValidate( ),
                                 new HandleDockDock( ),
                                 new HandleDockUndock( ),
                                 new HandleDockList( ),
-
+                                */
 
                                 //Waypoints
                                 new HandleWaypointAdd( ),
@@ -1285,7 +1286,7 @@
             
             Protection.Instance.Init( );
             ProcessReservedSlots.Init( );
-            PlayerBlockEnforcement.Init();
+            PlayerBlockEnforcement.Instance.Init();
 
             MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReceiveMessageParts);
             MyAPIGateway.Multiplayer.RegisterMessageHandler( 9007, Communication.HandleAddConcealExempt );
@@ -1459,7 +1460,6 @@
 
             if ( obj.Message[0] != '/' )
             {
-                //ChatHistory.AddChat( obj );
                 return;
             }
 
