@@ -16,7 +16,7 @@
     {
         public override string GetHelp( )
         {
-            return "This command allows you to change the ownership of a ship.  Usage: /admin ownership change <entityId> <PlayerName>";
+            return "This command allows you to change the ownership of a ship.  Usage: /admin ownership change <entityId/entityName> <PlayerName>";
         }
         public override string GetCommandText( )
         {

@@ -4,8 +4,10 @@
 	using System.Linq;
 	using EssentialsPlugin.Utility;
 	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.Game.Entities;
 	using Sandbox.ModAPI;
 	using VRage.Game;
+	using VRage.Game.Entity;
 	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
 	using VRageMath;
@@ -71,19 +73,21 @@
 			List<MyObjectBuilder_CubeGrid> gridsToMove = new List<MyObjectBuilder_CubeGrid>();
 			BoundingSphereD sphere = new BoundingSphereD(startPosition, radius);
 			List<IMyEntity> entitiesToMove = MyAPIGateway.Entities.GetEntitiesInSphere(ref sphere);
-			int count = 0;
+		    List<MyEntity> entities;
+		    int count = 0;
+		    Wrapper.GameAction( ( ) =>
+		                        {
+		                            entities = MyEntities.GetTopMostEntitiesInSphere( ref sphere );
 
-			Wrapper.GameAction(() =>
-			{
-				foreach (IMyEntity entity in entitiesToMove)
-				{
-					if (!(entity is IMyCubeGrid))
-						continue;
+		                            foreach (MyEntity entity in entities)
+		                            {
+		                                if (!( entity is MyCubeGrid ))
+		                                    continue;
 
-					Communication.SendPrivateInformation(userId, string.Format("Found ship '{0}' ({1}) at {2}", entity.DisplayName, entity.EntityId, General.Vector3DToString(entity.GetPosition())));
-					count++;
-				}
-			});
+		                                Communication.SendPrivateInformation( userId, string.Format( "Found ship '{0}' ({1}) at {2}", entity.DisplayName, entity.EntityId, General.Vector3DToString( entity.PositionComp.GetPosition( ) ) ) );
+		                                count++;
+		                            }
+		                        } );
 
 			Communication.SendPrivateInformation(userId, string.Format("Total ships found: {0}", count));
 			return true;

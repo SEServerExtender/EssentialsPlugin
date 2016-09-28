@@ -213,8 +213,25 @@ namespace EssentialsPlugin.NetworkHandlers
 
                 found = true;
             }
-            
-            return found;
+
+            if ( !PluginSettings.Instance.PlayerBlockEnforcementEnabled || found )
+                return found;
+
+            //we already did unit tests on the parameters, so don't bother with it here
+            if ( site.MethodInfo.Name == BuildBlockName )
+            {
+                //public void BuildBlockRequest(uint colorMaskHsv, MyBlockLocation location, [DynamicObjectBuilder] MyObjectBuilder_CubeBlock blockObjectBuilder, long builderEntityId, bool instantBuild, long ownerId)
+                uint colorMask = 0;
+                MyCubeGrid.MyBlockLocation location = new MyCubeGrid.MyBlockLocation();
+                MyObjectBuilder_CubeBlock builder = new MyObjectBuilder_CubeBlock();
+                long builderId = 0;
+                bool instant = false;
+                long ownerId = 0;
+
+                base.Serialize( site.MethodInfo, stream, ref colorMask, ref location, ref builder, ref builderId, ref instant, ref ownerId );
+            }
+
+            return false;
         }
     }
 }

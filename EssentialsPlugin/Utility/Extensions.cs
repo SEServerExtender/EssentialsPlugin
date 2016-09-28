@@ -14,11 +14,7 @@
             if (entity?.Physics == null || entity.Closed)
                 return;
 
-            Wrapper.GameAction(() =>
-            {
-                entity.Physics.LinearVelocity = Vector3D.Zero;
-                entity.Physics.AngularVelocity = Vector3D.Zero;
-            });
+            Wrapper.BeginGameAction(() => entity.Physics.SetSpeeds( Vector3.Zero, Vector3.Zero ), null, null);
         }
         public static void Stop(this MyEntity entity)
         {

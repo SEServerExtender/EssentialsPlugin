@@ -46,13 +46,13 @@
 		                continue;
 		            }
 
-		            Wrapper.GameAction( ( ) =>
+		            Wrapper.BeginGameAction( ( ) =>
 		                                {
 		                                    if ( controlledEntity.Physics.LinearVelocity.Length( ) > playerSpeed )
 		                                    {
 		                                        controlledEntity.Physics.SetSpeeds( Vector3.ClampToSphere( controlledEntity.Physics.LinearVelocity, playerSpeed ), controlledEntity.Physics.AngularVelocity);
 		                                    }
-		                                } );
+		                                }, null, null );
 		        }
 
 		        foreach ( long key in toRemove )

@@ -125,25 +125,32 @@ namespace EssentialsPlugin.Utility
         {
             Wrapper.GameAction( () =>
                                 {
-                                    double minDist = 0;
-                                    MyPlayer nearest = null;
-
-                                    foreach ( var player in MySession.Static.Players.GetOnlinePlayers() )
+                                    try
                                     {
-                                        var dist = Vector3D.DistanceSquared( player.GetPosition(), block.PositionComp.GetPosition() );
+                                        double minDist = 0;
+                                        MyPlayer nearest = null;
 
-                                        if ( nearest == null )
+                                        foreach (var player in MySession.Static.Players.GetOnlinePlayers( ))
                                         {
-                                            nearest = player;
-                                            minDist = dist;
-                                        }
-                                        else if ( dist < minDist )
-                                            nearest = player;
-                                    }
+                                            var dist = Vector3D.DistanceSquared( player.GetPosition( ), block.PositionComp.GetPosition( ) );
 
-                                    if ( nearest == null )
-                                        return;
-                                    MyAPIGateway.Utilities.InvokeOnGameThread(()=>block.ChangeBlockOwnerRequest( nearest.Identity.IdentityId, MyOwnershipShareModeEnum.Faction ));
+                                            if (nearest == null)
+                                            {
+                                                nearest = player;
+                                                minDist = dist;
+                                            }
+                                            else if (dist < minDist)
+                                                nearest = player;
+                                        }
+
+                                        if (nearest == null)
+                                            return;
+                                        MyAPIGateway.Utilities.InvokeOnGameThread( ( ) => block.ChangeBlockOwnerRequest( nearest.Identity.IdentityId, MyOwnershipShareModeEnum.Faction ) );
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Essentials.Log.Error( ex );
+                                    }
                                 } );
         }
 

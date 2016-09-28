@@ -11,6 +11,7 @@
     using SEModAPIInternal.API.Entity.Sector.SectorObject;
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid;
     using SEModAPIInternal.API.Entity.Sector.SectorObject.CubeGrid.CubeBlock;
+    using VRage.Game.Entity;
     using VRage.Game.ModAPI;
     using VRage.ModAPI;
     public class HandleAdminDeleteFloating : ChatHandlerBase
@@ -47,26 +48,19 @@
         public override bool HandleCommand( ulong userId, string[ ] words )
         {
             int count = 0;
-            HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
+            HashSet<MyEntity> entities = new HashSet<MyEntity>( );
 
-            Wrapper.GameAction( ( ) =>
-             {
-                 MyAPIGateway.Entities.GetEntities( entities );
-             } );
+            Wrapper.GameAction( ( ) => entities = MyEntities.GetEntities(  ) );
 
-            foreach ( IMyEntity entity in entities )
+            foreach ( MyEntity entity in entities )
             {
                 if ( entity == null )
                     continue;
 
-                if ( entity is IMyFloatingObject || entity is MyInventoryBagEntity || entity is IMyMeteor )
+                if ( entity is MyFloatingObject || entity is MyInventoryBagEntity || entity is MyMeteor )
                 {
                     count++;
-                    Wrapper.GameAction(()=>
-                    {
-                        entity.Close( );
-                    } );
-                    //MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( entity ) );
+                    Wrapper.BeginGameAction( entity.Close, null, null );
                 }
             }
             Communication.SendPrivateInformation( userId, count.ToString( ) + " floating objects deleted." );

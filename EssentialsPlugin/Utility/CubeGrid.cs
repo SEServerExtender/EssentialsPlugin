@@ -26,6 +26,7 @@
     using Sandbox.ModAPI.Ingame;
     using SEModAPI.API;
     using SEModAPIExtensions.API;
+    using SpaceEngineers.Game.Entities.Blocks;
     using SpaceEngineers.Game.ModAPI.Ingame;
     using VRage.Game;
     using VRage.Game.Entity;
@@ -121,7 +122,7 @@
 	        {
 	            foreach ( MyCubeGrid grid in group )
 	            {
-	                Wrapper.GameAction( ()=> grid.Close(  ) );
+	                Wrapper.BeginGameAction( grid.Close, null, null );
 	            }
 	        }
 	    }
@@ -777,7 +778,6 @@
             
 	        HashSet<GridGroup> groups = GridGroup.GetAllGroups( connectionType );
 	        HashSet<GridGroup> groupsFound = new HashSet<GridGroup>( );
-            List<Task> scanTasks = new List<Task>();
             
             /*
             * Invert scan logic here.
@@ -787,75 +787,72 @@
             * On large servers this can run into the tens of seconds,
             * so parallelize it.
             */
-	        foreach ( GridGroup group in groups )
-	        {
-	            if ( group?.Parent == null )
-	                continue;
+	        //foreach ( GridGroup group in groups )
+	        Parallel.ForEach( groups, group =>
+	                                  {
+	                                      if ( group?.Parent == null )
+	                                          return;
 
-	            scanTasks.Add( Task.Run( ( ) =>
-	                                     {
-	                                         if ( power == StateEnum.RequiresYes && !DoesGroupHavePowerSupply( group ) )
-	                                             return;
-	                                         if ( power == StateEnum.RequiresNo && DoesGroupHavePowerSupply( group ) )
-	                                             return;
+	                                      if ( power == StateEnum.RequiresYes && !DoesGroupHavePowerSupply( group ) )
+	                                          return;
+	                                      if ( power == StateEnum.RequiresNo && DoesGroupHavePowerSupply( group ) )
+	                                          return;
 
-	                                         if ( owner == StateEnum.RequiresYes && group.SmallOwners.Count == 0 || ( group.SmallOwners.Count == 1 && group.SmallOwners[0] == 0 ) )
-	                                             return;
-	                                         if ( owner == StateEnum.RequiresNo && group.SmallOwners.Count > 0 )
-	                                             return;
+	                                      if ( owner == StateEnum.RequiresYes && group.SmallOwners.Count == 0 || ( group.SmallOwners.Count == 1 && group.SmallOwners[0] == 0 ) )
+	                                          return;
+	                                      if ( owner == StateEnum.RequiresNo && group.SmallOwners.Count > 0 )
+	                                          return;
 
-	                                         if ( functional == StateEnum.RequiresYes && !IsGroupFunctional( group ) )
-	                                             return;
-	                                         if ( functional == StateEnum.RequiresNo && IsGroupFunctional( group ) )
-	                                             return;
+	                                      if ( functional == StateEnum.RequiresYes && !IsGroupFunctional( group ) )
+	                                          return;
+	                                      if ( functional == StateEnum.RequiresNo && IsGroupFunctional( group ) )
+	                                          return;
 
-	                                         if ( terminal == StateEnum.RequiresYes && !DoesGroupHaveTerminal( group ) )
-	                                             return;
-	                                         if ( terminal == StateEnum.RequiresNo && DoesGroupHaveTerminal( group ) )
-	                                             return;
+	                                      if ( terminal == StateEnum.RequiresYes && !DoesGroupHaveTerminal( group ) )
+	                                          return;
+	                                      if ( terminal == StateEnum.RequiresNo && DoesGroupHaveTerminal( group ) )
+	                                          return;
 
-	                                         if ( online == StateEnum.RequiresYes && !AreOwnersOnline( group ) )
-	                                             return;
-	                                         if ( online == StateEnum.RequiresNo && AreOwnersOnline( group ) )
-	                                             return;
+	                                      if ( online == StateEnum.RequiresYes && !AreOwnersOnline( group ) )
+	                                          return;
+	                                      if ( online == StateEnum.RequiresNo && AreOwnersOnline( group ) )
+	                                          return;
 
-	                                         if ( hasDisplayName && !DoesGroupHaveDisplayName( group, displayName, hasDisplayNameExact, displayNameGroup ) )
-	                                             return;
+	                                      if ( hasDisplayName && !DoesGroupHaveDisplayName( group, displayName, hasDisplayNameExact, displayNameGroup ) )
+	                                          return;
 
-	                                         if ( hasCustomName && !DoesGroupHaveCustomName( group, customName, hasCustomNameExact ) )
-	                                             return;
+	                                      if ( hasCustomName && !DoesGroupHaveCustomName( group, customName, hasCustomNameExact ) )
+	                                          return;
 
-	                                         if ( isBlockSize && !IsGroupGridSize( group, blockSize, testStatic ) )
-	                                             return;
+	                                      if ( isBlockSize && !IsGroupGridSize( group, blockSize, testStatic ) )
+	                                          return;
 
-	                                         if ( isOwnedBy && !( group.BigOwners.Count == 1 && group.BigOwners[0] == ownedByPlayerId ) )
-	                                             return;
+	                                      if ( isOwnedBy && !( group.BigOwners.Count == 1 && group.BigOwners[0] == ownedByPlayerId ) )
+	                                          return;
 
-	                                         if ( requireBlockCount && !( group.BlocksCount > blockCount ) )
-	                                             return;
+	                                      if ( requireBlockCount && !( group.BlocksCount > blockCount ) )
+	                                          return;
 
-	                                         if ( requireBlockCountLess && !( group.BlocksCount < blockCountLess ) )
-	                                             return;
+	                                      if ( requireBlockCountLess && !( group.BlocksCount < blockCountLess ) )
+	                                          return;
 
-	                                         if ( excludesBlockType && blockTypesExcluded.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value ) ) )
-	                                             return;
+	                                      if ( excludesBlockType && blockTypesExcluded.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value ) ) )
+	                                          return;
 
-	                                         if ( includesBlockType && !blockTypes.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value ) ) )
-	                                             return;
-                                             
-	                                         if ( includesBlockSubType && !blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ) )
-	                                             return;
+	                                      if ( includesBlockType && !blockTypes.Any( x => DoesGroupHaveBlockType( group, x.Key, x.Value ) ) )
+	                                          return;
 
-	                                         if ( excludesBlockSubType && blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ) )
-	                                             return;
+	                                      if ( includesBlockSubType && !blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ) )
+	                                          return;
 
-	                                         lock ( groupsFound )
-	                                         {
-	                                             groupsFound.Add( group );
-	                                         }
-	                                     } ) );
-	        }
-	        Task.WaitAll( scanTasks.ToArray(  ) );
+	                                      if ( excludesBlockSubType && blockSubTypes.Any( x => DoesGroupHaveBlockSubtype( group, x.Key, x.Value ) ) )
+	                                          return;
+
+	                                      lock ( groupsFound )
+	                                      {
+	                                          groupsFound.Add( group );
+	                                      }
+	                                  } );
             
 	        int gridCount = 0;
 	        int groupCount = groupsFound.Count;
@@ -947,13 +944,13 @@
 		    if ( !block.IsFunctional )
 		        return false;
 
-		    if (block is IMyBatteryBlock)
+		    if (block is MyBatteryBlock)
 		    {
-		        if (((IMyBatteryBlock)block).CurrentStoredPower > 0f)
+		        if (((MyBatteryBlock)block).CurrentStoredPower > 0f)
 		            return true;
 		    }
 
-		    if (block is IMyReactor)
+		    if (block is MyReactor)
 		    {
 		        //reactors in creative mode provide power without uranium
 		        bool found = false;
@@ -964,16 +961,16 @@
 
 		        Wrapper.GameAction( ( ) =>
 		                            {
-		                                if ( ((IMyReactor)block).GetInventory( 0 ).GetItems( ).Count > 0 )
+		                                if ( block.GetInventory( ).GetItems( ).Count > 0 )
 		                                    found = true;
 		                            } );
 		        if ( found )
 		            return true;
 		    }
 
-		    if ( block is IMySolarPanel )
+		    if ( block is MySolarPanel )
             {
-                return true;
+                return ((MyFunctionalBlock)block).Enabled;
             }
 
             return false;

@@ -1165,13 +1165,13 @@
                                 new HandleAdminVersion( ),
                                 new HandleAdminStop( ),
                                 new HandleAdminSpeed( ),
-                                new HandleAdminIdentityCleanup(  ),
-                                new HandleAdminFactionCleanup(  ),
-                                new HandleAdminSpawnCargo(  ),
+                                new HandleAdminIdentityCleanup( ),
+                                new HandleAdminFactionCleanup( ),
+                                new HandleAdminSpawnCargo( ),
 
 
                                 //Admin Scan
-				                new HandleAdminScanAreaAt( ),
+                                new HandleAdminScanAreaAt( ),
                                 new HandleAdminScanAreaTowards( ),
                                 new HandleAdminScanCleanup( ),
                                 new HandleAdminScanEntityId( ),
@@ -1179,7 +1179,8 @@
                                 new HandleAdminScanInactive( ),
                                 new HandleAdminScanNoBeacon( ),
                                 new HandleAdminScanOverlimit( ),
-                
+                                new HandleAdminScanInsidePlanet( ),
+
 
                                 //Admin Delete
                                 new HandleAdminDeleteCleanup( ),
@@ -1190,18 +1191,19 @@
                                 new HandleAdminDeleteShipsArea( ),
                                 new HandleAdminDeleteStationsArea( ),
                                 new HandleAdminDeleteFloating( ),
-               
+                                new HandleAdminDeleteInsidePlanet( ),
+
 
                                 //Admin Move
-				                new HandleAdminMoveAreaToPosition( ),
+                                new HandleAdminMoveAreaToPosition( ),
                                 new HandleAdminMoveAreaTowards( ),
                                 new HandleAdminMoveGridTo( ),
                                 new HandleAdminMovePlayerPosition( ),
                                 new HandleAdminMovePlayerTo( ),
-                
+
 
                                 //Admin Conceal
-				                new HandleAdminConceal( ),
+                                new HandleAdminConceal( ),
                                 new HandleAdminReveal( ),
 
 
@@ -1213,14 +1215,14 @@
                                 //Admin Settings
                                 new HandleAdminSettings( ),
 
-                                
+
                                 //Settings
                                 new HandleSettingsEnableBlockEnforcement( ),
                                 new HandleSettingsRemoveBlockEnforcement( ),
                                 new HandleSettingsGetBlockEnforcement( ),
                                 new HandleSettingsSetBlockEnforcement( ),
                                 new HandleSettingsSetMOTD( ),
-                                
+
                                 /*
                                 //Dock
                                 new HandleDockValidate( ),
@@ -1239,10 +1241,10 @@
                                 new HandleWaypointRefresh( ),
                                 new HandleWaypointFactionAdd( ),
                                 new HandleWaypointFactionRemove( ),
-                                                                
+
 
                                 //Utility
-				                new HandleUtilityExportServer( ),
+                                new HandleUtilityExportServer( ),
                                 new HandleUtilityGridsList( ),
                                 new HandleUtilityGridsCompare( ),
 
@@ -1257,10 +1259,10 @@
                                 new HandleRevoke( ),
 
                                 //Tickets
-                                new HandleTicketAdd(  ),
-                                new HandleTicketExtend(  ),
-                                new HandleTicketRemove(  ),
-                                new HandleTicketTimeleft(  )
+                                new HandleTicketAdd( ),
+                                new HandleTicketExtend( ),
+                                new HandleTicketRemove( ),
+                                new HandleTicketTimeleft( )
                             };
             
             //TODO: These should be in an init function somehere so we don't intercept network unless the user really needs it
@@ -1286,7 +1288,7 @@
             
             Protection.Instance.Init( );
             ProcessReservedSlots.Init( );
-            PlayerBlockEnforcement.Instance.Init();
+            PlayerBlockEnforcement.Init();
 
             MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReceiveMessageParts);
             MyAPIGateway.Multiplayer.RegisterMessageHandler( 9007, Communication.HandleAddConcealExempt );
