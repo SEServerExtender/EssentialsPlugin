@@ -224,8 +224,9 @@
 				Console.WriteLine("No factions");
 				return false;
 			}
-
-			MyObjectBuilder_Faction faction = m_factionCollection.Factions.FirstOrDefault(f => f.Members.FirstOrDefault(m => m.PlayerId == playerId).PlayerId != 0);
+            string а = m_factionCollection.Factions.ToString();
+            Essentials.Log.Info("kekekekCompleted checking logs in {0}", а);
+            MyObjectBuilder_Faction faction = m_factionCollection.Factions.FirstOrDefault(f => f.Members.FirstOrDefault(m => m.PlayerId == playerId).PlayerId != 0);
 			if (faction != null)
 			{
 				if (faction.Members.FirstOrDefault(m => m.PlayerId == compareId).PlayerId != 0)
@@ -243,8 +244,41 @@
 			long compareId = PlayerMap.Instance.GetPlayerIdsFromSteamId(steamCompareId).FirstOrDefault();
 			return CheckPlayerSameFaction(playerId, compareId);
 		}
+        public static Boolean CheckPlayerSameAlliance(long playerId, long compareId)
+        {
+            MyObjectBuilder_FactionCollection m_factionCollection = MySession.Static.Factions.GetObjectBuilder();
 
-		internal static Object InvokeEntityMethod(Object gameEntity, string methodName)
+            if (m_factionCollection == null)
+            {   Console.WriteLine("No faction collection");
+                return false; }
+
+            if (m_factionCollection.Factions == null)
+            {   Console.WriteLine("No factions");
+                return false; }
+           MyObjectBuilder_Faction faction = m_factionCollection.Factions.FirstOrDefault(f => f.Members.FirstOrDefault(m => m.PlayerId == playerId).PlayerId != 0);
+            if (faction != null)
+            {
+                 if (faction.Members.FirstOrDefault(m => m.PlayerId == compareId).PlayerId != 0)
+                { return true; }
+                return IsNeutral(compareId, faction.FactionId);
+            }
+
+            return false;
+        }
+        public static bool IsNeutral(long playerId, long FactionId)
+        {
+            IMyFaction myFaction = MySession.Static.Factions.TryGetPlayerFaction(playerId);//получаем фракцию персонажа
+            //узнаём как относиться одна(playerId) фракция к другой(FactionId)
+            return myFaction != null && MySession.Static.Factions.GetRelationBetweenFactions(FactionId, myFaction.FactionId) == MyRelationsBetweenFactions.Neutral;
+        }
+        public static Boolean CheckPlayerSameAlliance(ulong steamId, ulong steamCompareId)
+        {
+            long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(steamId).FirstOrDefault();
+            long compareId = PlayerMap.Instance.GetPlayerIdsFromSteamId(steamCompareId).FirstOrDefault();
+            return CheckPlayerSameAlliance(playerId, compareId);
+        }
+
+        internal static Object InvokeEntityMethod(Object gameEntity, string methodName)
 		{
 			return InvokeEntityMethod(gameEntity, methodName, new object[] { });
 		}

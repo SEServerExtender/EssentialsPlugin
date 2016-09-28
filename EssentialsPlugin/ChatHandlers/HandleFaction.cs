@@ -8,12 +8,12 @@
 	{
 		public override string GetHelp()
 		{
-			return "Sends a private message to all faction members that are online.  Usage: /faction <msg>";
+			return "Sends a private message to all Alliance members that are online.  Usage: /a <msg>";
 		}
 
 		public override string GetCommandText()
 		{
-			return "/faction";
+			return "/a";
 		}
 
         public override Communication.ServerDialogItem GetHelpDialog( )
@@ -49,7 +49,7 @@
 			}
 
 			string userName = PlayerMap.Instance.GetPlayerNameFromSteamId(userId);
-			Communication.SendFactionClientMessage(userId, string.Join(" ", words));
+			Communication.SendAllianceClientMessage(userId, string.Join(" ", words));
 			return true;
 		}
 	}
