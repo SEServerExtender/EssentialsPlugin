@@ -88,31 +88,34 @@
             chatItem.Message = (from == null ? infoText : ( $"{{whisper}} to {PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerId )}: {infoText}" ));
             ChatManager.Instance.AddChatHistory( chatItem );
         }
-        
-        public static void SendFactionClientMessage( ulong playerSteamId, string message )
+
+        public static void SendFactionClientMessage(ulong playerSteamId, string message)
         {
-            ServerMessageItem MessageItem = new ServerMessageItem( );
-            if ( PluginSettings.Instance.FactionChatPrefix )
-                MessageItem.From = "<faction> " + PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerSteamId );
+            ServerMessageItem MessageItem = new ServerMessageItem();
+            if (PluginSettings.Instance.FactionChatPrefix)
+                MessageItem.From = "<faction> " + PlayerMap.Instance.GetFastPlayerNameFromSteamId(playerSteamId);
             else
-                MessageItem.From = PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerSteamId );
+                MessageItem.From = PlayerMap.Instance.GetFastPlayerNameFromSteamId(playerSteamId);
 
             MessageItem.Message = message;
 
-            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
-            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
+            string messageString = MyAPIGateway.Utilities.SerializeToXML(MessageItem);
+            byte[] data = Encoding.UTF8.GetBytes(messageString);
 
-            foreach ( ulong steamId in PlayerManager.Instance.ConnectedPlayers )
+            foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
             {
-                if ( Player.CheckPlayerSameFaction( playerSteamId, steamId ) )
+                if (!(playerSteamId == steamId))//fix
                 {
-                    if ( ChatManager.EnableData )
+                    if (Player.CheckPlayerSameFaction(playerSteamId, steamId))
                     {
-                        SendDataMessage( steamId, DataMessageType.Message, data );
-                        ChatManager.Instance.AddChatHistory( new ChatManager.ChatEvent( DateTime.Now, playerSteamId, "{faction message}: " + message ) );
+                        if (ChatManager.EnableData)
+                        {
+                            SendDataMessage(steamId, DataMessageType.Message, data);
+                            ChatManager.Instance.AddChatHistory(new ChatManager.ChatEvent(DateTime.Now, playerSteamId, "{faction message}: " + message));
+                        }
+                        else
+                            ChatManager.Instance.SendPrivateChatMessage(steamId, message);
                     }
-                    else
-                        ChatManager.Instance.SendPrivateChatMessage( steamId, message );
                 }
             }
         }
