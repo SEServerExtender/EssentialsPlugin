@@ -128,3 +128,5 @@ $RECYCLE.BIN/
 ClientEntityManagement.cs
 ProcessClientConceal.cs
 packages/*/*
+*.sln
+*.csproj

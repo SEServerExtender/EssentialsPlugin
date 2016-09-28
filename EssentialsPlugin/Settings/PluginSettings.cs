@@ -98,6 +98,7 @@
         private MTObservableCollection<SettingsCleanupNotificationItem> _cleanupNotificationItems;
 
         private bool _blockEnforcementEnabled;
+        private bool _BlockEnforcementEnableParallel;
         private MTObservableCollection<SettingsBlockEnforcementItem> _blockEnforcementItems;
 
         private bool _playerBlockEnforcementEnabled;
@@ -761,8 +762,17 @@
 				Save();
 			}
 		}
-
-		public bool BlockEnforcementEnabled
+        
+        public bool BlockEnforcementEnableParallel
+        {
+            get { return _BlockEnforcementEnableParallel; }
+            set
+            {
+                _BlockEnforcementEnableParallel = value;
+                Save();
+            }
+        }
+        public bool BlockEnforcementEnabled
 		{
 			get { return _blockEnforcementEnabled; }
 			set 
@@ -789,7 +799,7 @@
             {
                 _playerBlockEnforcementEnabled = value;
                 if(value)
-                    PlayerBlockEnforcement.Instance.Init();
+                    PlayerBlockEnforcement.Init();
                 Save();
             }
         }
