@@ -892,6 +892,15 @@
             get { return PluginSettings.Instance.BlockEnforcementEnabled; }
             set { PluginSettings.Instance.BlockEnforcementEnabled = value; }
         }
+        [Category("Block Enforcement System")]
+        [Description("Enable / DisableBlockEnforcementEnableParallel")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        public bool BlockEnforcementEnableParallel
+        {
+            get { return PluginSettings.Instance.BlockEnforcementEnableParallel; }
+            set { PluginSettings.Instance.BlockEnforcementEnableParallel = value; }
+        }
 
         [Category( "Block Enforcement System" )]
         [Description( "Enforcement Items. These are how block enforcements are defined. Each item is a block that is scanned for." )]
@@ -1286,7 +1295,7 @@
             
             Protection.Instance.Init( );
             ProcessReservedSlots.Init( );
-            PlayerBlockEnforcement.Instance.Init();
+            PlayerBlockEnforcement.Init();
 
             MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReceiveMessageParts);
             MyAPIGateway.Multiplayer.RegisterMessageHandler( 9007, Communication.HandleAddConcealExempt );

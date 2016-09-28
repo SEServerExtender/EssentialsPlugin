@@ -88,7 +88,37 @@
             chatItem.Message = (from == null ? infoText : ( $"{{whisper}} to {PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerId )}: {infoText}" ));
             ChatManager.Instance.AddChatHistory( chatItem );
         }
+        public static void SendAllianceClientMessage(ulong playerSteamId, string message)
+        {
+           
+            ServerMessageItem MessageItem = new ServerMessageItem();
+            if (PluginSettings.Instance.FactionChatPrefix)
+                MessageItem.From = "<Alliance> " + PlayerMap.Instance.GetFastPlayerNameFromSteamId(playerSteamId);
+            else
+                MessageItem.From = PlayerMap.Instance.GetFastPlayerNameFromSteamId(playerSteamId);
 
+            MessageItem.Message = message;
+
+            string messageString = MyAPIGateway.Utilities.SerializeToXML(MessageItem);
+            byte[] data = Encoding.UTF8.GetBytes(messageString);
+
+            foreach (ulong steamId in PlayerManager.Instance.ConnectedPlayers)
+            {
+                if (!(playerSteamId == steamId))//fix
+                {
+                    if (Player.CheckPlayerSameAlliance(playerSteamId, steamId))
+                    {
+                        if (ChatManager.EnableData)
+                        {
+                            SendDataMessage(steamId, DataMessageType.Message, data);
+                            ChatManager.Instance.AddChatHistory(new ChatManager.ChatEvent(DateTime.Now, playerSteamId, "{Alliance message}: " + message));
+                        }
+                        else
+                            ChatManager.Instance.SendPrivateChatMessage(steamId, message);
+                    }
+                }
+            }
+        }
         public static void SendFactionClientMessage(ulong playerSteamId, string message)
         {
             ServerMessageItem MessageItem = new ServerMessageItem();
