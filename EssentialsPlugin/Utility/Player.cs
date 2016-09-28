@@ -255,8 +255,7 @@
             if (m_factionCollection.Factions == null)
             {   Console.WriteLine("No factions");
                 return false; }
-         //   Essentials.Log.Info("kekekekCompleted checking logs in {0}", а);
-            MyObjectBuilder_Faction faction = m_factionCollection.Factions.FirstOrDefault(f => f.Members.FirstOrDefault(m => m.PlayerId == playerId).PlayerId != 0);
+           MyObjectBuilder_Faction faction = m_factionCollection.Factions.FirstOrDefault(f => f.Members.FirstOrDefault(m => m.PlayerId == playerId).PlayerId != 0);
             if (faction != null)
             {
                  if (faction.Members.FirstOrDefault(m => m.PlayerId == compareId).PlayerId != 0)
