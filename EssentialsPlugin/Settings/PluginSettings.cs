@@ -9,6 +9,7 @@
 	using System.Linq;
 	using System.Reflection;
 	using System.Xml.Serialization;
+	using EntityManagers;
 	using EssentialsPlugin.GameModes;
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
@@ -627,44 +628,25 @@
 				Save();
 			}
 		}
-
-		public int DynamicTurretTargetDistance
-		{
-			get { return _dynamicTurretTargetDistance; }
-			set 
-			{ 
-				_dynamicTurretTargetDistance = value;
-				Save();
-			}
-		}
-
+        
 		public bool DynamicTurretManagmentEnabled
 		{
 			get { return _dynamicTurretManagementEnabled; }
 			set 
 			{
 				_dynamicTurretManagementEnabled = value;
+                if(!value)
+                    TurretManagement.Instance.EnableAllTurrets(  );
 				Save();
 			}
 		}
-
-		public bool DynamicTurretAllowExemption
-		{
-			get { return _dynamicTurretAllowExemption; }
-			set 
-			{ 
-				_dynamicTurretAllowExemption = value;
-				Save();
-			}
-		}
-
+        
 		public DynamicTurretManagementMode DynamicTurretManagementMode
 		{
 			get { return _mDynamicTurretManagementMode; }
 			set 
 			{ 
 				_mDynamicTurretManagementMode = value;
-				//_mDynamicTurretManagementMode = DynamicTurretManagementMode.All;
 				Save();
 			}
 		}
@@ -688,7 +670,6 @@
 				Save();
 			}
 		}
-
 
 		public int WaypointsMaxPerPlayer
 		{

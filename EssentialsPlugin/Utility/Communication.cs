@@ -102,6 +102,8 @@
             string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
             byte[ ] data = Encoding.UTF8.GetBytes( messageString );
 
+            ChatManager.Instance.AddChatHistory( new ChatManager.ChatEvent( DateTime.Now, playerSteamId, "{faction message}: " + message ) );
+
             foreach ( ulong steamId in PlayerManager.Instance.ConnectedPlayers )
             {
                 if ( Player.CheckPlayerSameFaction( playerSteamId, steamId ) )
@@ -109,7 +111,6 @@
                     if ( ChatManager.EnableData )
                     {
                         SendDataMessage( steamId, DataMessageType.Message, data );
-                        ChatManager.Instance.AddChatHistory( new ChatManager.ChatEvent( DateTime.Now, playerSteamId, "{faction message}: " + message ) );
                     }
                     else
                         ChatManager.Instance.SendPrivateChatMessage( steamId, message );

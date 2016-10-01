@@ -57,7 +57,7 @@
                 if ( entity == null )
                     continue;
 
-                if ( entity is MyFloatingObject || entity is MyInventoryBagEntity || entity is MyMeteor )
+                if ( entity is MyFloatingObject || entity is MyInventoryBagEntity || entity is IMyMeteor )
                 {
                     count++;
                     Wrapper.BeginGameAction( entity.Close, null, null );

@@ -707,35 +707,7 @@
                 PluginSettings.Instance.DynamicTurretManagmentEnabled = value;
             }
         }
-
-        [Category( "Dynamic Turret Management" )]
-        [DisplayName( "Activation Distance" )]
-        [Description( "Distance from a grid that has a turret that a valid target must be before enabling.  Should be 2x or more than the scan distance of a turret." )]
-        [Browsable( true )]
-        [ReadOnly( false )]
-        public int DynamicTurretTargetDistance
-        {
-            get { return PluginSettings.Instance.DynamicTurretTargetDistance; }
-            set
-            {
-                PluginSettings.Instance.DynamicTurretTargetDistance = value;
-            }
-        }
-
-        [Category( "Dynamic Turret Management" )]
-        [DisplayName( "Allow Exemption" )]
-        [Description( "Enable / Disable Allowing users to manually exempt their turrets from control with the [ManualControl] tag in custom name of turret." )]
-        [Browsable( true )]
-        [ReadOnly( false )]
-        public bool DynamicTurretAllowExemption
-        {
-            get { return PluginSettings.Instance.DynamicTurretAllowExemption; }
-            set
-            {
-                PluginSettings.Instance.DynamicTurretAllowExemption = value;
-            }
-        }
-
+        
         [Category( "Dynamic Turret Management" )]
         [Description( "Set the type of management the server does.  All means anything will turn the turrets back on.  All but owner means everything except owner of turret turns them on.  EnemyAndNeutral mean enemy and neutral players/grids turn the turrets back on." )]
         [Browsable( true )]
@@ -1144,11 +1116,12 @@
                                    new ProcessWaypoints( ),
                                    new ProcessCleanup( ),
                                    new ProcessBlockEnforcement( ),
-                                   new ProcessReservedSlots(),
-                                   new ProcessTimedCommands(  ),
-                                   new ProcessSpeed(  ),
-                                   new ProcessCargoShips(  ),
-                                   new ProcessTicket(  )
+                                   new ProcessReservedSlots( ),
+                                   new ProcessTimedCommands( ),
+                                   new ProcessSpeed( ),
+                                   new ProcessCargoShips( ),
+                                   new ProcessTicket( ),
+                                   new ProcessTurrets( )
                                };
 
             // Setup chat handlers
