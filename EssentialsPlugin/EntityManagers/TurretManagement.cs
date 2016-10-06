@@ -27,22 +27,23 @@
             }
         }
 
+        private List<MyEntity> _entityCache = new List<MyEntity>();
+
         public void ProcessTurrets( )
         {
-            List<MyEntity> entities = new List<MyEntity>( );
-            Wrapper.GameAction( ( ) => entities = MyEntities.GetEntities( ).ToList( ) );
+            Wrapper.GameAction( ( ) => _entityCache = MyEntities.GetEntities( ).ToList( ) );
 
-            foreach (MyEntity entity in entities)
-            {
-                MyCubeGrid grid = entity as MyCubeGrid;
-                if (grid == null)
-                    continue;
+            Parallel.ForEach( _entityCache, entity =>
+                                        {
+                                            MyCubeGrid grid = entity as MyCubeGrid;
+                                            if (grid == null)
+                                                return;
 
-                if (DoesGridHaveTarget( grid ))
-                    EnableTurrets( grid );
-                else
-                    DisableTurrets( grid );
-            }
+                                            if (DoesGridHaveTarget( grid ))
+                                                EnableTurrets( grid );
+                                            else
+                                                DisableTurrets( grid );
+                                        } );
         }
 
         public void EnableAllTurrets( )
@@ -76,12 +77,12 @@
                                         if (turret == null)
                                             continue;
 
-                                        if (!turret.Enabled)
-                                            continue;
-
-                                        turret.Enabled = false;
+                                        //if (!turret.Enabled)
+                                        //    continue;
+                                        //
+                                        //turret.Enabled = false;
                                         MyEntities.UnregisterForUpdate( turret );
-                                        count++;
+                                        //count++;
                                     }
                                 } );
             if (count > 0)
@@ -101,12 +102,12 @@
                                         if (turret == null)
                                             continue;
 
-                                        if (turret.Enabled)
-                                            continue;
-
-                                        turret.Enabled = true;
+                                        //if (turret.Enabled)
+                                        //    continue;
+                                        //
+                                        //turret.Enabled = true;
                                         MyEntities.RegisterForUpdate( turret );
-                                        count++;
+                                        //count++;
                                     }
                                 } );
             if (count > 0)
@@ -117,14 +118,11 @@
         {
             HashSet<MySlimBlock> blocks = grid.GetBlocks( );
             BoundingSphereD sphere = new BoundingSphereD( Vector3D.Zero, 0 );
-            bool hasTurrets = false;
             foreach (MySlimBlock block in blocks)
             {
                 MyLargeTurretBase turret = block.FatBlock as MyLargeTurretBase;
                 if (turret == null)
                     continue;
-
-                hasTurrets = true;
 
                 BoundingSphereD gunSphere = new BoundingSphereD( turret.PositionComp.GetPosition( ), turret.ShootingRange * 2 );
                 if (sphere.Radius == 0)
@@ -133,20 +131,15 @@
                     sphere.Include( gunSphere );
             }
 
-            if (!hasTurrets)
+            if (sphere.Radius == 0)
                 return false;
 
-            MyEntity[] targets;
-            try
+            var targets = new HashSet<MyEntity>();
+
+            foreach (var ent in _entityCache)
             {
-                var list = new List<MyEntity>( );
-                Wrapper.GameAction( ( ) => list = MyEntities.GetTopMostEntitiesInSphere( ref sphere ) );
-                targets = list.ToArray( );
-            }
-            catch (Exception ex)
-            {
-                Essentials.Log.Error( ex );
-                return true;
+                if (sphere.Contains( ent.PositionComp.WorldVolume ) != ContainmentType.Disjoint)
+                    targets.Add( ent );
             }
 
             foreach (MyEntity target in targets)
@@ -200,10 +193,7 @@
                             break;
                         }
                         if (!grid.SmallOwners.Contains( controllingIdentity ))
-                        {
-                            Essentials.Log.Debug( "!" );
                             return true;
-                        }
                         break;
                     default:
                         throw new ArgumentOutOfRangeException( );

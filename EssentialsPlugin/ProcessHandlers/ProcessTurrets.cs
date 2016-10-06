@@ -7,7 +7,7 @@
 	{
 		public override int GetUpdateResolution( )
 		{
-			return 1000;
+			return 5000;
 		}
 
 		public override void Handle( )
