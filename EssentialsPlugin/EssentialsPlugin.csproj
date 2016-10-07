@@ -66,13 +66,11 @@
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteCleanup.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteGrids.cs" />
     <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteFloating.cs" />
-    <Compile Include="ChatHandlers\AdminDelete\HandleAdminDeleteInsidePlanet.cs" />
     <Compile Include="ChatHandlers\AdminMove\HandleAdminMoveGridTo.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayerCleanup.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayer.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayerListInactive.cs" />
     <Compile Include="ChatHandlers\AdminPlayer\HandleAdminPlayerListActive.cs" />
-    <Compile Include="ChatHandlers\AdminScan\HandleAdminScanInsidePlanet.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanGrids.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanEntityId.cs" />
     <Compile Include="ChatHandlers\AdminScan\HandleAdminScanOverlimit.cs" />
@@ -226,6 +224,7 @@
     <Compile Include="Utility\Backup.cs" />
     <Compile Include="Utility\BlacklistManager.cs" />
     <Compile Include="Utility\CargoShips.cs" />
+    <Compile Include="Utility\ChatHistory.cs" />
     <Compile Include="Utility\Docking.cs" />
     <Compile Include="Utility\DockingItem.cs" />
     <Compile Include="Utility\Extensions.cs" />

@@ -151,7 +151,7 @@
 
         public void Close( )
         {
-            Wrapper.BeginGameAction( ( ) =>
+            Wrapper.GameAction( ( ) =>
                                 {
                                     foreach (MyCubeGrid grid in _grids)
                                     {
@@ -160,18 +160,15 @@
 
                                         grid.Close( );
                                     }
-                                }, null, null );
+                                } );
         }
 
         public void Stop( )
         {
-            Wrapper.BeginGameAction( ( ) =>
-                                     {
-                                         foreach ( MyCubeGrid grid in _grids )
-                                         {
-                                             grid.Physics.SetSpeeds( Vector3.Zero, Vector3.Zero );
-                                         }
-                                     }, null, null );
+            foreach ( MyCubeGrid grid in _grids )
+            {
+                Wrapper.GameAction( ( ) => grid.Stop(  ) );
+            }
         }
 
         public void UpdateGroup()

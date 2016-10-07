@@ -125,43 +125,25 @@ namespace EssentialsPlugin.Utility
         {
             Wrapper.GameAction( () =>
                                 {
-                                    try
-                                    {
-                                        double minDist = 0;
-                                        MyPlayer nearest = null;
+                                    double minDist = 0;
+                                    MyPlayer nearest = null;
 
-                                        foreach (var player in MySession.Static.Players.GetOnlinePlayers( ))
+                                    foreach ( var player in MySession.Static.Players.GetOnlinePlayers() )
+                                    {
+                                        var dist = Vector3D.DistanceSquared( player.GetPosition(), block.PositionComp.GetPosition() );
+
+                                        if ( nearest == null )
                                         {
-                                            var dist = Vector3D.DistanceSquared( player.GetPosition( ), block.PositionComp.GetPosition( ) );
-
-                                            if (nearest == null)
-                                            {
-                                                nearest = player;
-                                                minDist = dist;
-                                            }
-                                            else if (dist < minDist)
-                                                nearest = player;
+                                            nearest = player;
+                                            minDist = dist;
                                         }
+                                        else if ( dist < minDist )
+                                            nearest = player;
+                                    }
 
-                                        if (nearest == null)
-                                            return;
-                                        //MyAPIGateway.Utilities.InvokeOnGameThread( ( ) => block.ChangeBlockOwnerRequest( nearest.Identity.IdentityId, MyOwnershipShareModeEnum.Faction ) );
-                                        Wrapper.BeginGameAction(() =>
-                                                                {
-                                                                    try
-                                                                    {
-                                                                        block.ChangeBlockOwnerRequest(nearest.Identity.IdentityId, MyOwnershipShareModeEnum.Faction);
-                                                                    }
-                                                                    catch (Exception ex)
-                                                                    {
-                                                                        Essentials.Log.Error(ex);
-                                                                    }
-                                                                }, null, null);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Essentials.Log.Error( ex );
-                                    }
+                                    if ( nearest == null )
+                                        return;
+                                    MyAPIGateway.Utilities.InvokeOnGameThread(()=>block.ChangeBlockOwnerRequest( nearest.Identity.IdentityId, MyOwnershipShareModeEnum.Faction ));
                                 } );
         }
 
@@ -276,15 +258,7 @@ namespace EssentialsPlugin.Utility
                               
                               foreach ( var block in razeBlocks )
                               {
-                                  Wrapper.BeginGameAction( ( ) =>
-                                                           {
-                                                               if (block.HasInventory)
-                                                               {
-                                                                   for (int i = 0; i < block.InventoryCount; i++)
-                                                                       block.GetInventory( i )?.Clear( );
-                                                               }
-                                                               block.CubeGrid.RazeBlock( block.Position );
-                                                           }, null, null );
+                                  Wrapper.GameAction( () => block.CubeGrid.RazeBlock( block.Position ) );
                                   lock ( BlockOwners )
                                       BlockOwners.Remove( (MyTerminalBlock)block );
                               }
@@ -439,64 +413,42 @@ namespace EssentialsPlugin.Utility
         private static void FatBlock_OwnershipChanged(MyTerminalBlock block)
         {
             if ( block?.CubeGrid?.Physics == null || block.Closed )
+            {
+                //idfk
+                Thread.Sleep( 500 );
+                if ( block?.CubeGrid?.Physics == null || block.Closed )
                     return;
+            }
 
             Task.Run( () =>
                       {
-                          try
+                          if ( block.OwnerId != 0 )
                           {
-                              if (block.OwnerId != 0)
+                              var owner = MySession.Static.Players.GetPlayerById( new MyPlayer.PlayerId( PlayerMap.Instance.GetSteamIdFromPlayerId( block.OwnerId ) ) );
+                              if ( owner != null && MySession.Static.Players.IdentityIsNpc( block.OwnerId ) )
                               {
-                                  var owner = MySession.Static.Players.GetPlayerById( new MyPlayer.PlayerId( PlayerMap.Instance.GetSteamIdFromPlayerId( block.OwnerId ) ) );
-                                  if (owner != null && MySession.Static.Players.IdentityIsNpc( block.OwnerId ))
+                                  if ( owner.DisplayName != "Space Pirates" )
                                   {
-                                      if (owner.DisplayName != "Space Pirates")
-                                      {
-                                          lock (BlockOwners)
-                                              BlockOwners[block] = block.OwnerId;
-                                          return;
-                                      }
-                                  }
-                              }
-
-                              lock (BlockOwners)
-                              {
-                                  if (BlockOwners.ContainsKey( block ))
-                                      Wrapper.BeginGameAction( ( ) =>
-                                                               {
-                                                                   try
-                                                                   {
-                                                                       block.ChangeBlockOwnerRequest( BlockOwners[block], MyOwnershipShareModeEnum.Faction );
-                                                                   }
-                                                                   catch (Exception ex)
-                                                                   {
-                                                                       Essentials.Log.Error( ex );
-                                                                   }
-                                                               }, null, null );
-                                  else if (PluginSettings.Instance.PlayerBlockEnforcementChangeOwner)
-                                  {
-                                      ChangeOwnershipToNearestPlayer( block );
-                                      if (block.OwnerId == 0 && block.CubeGrid.BigOwners.Count > 0)
-                                          Wrapper.GameAction( ( ) =>
-                                                                   {
-                                                                       try
-                                                                       {
-                                                                           block.ChangeBlockOwnerRequest( block.CubeGrid.BigOwners[0], MyOwnershipShareModeEnum.Faction );
-                                                                       }
-                                                                       catch (Exception ex)
-                                                                       {
-                                                                           Essentials.Log.Error( ex );
-                                                                       }
-                                                                   } );
-
-                                      if (block.OwnerId != 0)
+                                      lock ( BlockOwners )
                                           BlockOwners[block] = block.OwnerId;
+                                      return;
                                   }
                               }
                           }
-                          catch (Exception ex)
+
+                          lock ( BlockOwners )
                           {
-                              Essentials.Log.Error( ex );
+                              if ( BlockOwners.ContainsKey( block ) )
+                                  MyAPIGateway.Utilities.InvokeOnGameThread( () => block.ChangeBlockOwnerRequest( BlockOwners[block], MyOwnershipShareModeEnum.Faction ) );
+                              else if ( PluginSettings.Instance.PlayerBlockEnforcementChangeOwner )
+                              {
+                                  ChangeOwnershipToNearestPlayer( block );
+                                  if ( block.OwnerId == 0 && block.CubeGrid.BigOwners.Count > 0 )
+                                      MyAPIGateway.Utilities.InvokeOnGameThread(()=>block.ChangeBlockOwnerRequest( block.CubeGrid.BigOwners[0], MyOwnershipShareModeEnum.Faction ));
+
+                                  if ( block.OwnerId != 0 )
+                                      BlockOwners[block] = block.OwnerId;
+                              }
                           }
                       } );
 

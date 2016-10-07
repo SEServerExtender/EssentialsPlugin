@@ -540,7 +540,6 @@
             get { return "Press the button to edit settings ---->"; }
         }
 
-        /*
         [Category( "Docking Zones" )]
         [Description( "Enable / Disable docking zones.  This allows players to safely dock in zones created by 4 beacons with the same name.  This removes the entity from the world when docked, and adds it back when undocked." )]
         [Browsable( true )]
@@ -560,7 +559,7 @@
             get { return PluginSettings.Instance.DockingShipsPerZone; }
             set { PluginSettings.Instance.DockingShipsPerZone = value; }
         }
-        */
+
         [Category( "Dynamic Entity Management" )]
         [DisplayName( "Enabled" )]
         [Description( "Enable / Disable dynamic entity concealment.  This option will automatically 'hide' ships that players are not close to, meaning they won't be processed by the physics engine.  This should improve performance." )]
@@ -707,7 +706,35 @@
                 PluginSettings.Instance.DynamicTurretManagmentEnabled = value;
             }
         }
-        
+
+        [Category( "Dynamic Turret Management" )]
+        [DisplayName( "Activation Distance" )]
+        [Description( "Distance from a grid that has a turret that a valid target must be before enabling.  Should be 2x or more than the scan distance of a turret." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public int DynamicTurretTargetDistance
+        {
+            get { return PluginSettings.Instance.DynamicTurretTargetDistance; }
+            set
+            {
+                PluginSettings.Instance.DynamicTurretTargetDistance = value;
+            }
+        }
+
+        [Category( "Dynamic Turret Management" )]
+        [DisplayName( "Allow Exemption" )]
+        [Description( "Enable / Disable Allowing users to manually exempt their turrets from control with the [ManualControl] tag in custom name of turret." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool DynamicTurretAllowExemption
+        {
+            get { return PluginSettings.Instance.DynamicTurretAllowExemption; }
+            set
+            {
+                PluginSettings.Instance.DynamicTurretAllowExemption = value;
+            }
+        }
+
         [Category( "Dynamic Turret Management" )]
         [Description( "Set the type of management the server does.  All means anything will turn the turrets back on.  All but owner means everything except owner of turret turns them on.  EnemyAndNeutral mean enemy and neutral players/grids turn the turrets back on." )]
         [Browsable( true )]
@@ -1111,17 +1138,16 @@
                                    new ProcessInfo( ),
                                    new ProcessBackup( ),
                                    new ProcessLoginTracking( ),
-                                   //new ProcessDockingZone( ),
+                                   new ProcessDockingZone( ),
                                    new ProcessConceal( ),
                                    new ProcessWaypoints( ),
                                    new ProcessCleanup( ),
                                    new ProcessBlockEnforcement( ),
-                                   new ProcessReservedSlots( ),
-                                   new ProcessTimedCommands( ),
-                                   new ProcessSpeed( ),
-                                   new ProcessCargoShips( ),
-                                   new ProcessTicket( ),
-                                   new ProcessTurrets( )
+                                   new ProcessReservedSlots(),
+                                   new ProcessTimedCommands(  ),
+                                   new ProcessSpeed(  ),
+                                   new ProcessCargoShips(  ),
+                                   new ProcessTicket(  )
                                };
 
             // Setup chat handlers
@@ -1138,13 +1164,13 @@
                                 new HandleAdminVersion( ),
                                 new HandleAdminStop( ),
                                 new HandleAdminSpeed( ),
-                                new HandleAdminIdentityCleanup( ),
-                                new HandleAdminFactionCleanup( ),
-                                new HandleAdminSpawnCargo( ),
+                                new HandleAdminIdentityCleanup(  ),
+                                new HandleAdminFactionCleanup(  ),
+                                new HandleAdminSpawnCargo(  ),
 
 
                                 //Admin Scan
-                                new HandleAdminScanAreaAt( ),
+				                new HandleAdminScanAreaAt( ),
                                 new HandleAdminScanAreaTowards( ),
                                 new HandleAdminScanCleanup( ),
                                 new HandleAdminScanEntityId( ),
@@ -1152,8 +1178,7 @@
                                 new HandleAdminScanInactive( ),
                                 new HandleAdminScanNoBeacon( ),
                                 new HandleAdminScanOverlimit( ),
-                                new HandleAdminScanInsidePlanet( ),
-
+                
 
                                 //Admin Delete
                                 new HandleAdminDeleteCleanup( ),
@@ -1164,19 +1189,18 @@
                                 new HandleAdminDeleteShipsArea( ),
                                 new HandleAdminDeleteStationsArea( ),
                                 new HandleAdminDeleteFloating( ),
-                                new HandleAdminDeleteInsidePlanet( ),
-
+               
 
                                 //Admin Move
-                                new HandleAdminMoveAreaToPosition( ),
+				                new HandleAdminMoveAreaToPosition( ),
                                 new HandleAdminMoveAreaTowards( ),
                                 new HandleAdminMoveGridTo( ),
                                 new HandleAdminMovePlayerPosition( ),
                                 new HandleAdminMovePlayerTo( ),
-
+                
 
                                 //Admin Conceal
-                                new HandleAdminConceal( ),
+				                new HandleAdminConceal( ),
                                 new HandleAdminReveal( ),
 
 
@@ -1188,21 +1212,21 @@
                                 //Admin Settings
                                 new HandleAdminSettings( ),
 
-
+                                
                                 //Settings
                                 new HandleSettingsEnableBlockEnforcement( ),
                                 new HandleSettingsRemoveBlockEnforcement( ),
                                 new HandleSettingsGetBlockEnforcement( ),
                                 new HandleSettingsSetBlockEnforcement( ),
                                 new HandleSettingsSetMOTD( ),
+                                
 
-                                /*
                                 //Dock
                                 new HandleDockValidate( ),
                                 new HandleDockDock( ),
                                 new HandleDockUndock( ),
                                 new HandleDockList( ),
-                                */
+
 
                                 //Waypoints
                                 new HandleWaypointAdd( ),
@@ -1214,10 +1238,10 @@
                                 new HandleWaypointRefresh( ),
                                 new HandleWaypointFactionAdd( ),
                                 new HandleWaypointFactionRemove( ),
-
+                                                                
 
                                 //Utility
-                                new HandleUtilityExportServer( ),
+				                new HandleUtilityExportServer( ),
                                 new HandleUtilityGridsList( ),
                                 new HandleUtilityGridsCompare( ),
 
@@ -1232,10 +1256,10 @@
                                 new HandleRevoke( ),
 
                                 //Tickets
-                                new HandleTicketAdd( ),
-                                new HandleTicketExtend( ),
-                                new HandleTicketRemove( ),
-                                new HandleTicketTimeleft( )
+                                new HandleTicketAdd(  ),
+                                new HandleTicketExtend(  ),
+                                new HandleTicketRemove(  ),
+                                new HandleTicketTimeleft(  )
                             };
             
             //TODO: These should be in an init function somehere so we don't intercept network unless the user really needs it
@@ -1435,6 +1459,7 @@
 
             if ( obj.Message[0] != '/' )
             {
+                //ChatHistory.AddChat( obj );
                 return;
             }
 

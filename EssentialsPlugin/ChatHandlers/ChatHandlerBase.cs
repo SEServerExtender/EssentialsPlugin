@@ -13,10 +13,9 @@
 		protected static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
 		public ChatHandlerBase( )
 		{
-#if DEBUG
-            Log.Debug( $"Added chat handler: {GetCommandText()}" );
-#endif
-        }
+		    if ( ExtenderOptions.IsDebugging )
+		        Log.Debug( $"Added chat handler: {GetCommandText()}" );
+		}
 
 		public virtual Boolean CanHandle(ulong steamId, String[] words, ref int commandCount)
 		{

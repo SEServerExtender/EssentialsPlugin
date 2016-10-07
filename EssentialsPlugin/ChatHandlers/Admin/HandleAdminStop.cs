@@ -13,7 +13,6 @@
     using VRageMath;
     using Sandbox.Game.Entities;
     using Sandbox.Game.Entities.Cube;
-    using VRage.Game.Entity;
     using VRage.Game.ModAPI;
 
     public class HandleAdminStop : ChatHandlerBase
@@ -78,23 +77,25 @@
             //    arg_ships = true;
             //    arg_piloted = true;
             //}
-            HashSet<MyEntity> entities = new HashSet<MyEntity>( );
+            HashSet<IMyEntity> entities = new HashSet<IMyEntity>( );
             Wrapper.GameAction( ( ) =>
-                                {
-                                    entities = MyEntities.GetEntities( );
-                                } );
+             {
+                 MyAPIGateway.Entities.GetEntities( entities );
+             } );
 
-            foreach ( MyEntity entity in entities )
+            foreach ( IMyEntity entity in entities )
             {
                 bool found = false;
+                if ( entity == null )
+                    continue;
 
-                if ( entity?.Physics == null )
+                if ( entity.Physics == null )
                     continue;
 
                 //if ( !(entity is IMyCubeGrid) || !(entity is IMyFloatingObject) || !(entity is MyInventoryBagEntity) )
                 //    continue;
 
-                if ( arg_ships && entity is MyCubeGrid )
+                if ( arg_ships && entity is IMyCubeGrid )
                 {
                     //TODO: find a way to stop piloted ships
                     //even if we try to stop the grid entity, it won't work if there's a pilot
@@ -118,10 +119,10 @@
                     */
                     Stop( entity.GetTopMostParent( ) );
                 }
-                else if ( arg_floating && (entity is MyFloatingObject || entity is MyInventoryBagEntity) )
+                else if ( arg_floating && (entity is IMyFloatingObject || entity is MyInventoryBagEntity) )
                     Stop( entity );
             }
-            Communication.SendPrivateInformation( userId, count + " entities have been stopped." );
+            Communication.SendPrivateInformation( userId, count.ToString( ) + " entities have been stopped." );
             count = 0;
             return true;
         }
@@ -132,10 +133,11 @@
             if ( entity.Physics.LinearVelocity == Vector3D.Zero && entity.Physics.AngularVelocity == Vector3D.Zero )
                 return;
 
-            Wrapper.BeginGameAction( ( ) =>
+            Wrapper.GameAction( ( ) =>
             {
-                entity.Physics.SetSpeeds( Vector3.Zero, Vector3.Zero );
-            }, null, null );
+                entity.Physics.LinearVelocity = Vector3D.Zero;
+                entity.Physics.AngularVelocity = Vector3D.Zero;
+            } );
             ++count;
         }
 
