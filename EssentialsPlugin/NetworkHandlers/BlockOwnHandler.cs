@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EssentialsPlugin.NetworkHandlers
+﻿namespace EssentialsPlugin.NetworkHandlers
 {
+    using System;
+    using System.Collections.Generic;
     using System.Reflection;
+    using System.Threading.Tasks;
     using System.Timers;
     using ProcessHandlers;
     using Sandbox.Engine.Multiplayer;
@@ -25,9 +22,11 @@ namespace EssentialsPlugin.NetworkHandlers
 
     public class BlockOwnHandler : NetworkHandlerBase
     {
-        private static Dictionary<string, bool> _unitTestResults = new Dictionary<string, bool>();
         private const string ChangeOwnerName = "OnChangeOwnerRequest";
         private const string ChangeOwnersName = "OnChangeOwnersRequest";
+        private static readonly Dictionary<string, bool> _unitTestResults = new Dictionary<string, bool>( );
+
+        private readonly Timer _kickTimer = new Timer( 30000 );
 
         public override bool CanHandle( CallSite site )
         {
@@ -36,7 +35,7 @@ namespace EssentialsPlugin.NetworkHandlers
                 if ( !_unitTestResults.ContainsKey( ChangeOwnerName ) )
                 {
                     //void OnChangeOwnerRequest(long blockId, long owner, MyOwnershipShareModeEnum shareMode)
-                    var parameters = site.MethodInfo.GetParameters();
+                    ParameterInfo[] parameters = site.MethodInfo.GetParameters( );
                     if ( parameters.Length != 3 )
                     {
                         _unitTestResults[ChangeOwnerName] = false;
@@ -47,7 +46,6 @@ namespace EssentialsPlugin.NetworkHandlers
                          || parameters[1].ParameterType != typeof(long)
                          || parameters[2].ParameterType != typeof(MyOwnershipShareModeEnum) )
                     {
-
                         _unitTestResults[ChangeOwnerName] = false;
                         return false;
                     }
@@ -56,12 +54,12 @@ namespace EssentialsPlugin.NetworkHandlers
 
                 return _unitTestResults[ChangeOwnerName];
             }
-            else if ( site.MethodInfo.Name == ChangeOwnersName )
+            if ( site.MethodInfo.Name == ChangeOwnersName )
             {
                 if ( !_unitTestResults.ContainsKey( ChangeOwnersName ) )
                 {
                     //private static void OnChangeOwnersRequest(MyOwnershipShareModeEnum shareMode, List<MySingleOwnershipRequest> requests, long requestingPlayer)   
-                    var parameters = site.MethodInfo.GetParameters();
+                    ParameterInfo[] parameters = site.MethodInfo.GetParameters( );
                     if ( parameters.Length != 3 )
                     {
                         _unitTestResults[ChangeOwnersName] = false;
@@ -82,15 +80,14 @@ namespace EssentialsPlugin.NetworkHandlers
             return false;
         }
 
-        Timer _kickTimer = new Timer(30000);
         public override bool Handle( ulong remoteUserId, CallSite site, BitStream stream, object obj )
         {
-            if (!PluginSettings.Instance.ProtectedEnabled)
+            if ( !PluginSettings.Instance.ProtectedEnabled )
                 return false;
-            HashSet<MyCubeGrid> processGrids = new HashSet<MyCubeGrid>();
+            HashSet<MyCubeGrid> processGrids = new HashSet<MyCubeGrid>( );
             if ( site.MethodInfo.Name == ChangeOwnerName )
             {
-                var grid = obj as MyCubeGrid;
+                MyCubeGrid grid = obj as MyCubeGrid;
                 if ( grid == null )
                 {
                     Essentials.Log.Debug( "Null grid in BlockOwnHandler" );
@@ -101,16 +98,16 @@ namespace EssentialsPlugin.NetworkHandlers
             else if ( site.MethodInfo.Name == ChangeOwnersName )
             {
                 MyOwnershipShareModeEnum shareMode = MyOwnershipShareModeEnum.None;
-                List<MyCubeGrid.MySingleOwnershipRequest> requests = new List<MyCubeGrid.MySingleOwnershipRequest>();
+                List<MyCubeGrid.MySingleOwnershipRequest> requests = new List<MyCubeGrid.MySingleOwnershipRequest>( );
                 long requestingPlayer = 0;
 
-                base.Serialize( site.MethodInfo,stream,ref shareMode, ref requests, ref requestingPlayer );
+                Serialize( site.MethodInfo, stream, ref shareMode, ref requests, ref requestingPlayer );
 
-                foreach ( var request in requests )
+                foreach ( MyCubeGrid.MySingleOwnershipRequest request in requests )
                 {
                     MyEntity entity;
                     MyEntities.TryGetEntityById( request.BlockId, out entity );
-                    var block = entity as MyCubeBlock;
+                    MyCubeBlock block = entity as MyCubeBlock;
                     if ( block?.CubeGrid == null )
                         continue;
 
@@ -121,7 +118,7 @@ namespace EssentialsPlugin.NetworkHandlers
             bool found = false;
             Parallel.ForEach( processGrids, grid =>
                                             {
-                                                foreach ( var item in PluginSettings.Instance.ProtectedItems )
+                                                foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
                                                 {
                                                     if ( !item.Enabled )
                                                         continue;
@@ -132,7 +129,7 @@ namespace EssentialsPlugin.NetworkHandlers
                                                     if ( !item.ProtectionSettingsDict.Dictionary.ContainsKey( ProtectedItem.ProtectionModeEnum.BlockOwn ) )
                                                         continue;
 
-                                                    var settings = item.ProtectionSettingsDict[ProtectedItem.ProtectionModeEnum.BlockOwn];
+                                                    ProtectedItem.ProtectionSettings settings = item.ProtectionSettingsDict[ProtectedItem.ProtectionModeEnum.BlockOwn];
 
                                                     if ( Protection.Instance.CheckPlayerExempt( settings, grid, remoteUserId ) )
                                                         continue;
@@ -151,8 +148,8 @@ namespace EssentialsPlugin.NetworkHandlers
 
                                                     if ( settings.BroadcastGPS )
                                                     {
-                                                        var player = MySession.Static.Players.GetPlayerById( new MyPlayer.PlayerId( remoteUserId, 0 ) );
-                                                        var pos = player.GetPosition();
+                                                        MyPlayer player = MySession.Static.Players.GetPlayerById( new MyPlayer.PlayerId( remoteUserId, 0 ) );
+                                                        Vector3D pos = player.GetPosition( );
                                                         MyAPIGateway.Utilities.SendMessage( $"GPS:{player.DisplayName}:{pos.X}:{pos.Y}:{pos.Z}:" );
                                                     }
 
@@ -167,7 +164,7 @@ namespace EssentialsPlugin.NetworkHandlers
                                                                                       MyMultiplayer.Static.KickClient( remoteUserId );
                                                                                   };
                                                             _kickTimer.AutoReset = false;
-                                                            _kickTimer.Start();
+                                                            _kickTimer.Start( );
                                                             break;
                                                         case ProtectedItem.PunishmentEnum.Ban:
                                                             _kickTimer.Elapsed += ( sender, e ) =>
@@ -176,18 +173,18 @@ namespace EssentialsPlugin.NetworkHandlers
                                                                                       MyMultiplayer.Static.BanClient( remoteUserId, true );
                                                                                   };
                                                             _kickTimer.AutoReset = false;
-                                                            _kickTimer.Start();
+                                                            _kickTimer.Start( );
                                                             break;
                                                         case ProtectedItem.PunishmentEnum.Speed:
-                                                            Task.Run(() =>
-                                                                     {
-                                                                         lock (ProcessSpeed.SpeedPlayers)
-                                                                         {
-                                                                             long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId(remoteUserId);
-                                                                             ProcessSpeed.SpeedPlayers[playerId] = new Tuple<float, DateTime>((float)settings.SpeedLimit, DateTime.Now + TimeSpan.FromMinutes(settings.SpeedTime));
-                                                                         }
-                                                                     });
-                                                            Essentials.Log.Info($"Limited user {PlayerMap.Instance.GetFastPlayerNameFromSteamId(remoteUserId)} to {settings.SpeedLimit}m/s for {settings.SpeedTime} minutes");
+                                                            Task.Run( ( ) =>
+                                                                      {
+                                                                          lock ( ProcessSpeed.SpeedPlayers )
+                                                                          {
+                                                                              long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( remoteUserId );
+                                                                              ProcessSpeed.SpeedPlayers[playerId] = new Tuple<float, DateTime>( (float)settings.SpeedLimit, DateTime.Now + TimeSpan.FromMinutes( settings.SpeedTime ) );
+                                                                          }
+                                                                      } );
+                                                            Essentials.Log.Info( $"Limited user {PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId )} to {settings.SpeedLimit}m/s for {settings.SpeedTime} minutes" );
                                                             break;
                                                     }
                                                     found = true;
