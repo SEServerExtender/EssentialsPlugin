@@ -283,6 +283,11 @@
                           }
                       } );
         }
+
+        public static void SendVoxelReset( long entityId )
+        {
+            BroadcastDataMessage( DataMessageType.VoxelReset, BitConverter.GetBytes( entityId ) );
+        }
         
         public static void SendDataMessage( ulong steamId, DataMessageType messageType, byte[ ] data )
         {
@@ -592,7 +597,8 @@
             MaxSpeed,
             ServerInfo,
             Waypoint,
-            GMenu
+            GMenu,
+            VoxelReset,
         }
     }
 }

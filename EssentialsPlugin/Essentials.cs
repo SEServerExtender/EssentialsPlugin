@@ -1255,6 +1255,9 @@
                                 new HandleMotd( ),
                                 new HandleRevoke( ),
 
+                                new HandleAdminResetAsteroid(  ),
+                                new HandleAdminResetPlanet(  ),
+
                                 //Tickets
                                 new HandleTicketAdd(  ),
                                 new HandleTicketExtend(  ),
