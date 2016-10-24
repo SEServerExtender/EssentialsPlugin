@@ -77,7 +77,7 @@
 
 		private static void ShowTopicList(ulong userId)
 		{
-			String noticeList = "";
+			string noticeList = "";
 			foreach (InformationItem item in PluginSettings.Instance.InformationItems)
 			{
 				if (!item.Enabled)

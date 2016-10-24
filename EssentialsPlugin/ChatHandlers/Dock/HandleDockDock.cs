@@ -73,7 +73,7 @@
 			m_docking = true;
 			try
 			{
-				String pylonName = String.Join(" ", words);
+				string pylonName = string.Join(" ", words);
 
 				/*
 				int timeLeft;
@@ -92,7 +92,7 @@
 
 				long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(userId).First();
 
-				Dictionary<String, List<IMyCubeBlock>> testList;
+				Dictionary<string, List<IMyCubeBlock>> testList;
 				List<IMyCubeBlock> beaconList;
 				DockingZone.FindByName(pylonName, out testList, out beaconList, playerId);
 				if (beaconList.Count == 4)

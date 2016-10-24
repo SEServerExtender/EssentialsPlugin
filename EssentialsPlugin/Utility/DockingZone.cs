@@ -41,7 +41,7 @@
 
 		public static Dictionary<string, List<IMyCubeBlock>> GetZonesInGrid(IMyCubeGrid cubeGrid)
 		{
-			Dictionary<String, List<IMyCubeBlock>> testList = new Dictionary<string, List<IMyCubeBlock>>();
+			Dictionary<string, List<IMyCubeBlock>> testList = new Dictionary<string, List<IMyCubeBlock>>();
 			List<IMySlimBlock> cubeBlocks = new List<IMySlimBlock>();
 			cubeGrid.GetBlocks(cubeBlocks);
 			foreach (IMySlimBlock entityBlock in cubeBlocks)
@@ -73,8 +73,8 @@
 				}
 			}
 
-			Dictionary<String, List<IMyCubeBlock>> resultList = new Dictionary<string, List<IMyCubeBlock>>();
-			foreach (KeyValuePair<String, List<IMyCubeBlock>> p in testList)
+			Dictionary<string, List<IMyCubeBlock>> resultList = new Dictionary<string, List<IMyCubeBlock>>();
+			foreach (KeyValuePair<string, List<IMyCubeBlock>> p in testList)
 			{
 				if (p.Value.Count == 4)
 				{
@@ -90,7 +90,7 @@
 			return GetZonesInGrid(cubeGrid).Count > 0;
 		}
 
-		static public void FindByName(String pylonName, out Dictionary<String, List<IMyCubeBlock>> testList, out List<IMyCubeBlock> beaconList, long playerId)
+		static public void FindByName(string pylonName, out Dictionary<string, List<IMyCubeBlock>> testList, out List<IMyCubeBlock> beaconList, long playerId)
 		{
 			IMyCubeGrid beaconParent = null;
 			testList = new Dictionary<string, List<IMyCubeBlock>>();

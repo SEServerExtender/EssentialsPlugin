@@ -75,7 +75,7 @@
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		private void NotifyPropertyChanged(String propertyName = "")
+		private void NotifyPropertyChanged(string propertyName = "")
 		{			
 			if (PropertyChanged != null)
 			{

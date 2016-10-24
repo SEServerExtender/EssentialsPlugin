@@ -1400,7 +1400,7 @@
             DoInit( Path.GetDirectoryName( Assembly.GetExecutingAssembly( ).Location ) + "\\" );
         }
 
-        public void InitWithPath( String modPath )
+        public void InitWithPath( string modPath )
         {
             //register object builder assembly
             string path = System.IO.Path.Combine( AppDomain.CurrentDomain.BaseDirectory, "SpaceEngineers.ObjectBuilders.DLL" );
@@ -1561,7 +1561,7 @@
 					// Again, we should get handler to just return string[] of command Text
 					if ( handler.GetMultipleCommandText( ).Length < 1 )
 					{
-						if ( String.Equals( handler.GetCommandText( ), helpTarget, StringComparison.CurrentCultureIgnoreCase ) )
+						if ( string.Equals( handler.GetCommandText( ), helpTarget, StringComparison.CurrentCultureIgnoreCase ) )
 						{
 							Communication.SendPrivateInformation( remoteUserId, handler.GetHelp( ) );
 							found = true;
@@ -1571,7 +1571,7 @@
 					{
 						foreach ( string cmd in handler.GetMultipleCommandText( ) )
 						{
-							if ( String.Equals( cmd, helpTarget, StringComparison.CurrentCultureIgnoreCase ) )
+							if ( string.Equals( cmd, helpTarget, StringComparison.CurrentCultureIgnoreCase ) )
 							{
 								Communication.SendPrivateInformation( remoteUserId, handler.GetHelp( ) );
 								found = true;
@@ -1668,7 +1668,7 @@
                     // Again, we should get handler to just return string[] of command Text
                     if (handler.GetMultipleCommandText().Length < 1)
                     {
-                        if (String.Equals(handler.GetCommandText(), helpTarget, StringComparison.CurrentCultureIgnoreCase))
+                        if (string.Equals(handler.GetCommandText(), helpTarget, StringComparison.CurrentCultureIgnoreCase))
                         {
                             Communication.DisplayDialog(remoteUserId, handler.GetHelpDialog());
                             found = true;
@@ -1678,7 +1678,7 @@
                     {
                         foreach (string cmd in handler.GetMultipleCommandText())
                         {
-                            if (String.Equals(cmd, helpTarget, StringComparison.CurrentCultureIgnoreCase))
+                            if (string.Equals(cmd, helpTarget, StringComparison.CurrentCultureIgnoreCase))
                             {
                                 Communication.DisplayDialog(remoteUserId, handler.GetHelpDialog());
                                 found = true;

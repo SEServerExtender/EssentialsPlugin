@@ -74,7 +74,7 @@
 			m_undocking = true;
 			try
 			{
-				String pylonName = String.Join( " ", words );
+				string pylonName = string.Join( " ", words );
 				if ( PlayerMap.Instance.GetPlayerIdsFromSteamId( userId ).Count < 1 )
 				{
 					Communication.SendPrivateInformation( userId, string.Format( "Unable to find player Id: {0}", userId ) );
@@ -83,7 +83,7 @@
 
 				long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId( userId ).First( );
 
-				Dictionary<String, List<IMyCubeBlock>> testList;
+				Dictionary<string, List<IMyCubeBlock>> testList;
 				List<IMyCubeBlock> beaconList;
 				DockingZone.FindByName( pylonName, out testList, out beaconList, playerId );
 
@@ -150,7 +150,7 @@
 						}
 					}
 
-					String dockedShipFileName = Essentials.PluginPath + String.Format( "\\Docking\\docked_{0}_{1}_{2}.sbc", ownerId, dockingItem.TargetEntityId, dockingItem.DockedEntityId );
+					string dockedShipFileName = Essentials.PluginPath + string.Format( "\\Docking\\docked_{0}_{1}_{2}.sbc", ownerId, dockingItem.TargetEntityId, dockingItem.DockedEntityId );
 
 					// Load Entity From File and add to game
 					FileInfo fileInfo = new FileInfo( dockedShipFileName );

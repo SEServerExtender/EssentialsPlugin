@@ -57,7 +57,7 @@
 			{
 				foreach (DockingItem dockingItem in Docking.Instance.DockingItems)
 				{
-					string dockedShipFileName = Essentials.PluginPath + String.Format("\\Docking\\docked_{0}_{1}_{2}.sbc", dockingItem.PlayerId, dockingItem.TargetEntityId, dockingItem.DockedEntityId);
+					string dockedShipFileName = Essentials.PluginPath + string.Format("\\Docking\\docked_{0}_{1}_{2}.sbc", dockingItem.PlayerId, dockingItem.TargetEntityId, dockingItem.DockedEntityId);
 
 					DockingItem dockedShip = dockingItem;
 					IMyEntity entity = MyAPIGateway.Entities.GetEntity(x => x.EntityId == dockedShip.TargetEntityId && x is IMyCubeGrid);

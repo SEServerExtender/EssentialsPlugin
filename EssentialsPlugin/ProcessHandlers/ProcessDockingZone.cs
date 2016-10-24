@@ -119,7 +119,7 @@
 				// Does this grid contain a docking zone?
 				if (m_zoneCache.Contains(cubeGrid))
 				{
-					Dictionary<String, List<IMyCubeBlock>> zoneList = DockingZone.GetZonesInGrid(cubeGrid);
+					Dictionary<string, List<IMyCubeBlock>> zoneList = DockingZone.GetZonesInGrid(cubeGrid);
 					if (zoneList == null)
 						continue;
 

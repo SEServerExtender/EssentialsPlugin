@@ -50,8 +50,8 @@
 			set { _saveQuat = value; }
 		}
 
-		private String _dockedName;
-		public String DockedName
+		private string _dockedName;
+		public string DockedName
 		{
 			get { return _dockedName; }
 			set { _dockedName = value; }

@@ -57,7 +57,7 @@
             //Version version = typeof( Essentials ).Assembly.GetName( ).Version;
             //Communication.SendPrivateInformation( userId, (String)version );
             
-            Communication.SendPrivateInformation( userId, String.Format("Plugin '{0}' initialized. (Version: {1}  ID: {2})", 
+            Communication.SendPrivateInformation( userId, string.Format("Plugin '{0}' initialized. (Version: {1}  ID: {2})", 
                                                      Essentials.Instance.Name, Essentials.Instance.Version, Essentials.Instance.Id) );
 
             return true;

@@ -13,7 +13,7 @@
 			SandboxGameAssemblyWrapper.Instance.GameAction(action);
 		}
 
-		public static void BeginGameAction(Action action, SandboxGameAssemblyWrapper.GameActionCallback callback, Object state)
+		public static void BeginGameAction(Action action, SandboxGameAssemblyWrapper.GameActionCallback callback, object state)
 		{
 			SandboxGameAssemblyWrapper.Instance.BeginGameAction(action, callback, state);
 		}
@@ -35,7 +35,7 @@
 			}
 		}
 
-		internal static FieldInfo GetEntityField(Object gameEntity, string fieldName)
+		internal static FieldInfo GetEntityField(object gameEntity, string fieldName)
 		{
 			try
 			{
@@ -44,7 +44,7 @@
 				{
 					//Recurse up through the class heirarchy to try to find the field
 					Type type = gameEntity.GetType();
-					while (type != typeof(Object))
+					while (type != typeof(object))
 					{
 						field = type.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 						if (field != null)
@@ -75,7 +75,7 @@
 				{
 					//Recurse up through the class heirarchy to try to find the method
 					Type type = objectType;
-					while (type != typeof(Object))
+					while (type != typeof(object))
 					{
 						method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 						if (method != null)
@@ -111,7 +111,7 @@
 				{
 					//Recurse up through the class heirarchy to try to find the method
 					Type type = objectType;
-					while (type != typeof(Object))
+					while (type != typeof(object))
 					{
 						method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy, Type.DefaultBinder, argTypes, null);
 						if (method != null)
@@ -133,7 +133,7 @@
 			}
 		}
 
-		internal static MethodInfo GetEntityMethod(Object gameEntity, string methodName)
+		internal static MethodInfo GetEntityMethod(object gameEntity, string methodName)
 		{
 			try
 			{
@@ -146,7 +146,7 @@
 				{
 					//Recurse up through the class heirarchy to try to find the method
 					Type type = gameEntity.GetType();
-					while (type != typeof(Object))
+					while (type != typeof(object))
 					{
 						method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 						if (method != null)
@@ -168,7 +168,7 @@
 			}
 		}
 
-		internal static MethodInfo GetEntityMethod(Object gameEntity, string methodName, Type[] argTypes)
+		internal static MethodInfo GetEntityMethod(object gameEntity, string methodName, Type[] argTypes)
 		{
 			try
 			{
@@ -184,7 +184,7 @@
 				{
 					//Recurse up through the class heirarchy to try to find the method
 					Type type = gameEntity.GetType();
-					while (type != typeof(Object))
+					while (type != typeof(object))
 					{
 						method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy, Type.DefaultBinder, argTypes, null);
 						if (method != null)
@@ -206,14 +206,14 @@
 			}
 		}
 
-		internal static Object GetStaticFieldValue(Type objectType, string fieldName)
+		internal static object GetStaticFieldValue(Type objectType, string fieldName)
 		{
 			try
 			{
 				FieldInfo field = GetStaticField(objectType, fieldName);
 				if (field == null)
 					return null;
-				Object value = field.GetValue(null);
+				object value = field.GetValue(null);
 				return value;
 			}
 			catch (Exception ex)
@@ -223,7 +223,7 @@
 			}
 		}
 
-		internal static void SetStaticFieldValue(Type objectType, string fieldName, Object value)
+		internal static void SetStaticFieldValue(Type objectType, string fieldName, object value)
 		{
 			try
 			{
@@ -238,14 +238,14 @@
 			}
 		}
 
-		internal static Object GetEntityFieldValue(Object gameEntity, string fieldName)
+		internal static object GetEntityFieldValue(object gameEntity, string fieldName)
 		{
 			try
 			{
 				FieldInfo field = GetEntityField(gameEntity, fieldName);
 				if (field == null)
 					return null;
-				Object value = field.GetValue(gameEntity);
+				object value = field.GetValue(gameEntity);
 				return value;
 			}
 			catch (Exception ex)
@@ -255,7 +255,7 @@
 			}
 		}
 
-		internal static void SetEntityFieldValue(Object gameEntity, string fieldName, Object value)
+		internal static void SetEntityFieldValue(object gameEntity, string fieldName, object value)
 		{
 			try
 			{
@@ -270,19 +270,19 @@
 			}
 		}
 
-		internal static Object InvokeStaticMethod(Type objectType, string methodName)
+		internal static object InvokeStaticMethod(Type objectType, string methodName)
 		{
 			return InvokeStaticMethod(objectType, methodName, new object[] { });
 		}
 
-		internal static Object InvokeStaticMethod(Type objectType, string methodName, Object[] parameters)
+		internal static object InvokeStaticMethod(Type objectType, string methodName, object[] parameters)
 		{
 			try
 			{
 				MethodInfo method = GetStaticMethod(objectType, methodName);
 				if (method == null)
 					throw new Exception("Method is empty");
-				Object result = method.Invoke(null, parameters);
+				object result = method.Invoke(null, parameters);
 
 				return result;
 			}
@@ -295,24 +295,24 @@
 			}
 		}
 
-		internal static Object InvokeEntityMethod(Object gameEntity, string methodName)
+		internal static object InvokeEntityMethod(object gameEntity, string methodName)
 		{
 			return InvokeEntityMethod(gameEntity, methodName, new object[] { });
 		}
 
-		internal static Object InvokeEntityMethod(Object gameEntity, string methodName, Object[] parameters)
+		internal static object InvokeEntityMethod(object gameEntity, string methodName, object[] parameters)
 		{
 			return InvokeEntityMethod(gameEntity, methodName, parameters, null);
 		}
 
-		internal static Object InvokeEntityMethod(Object gameEntity, string methodName, Object[] parameters, Type[] argTypes)
+		internal static object InvokeEntityMethod(object gameEntity, string methodName, object[] parameters, Type[] argTypes)
 		{
 			try
 			{
 				MethodInfo method = GetEntityMethod(gameEntity, methodName, argTypes);
 				if (method == null)
 					throw new Exception("Method is empty");
-				Object result = method.Invoke(gameEntity, parameters);
+				object result = method.Invoke(gameEntity, parameters);
 
 				return result;
 			}
@@ -326,7 +326,7 @@
 			}
 		}
 
-		internal static PropertyInfo GetEntityProperty(Object gameEntity, string propertyName)
+		internal static PropertyInfo GetEntityProperty(object gameEntity, string propertyName)
 		{
 			try
 			{
@@ -344,7 +344,7 @@
 			}
 		}
 
-		internal static Object GetEntityPropertyValue(Object gameEntity, string propertyName)
+		internal static object GetEntityPropertyValue(object gameEntity, string propertyName)
 		{
 			try
 			{
@@ -352,7 +352,7 @@
 				if (property == null)
 					return null;
 
-				Object result = property.GetValue(gameEntity, null);
+				object result = property.GetValue(gameEntity, null);
 				return result;
 			}
 			catch (Exception ex)
@@ -364,7 +364,7 @@
 			}
 		}
 
-		internal static void SetEntityPropertyValue(Object gameEntity, string propertyName, Object value)
+		internal static void SetEntityPropertyValue(object gameEntity, string propertyName, object value)
 		{
 			try
 			{
