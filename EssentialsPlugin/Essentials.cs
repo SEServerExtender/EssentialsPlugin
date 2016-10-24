@@ -1103,6 +1103,16 @@
             }
         }
 
+        [Category( "Experiments" )]
+        [Description( "This will stop the server from processing the ragdoll component on characters. Can lead to SIGNIFICANT performance gains." )]
+        [Browsable( true )]
+        [ReadOnly( false )]
+        public bool DisableRagdoll
+        {
+            get { return PluginSettings.Instance.DisableRagdoll; }
+            set { PluginSettings.Instance.DisableRagdoll = value; }
+        }
+
         /*
 		[Category("Game Modes")]
 		[Description("Conquest Game Mode - This mode tracks asteroid owners by counting owned blocks near an asteroid to determine the owner.  Includes a leaderboard")]
@@ -1147,7 +1157,8 @@
                                    new ProcessTimedCommands(  ),
                                    new ProcessSpeed(  ),
                                    new ProcessCargoShips(  ),
-                                   new ProcessTicket(  )
+                                   new ProcessTicket(  ),
+                                   new ProcessRagdoll(  ),
                                };
 
             // Setup chat handlers

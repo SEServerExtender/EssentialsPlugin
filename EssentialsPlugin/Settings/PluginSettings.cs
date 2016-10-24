@@ -121,7 +121,9 @@
         private List<TicketPlayerItem> _ticketPlayers;
 
         private MTObservableCollection<BlacklistItem> _blacklistItems;
-        
+
+        private bool _disableRagdoll;
+
         #endregion
 
 		#region Static Properties
@@ -958,6 +960,16 @@
                 Save();
             }
         }
+
+        public bool DisableRagdoll
+        {
+            get { return _disableRagdoll; }
+            set
+            {
+                _disableRagdoll = value;
+                Save( );
+            }
+        }
         #endregion
 
         #region Constructor
@@ -989,6 +1001,8 @@
 
             _stopShipsOnStart = false;
             _promotedAdminCommands = false;
+
+		    _loginEnabled = true;
 
             _serverChatName = "Server";
             _factionChatPrefix = true;
