@@ -82,6 +82,9 @@
     <Compile Include="ChatHandlers\Admin\HandleAdminSpeed.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminIdentityCleanup.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminSpawnCargo.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminResetPlanet.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminResetAsteroid.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminPlayerCount.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminVersion.cs" />
     <Compile Include="ChatHandlers\HandleRevoke.cs" />
     <Compile Include="ChatHandlers\HandleLastSeen.cs" />
@@ -159,6 +162,8 @@
     <Compile Include="NetworkHandlers\RemoveBlockHandler.cs" />
     <Compile Include="NetworkHandlers\BuildBlockHandler.cs" />
     <Compile Include="NetworkHandlers\ColorBlockHandler.cs" />
+    <Compile Include="NetworkHandlers\SyncPropertyHandler.cs" />
+    <Compile Include="ProcessHandlers\ProcessRagdoll.cs" />
     <Compile Include="ProcessHandlers\ProcessTicket.cs" />
     <Compile Include="ProcessHandlers\ProcessPlayerCleanup.cs" />
     <Compile Include="ProcessHandlers\ProcessCargoShips.cs" />
@@ -276,17 +281,20 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SEServerExtender\GameLibraries\Sandbox.Game.dll</HintPath>
     </Reference>
-    <Reference Include="SEModAPI, Version=1.74.10.278, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SEServerExtender\SEModAPI\bin\x64\Debug\SEModAPI.dll</HintPath>
+    <Reference Include="SEComm">
+      <HintPath>..\..\SEServerExtender\bin\x64\DedicatedServer64\SEComm.dll</HintPath>
     </Reference>
-    <Reference Include="SEModAPIExtensions, Version=1.74.10.237, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="SEModAPI, Version=1.146.6.576, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SEServerExtender\SEModAPIExtensions\bin\x64\Debug\SEModAPIExtensions.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\bin\x64\DedicatedServer64\SEModAPI.dll</HintPath>
     </Reference>
-    <Reference Include="SEModAPIInternal, Version=1.74.10.350, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="SEModAPIExtensions, Version=1.146.6.634, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SEServerExtender\SEModAPIInternal\bin\x64\Debug\SEModAPIInternal.dll</HintPath>
+      <HintPath>..\..\SEServerExtender\bin\x64\DedicatedServer64\SEModAPIExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="SEModAPIInternal, Version=1.146.6.591, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SEServerExtender\bin\x64\DedicatedServer64\SEModAPIInternal.dll</HintPath>
     </Reference>
     <Reference Include="SpaceEngineers.Game, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
@@ -365,8 +373,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y E:\GitHub\EssentialsPlugin\EssentialsPlugin\bin\x64\Debug\Essentials.dll "c:\programdata\SpaceEngineersDedicated\SESEDevTest\Mods\Essentials"
-copy /Y E:\GitHub\EssentialsPlugin\EssentialsPlugin\bin\x64\Debug\Essentials.dll "C:\ProgramData\SpaceEngineersDedicated\OGG Roids Jan29\Mods\Essentials"</PostBuildEvent>
+    <PostBuildEvent>copy /Y E:\GitHub\EssentialsPlugin\EssentialsPlugin\bin\x64\Debug\Essentials.dll "c:\programdata\SpaceEngineersDedicated\SESEDevTest\Mods\Essentials"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
