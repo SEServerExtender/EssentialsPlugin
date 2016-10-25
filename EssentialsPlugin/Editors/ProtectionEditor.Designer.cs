@@ -208,6 +208,7 @@
             this.BTN_GroupId.TabIndex = 27;
             this.BTN_GroupId.Text = "Allowed Steam Groups";
             this.BTN_GroupId.UseVisualStyleBackColor = true;
+            this.BTN_GroupId.Visible = false;
             this.BTN_GroupId.Click += new System.EventHandler(this.BTN_GroupId_Click);
             // 
             // BTN_SteamId

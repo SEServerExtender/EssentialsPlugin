@@ -40,8 +40,7 @@
                 Essentials.Log.Debug( "Null grid in BuildBlockHandler" );
                 return false;
             }
-
-            bool found = false;
+            
             foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
             {
                 if ( !item.Enabled )
@@ -57,7 +56,7 @@
                 else
                     settings = item.ProtectionSettingsDict[ProtectedItem.ProtectionModeEnum.GridSetStation];
 
-                if ( item.EntityId != grid.EntityId )
+                if (item.EntityId != grid.EntityId && item.EntityId != -1)
                     continue;
 
                 if ( Protection.Instance.CheckPlayerExempt( settings, grid, remoteUserId ) )
@@ -117,10 +116,10 @@
                         break;
                 }
 
-                found = true;
+                return true;
             }
 
-            return found;
+            return false;
         }
     }
 }

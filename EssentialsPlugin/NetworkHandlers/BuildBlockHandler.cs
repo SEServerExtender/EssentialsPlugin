@@ -134,14 +134,13 @@
                 Essentials.Log.Debug( "Null grid in BuildBlockHandler" );
                 return false;
             }
-
-            bool found = false;
+            
             foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
             {
                 if ( !item.Enabled )
                     continue;
 
-                if ( item.EntityId != grid.EntityId )
+                if ( item.EntityId != grid.EntityId && item.EntityId != -1)
                 {
                     //Essentials.Log.Debug( item.EntityId );
                     //Essentials.Log.Debug( grid.EntityId );
@@ -210,10 +209,10 @@
                         break;
                 }
 
-                found = true;
+                return true;
             }
 
-            return found;
+            return false;
         }
     }
 }

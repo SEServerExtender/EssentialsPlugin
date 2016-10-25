@@ -7,6 +7,7 @@
     using ProcessHandlers;
     using Sandbox.Engine.Multiplayer;
     using Sandbox.Game.Entities;
+    using Sandbox.Game.Entities.Cube;
     using Sandbox.Game.World;
     using Sandbox.ModAPI;
     using Settings;
@@ -26,7 +27,7 @@
 
         public override bool CanHandle( CallSite site )
         {
-            if ( site.MethodInfo.Name != "SetCustomNameEvent" )
+            if ( site.MethodInfo.Name == "SetCustomNameEvent" )
             {
                 if ( _unitTestResult == null )
                 {
@@ -34,12 +35,14 @@
                     if ( parameters.Length != 1 )
                     {
                         _unitTestResult = false;
+                        Essentials.Log.Error( "Unit test 1" );
                         return false;
                     }
 
                     if ( parameters[0].ParameterType != typeof(string) )
                     {
                         _unitTestResult = false;
+                        Essentials.Log.Error("Unit test 2");
                         return false;
                     }
                     _unitTestResult = true;
@@ -56,22 +59,23 @@
             if ( !PluginSettings.Instance.ProtectedEnabled )
                 return false;
 
-            MyCubeGrid grid = obj as MyCubeGrid;
+            MyCubeGrid grid = (obj as MyTerminalBlock)?.CubeGrid;
             if ( grid == null )
             {
                 Essentials.Log.Debug( "Null grid in BlockNameHandler" );
                 return false;
             }
-
-            bool found = false;
+            
             foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
             {
                 if ( !item.Enabled )
                     continue;
 
-                if ( item.EntityId != grid.EntityId )
+                Essentials.Log.Error("enter");
+                if (item.EntityId != grid.EntityId && item.EntityId != -1)
                     continue;
 
+                Essentials.Log.Error("pass");
                 if ( !item.ProtectionSettingsDict.Dictionary.ContainsKey( ProtectedItem.ProtectionModeEnum.BlockRename ) )
                     continue;
 
@@ -134,10 +138,12 @@
                         break;
                 }
 
-                found = true;
+                var block = (MyTerminalBlock)obj;
+                block.SetCustomName( block.CustomName );
+                return true;
             }
 
-            return found;
+            return false;
         }
     }
 }

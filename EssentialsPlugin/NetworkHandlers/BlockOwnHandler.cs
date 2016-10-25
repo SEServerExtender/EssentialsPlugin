@@ -114,83 +114,83 @@
                     processGrids.Add( block.CubeGrid );
                 }
             }
+            
+            //Parallel.ForEach( processGrids, grid =>
+            foreach (var grid in processGrids)
+            {
+                foreach (ProtectedItem item in PluginSettings.Instance.ProtectedItems)
+                {
+                    if (!item.Enabled)
+                        continue;
 
-            bool found = false;
-            Parallel.ForEach( processGrids, grid =>
-                                            {
-                                                foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
-                                                {
-                                                    if ( !item.Enabled )
-                                                        continue;
+                    if (item.EntityId != grid.EntityId && item.EntityId != -1)
+                        continue;
 
-                                                    if ( item.EntityId != grid.EntityId )
-                                                        continue;
+                    if (!item.ProtectionSettingsDict.Dictionary.ContainsKey( ProtectedItem.ProtectionModeEnum.BlockOwn ))
+                        continue;
 
-                                                    if ( !item.ProtectionSettingsDict.Dictionary.ContainsKey( ProtectedItem.ProtectionModeEnum.BlockOwn ) )
-                                                        continue;
+                    ProtectedItem.ProtectionSettings settings = item.ProtectionSettingsDict[ProtectedItem.ProtectionModeEnum.BlockOwn];
 
-                                                    ProtectedItem.ProtectionSettings settings = item.ProtectionSettingsDict[ProtectedItem.ProtectionModeEnum.BlockOwn];
+                    if (Protection.Instance.CheckPlayerExempt( settings, grid, remoteUserId ))
+                        continue;
 
-                                                    if ( Protection.Instance.CheckPlayerExempt( settings, grid, remoteUserId ) )
-                                                        continue;
+                    if (item.LogOnly)
+                    {
+                        Essentials.Log.Info( $"Recieved block ownership change request from user {PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId )}:{remoteUserId} for grid {grid.DisplayNameText ?? "ID"}:{item.EntityId}" );
+                        continue;
+                    }
 
-                                                    if ( item.LogOnly )
-                                                    {
-                                                        Essentials.Log.Info( $"Recieved block ownership change request from user {PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId )}:{remoteUserId} for grid {grid.DisplayNameText ?? "ID"}:{item.EntityId}" );
-                                                        continue;
-                                                    }
+                    if (!string.IsNullOrEmpty( settings.PrivateWarningMessage ))
+                        Communication.Notification( remoteUserId, MyFontEnum.Red, 5000, settings.PrivateWarningMessage );
 
-                                                    if ( !string.IsNullOrEmpty( settings.PrivateWarningMessage ) )
-                                                        Communication.Notification( remoteUserId, MyFontEnum.Red, 5000, settings.PrivateWarningMessage );
+                    if (!string.IsNullOrEmpty( settings.PublicWarningMessage ))
+                        Communication.SendPublicInformation( settings.PublicWarningMessage.Replace( "%player%", PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId ) ) );
 
-                                                    if ( !string.IsNullOrEmpty( settings.PublicWarningMessage ) )
-                                                        Communication.SendPublicInformation( settings.PublicWarningMessage.Replace( "%player%", PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId ) ) );
+                    if (settings.BroadcastGPS)
+                    {
+                        MyPlayer player = MySession.Static.Players.GetPlayerById( new MyPlayer.PlayerId( remoteUserId, 0 ) );
+                        Vector3D pos = player.GetPosition( );
+                        MyAPIGateway.Utilities.SendMessage( $"GPS:{player.DisplayName}:{pos.X}:{pos.Y}:{pos.Z}:" );
+                    }
 
-                                                    if ( settings.BroadcastGPS )
-                                                    {
-                                                        MyPlayer player = MySession.Static.Players.GetPlayerById( new MyPlayer.PlayerId( remoteUserId, 0 ) );
-                                                        Vector3D pos = player.GetPosition( );
-                                                        MyAPIGateway.Utilities.SendMessage( $"GPS:{player.DisplayName}:{pos.X}:{pos.Y}:{pos.Z}:" );
-                                                    }
+                    Essentials.Log.Info( $"Intercepted block ownership change request from user {PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId )}:{remoteUserId} for grid {grid.DisplayNameText ?? "ID"}:{item.EntityId}" );
 
-                                                    Essentials.Log.Info( $"Intercepted block ownership change request from user {PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId )}:{remoteUserId} for grid {grid.DisplayNameText ?? "ID"}:{item.EntityId}" );
-
-                                                    switch ( settings.PunishmentType )
-                                                    {
-                                                        case ProtectedItem.PunishmentEnum.Kick:
-                                                            _kickTimer.Elapsed += ( sender, e ) =>
-                                                                                  {
-                                                                                      Essentials.Log.Info( $"Kicked user {PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId )}:{remoteUserId} for changing block ownership on protected grid {grid.DisplayNameText ?? "ID"}:{item.EntityId}" );
-                                                                                      MyMultiplayer.Static.KickClient( remoteUserId );
-                                                                                  };
-                                                            _kickTimer.AutoReset = false;
-                                                            _kickTimer.Start( );
-                                                            break;
-                                                        case ProtectedItem.PunishmentEnum.Ban:
-                                                            _kickTimer.Elapsed += ( sender, e ) =>
-                                                                                  {
-                                                                                      Essentials.Log.Info( $"Banned user {PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId )}:{remoteUserId} for changing block ownership on protected grid {grid.DisplayNameText ?? "ID"}:{item.EntityId}" );
-                                                                                      MyMultiplayer.Static.BanClient( remoteUserId, true );
-                                                                                  };
-                                                            _kickTimer.AutoReset = false;
-                                                            _kickTimer.Start( );
-                                                            break;
-                                                        case ProtectedItem.PunishmentEnum.Speed:
-                                                            Task.Run( ( ) =>
-                                                                      {
-                                                                          lock ( ProcessSpeed.SpeedPlayers )
-                                                                          {
-                                                                              long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( remoteUserId );
-                                                                              ProcessSpeed.SpeedPlayers[playerId] = new Tuple<float, DateTime>( (float)settings.SpeedLimit, DateTime.Now + TimeSpan.FromMinutes( settings.SpeedTime ) );
-                                                                          }
-                                                                      } );
-                                                            Essentials.Log.Info( $"Limited user {PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId )} to {settings.SpeedLimit}m/s for {settings.SpeedTime} minutes" );
-                                                            break;
-                                                    }
-                                                    found = true;
-                                                }
-                                            } );
-            return found;
+                    switch (settings.PunishmentType)
+                    {
+                        case ProtectedItem.PunishmentEnum.Kick:
+                            _kickTimer.Elapsed += ( sender, e ) =>
+                                                  {
+                                                      Essentials.Log.Info( $"Kicked user {PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId )}:{remoteUserId} for changing block ownership on protected grid {grid.DisplayNameText ?? "ID"}:{item.EntityId}" );
+                                                      MyMultiplayer.Static.KickClient( remoteUserId );
+                                                  };
+                            _kickTimer.AutoReset = false;
+                            _kickTimer.Start( );
+                            break;
+                        case ProtectedItem.PunishmentEnum.Ban:
+                            _kickTimer.Elapsed += ( sender, e ) =>
+                                                  {
+                                                      Essentials.Log.Info( $"Banned user {PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId )}:{remoteUserId} for changing block ownership on protected grid {grid.DisplayNameText ?? "ID"}:{item.EntityId}" );
+                                                      MyMultiplayer.Static.BanClient( remoteUserId, true );
+                                                  };
+                            _kickTimer.AutoReset = false;
+                            _kickTimer.Start( );
+                            break;
+                        case ProtectedItem.PunishmentEnum.Speed:
+                            Task.Run( ( ) =>
+                                      {
+                                          lock (ProcessSpeed.SpeedPlayers)
+                                          {
+                                              long playerId = PlayerMap.Instance.GetFastPlayerIdFromSteamId( remoteUserId );
+                                              ProcessSpeed.SpeedPlayers[playerId] = new Tuple<float, DateTime>( (float)settings.SpeedLimit, DateTime.Now + TimeSpan.FromMinutes( settings.SpeedTime ) );
+                                          }
+                                      } );
+                            Essentials.Log.Info( $"Limited user {PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId )} to {settings.SpeedLimit}m/s for {settings.SpeedTime} minutes" );
+                            break;
+                    }
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

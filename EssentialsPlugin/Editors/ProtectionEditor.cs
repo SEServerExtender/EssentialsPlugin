@@ -26,6 +26,7 @@
                                          "These players are allowed to convert this grid to a station.",
                                          "These players are allowed to convert this grid to a ship.",
                                          "These players are allowed to delete this grid.",
+                                         //"These players are allowed to change block settings on this grid.",
                                      };
         private ProtectedItem _currentItem;
         private ProtectedItem.ProtectionSettings _currentSettings;
@@ -43,7 +44,8 @@
                                          "Grid Rename",
                                          "Grid Convert To Station",
                                          "Grid Convert To Ship",
-                                         "Grid Delete"
+                                         "Grid Delete",
+                                         //"Block Settings",
                                      } );
             //CMB_Mode.Items.AddRange( Enum.GetNames( typeof(ProtectedItem.ProtectionModeEnum) ) );
             List<FactionListItem> factions = new List<FactionListItem>();
@@ -78,19 +80,26 @@
             LST_Entries.Items.Clear();
             foreach ( var item in PluginSettings.Instance.ProtectedItems )
             {
-                MyEntity entity;
-                if ( !MyEntities.TryGetEntityById( item.EntityId, out entity ) )
+                if (item.EntityId == -1)
                 {
-                    LST_Entries.Items.Add( $"Invalid entityId: {item.EntityId}" );
-                    continue;
+                    LST_Entries.Items.Add( ".Default" );
                 }
-                var grid = entity as MyCubeGrid;
-                if(grid==null)
+                else
                 {
-                    LST_Entries.Items.Add($"Invalid entityId: {item.EntityId}");
-                    continue;
+                    MyEntity entity;
+                    if (!MyEntities.TryGetEntityById( item.EntityId, out entity ))
+                    {
+                        LST_Entries.Items.Add( $"Invalid entityId: {item.EntityId}" );
+                        continue;
+                    }
+                    var grid = entity as MyCubeGrid;
+                    if (grid == null)
+                    {
+                        LST_Entries.Items.Add( $"Invalid entityId: {item.EntityId}" );
+                        continue;
+                    }
+                    LST_Entries.Items.Add( $"{grid.DisplayName ?? ""}: {item.EntityId}" );
                 }
-                LST_Entries.Items.Add( $"{grid.DisplayName ?? ""}: {item.EntityId}" );
             }
             LST_Entries.SelectedIndex = selectedIndex;
             CMB_Mode.SelectedIndex = selectedCmbIndex;
@@ -135,6 +144,15 @@
 
         private void BTN_SaveItem_Click(object sender, EventArgs e)
         {
+            foreach (var item in PluginSettings.Instance.ProtectedItems)
+            {
+                //this loop moves the default item to the end of the list
+                if (item.EntityId != -1)
+                    continue;
+                PluginSettings.Instance.ProtectedItems.Remove( item );
+                PluginSettings.Instance.ProtectedItems.Add( item );
+                break;
+            }
             PluginSettings.Instance.Save();
             UpdateListbox();
         }
@@ -199,19 +217,26 @@
 
         private void TXT_EntityId_TextChanged(object sender, EventArgs e)
         {
-            MyEntity entity;
             long entityId;
             if(!long.TryParse( TXT_EntityId.Text, out entityId ))
                 throw new ArgumentException();
             _currentItem.EntityId = entityId;
-            MyEntities.TryGetEntityById( entityId, out entity );
-            var grid = entity as MyCubeGrid;
-            if (grid == null)
+            if (entityId == -1)
             {
-                LBL_GridName.Text = "Invalid EntityID";
-                return;
+                LBL_GridName.Text = "Default";
             }
-            LBL_GridName.Text=grid.DisplayName ?? "";
+            else
+            {
+                MyEntity entity;
+                MyEntities.TryGetEntityById( entityId, out entity );
+                var grid = entity as MyCubeGrid;
+                if (grid == null)
+                {
+                    LBL_GridName.Text = "Invalid EntityID";
+                    return;
+                }
+                LBL_GridName.Text = grid.DisplayName ?? "";
+            }
             UpdateListbox();
         }
 
@@ -222,7 +247,7 @@
 
         private void CHK_Damage_CheckedChanged(object sender, EventArgs e)
         {
-            _currentItem.Enabled = CHK_Damage.Checked;
+            _currentItem.ProtectDamage = CHK_Damage.Checked;
         }
 
         private void CHK_LogOnly_CheckedChanged(object sender, EventArgs e)

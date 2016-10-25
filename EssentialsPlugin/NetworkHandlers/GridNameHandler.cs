@@ -62,14 +62,13 @@
                 Essentials.Log.Debug( "Null grid in GridNameHandler" );
                 return false;
             }
-
-            bool found = false;
+            
             foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
             {
                 if ( !item.Enabled )
                     continue;
 
-                if ( item.EntityId != grid.EntityId )
+                if (item.EntityId != grid.EntityId && item.EntityId != -1)
                     continue;
 
                 if ( !item.ProtectionSettingsDict.Dictionary.ContainsKey( ProtectedItem.ProtectionModeEnum.GridRename ) )
@@ -134,10 +133,10 @@
                         break;
                 }
 
-                found = true;
+                return true;
             }
 
-            return found;
+            return false;
         }
     }
 }

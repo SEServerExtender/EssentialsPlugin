@@ -90,14 +90,13 @@
                 Essentials.Log.Debug( "Null grid in RemoveBlockHandler" );
                 return false;
             }
-
-            bool found = false;
+            
             foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
             {
                 if ( !item.Enabled )
                     continue;
 
-                if ( item.EntityId != grid.EntityId )
+                if (item.EntityId != grid.EntityId && item.EntityId != -1)
                     continue;
 
                 if ( !item.ProtectionSettingsDict.Dictionary.ContainsKey( ProtectedItem.ProtectionModeEnum.BlockRemove ) )
@@ -162,9 +161,9 @@
                         break;
                 }
 
-                found = true;
+                return true;
             }
-            return found;
+            return false;
         }
     }
 }
