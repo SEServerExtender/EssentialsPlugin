@@ -121,18 +121,18 @@
             set { PluginSettings.Instance.ServerUtilityGridsShowCoords = value; }
         }
 
-        [Category( "General" )]
-        [Description( "Enable / Disable respawn menu override.  If you're having issues with a very slow respawn menu, this will help, though please note it may cause more problems if your server is running quickly.  (Will give the spawn menu twice)" )]
-        [Browsable( true )]
-        [ReadOnly( false )]
-        public bool ServerRespawnMenuOverride
-        {
-            get { return PluginSettings.Instance.ServerRespawnMenuOverride; }
-            set
-            {
-                PluginSettings.Instance.ServerRespawnMenuOverride = value;
-            }
-        }
+        //[Category( "General" )]
+        //[Description( "Enable / Disable respawn menu override.  If you're having issues with a very slow respawn menu, this will help, though please note it may cause more problems if your server is running quickly.  (Will give the spawn menu twice)" )]
+        //[Browsable( true )]
+        //[ReadOnly( false )]
+        //public bool ServerRespawnMenuOverride
+        //{
+        //    get { return PluginSettings.Instance.ServerRespawnMenuOverride; }
+        //    set
+        //    {
+        //        PluginSettings.Instance.ServerRespawnMenuOverride = value;
+        //    }
+        //}
 
         [Category( "General" )]
         [Description( "Enable / Disable stopping all ships when server starts" )]
@@ -164,7 +164,7 @@
         [Description( "Name that users see when the server sends a chat message" )]
         [Browsable( true )]
         [ReadOnly( false )]
-        public String ServerChatName
+        public string ServerChatName
         {
             get
             {
@@ -1178,6 +1178,7 @@
                                 new HandleAdminIdentityCleanup(  ),
                                 new HandleAdminFactionCleanup(  ),
                                 new HandleAdminSpawnCargo(  ),
+                                new HandleAdminPlayerCount(  ),
 
 
                                 //Admin Scan
@@ -1277,16 +1278,14 @@
                             };
             
             //TODO: These should be in an init function somehere so we don't intercept network unless the user really needs it
-            ServerNetworkManager.Instance.RegisterNetworkHandlers( new NetworkHandlerBase[]
-                                                                   {
-                                                                       new BlockNameHandler(),
-                                                                       new BlockOwnHandler(),
-                                                                       new BuildBlockHandler(),
-                                                                       new ColorBlockHandler(), 
-                                                                       new ConvertPhyiscsHandler(),
-                                                                       new GridDeleteHandler(), 
-                                                                       new RemoveBlockHandler(), 
-                                                                   } );
+            ServerNetworkManager.Instance.RegisterNetworkHandlers( new BlockNameHandler( ),
+                                                                   new BlockOwnHandler( ),
+                                                                   new BuildBlockHandler( ),
+                                                                   new ColorBlockHandler( ),
+                                                                   new ConvertPhyiscsHandler( ),
+                                                                   new GridDeleteHandler( ),
+                                                                   new RemoveBlockHandler( ),
+                                                                   new SyncPropertyHandler( ) );
 
             _processThreads = new List<Thread>( );
             _processThread = new Thread( PluginProcessing );
