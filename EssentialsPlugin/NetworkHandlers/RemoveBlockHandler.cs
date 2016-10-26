@@ -161,6 +161,11 @@
                         break;
                 }
 
+                //send the fail message to make the client play the paste fail sound
+                //just because we can
+                var inf = typeof(MyCubeBuilder).GetMethod("SpawnGridReply", BindingFlags.NonPublic | BindingFlags.Static);
+                ServerNetworkManager.Instance.RaiseStaticEvent(inf, remoteUserId, false);
+
                 return true;
             }
             return false;

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Threading.Tasks;
     using System.Timers;
     using ProcessHandlers;
@@ -182,6 +183,11 @@
                         Essentials.Log.Info( $"Limited user {PlayerMap.Instance.GetFastPlayerNameFromSteamId( remoteUserId )} to {settings.SpeedLimit}m/s for {settings.SpeedTime} minutes" );
                         break;
                 }
+
+                //send the fail message to make the client play the paste fail sound
+                //just because we can
+                var inf = typeof(MyCubeBuilder).GetMethod("SpawnGridReply", BindingFlags.NonPublic | BindingFlags.Static);
+                ServerNetworkManager.Instance.RaiseStaticEvent(inf, remoteUserId, false);
 
                 return true;
             }
