@@ -101,6 +101,8 @@
             //MySandboxGame.Static.Exit(  );
             //Thread.Sleep( 5000 );
 
+            Essentials.Log.Info( "Stopping server" );
+
             //cache for console output while we're waiting
             StringBuilder sb = new StringBuilder();
             TextWriter tw = new StringWriter(sb);
