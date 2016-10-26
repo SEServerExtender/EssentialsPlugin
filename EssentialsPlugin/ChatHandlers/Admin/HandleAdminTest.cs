@@ -51,8 +51,7 @@
 		{
 			return true;
 		}
-
-        public static bool set = false;
+        
         public override bool HandleCommand( ulong userId, string[ ] words )
         {
             if (words.Length < 1)
@@ -170,6 +169,36 @@
                 {
                     var inf = typeof(MySpaceRespawnComponent).GetMethod( "ShowMedicalScreen_Implementation", BindingFlags.NonPublic | BindingFlags.Static );
                     Wrapper.GameAction( ( ) => ServerNetworkManager.Instance.RaiseStaticEvent( inf, userId ) );
+                    break;
+                }
+                case "update":
+                {
+                    bool set = words.Length > 1 && words[1].ToLower( ).Equals( "on" );
+                    MyEntity[] ents = new MyEntity[0];
+                    Wrapper.GameAction( ( ) => ents = MyEntities.GetEntities( ).ToArray( ) );
+                    foreach (var ent in ents)
+                    {
+                        var character = ent as MyCharacter;
+                        if (character == null)
+                            continue;
+
+                        if (set)
+                            MyEntities.RegisterForUpdate( ent );
+                        else
+                            MyEntities.UnregisterForUpdate( ent );
+                    }
+                    break;
+                }
+                case "component":
+                {
+                    MyEntity[] ents = new MyEntity[0];
+                    Wrapper.GameAction( ( ) => ents = MyEntities.GetEntities( ).ToArray( ) );
+                    foreach (var ent in ents)
+                    {
+                        var character = ent as MyCharacter;
+
+                        character?.Components.Clear( );
+                    }
                     break;
                 }
             }
