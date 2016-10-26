@@ -58,15 +58,13 @@
                 if(ent is MyPlanet)
                     continue;
 
-                //if (string.IsNullOrEmpty(voxel.StorageName)||!voxel.StorageName.StartsWith( "Asteroid_" ))
-                //    continue;
-                
-                //if (ents.Any( x =>
-                //              {
-                //                  var box = x.PositionComp.WorldAABB;
-                //                 return voxel.IsBoxIntersectingBoundingBoxOfThisVoxelMap( ref box);
-                //              }))
-                //    continue;
+                if (string.IsNullOrEmpty(voxel.StorageName)||!(voxel.StorageName.StartsWith( "Asteroid_" ) || voxel.StorageName.StartsWith( "ProcAsteroid-" )))
+                    continue;
+
+                var box = voxel.PositionComp.WorldAABB;
+
+                if (ents.Any(x => !(x is MyVoxelBase) && box.Contains( x.PositionComp.WorldAABB ) != ContainmentType.Disjoint))
+                    continue;
 
                 Communication.SendVoxelReset( ent.EntityId );
 
