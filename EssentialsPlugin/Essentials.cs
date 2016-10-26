@@ -38,11 +38,15 @@
     using System.Threading.Tasks;
     using NetworkHandlers;
     using Sandbox.Engine.Multiplayer;
+    using Sandbox.Game;
     using Sandbox.Game.Entities;
     using Sandbox.Game.Multiplayer;
+    using Sandbox.Game.Weapons;
     using SEModAPIInternal.API.Server;
     using VRage;
+    using VRage.Collections;
     using VRage.Game;
+    using VRage.Game.Entity;
     using VRage.Library.Collections;
     using VRage.Network;
     using VRage.Serialization;
@@ -1113,6 +1117,13 @@
             set { PluginSettings.Instance.DisableRagdoll = value; }
         }
 
+        [Category( "Experiments" )]
+        public int DrillSpeed
+        {
+            get { return PluginSettings.Instance.DrillSpeed; }
+            set { PluginSettings.Instance.DrillSpeed = value; }
+        }
+
         /*
 		[Category("Game Modes")]
 		[Description("Conquest Game Mode - This mode tracks asteroid owners by counting owned blocks near an asteroid to determine the owner.  Includes a leaderboard")]
@@ -1303,6 +1314,9 @@
             MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReceiveMessageParts);
             MyAPIGateway.Multiplayer.RegisterMessageHandler( 9007, Communication.HandleAddConcealExempt );
             BlacklistManager.Instance.UpdateBlacklist();
+            _drillUpdateVal= (int)typeof(MyDrillConstants).GetField("DRILL_UPDATE_INTERVAL_IN_FRAMES").GetValue(null);
+            m_entitiesForUpdate10 = (CachingList<MyEntity>)typeof(MyEntities).GetField("m_entitiesForUpdate10", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+            _countdownField = typeof(MyShipDrill).GetField("m_drillFrameCountdown", BindingFlags.NonPublic | BindingFlags.Instance);
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
         }
 
@@ -1435,10 +1449,32 @@
             MyAPIGateway.Multiplayer.UnregisterMessageHandler( 9007, Communication.HandleAddConcealExempt );
         }
 
+        private int _updateCounter;
+        private int _drillUpdateVal;
+        static CachingList<MyEntity> m_entitiesForUpdate10;
+        private FieldInfo _countdownField;
+
         public void Update( )
         {
             if (MyAPIGateway.Session == null)
                 return;
+
+            //if (++_updateCounter % 10 != 0)
+            //    return;
+
+            
+            Wrapper.BeginGameAction( ( ) =>
+                                     {
+                                         foreach (var entity in m_entitiesForUpdate10)
+                                         {
+                                             if (!( entity is MyShipDrill ))
+                                                 continue;
+                                             Log.Debug( "Update " + entity.DisplayName );
+                                             int val = (int)_countdownField.GetValue( entity );
+                                             val -= PluginSettings.Instance.DrillSpeed / 10;
+                                             _countdownField.SetValue( entity, val );
+                                         }
+                                     }, null, null );
         }
 
         #endregion

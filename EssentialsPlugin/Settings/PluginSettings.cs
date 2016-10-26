@@ -13,6 +13,7 @@
 	using EssentialsPlugin.Settings;
 	using EssentialsPlugin.Utility;
 	using EssentialsPlugin.UtilityClasses;
+	using Sandbox.Game;
 	using VRage.FileSystem;
 
     [Serializable]
@@ -123,6 +124,7 @@
         private MTObservableCollection<BlacklistItem> _blacklistItems;
 
         private bool _disableRagdoll;
+        private int _drillSpeed;
 
         #endregion
 
@@ -967,6 +969,16 @@
             set
             {
                 _disableRagdoll = value;
+                Save( );
+            }
+        }
+
+        public int DrillSpeed
+        {
+            get { return _drillSpeed; }
+            set
+            {
+                _drillSpeed = value;
                 Save( );
             }
         }
