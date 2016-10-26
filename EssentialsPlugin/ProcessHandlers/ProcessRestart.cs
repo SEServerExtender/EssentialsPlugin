@@ -5,6 +5,7 @@
 	using System.Diagnostics;
 	using System.IO;
 	using System.Net;
+	using System.Text;
 	using System.Threading;
 	using System.Windows.Forms;
 	using EssentialsPlugin.Settings;
@@ -13,6 +14,7 @@
 	using Sandbox.ModAPI;
 	using SEModAPIExtensions.API;
 	using SEModAPIInternal.API.Common;
+	using SEModAPIInternal.Support;
 	using SteamSDK;
 	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
@@ -96,10 +98,43 @@
 		{
             // Tell SE to shut down
             //Wrapper.GameAction( ()=>MySandboxGame.Static.Exit(  ) );
-            MySandboxGame.Static.Exit(  );
+            //MySandboxGame.Static.Exit(  );
             //Thread.Sleep( 5000 );
-			// If we're not a service, restart with a .bat otherwise just exit and let the service be restarted
-			if (Environment.UserInteractive)
+
+            //cache for console output while we're waiting
+            StringBuilder sb = new StringBuilder();
+            TextWriter tw = new StringWriter(sb);
+            TextWriter tmp = Console.Out;
+
+            //hijack the console so we can listen for the server stopped message
+            Console.SetOut(tw);
+
+            //ask the server nicely to stop
+            MySandboxGame.ExitThreadSafe();
+
+            DateTime waitStart = DateTime.Now;
+
+            while (true)
+            {
+                if (sb.ToString().Contains("Server stopped, press any key to close this window"))
+                    break;
+
+                Thread.Sleep(100);
+
+                //the server didn't listen, so kill it forcefully
+                if (DateTime.Now - waitStart > TimeSpan.FromMinutes(5))
+                {
+                    Essentials.Log.Warn("Server failed to shut down correctly!");
+                    break;
+                }
+            }
+
+            //return control back to the console and write the cached log back
+            Console.SetOut(tmp);
+            Console.Write(sb);
+
+            // If we're not a service, restart with a .bat otherwise just exit and let the service be restarted
+            if (Environment.UserInteractive)
 			{
 				string restartText = "%windir%/system32/timeout /t 30\r\n";
 				restartText += string.Format("cd /d \"{0}\"\r\n", Path.GetDirectoryName(Application.ExecutablePath));
