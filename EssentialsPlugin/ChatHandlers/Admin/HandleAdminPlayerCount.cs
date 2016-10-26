@@ -46,7 +46,7 @@
         {
             if (words.Length == 0)
             {
-                Communication.SendPrivateInformation( userId, $"Max player count: {MyMultiplayer.Static.MemberLimit}. Current player count: {MyMultiplayer.Static.MemberCount}" );
+                Communication.SendPrivateInformation( userId, $"Max player count: {MyMultiplayer.Static.MemberLimit}. Current player count: {MyMultiplayer.Static.MemberCount - 1}" );
                 return true;
             }
 
@@ -58,7 +58,7 @@
             }
 
             MyMultiplayer.Static.MemberLimit = count;
-            Communication.SendPrivateInformation(userId, $"Max player count: {MyMultiplayer.Static.MemberLimit}. Current player count: {MyMultiplayer.Static.MemberCount}");
+            Communication.SendPrivateInformation(userId, $"Max player count: {MyMultiplayer.Static.MemberLimit}. Current player count: {MyMultiplayer.Static.MemberCount - 1}");
 
             return true;
         }
