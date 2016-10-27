@@ -1108,7 +1108,7 @@
         }
 
         [Category( "Experiments" )]
-        [Description( "This will stop the server from processing the ragdoll component on characters. Can lead to SIGNIFICANT performance gains." )]
+        [Description( "This will stop the server from processing the ragdoll component on characters. Can lead to SIGNIFICANT performance gains.\r\n ONLY USEFUL ON STABLE!" )]
         [Browsable( true )]
         [ReadOnly( false )]
         public bool DisableRagdoll
@@ -1118,6 +1118,7 @@
         }
 
         [Category( "Experiments" )]
+        [Description("Modifies the internal drill code to make cutouts happen faster or slower. Negative values will slow down drilling.")]
         public int DrillSpeed
         {
             get { return PluginSettings.Instance.DrillSpeed; }
@@ -1465,8 +1466,10 @@
             
             Wrapper.BeginGameAction( ( ) =>
                                      {
-                                         foreach (var entity in m_entitiesForUpdate10)
+                                         //foreach (var entity in m_entitiesForUpdate10)
+                                         for(int i = 0; i < m_entitiesForUpdate10.Count; i++)
                                          {
+                                             var entity = m_entitiesForUpdate10[i];
                                              if (!( entity is MyShipDrill ))
                                                  continue;
                                              Log.Debug( "Update " + entity.DisplayName );
