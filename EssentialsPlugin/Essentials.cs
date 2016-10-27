@@ -1472,7 +1472,7 @@
                                              var entity = m_entitiesForUpdate10[i];
                                              if (!( entity is MyShipDrill ))
                                                  continue;
-                                             Log.Debug( "Update " + entity.DisplayName );
+                                             //Log.Debug( "Update " + entity.DisplayName );
                                              int val = (int)_countdownField.GetValue( entity );
                                              val -= PluginSettings.Instance.DrillSpeed / 10;
                                              _countdownField.SetValue( entity, val );
