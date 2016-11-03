@@ -51,7 +51,7 @@
 				return true;
 			}
 
-			string pylonName = string.Join(" ", words);
+			String pylonName = String.Join(" ", words);
 			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(userId).Count < 1)
 			{
 				Communication.SendPrivateInformation(userId, string.Format("Unable to find player Id: {0}", userId));
@@ -60,7 +60,7 @@
 
 			long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(userId).First();
 
-			Dictionary<string, List<IMyCubeBlock>> testList;
+			Dictionary<String, List<IMyCubeBlock>> testList;
 			List<IMyCubeBlock> beaconList;
 			DockingZone.FindByName(pylonName, out testList, out beaconList, playerId);
 

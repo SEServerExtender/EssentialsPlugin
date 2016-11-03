@@ -139,7 +139,7 @@
             if (Environment.UserInteractive)
 			{
 				string restartText = "%windir%/system32/timeout /t 30\r\n";
-				restartText += string.Format("cd /d \"{0}\"\r\n", Path.GetDirectoryName(Application.ExecutablePath));
+				restartText += String.Format("cd /d \"{0}\"\r\n", Path.GetDirectoryName(Application.ExecutablePath));
 				restartText += PluginSettings.Instance.RestartAddedProcesses + "\r\n";
 				restartText += Path.GetFileName(Application.ExecutablePath) + " " + Server.Instance.CommandLineArgs.Args + "\r\n";
 

@@ -17,7 +17,7 @@
 		        Log.Debug( $"Added chat handler: {GetCommandText()}" );
 		}
 
-		public virtual bool CanHandle(ulong steamId, string[] words, ref int commandCount)
+		public virtual Boolean CanHandle(ulong steamId, String[] words, ref int commandCount)
 		{
 			// Administrator Command
 			if (IsAdminCommand())
@@ -39,7 +39,7 @@
 			{
 				commandCount = GetCommandText().Split(new char[] { ' ' }).Count();
 				if (words.Length > commandCount - 1)
-					return string.Join(" ", words).ToLower().StartsWith(GetCommandText());
+					return String.Join(" ", words).ToLower().StartsWith(GetCommandText());
 			}
 			else
 			{
@@ -49,7 +49,7 @@
 					commandCount = command.Split(new char[] { ' ' }).Count();
 					if (words.Length > commandCount - 1)
 					{
-						found = string.Join(" ", words).ToLower().StartsWith(command);
+						found = String.Join(" ", words).ToLower().StartsWith(command);
 						if (found)
 							break;
 					}
@@ -65,16 +65,18 @@
 
         public virtual Communication.ServerDialogItem GetHelpDialog( )
         {
-            return new Communication.ServerDialogItem
-                   {
-                       title = "Help",
-                       header = GetCommandText( ),
-                       content = GetHelp( ),
-                       buttonText = "close"
-                   };
+            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem();
+            DialogItem.title = "Help";
+            DialogItem.header = GetCommandText();
+            DialogItem.content = GetHelp();
+            DialogItem.buttonText = "close";
+            return DialogItem;
         }
 
-	    public abstract string GetCommandText( );
+        public virtual String GetCommandText()
+		{
+			return "";
+		}
 
 		public virtual string[] GetMultipleCommandText()
 		{
@@ -96,7 +98,7 @@
 			return false;
 		}
 
-		public virtual bool HandleCommand(ulong userId, string[] words)
+		public virtual bool HandleCommand(ulong userId, String[] words)
 		{
 			return false;
 		}

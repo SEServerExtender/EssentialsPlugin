@@ -17,7 +17,7 @@
     class Entity
 	{
 		private static readonly Logger Log = LogManager.GetLogger( "PluginLog" );
-		static public bool GreaterThan( Vector3D v, Vector3D container )
+		static public Boolean GreaterThan( Vector3D v, Vector3D container )
 		{
 			if (v.X > container.X || v.Y > container.Y || v.Z > container.Z)
 				return false;
@@ -51,9 +51,9 @@
 		}
 		 */ 
 
-		static public bool CheckForIntersection(Dictionary<string, List<IMyCubeBlock>> testList, List<IMyCubeBlock> beaconList, out int intersectElement)
+		static public bool CheckForIntersection(Dictionary<String, List<IMyCubeBlock>> testList, List<IMyCubeBlock> beaconList, out int intersectElement)
 		{
-			bool intersects = false;
+			Boolean intersects = false;
 			intersectElement = 0;
 			OrientedBoundingBoxD targetTestBounding = GetBoundingBox(beaconList);
 			if (testList.Count > 0)
@@ -133,7 +133,7 @@
 			return new OrientedBoundingBoxD(bb.Center, bb.HalfExtents, Quaternion.CreateFromRotationMatrix(parent.WorldMatrix.GetOrientation()));
 		}
 
-		static public bool CheckOwnership(IMyCubeBlock entity, long playerId)
+		static public Boolean CheckOwnership(IMyCubeBlock entity, long playerId)
 		{
 			MyRelationsBetweenPlayerAndBlock relation = entity.GetUserRelationToOwner(playerId);
 

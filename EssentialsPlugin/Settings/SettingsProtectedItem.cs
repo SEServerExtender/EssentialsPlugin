@@ -1,6 +1,9 @@
 ﻿namespace EssentialsPlugin.Settings
 {
 	using System;
+	using System.Collections.Generic;
+	using System.ComponentModel;
+	using System.Windows.Forms;
 	using System.Xml.Serialization;
 	using VRage.Serialization;
 
@@ -27,7 +30,6 @@
             GridSetStation,
             GridSetDynamic,
             GridDelete,
-            BlockSettings,
         }
 
         [Serializable]
@@ -51,32 +53,33 @@
 
         public SerializableDictionary<ProtectionModeEnum,ProtectionSettings> ProtectionSettingsDict = new SerializableDictionary<ProtectionModeEnum, ProtectionSettings>();
         
-		private bool _enabled = true;
+		private bool enabled = true;
 		public bool Enabled
 		{
-			get { return _enabled; }
-			set { _enabled = value; }
+			get { return enabled; }
+			set { enabled = value; }
 		}
 
-        private long _entityId;
+        private long entityId;
         public long EntityId
 		{
-			get { return _entityId; }
-			set { _entityId = value; }
+			get { return entityId; }
+			set { entityId = value; }
 		}
 
-        private bool _logOnly;
+        private bool logOnly;
         public bool LogOnly
         {
-            get { return _logOnly; }
-            set { _logOnly = value; }
+            get { return logOnly; }
+            set { logOnly = value; }
         }
 
-        private bool _protectDamage = true;
+        private bool protectDamage = true;
         public bool ProtectDamage
         {
-            get { return _protectDamage; }
-            set { _protectDamage = value; }
+            get { return protectDamage; }
+            set
+            {protectDamage = value;}
         }
     }
 }

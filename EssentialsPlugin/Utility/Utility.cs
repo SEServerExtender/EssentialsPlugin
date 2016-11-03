@@ -10,11 +10,11 @@
 		public static string TimeSpanToString(TimeSpan ts)
 		{
 			if (ts.Days > 0)
-				return string.Format("{0}d:{1:D2}h:{2:D2}m:{3:D2}s", ts.Days, ts.Hours, ts.Minutes, ts.Seconds);
+				return String.Format("{0}d:{1:D2}h:{2:D2}m:{3:D2}s", ts.Days, ts.Hours, ts.Minutes, ts.Seconds);
 			else if (ts.Hours > 0)
-				return string.Format("{0:D2}h:{1:D2}m:{2:D2}s", ts.Hours, ts.Minutes, ts.Seconds);
+				return String.Format("{0:D2}h:{1:D2}m:{2:D2}s", ts.Hours, ts.Minutes, ts.Seconds);
 			else
-				return string.Format("{0:D2}m:{1:D2}s", ts.Minutes, ts.Seconds);
+				return String.Format("{0:D2}m:{1:D2}s", ts.Minutes, ts.Seconds);
 		}
 
 		public static string Vector3DToString(Vector3D vector)

@@ -161,7 +161,7 @@
 		{
 			try
 			{
-				string fileName = Essentials.PluginPath + "Essentials-Conquest.xml";
+				String fileName = Essentials.PluginPath + "Essentials-Conquest.xml";
 				if (File.Exists(fileName))
 				{
 					using (StreamReader reader = new StreamReader(fileName))
@@ -187,7 +187,7 @@
 			{
 				lock (Instance)
 				{
-					string fileName = Essentials.PluginPath + "Essentials-Conquest.xml";
+					String fileName = Essentials.PluginPath + "Essentials-Conquest.xml";
 					using (StreamWriter writer = new StreamWriter(fileName))
 					{
 						XmlSerializer x = new XmlSerializer(typeof(Conquest));

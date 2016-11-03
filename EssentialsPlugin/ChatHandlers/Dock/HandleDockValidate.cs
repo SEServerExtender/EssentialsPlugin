@@ -52,7 +52,7 @@
 			}
 
 			// Grab shared beacon name and playerId
-			string pylonName = string.Join(" ", words);
+			String pylonName = String.Join(" ", words);
 			if (PlayerMap.Instance.GetPlayerIdsFromSteamId(userId).Count < 1)
 			{
 				Communication.SendPrivateInformation(userId, "Failed to retrieve your playerId.  Command failed.");
@@ -62,7 +62,7 @@
 			long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(userId).First();
 
 			// Find shared beacon area
-			Dictionary<string, List<IMyCubeBlock>> testList;
+			Dictionary<String, List<IMyCubeBlock>> testList;
 			List<IMyCubeBlock> beaconList;
 			DockingZone.FindByName(pylonName, out testList, out beaconList, playerId);
 			if (beaconList.Count == 4)

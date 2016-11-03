@@ -16,7 +16,7 @@
 	{
 		public long entityId;
 		public DateTime addedTime;
-		public int secondsAfterAdding;
+		public Int32 secondsAfterAdding;
 	}
 
 	public class TimedEntityCleanup

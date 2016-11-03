@@ -56,7 +56,7 @@
 			int itemCount = info.GetInt32("ItemCount");
 			for (int i = 0; i < itemCount; i++)
 			{
-				KeyValuePair<TKey, TVal> kvp = (KeyValuePair<TKey, TVal>)info.GetValue(string.Format("Item{0}", i), typeof(KeyValuePair<TKey, TVal>));
+				KeyValuePair<TKey, TVal> kvp = (KeyValuePair<TKey, TVal>)info.GetValue(String.Format("Item{0}", i), typeof(KeyValuePair<TKey, TVal>));
 				Add(kvp.Key, kvp.Value);
 			}
 		}
@@ -67,7 +67,7 @@
 			int itemIdx = 0;
 			foreach (KeyValuePair<TKey, TVal> kvp in this)
 			{
-				info.AddValue(string.Format("Item{0}", itemIdx), kvp, typeof(KeyValuePair<TKey, TVal>));
+				info.AddValue(String.Format("Item{0}", itemIdx), kvp, typeof(KeyValuePair<TKey, TVal>));
 				itemIdx++;
 			}
 		}

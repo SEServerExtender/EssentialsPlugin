@@ -63,7 +63,7 @@
 		{
 			return (Center == other.Center && HalfExtent == other.HalfExtent && Orientation == other.Orientation);
 		}
-		public override bool Equals(object obj)
+		public override bool Equals(Object obj)
 		{
 			if (obj != null && obj is OrientedBoundingBox)
 			{
@@ -659,7 +659,7 @@
 		{
 			return (Center == other.Center && HalfExtent == other.HalfExtent && Orientation == other.Orientation);
 		}
-		public override bool Equals(object obj)
+		public override bool Equals(Object obj)
 		{
 			if (obj != null && obj is OrientedBoundingBoxD)
 			{

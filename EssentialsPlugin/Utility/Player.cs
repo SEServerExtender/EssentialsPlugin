@@ -203,7 +203,7 @@
             return true;
 		}
 
-		public static bool CheckPlayerSameFaction(long playerId, long compareId)
+		public static Boolean CheckPlayerSameFaction(long playerId, long compareId)
 		{
 			if (compareId == playerId)
 				return true;
@@ -237,31 +237,31 @@
 			return false;
 		}
 
-		public static bool CheckPlayerSameFaction(ulong steamId, ulong steamCompareId)
+		public static Boolean CheckPlayerSameFaction(ulong steamId, ulong steamCompareId)
 		{
 			long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(steamId).FirstOrDefault();
 			long compareId = PlayerMap.Instance.GetPlayerIdsFromSteamId(steamCompareId).FirstOrDefault();
 			return CheckPlayerSameFaction(playerId, compareId);
 		}
 
-		internal static object InvokeEntityMethod(object gameEntity, string methodName)
+		internal static Object InvokeEntityMethod(Object gameEntity, string methodName)
 		{
 			return InvokeEntityMethod(gameEntity, methodName, new object[] { });
 		}
 
-		internal static object InvokeEntityMethod(object gameEntity, string methodName, object[] parameters)
+		internal static Object InvokeEntityMethod(Object gameEntity, string methodName, Object[] parameters)
 		{
 			return InvokeEntityMethod(gameEntity, methodName, parameters, null);
 		}
 
-		internal static object InvokeEntityMethod(object gameEntity, string methodName, object[] parameters, Type[] argTypes)
+		internal static Object InvokeEntityMethod(Object gameEntity, string methodName, Object[] parameters, Type[] argTypes)
 		{
 			try
 			{
 				MethodInfo method = GetEntityMethod(gameEntity, methodName, argTypes);
 				if (method == null)
 					throw new Exception("Method is empty");
-				object result = method.Invoke(gameEntity, parameters);
+				Object result = method.Invoke(gameEntity, parameters);
 
 				return result;
 			}
@@ -272,7 +272,7 @@
 			}
 		}
 
-		internal static MethodInfo GetEntityMethod(object gameEntity, string methodName)
+		internal static MethodInfo GetEntityMethod(Object gameEntity, string methodName)
 		{
 			try
 			{
@@ -285,7 +285,7 @@
 				{
 					//Recurse up through the class heirarchy to try to find the method
 					Type type = gameEntity.GetType();
-					while (type != typeof(object))
+					while (type != typeof(Object))
 					{
 						method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 						if (method != null)
@@ -305,7 +305,7 @@
 			}
 		}
 
-		internal static MethodInfo GetEntityMethod(object gameEntity, string methodName, Type[] argTypes)
+		internal static MethodInfo GetEntityMethod(Object gameEntity, string methodName, Type[] argTypes)
 		{
 			try
 			{
@@ -321,7 +321,7 @@
 				{
 					//Recurse up through the class heirarchy to try to find the method
 					Type type = gameEntity.GetType();
-					while (type != typeof(object))
+					while (type != typeof(Object))
 					{
 						method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy, Type.DefaultBinder, argTypes, null);
 						if (method != null)
@@ -412,7 +412,7 @@
 		{
 			try
 			{
-				string fileName = Essentials.PluginPath + "Essential-PlayerLogins.xml";
+				String fileName = Essentials.PluginPath + "Essential-PlayerLogins.xml";
 				if (File.Exists(fileName))
 				{
 					using (StreamReader reader = new StreamReader(fileName))

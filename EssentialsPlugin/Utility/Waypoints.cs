@@ -40,7 +40,7 @@
 		{
 			try
 			{
-				string fileName = Essentials.PluginPath + "Essential-Waypoints.xml";
+				String fileName = Essentials.PluginPath + "Essential-Waypoints.xml";
 				if (File.Exists(fileName))
 				{
 					using (StreamReader reader = new StreamReader(fileName))
