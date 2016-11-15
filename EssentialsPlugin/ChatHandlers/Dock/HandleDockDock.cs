@@ -9,9 +9,9 @@
 	using EssentialsPlugin.UtilityClasses;
 	using Microsoft.Xml.Serialization.GeneratedAssembly;
 	using Sandbox.Common.ObjectBuilders;
+	using Sandbox.Game.Entities;
 	using Sandbox.ModAPI;
 	using SEModAPIInternal.API.Common;
-	using SEModAPIInternal.API.Entity;
 	using VRage.Game;
 	using VRage.Game.ModAPI;
 	using VRage.ModAPI;
@@ -32,17 +32,7 @@
 		{
 			return "/dock dock";
 		}
-
-        public override Communication.ServerDialogItem GetHelpDialog( )
-        {
-            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
-            DialogItem.title = "Help";
-            DialogItem.header = "";
-            DialogItem.content = GetHelp( );
-            DialogItem.buttonText = "close";
-            return DialogItem;
-        }
-
+        
         public override bool IsAdminCommand()
 		{
 			return false;
@@ -73,7 +63,7 @@
 			m_docking = true;
 			try
 			{
-				String pylonName = String.Join(" ", words);
+				string pylonName = string.Join(" ", words);
 
 				/*
 				int timeLeft;
@@ -86,13 +76,13 @@
 
 				if (PlayerMap.Instance.GetPlayerIdsFromSteamId(userId).Count < 1)
 				{
-					Communication.SendPrivateInformation(userId, string.Format("Unable to find player Id: {0}", userId));
+					Communication.SendPrivateInformation(userId, $"Unable to find player Id: {userId}" );
 					return true;
 				}
 
 				long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId(userId).First();
 
-				Dictionary<String, List<IMyCubeBlock>> testList;
+				Dictionary<string, List<IMyCubeBlock>> testList;
 				List<IMyCubeBlock> beaconList;
 				DockingZone.FindByName(pylonName, out testList, out beaconList, playerId);
 				if (beaconList.Count == 4)
@@ -103,7 +93,7 @@
 						IMyTerminalBlock terminal = (IMyTerminalBlock)entityBlock;
 						if (!terminal.HasPlayerAccess(playerId))
 						{
-							Communication.SendPrivateInformation(userId, string.Format("You do not have permission to use '{0}'.  You must either own all the beacons or they must be shared with faction.", pylonName));
+							Communication.SendPrivateInformation(userId, $"You do not have permission to use '{pylonName}'.  You must either own all the beacons or they must be shared with faction." );
 							return true;
 						}
 					}
@@ -112,7 +102,7 @@
 					int intersectElement = 0;
 					if (Entity.CheckForIntersection(testList, beaconList, out intersectElement))
 					{
-						Communication.SendPrivateInformation(userId, string.Format("The docking zone '{0}' intersects with docking zone '{1}'.  Make sure you place your docking zones so they don't overlap.", pylonName, testList.ElementAt(intersectElement).Key));
+						Communication.SendPrivateInformation(userId, $"The docking zone '{pylonName}' intersects with docking zone '{testList.ElementAt( intersectElement ).Key}'.  Make sure you place your docking zones so they don't overlap." );
 						return true;
 					}
 
@@ -124,7 +114,7 @@
 					List<DockingItem> checkItems = Docking.Instance.Find(d => d.PlayerId == ownerId && d.TargetEntityId == parent.EntityId && d.DockingBeaconIds.Intersect(beaconListIds).Count() == 4);
 					if (checkItems.Count >= PluginSettings.Instance.DockingShipsPerZone)
 					{
-						Communication.SendPrivateInformation(userId, string.Format("Docking zone '{0}' already contains the maximum capacity of ships.", pylonName));
+						Communication.SendPrivateInformation(userId, $"Docking zone '{pylonName}' already contains the maximum capacity of ships." );
 						return true;
 					}
 
@@ -175,13 +165,13 @@
 						// Make sure the docking zone contains the docking ship.  If they intersect or are disjointed, then fail
 						if (!Entity.GreaterThan(dockingBounding.HalfExtent * 2, targetBounding.HalfExtent * 2))
 						{
-							Communication.SendPrivateInformation(userId, string.Format("The ship '{0}' is too large for it's carrier.  The ship's bounding box must fit inside the docking zone bounding box!", dockingEntity.DisplayName));
+							Communication.SendPrivateInformation(userId, $"The ship '{dockingEntity.DisplayName}' is too large for it's carrier.  The ship's bounding box must fit inside the docking zone bounding box!" );
 							return true;
 						}
 
 						if (targetBounding.Contains(ref dockingBounding) != ContainmentType.Contains)
 						{
-							Communication.SendPrivateInformation(userId, string.Format("The ship '{0}' is not fully inside the docking zone '{1}'.  Make sure the ship is fully contained inside the docking zone", dockingEntity.DisplayName, pylonName));
+							Communication.SendPrivateInformation(userId, $"The ship '{dockingEntity.DisplayName}' is not fully inside the docking zone '{pylonName}'.  Make sure the ship is fully contained inside the docking zone" );
 							return true;
 						}
 
@@ -190,20 +180,21 @@
 						float dockingMass = Entity.CalculateMass(dockingEntity);
 						if (dockingMass > parentMass)
 						{
-							Communication.SendPrivateInformation(userId, string.Format("The ship you're trying to dock is too heavy for it's carrier.  The ship mass must be less than half the large ship / stations mass! (DM={0}kg CM={1}kg)", dockingMass, parentMass));
+							Communication.SendPrivateInformation(userId, $"The ship you're trying to dock is too heavy for it's carrier.  The ship mass must be less than half the large ship / stations mass! (DM={dockingMass}kg CM={parentMass}kg)" );
 							return true;
 						}
 
 						// Check to see if the ship is piloted, if it is, error out.  
 						// TODO: Check to see if we can get a real time copy of this entity?
 						List<IMySlimBlock> blocks = new List<IMySlimBlock>();
-						dockingEntity.GetBlocks(blocks, x => x.FatBlock != null && x.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_Cockpit));
-						foreach (IMySlimBlock slim_cbe in blocks)
+						dockingEntity.GetBlocks(blocks, x => x.FatBlock is MyCockpit);
+						foreach (IMySlimBlock slim in blocks)
 						{
-							MyObjectBuilder_Cockpit c = (MyObjectBuilder_Cockpit)slim_cbe.FatBlock.GetObjectBuilderCubeBlock();
+							//MyObjectBuilder_Cockpit c = (MyObjectBuilder_Cockpit)slim.FatBlock.GetObjectBuilderCubeBlock();
+						    var c = (MyShipController)slim.FatBlock;
 							if (c.Pilot != null)
 							{
-								Communication.SendPrivateInformation(userId, string.Format("Ship in docking zone '{0}' has a pilot!  Please exit the ship before trying to dock.  (Sometimes this can lag a bit.  Wait 10 seconds and try again)", pylonName));
+								Communication.SendPrivateInformation(userId, $"Ship in docking zone '{pylonName}' has a pilot!  Please exit the ship before trying to dock.  (Sometimes this can lag a bit.  Wait 10 seconds and try again)" );
 								return true;
 							}
 						}
@@ -217,16 +208,16 @@
 						saveQuat = Quaternion.Inverse(saveQuat) * Quaternion.CreateFromRotationMatrix(dockingEntity.WorldMatrix.GetOrientation());
 
 						// Save ship to file and remove
-						FileInfo info = new FileInfo( Path.Combine( Essentials.PluginPath, "Docking", string.Format( "docked_{0}_{1}_{2}.sbc", ownerId, parent.EntityId, dockingEntity.EntityId ) ) );
+						FileInfo info = new FileInfo( Path.Combine( Essentials.PluginPath, "Docking", $"docked_{ownerId}_{parent.EntityId}_{dockingEntity.EntityId}.sbc" ) );
 						if ( !Directory.Exists( info.DirectoryName ) )
 						{
 							Directory.CreateDirectory( info.DirectoryName );
 						}
 						//CubeGridEntity dockingGrid = new CubeGridEntity((MyObjectBuilder_CubeGrid)dockingEntity.GetObjectBuilder(), dockingEntity);
-						MyObjectBuilder_CubeGrid gridBuilder=null;// = CubeGrids.SafeGetObjectBuilder(dockingEntity);
+						MyObjectBuilder_CubeGrid gridBuilder = CubeGrids.SafeGetObjectBuilder(dockingEntity);
 						if (gridBuilder == null)
 						{
-							Communication.SendPrivateInformation(userId, string.Format("Failed to load entity for export: {0}", dockingEntity.DisplayName));
+							Communication.SendPrivateInformation(userId, $"Failed to load entity for export: {dockingEntity.DisplayName}" );
 							return true;
 						}
 
@@ -245,11 +236,9 @@
 
 						// Serialize and save ship to file
 						MyObjectBuilderSerializer.SerializeXML( info.FullName, false, gridBuilder );
-						//BaseObjectManager.SaveContentFile<MyObjectBuilder_CubeGrid, MyObjectBuilder_CubeGridSerializer>(gridBuilder, info);
-						BaseEntityNetworkManager.BroadcastRemoveEntity(dockingEntity);
-						//dockingEntity.Close();
+					    Wrapper.BeginGameAction( ( ) => dockingEntity.Close( ) );
 
-						Communication.SendPrivateInformation(userId, string.Format("Docked ship '{0}' in docking zone '{1}'.", dockItem.DockedName, pylonName));
+						Communication.SendPrivateInformation(userId, $"Docked ship '{dockItem.DockedName}' in docking zone '{pylonName}'." );
 						Log.Info( "Docked ship \"{0}\" in docking zone \"{1}\". Saved to {2}", dockItem.DockedName, pylonName, info.FullName );
 						/*
 						// Add a cool down
@@ -261,12 +250,12 @@
 					}
 					else
 					{
-						Communication.SendPrivateInformation(userId, string.Format("No ships in docking zone '{0}'.", pylonName));
+						Communication.SendPrivateInformation(userId, $"No ships in docking zone '{pylonName}'." );
 					}
 				}
 				else if (beaconList.Count > 4)
 				{
-					Communication.SendPrivateInformation(userId, string.Format("Too many beacons with the name or another zone with the name '{0}'.  Place only 4 beacons to create a zone or try a different zone name.", pylonName));
+					Communication.SendPrivateInformation(userId, $"Too many beacons with the name or another zone with the name '{pylonName}'.  Place only 4 beacons to create a zone or try a different zone name." );
 				}
 				else
 				{

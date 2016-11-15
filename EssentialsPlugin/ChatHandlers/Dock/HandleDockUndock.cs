@@ -11,7 +11,6 @@
     using Sandbox.Game.Replication;
     using Sandbox.ModAPI;
     using SEModAPIInternal.API.Common;
-    using SEModAPIInternal.API.Entity;
     using VRage;
     using VRage.Game;
     using VRage.Game.ModAPI;
@@ -33,17 +32,7 @@
 		{
 			return "/dock undock";
 		}
-
-        public override Communication.ServerDialogItem GetHelpDialog( )
-        {
-            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
-            DialogItem.title = "Help";
-            DialogItem.header = "";
-            DialogItem.content = GetHelp( );
-            DialogItem.buttonText = "close";
-            return DialogItem;
-        }
-
+        
         public override bool IsAdminCommand()
 		{
 			return false;
@@ -67,23 +56,23 @@
 
 			if (m_undocking)
 			{
-				Communication.SendPrivateInformation(userId, string.Format("Server is busy, try again"));
+				Communication.SendPrivateInformation(userId, "Server is busy, try again");
 				return true;
 			}
 
 			m_undocking = true;
 			try
 			{
-				String pylonName = String.Join( " ", words );
+				string pylonName = string.Join( " ", words );
 				if ( PlayerMap.Instance.GetPlayerIdsFromSteamId( userId ).Count < 1 )
 				{
-					Communication.SendPrivateInformation( userId, string.Format( "Unable to find player Id: {0}", userId ) );
+					Communication.SendPrivateInformation( userId, $"Unable to find player Id: {userId}" );
 					return true;
 				}
 
 				long playerId = PlayerMap.Instance.GetPlayerIdsFromSteamId( userId ).First( );
 
-				Dictionary<String, List<IMyCubeBlock>> testList;
+				Dictionary<string, List<IMyCubeBlock>> testList;
 				List<IMyCubeBlock> beaconList;
 				DockingZone.FindByName( pylonName, out testList, out beaconList, playerId );
 
@@ -93,7 +82,7 @@
 					{
 						if ( !Entity.CheckOwnership( entity, playerId ) )
 						{
-							Communication.SendPrivateInformation( userId, string.Format( "You do not have permission to use '{0}'.  You must either own all the beacons or they must be shared with faction.", pylonName ) );
+							Communication.SendPrivateInformation( userId, $"You do not have permission to use '{pylonName}'.  You must either own all the beacons or they must be shared with faction." );
 							return true;
 						}
 					}
@@ -106,7 +95,7 @@
 					List<DockingItem> dockingItems = Docking.Instance.Find( d => d.PlayerId == ownerId && d.TargetEntityId == parent.EntityId && d.DockingBeaconIds.Intersect( beaconListIds ).Count( ) == 4 );
 					if ( dockingItems.Count < 1 )
 					{
-						Communication.SendPrivateInformation( userId, string.Format( "You have no ships docked in docking zone '{0}'.", pylonName ) );
+						Communication.SendPrivateInformation( userId, $"You have no ships docked in docking zone '{pylonName}'." );
 						return true;
 					}
 
@@ -150,7 +139,7 @@
 						}
 					}
 
-					String dockedShipFileName = Essentials.PluginPath + String.Format( "\\Docking\\docked_{0}_{1}_{2}.sbc", ownerId, dockingItem.TargetEntityId, dockingItem.DockedEntityId );
+					string dockedShipFileName = Essentials.PluginPath + $"\\Docking\\docked_{ownerId}_{dockingItem.TargetEntityId}_{dockingItem.DockedEntityId}.sbc";
 
 					// Load Entity From File and add to game
 					FileInfo fileInfo = new FileInfo( dockedShipFileName );
@@ -169,7 +158,7 @@
 					cubeGrid.PositionAndOrientation = new MyPositionAndOrientation( rotatedPos + parent.GetPosition( ), cubeGrid.PositionAndOrientation.Value.Forward, cubeGrid.PositionAndOrientation.Value.Up );
 
 					// Add object to world
-					cubeGrid.EntityId = BaseEntity.GenerateEntityId( );
+					cubeGrid.EntityId = MyEntityIdentifier.AllocateId( );
 					cubeGrid.LinearVelocity = Vector3.Zero;
 					cubeGrid.AngularVelocity = Vector3.Zero;
 
@@ -179,12 +168,12 @@
 						                    try
 						                    {
 							                    IMyEntity entitiy = MyAPIGateway.Entities.CreateFromObjectBuilderAndAdd( cubeGrid );
-                                                MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( entitiy ) );
+                                                //MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( entitiy ) );
                                                 undock = true;
 						                    }
 						                    catch ( Exception Ex )
 						                    {
-							                    Log.Info( string.Format( "Error undocking ship: {0}", Ex.ToString( ) ) );
+							                    Log.Info( $"Error undocking ship: {Ex.ToString( )}" );
 							                    Communication.SendPrivateInformation( userId, string.Format( "Unable to undock ship due to error." ) );
 						                    }
 					                    } );
@@ -198,7 +187,7 @@
 					File.Delete( dockedShipFileName );
 					Docking.Instance.Remove( dockingItem );
 
-					Communication.SendPrivateInformation( userId, string.Format( "The ship '{0}' has been undocked from docking zone '{1}'", dockingItem.DockedName, pylonName ) );
+					Communication.SendPrivateInformation( userId, $"The ship '{dockingItem.DockedName}' has been undocked from docking zone '{pylonName}'" );
 
 					/*
 					// Queue for cooldown
@@ -248,8 +237,7 @@
 				else if ( beaconList.Count > 4 ) // Too many beacons, must be 4
 				{
 					Communication.SendPrivateInformation( userId,
-					                                      string.Format( "Too many beacons with the name or another zone with the name '{0}'.  Place only 4 beacons to create a zone or try a different zone name.",
-					                                                     pylonName ) );
+					                                      $"Too many beacons with the name or another zone with the name '{pylonName}'.  Place only 4 beacons to create a zone or try a different zone name." );
 				}
 				else // Can't find docking zone
 				{

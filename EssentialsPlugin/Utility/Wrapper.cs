@@ -13,7 +13,7 @@
 			SandboxGameAssemblyWrapper.Instance.GameAction(action);
 		}
 
-		public static void BeginGameAction(Action action, SandboxGameAssemblyWrapper.GameActionCallback callback, Object state)
+		public static void BeginGameAction(Action action, SandboxGameAssemblyWrapper.GameActionCallback callback = null, Object state = null)
 		{
 			SandboxGameAssemblyWrapper.Instance.BeginGameAction(action, callback, state);
 		}
