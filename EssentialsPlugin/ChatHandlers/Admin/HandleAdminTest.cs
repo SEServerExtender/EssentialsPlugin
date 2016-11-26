@@ -189,6 +189,36 @@
                     }
                     break;
                 }
+                case "seated":
+                {
+                    bool set = words.Length > 1 && words[1].ToLower( ).Equals( "on" );
+                    MyEntity[] ents = new MyEntity[0];
+                    Wrapper.GameAction( ( ) => ents = MyEntities.GetEntities( ).ToArray( ) );
+
+                    foreach (var ent in ents)
+                    {
+                        var grid = ent as MyCubeGrid;
+                        if (grid == null)
+                            continue;
+
+                        var blocks = grid.GetBlocks( );
+
+                        foreach (var block in blocks)
+                        {
+                            var cockpit = block?.FatBlock as MyCockpit;
+                            if (cockpit?.Pilot == null)
+                                continue;
+
+                            Essentials.Log.Info( cockpit.Pilot.DisplayName );
+
+                            if (set)
+                                MyEntities.RegisterForUpdate( cockpit.Pilot );
+                            else
+                                MyEntities.UnregisterForUpdate( cockpit.Pilot );
+                        }
+                    }
+                    break;
+                }
                 case "component":
                 {
                     MyEntity[] ents = new MyEntity[0];

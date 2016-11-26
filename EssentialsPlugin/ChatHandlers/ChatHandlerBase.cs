@@ -35,28 +35,28 @@
 			}
 
 			// Check if this command has multiple commands that do the same thing
-			if (GetMultipleCommandText().Length < 1)
-			{
+			//if (GetMultipleCommandText().Length < 1)
+			//{
 				commandCount = GetCommandText().Split(new char[] { ' ' }).Count();
 				if (words.Length > commandCount - 1)
 					return String.Join(" ", words).ToLower().StartsWith(GetCommandText());
-			}
-			else
-			{
-				bool found = false;
-				foreach (string command in GetMultipleCommandText())
-				{
-					commandCount = command.Split(new char[] { ' ' }).Count();
-					if (words.Length > commandCount - 1)
-					{
-						found = String.Join(" ", words).ToLower().StartsWith(command);
-						if (found)
-							break;
-					}
-				}
+			//}
+			//else
+			//{
+			//	bool found = false;
+			//	foreach (string command in GetMultipleCommandText())
+			//	{
+			//		commandCount = command.Split(new char[] { ' ' }).Count();
+			//		if (words.Length > commandCount - 1)
+			//		{
+			//			found = String.Join(" ", words).ToLower().StartsWith(command);
+			//			if (found)
+			//				break;
+			//		}
+			//	}
 
-				return found;
-			}
+			//	return found;
+			//}
 
 			return false;
 		}
@@ -73,10 +73,7 @@
             return DialogItem;
         }
 
-        public virtual String GetCommandText()
-		{
-			return "";
-		}
+	    public abstract string GetCommandText( );
 
 		public virtual string[] GetMultipleCommandText()
 		{
@@ -98,9 +95,6 @@
 			return false;
 		}
 
-		public virtual bool HandleCommand(ulong userId, String[] words)
-		{
-			return false;
-		}
+	    public abstract bool HandleCommand( ulong userId, string[] words );
 	}
 }
