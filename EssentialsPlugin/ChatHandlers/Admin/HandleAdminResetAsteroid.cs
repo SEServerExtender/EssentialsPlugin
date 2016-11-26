@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using ParallelTasks;
     using Sandbox.Definitions;
     using Sandbox.Engine.Multiplayer;
     using Sandbox.Engine.Voxels;
@@ -25,17 +26,7 @@
 		{
 			return "/admin reset asteroid";
 		}
-
-        public override Communication.ServerDialogItem GetHelpDialog( )
-        {
-            Communication.ServerDialogItem DialogItem = new Communication.ServerDialogItem( );
-            DialogItem.title = "Help";
-            DialogItem.header = "";
-            DialogItem.content = GetHelp( );
-            DialogItem.buttonText = "close";
-            return DialogItem;
-        }
-
+        
         public override bool IsAdminCommand()
 		{
 			return true;
@@ -68,11 +59,11 @@
 
                 Communication.SendVoxelReset( ent.EntityId );
 
-                Wrapper.BeginGameAction( ( ) =>
-                                         {
-                                             voxel.Storage.Reset( VRage.Voxels.MyStorageDataTypeFlags.All );
+                //Wrapper.BeginGameAction( ( ) =>
+                //                         {
+                                             Parallel.Start(()=>voxel.Storage.Reset( VRage.Voxels.MyStorageDataTypeFlags.All ));
                                              //MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( ent ) );
-                                         }, null, null );
+                //                         }, null, null );
 
                 Thread.Sleep( 100 );
             }
