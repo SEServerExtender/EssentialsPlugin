@@ -70,12 +70,10 @@
             {
                 if ( !item.Enabled )
                     continue;
-
-                Essentials.Log.Error("enter");
+                
                 if (item.EntityId != grid.EntityId && item.EntityId != -1)
                     continue;
-
-                Essentials.Log.Error("pass");
+                
                 if ( !item.ProtectionSettingsDict.Dictionary.ContainsKey( ProtectedItem.ProtectionModeEnum.BlockRename ) )
                     continue;
 
