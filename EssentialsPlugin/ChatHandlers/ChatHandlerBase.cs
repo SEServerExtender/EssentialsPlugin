@@ -24,12 +24,12 @@
 			{
 			    if ( PluginSettings.Instance.PromotedAdminCommands )  //promoted (Space Master) players can use admin commands
 			    {
-			        if ( steamId != 0 && !MySession.Static.HasPlayerAdminRights( steamId ) )
+			        if ( steamId != 0 && !MySession.Static.IsUserSpaceMaster( steamId ) )
 			            return false;
 			    }
 			    else
 			    {
-			        if ( steamId != 0 && !MyMultiplayer.Static.IsAdmin( steamId ) )
+			        if ( steamId != 0 && !MySession.Static.IsUserAdmin( steamId ) )
 			            return false;
 			    }
 			}

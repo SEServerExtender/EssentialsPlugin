@@ -86,6 +86,7 @@
     <Compile Include="ChatHandlers\Admin\HandleAdminResetAsteroid.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminPlayerCount.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminVersion.cs" />
+    <Compile Include="ChatHandlers\HandleHelp.cs" />
     <Compile Include="ChatHandlers\HandleRevoke.cs" />
     <Compile Include="ChatHandlers\HandleLastSeen.cs" />
     <Compile Include="ChatHandlers\Settings\HandleSettingsEnableBlockEnforcement.cs" />

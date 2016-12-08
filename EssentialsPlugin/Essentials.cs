@@ -1319,9 +1319,9 @@
             MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReceiveMessageParts);
             MyAPIGateway.Multiplayer.RegisterMessageHandler( 9007, Communication.HandleAddConcealExempt );
             BlacklistManager.Instance.UpdateBlacklist();
-            _drillUpdateVal= (int)typeof(MyDrillConstants).GetField("DRILL_UPDATE_INTERVAL_IN_FRAMES").GetValue(null);
-            m_entitiesForUpdate10 = (CachingList<MyEntity>)typeof(MyEntities).GetField("m_entitiesForUpdate10", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
-            _countdownField = typeof(MyShipDrill).GetField("m_drillFrameCountdown", BindingFlags.NonPublic | BindingFlags.Instance);
+            //_drillUpdateVal= (int)typeof(MyDrillConstants).GetField("DRILL_UPDATE_INTERVAL_IN_FRAMES").GetValue(null);
+            //m_entitiesForUpdate10 = (CachingList<MyEntity>)typeof(MyEntities).GetField("m_entitiesForUpdate10", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+            //_countdownField = typeof(MyShipDrill).GetField("m_drillFrameCountdown", BindingFlags.NonPublic | BindingFlags.Instance);
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
         }
 
@@ -1454,34 +1454,34 @@
             MyAPIGateway.Multiplayer.UnregisterMessageHandler( 9007, Communication.HandleAddConcealExempt );
         }
 
-        private int _updateCounter;
-        private int _drillUpdateVal;
-        static CachingList<MyEntity> m_entitiesForUpdate10;
-        private FieldInfo _countdownField;
+        //private int _updateCounter;
+        //private int _drillUpdateVal;
+        //static CachingList<MyEntity> m_entitiesForUpdate10;
+        //private FieldInfo _countdownField;
 
         public void Update( )
         {
-            if (MyAPIGateway.Session == null)
-                return;
+        //    if (MyAPIGateway.Session == null)
+        //        return;
 
-            //if (++_updateCounter % 10 != 0)
-            //    return;
+        //    //if (++_updateCounter % 10 != 0)
+        //    //    return;
 
             
-            Wrapper.BeginGameAction( ( ) =>
-                                     {
-                                         //foreach (var entity in m_entitiesForUpdate10)
-                                         for(int i = 0; i < m_entitiesForUpdate10.Count; i++)
-                                         {
-                                             var entity = m_entitiesForUpdate10[i];
-                                             if (!( entity is MyShipDrill ))
-                                                 continue;
-                                             //Log.Debug( "Update " + entity.DisplayName );
-                                             int val = (int)_countdownField.GetValue( entity );
-                                             val -= PluginSettings.Instance.DrillSpeed / 10;
-                                             _countdownField.SetValue( entity, val );
-                                         }
-                                     }, null, null );
+        //    Wrapper.BeginGameAction( ( ) =>
+        //                             {
+        //                                 //foreach (var entity in m_entitiesForUpdate10)
+        //                                 for(int i = 0; i < m_entitiesForUpdate10.Count; i++)
+        //                                 {
+        //                                     var entity = m_entitiesForUpdate10[i];
+        //                                     if (!( entity is MyShipDrill ))
+        //                                         continue;
+        //                                     //Log.Debug( "Update " + entity.DisplayName );
+        //                                     int val = (int)_countdownField.GetValue( entity );
+        //                                     val -= PluginSettings.Instance.DrillSpeed / 10;
+        //                                     _countdownField.SetValue( entity, val );
+        //                                 }
+        //                             }, null, null );
         }
 
         #endregion
