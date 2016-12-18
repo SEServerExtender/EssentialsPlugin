@@ -78,6 +78,7 @@
     <Compile Include="ChatHandlers\AdminSettings\HandleAdminSettings.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminAsteroidCleanup.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminFactionCleanup.cs" />
+    <Compile Include="ChatHandlers\Admin\HandleAdminStatic.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminStop.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminSpeed.cs" />
     <Compile Include="ChatHandlers\Admin\HandleAdminIdentityCleanup.cs" />

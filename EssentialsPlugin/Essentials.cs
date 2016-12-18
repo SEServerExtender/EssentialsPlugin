@@ -54,9 +54,6 @@
 
     public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
     {
-        //IMPORTANT: Comment out this field to let the build work on both branches
-        public const bool StableBuild = false;
-
         public static Logger Log;
         #region Private Fields
         internal static Essentials Instance;
@@ -1195,7 +1192,7 @@
                                 new HandleAdminFactionCleanup(  ),
                                 new HandleAdminSpawnCargo(  ),
                                 new HandleAdminPlayerCount(  ),
-
+                                new HandleAdminStatic(  ),
 
                                 //Admin Scan
 				                new HandleAdminScanAreaAt( ),

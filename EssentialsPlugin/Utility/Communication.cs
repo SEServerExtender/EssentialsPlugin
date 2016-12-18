@@ -8,6 +8,7 @@
     using Sandbox.Common.ObjectBuilders;
     using Sandbox.ModAPI;
     using System.Collections.Generic;
+    using System.Reflection;
     using SEModAPIExtensions.API;
     using SEModAPIInternal.API.Common;
     using SEModAPIInternal.API.Entity;
@@ -21,6 +22,7 @@
     using System.Threading.Tasks;
     using Sandbox;
     using Sandbox.Definitions;
+    using Sandbox.Engine.Multiplayer;
     using Sandbox.Game.Entities;
     using Settings;
     using VRage.Collections;
@@ -36,20 +38,29 @@
         {
             if ( infoText == "" )
                 return;
-           
-            ServerMessageItem MessageItem = new ServerMessageItem( );
-            MessageItem.From = PluginSettings.Instance.ServerChatName;
-            MessageItem.Message = infoText;
 
-            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
-            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
-
-            if ( ChatManager.EnableData )
+            ScriptedChatMsg msg = new ScriptedChatMsg
             {
-                BroadcastDataMessage( DataMessageType.Message, data );
-            }
-            else
-                ChatManager.Instance.SendPublicChatMessage( infoText );
+                Author = PluginSettings.Instance.ServerChatName,
+                Font = MyFontEnum.Red,
+                Text = infoText,
+            };
+
+            var messageMethod = typeof(MyMultiplayerBase).GetMethod("OnScriptedChatMessageRecieved", BindingFlags.NonPublic | BindingFlags.Static);
+            ServerNetworkManager.Instance.RaiseStaticEvent(messageMethod, msg);
+            //ServerMessageItem MessageItem = new ServerMessageItem( );
+            //MessageItem.From = PluginSettings.Instance.ServerChatName;
+            //MessageItem.Message = infoText;
+
+            //string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
+            //byte[ ] data = Encoding.UTF8.GetBytes( messageString );
+
+            //if ( ChatManager.EnableData )
+            //{
+            //    BroadcastDataMessage( DataMessageType.Message, data );
+            //}
+            //else
+            //    ChatManager.Instance.SendPublicChatMessage( infoText );
 
             ChatManager.Instance.AddChatHistory( new ChatManager.ChatEvent( DateTime.Now, 0, infoText ) );
         }
@@ -58,30 +69,22 @@
         {
             if ( infoText == "" )
                 return;
-
-            ServerMessageItem MessageItem = new ServerMessageItem( );
-
+            
             if ( from == null )
-                MessageItem.From = PluginSettings.Instance.ServerChatName;
-
+                from = PluginSettings.Instance.ServerChatName;
             else if ( PluginSettings.Instance.WhisperChatPrefix )
-                MessageItem.From = "<whisper> " + from;
+                from = "<whisper> " + from;
 
-            else
-                MessageItem.From = from;
-
-            MessageItem.Message = infoText;
-
-            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
-            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
-
-            if ( ChatManager.EnableData )
+            ScriptedChatMsg msg = new ScriptedChatMsg
             {
-                SendDataMessage( playerId, DataMessageType.Message, data );
-            }
-            else
-                ChatManager.Instance.SendPrivateChatMessage( playerId, infoText );
+                Author = from,
+                Font = MyFontEnum.Red,
+                Text = infoText,
+            };
 
+            var messageMethod = typeof(MyMultiplayerBase).GetMethod("OnScriptedChatMessageRecieved", BindingFlags.NonPublic | BindingFlags.Static);
+            ServerNetworkManager.Instance.RaiseStaticEvent(messageMethod, playerId, msg);
+            
             ChatManager.ChatEvent chatItem = new ChatManager.ChatEvent( );
             chatItem.Timestamp = DateTime.Now;
             chatItem.RemoteUserId = (from == null ? 0 : PlayerMap.Instance.GetSteamIdFromPlayerName( from ));
@@ -91,28 +94,27 @@
         
         public static void SendFactionClientMessage( ulong playerSteamId, string message )
         {
-            ServerMessageItem MessageItem = new ServerMessageItem( );
+            string from;
+
             if ( PluginSettings.Instance.FactionChatPrefix )
-                MessageItem.From = "<faction> " + PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerSteamId );
+                from = "<faction> " + PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerSteamId );
             else
-                MessageItem.From = PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerSteamId );
-
-            MessageItem.Message = message;
-
-            string messageString = MyAPIGateway.Utilities.SerializeToXML( MessageItem );
-            byte[ ] data = Encoding.UTF8.GetBytes( messageString );
-
+                from = PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerSteamId );
+            
             foreach ( ulong steamId in PlayerManager.Instance.ConnectedPlayers )
             {
                 if ( Player.CheckPlayerSameFaction( playerSteamId, steamId ) )
                 {
-                    if ( ChatManager.EnableData )
+                    ScriptedChatMsg msg = new ScriptedChatMsg
                     {
-                        SendDataMessage( steamId, DataMessageType.Message, data );
-                        ChatManager.Instance.AddChatHistory( new ChatManager.ChatEvent( DateTime.Now, playerSteamId, "{faction message}: " + message ) );
-                    }
-                    else
-                        ChatManager.Instance.SendPrivateChatMessage( steamId, message );
+                        Author = from,
+                        Font = MyFontEnum.Red,
+                        Text = message,
+                    };
+
+                    var messageMethod = typeof(MyMultiplayerBase).GetMethod("OnScriptedChatMessageRecieved", BindingFlags.NonPublic | BindingFlags.Static);
+                    ServerNetworkManager.Instance.RaiseStaticEvent(messageMethod, msg);
+                    ChatManager.Instance.AddChatHistory( new ChatManager.ChatEvent( DateTime.Now, playerSteamId, "{faction message}: " + message ) );
                 }
             }
         }
@@ -303,29 +305,25 @@
             Buffer.BlockCopy( data, 0, newData, msgIdString.Length + 1, data.Length );
             */
 
-            //hash a random long with the current time to make a decent quality guid for each message
-            byte[] randLong = new byte[sizeof(long)];
-            _random.NextBytes(randLong);
-            long uniqueId = 23;
-            uniqueId = uniqueId * 37 + BitConverter.ToInt64(randLong, 0);
-            uniqueId = uniqueId * 37 + DateTime.Now.GetHashCode();
-
+            byte[] guidBytes = Guid.NewGuid( ).ToByteArray( );
+            
             //this is a much more elegant and lightweight method
-            byte[] newData = new byte[sizeof(long)*2 + data.Length];
-            BitConverter.GetBytes( uniqueId ).CopyTo( newData, 0 );
-            BitConverter.GetBytes((long)messageType).CopyTo(newData, sizeof(long));
-            data.CopyTo( newData, sizeof(long)*2);
+            byte[] newData = new byte[sizeof(long) + guidBytes.Length + data.Length];
+            guidBytes.CopyTo( newData, 0 );
+            BitConverter.GetBytes((long)messageType).CopyTo(newData, guidBytes.Length);
+            data.CopyTo( newData, sizeof(long) + guidBytes.Length);
 
-            if ( newData.Length > 4096 )
-            {
-                SendMessagePartsTo( steamId, newData );
-                return;
-            }
+            //if ( newData.Length > 4096 )
+            //{
+            //    SendMessagePartsTo( steamId, newData );
+            //    return;
+            //}
 
             //Wrapper.GameAction( ( ) =>
             MySandboxGame.Static.Invoke( () =>
                                          {
-                                             MyAPIGateway.Multiplayer.SendMessageTo( 9000, newData, steamId );
+                                             //MyAPIGateway.Multiplayer.SendMessageTo( 9000, newData, steamId );
+                                             ServerNetworkManager.Instance.SendModMessageTo( 9000, newData, steamId );
                                          } );
         }
 
@@ -342,27 +340,26 @@
 
             Buffer.BlockCopy( data, 0, newData, msgIdString.Length + 1, data.Length );
             */
-            byte[] randLong = new byte[sizeof(long)];
-            _random.NextBytes(randLong);
-            long uniqueId = 23;
-            uniqueId = uniqueId * 37 + BitConverter.ToInt64( randLong, 0 );
-            uniqueId = uniqueId * 37 + DateTime.Now.GetHashCode();
 
-            byte[] newData = new byte[sizeof(long) * 2 + data.Length];
-            BitConverter.GetBytes(uniqueId).CopyTo(newData, 0);
-            BitConverter.GetBytes((long)messageType).CopyTo(newData, sizeof(long));
-            data.CopyTo(newData, sizeof(long) * 2);
+            byte[] guidBytes = Guid.NewGuid().ToByteArray();
 
-            if (newData.Length > 4096)
-            {
-                BroadcastMessageParts(newData);
-                return;
-            }
+            //this is a much more elegant and lightweight method
+            byte[] newData = new byte[sizeof(long) + guidBytes.Length + data.Length];
+            guidBytes.CopyTo(newData, 0);
+            BitConverter.GetBytes((long)messageType).CopyTo(newData, guidBytes.Length);
+            data.CopyTo(newData, sizeof(long) + guidBytes.Length);
+
+            //if (newData.Length > 4096)
+            //{
+            //    BroadcastMessageParts(newData);
+            //    return;
+            //}
 
             //Wrapper.GameAction( ( ) =>
             MySandboxGame.Static.Invoke(() =>
                                {
-                                    MyAPIGateway.Multiplayer.SendMessageToOthers( 9000, newData );
+                                   MyAPIGateway.Multiplayer.SendMessageToOthers( 9000, newData );
+                                   //ServerNetworkManager.Instance.BroadcastModMessage( 9000, newData );
                                 } );
         }
 

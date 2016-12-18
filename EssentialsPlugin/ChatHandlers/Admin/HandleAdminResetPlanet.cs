@@ -1,5 +1,6 @@
 ﻿namespace EssentialsPlugin.ChatHandlers.Admin
 {
+    using System.Diagnostics;
     using System.Linq;
     using ParallelTasks;
     using Sandbox.Definitions;
@@ -48,7 +49,14 @@
 
                 //Wrapper.BeginGameAction( ( ) =>
                 //                         {
-                                             Parallel.Start(()=>voxel.Storage.Reset( VRage.Voxels.MyStorageDataTypeFlags.All ));
+                                             Parallel.Start( ( ) =>
+                                                             {
+                                                                 Essentials.Log.Info( $"Resetting {voxel.StorageName}" );
+                                                                 var stopwatch = Stopwatch.StartNew( );
+                                                                 voxel.Storage.Reset( VRage.Voxels.MyStorageDataTypeFlags.All );
+                                                                 stopwatch.Stop( );
+                                                                 Essentials.Log.Info($"Reset {voxel.StorageName} in {(1000d * stopwatch.ElapsedTicks / Stopwatch.Frequency):N3}ms" );
+                                                             });
                                              //MyMultiplayer.ReplicateImmediatelly( MyExternalReplicable.FindByObject( ent ) );
                 //                         }, null, null );
             }
