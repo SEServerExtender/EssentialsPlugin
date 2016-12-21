@@ -48,6 +48,8 @@
 
             var messageMethod = typeof(MyMultiplayerBase).GetMethod("OnScriptedChatMessageRecieved", BindingFlags.NonPublic | BindingFlags.Static);
             ServerNetworkManager.Instance.RaiseStaticEvent(messageMethod, msg);
+
+            ChatManager.Instance.ScanGPSAndAdd( infoText );
             //ServerMessageItem MessageItem = new ServerMessageItem( );
             //MessageItem.From = PluginSettings.Instance.ServerChatName;
             //MessageItem.Message = infoText;
@@ -69,7 +71,9 @@
         {
             if ( infoText == "" )
                 return;
-            
+
+            ulong steamId = from == null ? 0 : PlayerMap.Instance.GetSteamIdFromPlayerName( from );
+
             if ( from == null )
                 from = PluginSettings.Instance.ServerChatName;
             else if ( PluginSettings.Instance.WhisperChatPrefix )
@@ -80,14 +84,19 @@
                 Author = from,
                 Font = MyFontEnum.Red,
                 Text = infoText,
+                Target = PlayerMap.Instance.GetFastPlayerIdFromSteamId(playerId),
             };
 
-            var messageMethod = typeof(MyMultiplayerBase).GetMethod("OnScriptedChatMessageRecieved", BindingFlags.NonPublic | BindingFlags.Static);
-            ServerNetworkManager.Instance.RaiseStaticEvent(messageMethod, playerId, msg);
-            
+            if (msg.Target != 0)
+            {
+                var messageMethod = typeof(MyMultiplayerBase).GetMethod( "OnScriptedChatMessageRecieved", BindingFlags.NonPublic | BindingFlags.Static );
+                ServerNetworkManager.Instance.RaiseStaticEvent( messageMethod, msg );
+                ChatManager.Instance.ScanGPSAndAdd( infoText, msg.Target );
+            }
+
             ChatManager.ChatEvent chatItem = new ChatManager.ChatEvent( );
             chatItem.Timestamp = DateTime.Now;
-            chatItem.RemoteUserId = (from == null ? 0 : PlayerMap.Instance.GetSteamIdFromPlayerName( from ));
+            chatItem.RemoteUserId = steamId;
             chatItem.Message = (from == null ? infoText : ( $"{{whisper}} to {PlayerMap.Instance.GetFastPlayerNameFromSteamId( playerId )}: {infoText}" ));
             ChatManager.Instance.AddChatHistory( chatItem );
         }
@@ -110,13 +119,15 @@
                         Author = from,
                         Font = MyFontEnum.Red,
                         Text = message,
+                        Target = PlayerMap.Instance.GetFastPlayerIdFromSteamId(steamId),
                     };
 
                     var messageMethod = typeof(MyMultiplayerBase).GetMethod("OnScriptedChatMessageRecieved", BindingFlags.NonPublic | BindingFlags.Static);
                     ServerNetworkManager.Instance.RaiseStaticEvent(messageMethod, msg);
-                    ChatManager.Instance.AddChatHistory( new ChatManager.ChatEvent( DateTime.Now, playerSteamId, "{faction message}: " + message ) );
                 }
             }
+
+            ChatManager.Instance.AddChatHistory( new ChatManager.ChatEvent( DateTime.Now, playerSteamId, "{faction message}: " + message ) );
         }
 
         public static void Notification( ulong steamId, MyFontEnum color, int timeInSeconds, string message )

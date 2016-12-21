@@ -75,15 +75,13 @@
                 if (grid.Physics == null || grid.IsStatic)
                     continue;
 
-                if (grid.GridSizeEnum == MyCubeSize.Large && large)
+                if ((grid.GridSizeEnum == MyCubeSize.Large && large) || (grid.GridSizeEnum == MyCubeSize.Small && small))
                 {
-                    grid.RequestConversionToStation( );
-                    Essentials.Log.Info( $"Converted {grid.DisplayName} to static" );
-                    count++;
-                }
-                else if (grid.GridSizeEnum == MyCubeSize.Small && small)
-                {
-                    grid.RequestConversionToStation( );
+                    Wrapper.BeginGameAction( ( ) =>
+                                             {
+                                                 grid.Physics.ClearSpeed( );
+                                                 grid.RequestConversionToStation( );
+                                             });
                     Essentials.Log.Info( $"Converted {grid.DisplayName} to static" );
                     count++;
                 }
