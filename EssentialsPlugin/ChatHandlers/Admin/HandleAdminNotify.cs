@@ -51,13 +51,12 @@
 				return true;
 			}
 
-			string colour = words[0];
-			MyFontEnum font = MyFontEnum.White;
-			if (!Enum.TryParse<MyFontEnum>(colour, out font))
-			{
-				Communication.SendPrivateInformation(userId, string.Format("Invalid colour value entered.  {0} is nto a valid value.  Please enter one of the following: {1}", colour, GetFontList()));
-				return true;
-			}
+			string font = words[0];
+			//if (!Enum.TryParse<MyFontEnum>(colour, out font))
+			//{
+			//	Communication.SendPrivateInformation(userId, string.Format("Invalid colour value entered.  {0} is nto a valid value.  Please enter one of the following: {1}", colour, GetFontList()));
+			//	return true;
+			//}
 
 			int timeInSeconds = 2;
 			if (!int.TryParse(words[1], out timeInSeconds) || timeInSeconds < 1)
