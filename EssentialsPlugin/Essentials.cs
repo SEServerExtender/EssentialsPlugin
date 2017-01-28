@@ -28,7 +28,6 @@
     using SEModAPI.API.Utility;
     using SEModAPI.API;
     using SEModAPIExtensions.API;
-    using SEModAPIExtensions.API.Plugin;
     using SEModAPIExtensions.API.Plugin.Events;
     using SEModAPIInternal.API.Common;
     using SEModAPIInternal.API.Entity.Sector.SectorObject;
@@ -49,8 +48,10 @@
     using VRage.Game.Entity;
     using VRage.Library.Collections;
     using VRage.Network;
+    using VRage.Plugins;
     using VRage.Serialization;
     using VRageMath;
+    using IPlugin = SEModAPIExtensions.API.Plugin.IPlugin;
 
     public class Essentials : IPlugin, IChatEventHandler, IPlayerEventHandler, ICubeGridHandler, ICubeBlockEventHandler, ISectorEventHandler
     {
@@ -1316,9 +1317,11 @@
             MyAPIGateway.Multiplayer.RegisterMessageHandler(9005, Communication.ReceiveMessageParts);
             MyAPIGateway.Multiplayer.RegisterMessageHandler( 9007, Communication.HandleAddConcealExempt );
             BlacklistManager.Instance.UpdateBlacklist();
-            //_drillUpdateVal= (int)typeof(MyDrillConstants).GetField("DRILL_UPDATE_INTERVAL_IN_FRAMES").GetValue(null);
-            //m_entitiesForUpdate10 = (CachingList<MyEntity>)typeof(MyEntities).GetField("m_entitiesForUpdate10", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
-            //_countdownField = typeof(MyShipDrill).GetField("m_drillFrameCountdown", BindingFlags.NonPublic | BindingFlags.Instance);
+            _drillUpdateVal= (int)typeof(MyDrillConstants).GetField("DRILL_UPDATE_INTERVAL_IN_FRAMES").GetValue(null);
+            m_entitiesForUpdate10 = ((MyDistributedUpdater<CachingList<MyEntity>, MyEntity>)typeof(MyEntities).GetField("m_entitiesForUpdate10", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null)).List;
+            _countdownField = typeof(MyShipDrill).GetField("m_drillFrameCountdown", BindingFlags.NonPublic | BindingFlags.Instance);
+            var pluginslist = (List<VRage.Plugins.IPlugin>)typeof(MyPlugins).GetField("m_plugins", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+            pluginslist.Add( new FakeVRagePlugin( ) );
             Log.Info( "Plugin '{0}' initialized. (Version: {1}  ID: {2})", Name, Version, Id );
         }
 
@@ -1452,9 +1455,9 @@
         }
 
         //private int _updateCounter;
-        //private int _drillUpdateVal;
-        //static CachingList<MyEntity> m_entitiesForUpdate10;
-        //private FieldInfo _countdownField;
+        private int _drillUpdateVal;
+        static CachingList<MyEntity> m_entitiesForUpdate10;
+        private FieldInfo _countdownField;
 
         public void Update( )
         {
@@ -1482,6 +1485,31 @@
         }
 
         #endregion
+
+        public void GameUpdate()
+        {
+            if (MyAPIGateway.Session == null)
+                return;
+
+            //if (++_updateCounter % 10 != 0)
+            //    return;
+
+
+            //Wrapper.BeginGameAction(() =>
+                                    //{
+                                            //foreach (var entity in m_entitiesForUpdate10)
+                                            for (int i = 0; i < m_entitiesForUpdate10.Count; i++)
+                                        {
+                                            var entity = m_entitiesForUpdate10[i];
+                                            if (!(entity is MyShipDrill))
+                                                continue;
+                                                //Log.Debug( "Update " + entity.DisplayName );
+                                                int val = (int)_countdownField.GetValue(entity);
+                                            val -= PluginSettings.Instance.DrillSpeed / 10;
+                                            _countdownField.SetValue(entity, val);
+                                        }
+                                    //}, null, null);
+        }
 
         #region IChatEventHandler Members
 
@@ -1731,5 +1759,22 @@
 		}
 
 		#endregion
+
 	}
+
+    class FakeVRagePlugin : VRage.Plugins.IPlugin
+    {
+        public void Dispose( )
+        {
+        }
+
+        public void Init( object gameInstance )
+        {
+        }
+
+        public void Update( )
+        {
+            Essentials.Instance.GameUpdate( );
+        }
+    }
 }
