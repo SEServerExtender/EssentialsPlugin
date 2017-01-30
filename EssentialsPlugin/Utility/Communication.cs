@@ -333,8 +333,8 @@
             //Wrapper.GameAction( ( ) =>
             MySandboxGame.Static.Invoke( () =>
                                          {
-                                             //MyAPIGateway.Multiplayer.SendMessageTo( 9000, newData, steamId );
-                                             ServerNetworkManager.Instance.SendModMessageTo( 9000, newData, steamId );
+                                             MyAPIGateway.Multiplayer.SendMessageTo( 9000, newData, steamId );
+                                             //ServerNetworkManager.Instance.SendModMessageTo( 9000, newData, steamId );
                                          } );
         }
 

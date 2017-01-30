@@ -12,6 +12,7 @@
     using Sandbox.Game.World;
     using Sandbox.Game.Entities.Blocks;
     using Sandbox.Game.Entities.Cube;
+    using SpaceEngineers.Game.Entities.Blocks;
     using SpaceEngineers.Game.ModAPI;
     using VRage.Collections;
     using VRage.Game;
@@ -310,7 +311,7 @@
 
 			foreach ( var cubeBlock in grid.GetFatBlocks() )
 			{
-			    var beacon = cubeBlock as IMyBeacon;
+			    var beacon = cubeBlock as MyBeacon;
 				if ( beacon != null )
 				{
 					if ( !beacon.Enabled )
@@ -318,9 +319,9 @@
 
 				    foreach ( var player in players )
 				    {
-				        var distance = Vector3D.Distance( player.GetPosition(), beacon.GetPosition() );
+				        var distance = Vector3D.Distance( player.GetPosition(), beacon.PositionComp.GetPosition() );
 
-                        if ( distance < beacon.Radius )
+                        if ( distance < ((IMyBeacon)beacon).Radius )
 				        {
 				            reason = $"{player.DisplayName} distance to beacon broadcast: {distance}";
 				            return true;
@@ -328,7 +329,7 @@
 				    }
 				}
 
-			    var antenna = cubeBlock as IMyRadioAntenna;
+			    var antenna = cubeBlock as MyRadioAntenna;
 				if ( antenna != null )
 				{
 					if ( !antenna.Enabled )
@@ -336,9 +337,9 @@
                     
 				    foreach ( var player in players )
 				    {
-				        var distance = Vector3D.Distance( player.GetPosition(), antenna.GetPosition() );
+				        var distance = Vector3D.Distance( player.GetPosition(), antenna.PositionComp.GetPosition(  ) );
 
-				        if ( distance < antenna.Radius )
+				        if ( distance < antenna.GetRadius(  ) )
 				        {
 				            reason = $"{player.DisplayName} distance to antenna broadcast: {distance}";
 				            return true;
@@ -346,7 +347,7 @@
 				    }
 				}
 
-			    var medical = cubeBlock as IMyMedicalRoom;
+			    var medical = cubeBlock as MyMedicalRoom;
 				if ( medical != null )
 				{
 					if ( !medical.Enabled || !medical.IsFunctional )
