@@ -1,47 +1,53 @@
-﻿namespace EssentialsPlugin.ProcessHandlers
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using Sandbox.Engine.Multiplayer;
-    using Sandbox.Game.World;
-    using Sandbox.ModAPI;
-    using Settings;
-    using SEModAPI.API;
-    using SEModAPIExtensions.API;
-    using SEModAPIInternal.API.Common;
-    using SEModAPIInternal.API.Server;
-    using SteamSDK;
-    using VRage.Game.ModAPI;
-    using VRage.Network;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using Sandbox;
+using Sandbox.Engine.Multiplayer;
+using Sandbox.Game.World;
+using SteamSDK;
+using VRage.Game.ModAPI;
+using VRage.Network;
+using VRage.Utils;
 
+namespace EssentialsPlugin.ProcessHandlers
+{
     public class ProcessReservedSlots : ProcessHandlerBase
     {
-        private static List<ulong> _reservedPlayers = new List<ulong>( );
-        private static List<ulong> _waitingPlayers = new List<ulong>( );
+        private static List<ulong> _reservedPlayers = new List<ulong>();
+        private static List<ulong> _waitingPlayers = new List<ulong>();
         private static bool _init;
 
-        public static void Init( )
+        private static string ConvertSteamIDFrom64(ulong from)
         {
-            if ( _init )
+            from -= 76561197960265728UL;
+            return new StringBuilder("STEAM_").Append("0:").Append(from % 2UL).Append(':').Append(from / 2UL).ToString();
+        }
+
+        public static void Init()
+        {
+            if (_init)
                 return;
 
             _init = true;
-            //RemoveHandlers();
+            RemoveHandlers();
             SteamServerAPI.Instance.GameServer.UserGroupStatus += GameServer_UserGroupStatus;
             SteamServerAPI.Instance.GameServer.ValidateAuthTicketResponse += GameServer_ValidateAuthTicketResponse;
 
-            Essentials.Log.Info( "Reserved slots initialized" );
+            m_waitingForGroup = (HashSet<ulong>)typeof(MyDedicatedServerBase).GetField("m_waitingForGroup", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(MyMultiplayer.Static);
+            m_groupId = (ulong)typeof(MyDedicatedServerBase).GetField("m_groupId", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(MyMultiplayer.Static);
+
+            Essentials.Log.Info("Reserved slots initialized");
         }
 
         private static void RemoveHandlers()
         {
-            var eventField = typeof(GameServer).GetField("<backing_store>ValidateAuthTicketResponse", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo eventField = typeof(GameServer).GetField("<backing_store>ValidateAuthTicketResponse", BindingFlags.NonPublic | BindingFlags.Instance);
             var eventDel = eventField?.GetValue(SteamServerAPI.Instance.GameServer) as MulticastDelegate;
             if (eventDel != null)
             {
-                foreach (var handle in eventDel.GetInvocationList())
+                foreach (Delegate handle in eventDel.GetInvocationList())
                 {
                     if (handle.Method.Name == "GameServer_ValidateAuthTicketResponse")
                     {
@@ -50,183 +56,194 @@
                     }
                 }
             }
-        }
-        private static void GameServer_ValidateAuthTicketResponse( ulong remoteUserId, AuthSessionResponseEnum response,
-                                                                   ulong ownerSteamId )
-        {
-            //using the player join event takes too long, sometimes they can load in before we boot them
-            //we're not replacing the lobby yet, but hooking into this event will give us more time to verify players
-
-            if ( !PluginSettings.Instance.ReservedSlotsEnabled )
-                return;
-
-            if ( response != AuthSessionResponseEnum.OK )
-                return;
-
-            if ( PluginSettings.Instance.ReservedSlotsPlayers.Contains( remoteUserId.ToString(  ) ) )
+            eventField = typeof(GameServer).GetField("<backing_store>UserGroupStatus", BindingFlags.NonPublic | BindingFlags.Instance);
+            eventDel = eventField?.GetValue(SteamServerAPI.Instance.GameServer) as MulticastDelegate;
+            if (eventDel != null)
             {
-                _reservedPlayers.Add( remoteUserId );
-                Essentials.Log.Info( "Whitelisted player connected: " + remoteUserId );
-                Essentials.Log.Info( "{0} whitelisted players connected. {1} of {2} reserved slots allocated.",
-                                     _reservedPlayers.Count,
-                                     Math.Min( _reservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount ),
-                                     PluginSettings.Instance.ReservedSlotsCount );
-                return;
-            }
-
-            if ( PluginSettings.Instance.TicketPlayers.Any( item => item.TicketId == remoteUserId ) )
-            {
-                _reservedPlayers.Add(remoteUserId);
-                Essentials.Log.Info("Ticket player connected: " + remoteUserId);
-                Essentials.Log.Info("{0} whitelisted players connected. {1} of {2} reserved slots allocated.",
-                                    _reservedPlayers.Count,
-                                    Math.Min(_reservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount),
-                                    PluginSettings.Instance.ReservedSlotsCount);
-                return;
-            }
-
-            if ( PluginSettings.Instance.ReservedSlotsAdmins && PlayerManager.Instance.IsUserAdmin( remoteUserId ) )
-            {
-                _reservedPlayers.Add( remoteUserId );
-                Essentials.Log.Info( "Whitelisted admin connected: " + remoteUserId );
-                Essentials.Log.Info( "{0} whitelisted players connected. {1} of {2} reserved slots allocated.",
-                                     _reservedPlayers.Count,
-                                     Math.Min( _reservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount ),
-                                     PluginSettings.Instance.ReservedSlotsCount );
-
-                return;
-            }
-
-            if ( PluginSettings.Instance.ReservedSlotsGroup != 0 )
-            {
-                _waitingPlayers.Add( remoteUserId );
-
-                //ask Steam if the connecting player is in the whitelisted group. response is raised as an event; GameServer_UserGroupStatus
-                SteamServerAPI.Instance.GameServer.RequestGroupStatus( remoteUserId,
-                                                                       PluginSettings.Instance.ReservedSlotsGroup );
-                return;
-            }
-
-            DenyPlayer( remoteUserId );
-        }
-
-        /*
-        public override void OnPlayerJoined( ulong remoteUserId )
-        {
-            //it might be better to hook into ValidateAuthTicketResponse, but doing it this way lets the game
-            //take care of denying banned players and group/friend whitelisting
-
-            if ( !PluginSettings.Instance.ReservedSlotsEnabled )
-                return;
-
-            if ( PluginSettings.Instance.ReservedSlotsPlayers.Contains( remoteUserId.ToString( ) ) )
-            {
-                reservedPlayers.Add( remoteUserId );
-                Essentials.Log.Info( "Whitelisted player connected: " + remoteUserId.ToString( ) );
-                Essentials.Log.Info( string.Format( "{0} whitelisted players connected. {1} of {2} reserved slots allocated.",
-                    reservedPlayers.Count, Math.Min( reservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount ), PluginSettings.Instance.ReservedSlotsCount ) );
-
-                return;
-            }
-
-            if ( PluginSettings.Instance.ReservedSlotsAdmins && PlayerManager.Instance.IsUserAdmin( remoteUserId ) )
-            {
-                reservedPlayers.Add( remoteUserId );
-                Essentials.Log.Info( "Whitelisted admin connected: " + remoteUserId.ToString( ) );
-                Essentials.Log.Info( string.Format( "{0} whitelisted players connected. {1} of {2} reserved slots allocated.",
-                    reservedPlayers.Count, Math.Min( reservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount ), PluginSettings.Instance.ReservedSlotsCount ) );
-
-                return;
-            }
-
-            if ( PluginSettings.Instance.ReservedSlotsGroup != 0 )
-            {
-                //ask Steam if the connecting player is in the whitelisted group. response is raised as an event; GameServer_UserGroupStatus
-                SteamServerAPI.Instance.GameServer.RequestGroupStatus( remoteUserId, PluginSettings.Instance.ReservedSlotsGroup );
-                waitingPlayers.Add( remoteUserId );
-                return;
-            }
-
-            DenyPlayer( remoteUserId );
-        }
-        */
-
-        private static void DenyPlayer( ulong remoteUserId )
-        {
-            //get the list of current players just so we can count them (this is a stupid solution)
-            List<IMyPlayer> connectedPlayers = new List<IMyPlayer>( );
-            MyAPIGateway.Players.GetPlayers( connectedPlayers );
-            RefreshPlayers( connectedPlayers );
-
-            int publicPlayers = connectedPlayers.Count -
-                                Math.Min( _reservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount );
-            int publicSlots = Server.Instance.Config.MaxPlayers - PluginSettings.Instance.ReservedSlotsCount;
-
-            if ( ExtenderOptions.IsDebugging )
-            {
-                Essentials.Log.Debug( "Public players: " + publicPlayers.ToString( ) );
-                Essentials.Log.Debug( "Public slots: " + publicSlots.ToString( ) );
-                Essentials.Log.Debug( "Connected players: " + connectedPlayers.Count.ToString( ) );
-                Essentials.Log.Debug( "Reserved players: " + _reservedPlayers.Count.ToString( ) );
-                Essentials.Log.Debug( "Reserved slots: " + PluginSettings.Instance.ReservedSlotsCount.ToString( ) );
-            }
-
-            if ( publicPlayers < publicSlots )
-                return;
-
-            //don't do anything while we're waiting for group authorization
-            if ( _waitingPlayers.Contains( remoteUserId ) )
-                return;
-
-            //kick the player with the "Server is full" message
-            //too bad we can't send a custom message, but they're hardcoded into the client
-            Essentials.Log.Info("Player denied: " + remoteUserId);
-            var userRejectedMethod = typeof(MyDedicatedServerBase).GetMethod("UserRejected", BindingFlags.NonPublic | BindingFlags.Instance);
-            userRejectedMethod.Invoke(MyMultiplayer.Static, new object[] { remoteUserId, JoinResult.ServerFull });
-        }
-
-        private static void GameServer_UserGroupStatus( ulong userId, ulong groupId, bool member, bool officier )
-        {
-            if ( !PluginSettings.Instance.ReservedSlotsEnabled )
-                return;
-
-            if ( groupId == PluginSettings.Instance.ReservedSlotsGroup )
-            {
-                _waitingPlayers.Remove( userId );
-                if ( member || officier )
+                foreach (Delegate handle in eventDel.GetInvocationList())
                 {
-                    _reservedPlayers.Add( userId );
-                    Essentials.Log.Info( "Whitelisted player connected: " + userId );
-                    Essentials.Log.Info( "{0} whitelisted players connected. {1} of {2} reserved slots allocated.",
-                                         _reservedPlayers.Count,
-                                         Math.Min( _reservedPlayers.Count, PluginSettings.Instance.ReservedSlotsCount ),
-                                         PluginSettings.Instance.ReservedSlotsCount );
+                    if (handle.Method.Name == "GameServer_UserGroupStatus")
+                    {
+                        SteamServerAPI.Instance.GameServer.ValidateAuthTicketResponse -= handle as ValidateAuthTicketResponse;
+                        Essentials.Log.Warn("Removed handler from UserGroupSataus");
+                    }
+                }
+            }
+        }
+
+        private static ulong m_groupId;
+        private static HashSet<ulong> m_waitingForGroup;
+        private static readonly HashSet<ulong> _waitingForWhitelistGroup = new HashSet<ulong>();
+
+        /// <summary>
+        ///     Reimplementation of the vanilla event
+        /// </summary>
+        /// <param name="steamID"></param>
+        /// <param name="response"></param>
+        /// <param name="steamOwner"></param>
+        private static void GameServer_ValidateAuthTicketResponse(ulong steamID, AuthSessionResponseEnum response,
+                                                                  ulong steamOwner)
+        {
+            try
+            {
+                MyLog.Default.WriteLineAndConsole($"Essentials ValidateAuthTicketResponse ({response}), owner: {steamOwner}");
+
+                if (IsClientBanned(steamOwner) || MySandboxGame.ConfigDedicated.Banned.Contains(steamOwner))
+                {
+                    UserRejected(steamID, JoinResult.BannedByAdmins);
+                    RaiseClientKicked(steamID);
                 }
                 else
-                    DenyPlayer( userId );
-            }
-        }
+                {
+                    if (IsClientKicked(steamOwner))
+                    {
+                        UserRejected(steamID, JoinResult.KickedRecently);
+                        RaiseClientKicked(steamID);
+                    }
+                }
 
-        public override void OnPlayerLeft( ulong remoteUserId )
-        {
-            //free up allocated slots so someone else can use it
-            if ( _reservedPlayers.Contains( remoteUserId ) )
+                if (response == AuthSessionResponseEnum.OK)
+                {
+                    if (MyMultiplayer.Static.MemberLimit > 0 && MyMultiplayer.Static.MemberCount - 1 >= MyMultiplayer.Static.MemberLimit) // Unfortunately, DS counds into the members, so subtract it
+                    {
+                        if (!PluginSettings.Instance.ReservedSlotsEnabled)
+                        {
+                            UserRejected(steamID, JoinResult.ServerFull);
+                            return;
+                        }
+
+                        if (PluginSettings.Instance.ReservedSlotsPlayers.Contains(steamID.ToString()) || PluginSettings.Instance.ReservedSlotsAdmins && MySession.Static.GetUserPromoteLevel(steamID) >= MyPromoteLevel.Admin)
+                        {
+                            Essentials.Log.Info($"Added whitelisted player {steamID}");
+                            UserAccepted(steamID);
+                        }
+                        else
+                        {
+                            if (PluginSettings.Instance.ReservedSlotsGroup != 0)
+                            {
+                                if (SteamServerAPI.Instance.GameServer.RequestGroupStatus(steamID, PluginSettings.Instance.ReservedSlotsGroup))
+                                {
+                                    // Returns false when there's no connection to Steam
+                                    _waitingForWhitelistGroup.Add(steamID);
+                                }
+                                else
+                                    UserRejected(steamID, JoinResult.SteamServersOffline);
+                            }
+                            else
+                                UserRejected(steamID, JoinResult.ServerFull);
+                        }
+                    }
+                    else
+                    {
+                        if (m_groupId == 0 || MySandboxGame.ConfigDedicated.Administrators.Contains(steamID.ToString()) || MySandboxGame.ConfigDedicated.Administrators.Contains(ConvertSteamIDFrom64(steamID)))
+                        {
+                            UserAccepted(steamID);
+                        }
+                        else
+                        {
+                            if (SteamServerAPI.Instance.GetAccountType(m_groupId) != AccountType.Clan)
+                            {
+                                UserRejected(steamID, JoinResult.GroupIdInvalid);
+                            }
+                            else
+                            {
+                                if (SteamServerAPI.Instance.GameServer.RequestGroupStatus(steamID, m_groupId))
+                                {
+                                    // Returns false when there's no connection to Steam
+                                    m_waitingForGroup.Add(steamID);
+                                }
+                                else
+                                    UserRejected(steamID, JoinResult.SteamServersOffline);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    var joinResult = JoinResult.TicketInvalid;
+                    switch (response)
+                    {
+                        case AuthSessionResponseEnum.AuthTicketCanceled:
+                            joinResult = JoinResult.TicketCanceled;
+                            break;
+                        case AuthSessionResponseEnum.AuthTicketInvalidAlreadyUsed:
+                            joinResult = JoinResult.TicketAlreadyUsed;
+                            break;
+                        case AuthSessionResponseEnum.LoggedInElseWhere:
+                            joinResult = JoinResult.LoggedInElseWhere;
+                            break;
+                        case AuthSessionResponseEnum.NoLicenseOrExpired:
+                            joinResult = JoinResult.NoLicenseOrExpired;
+                            break;
+                        case AuthSessionResponseEnum.UserNotConnectedToSteam:
+                            joinResult = JoinResult.UserNotConnected;
+                            break;
+                        case AuthSessionResponseEnum.VACBanned:
+                            joinResult = JoinResult.VACBanned;
+                            break;
+                        case AuthSessionResponseEnum.VACCheckTimedOut:
+                            joinResult = JoinResult.VACCheckTimedOut;
+                            break;
+                    }
+
+                    UserRejected(steamID, joinResult);
+                }
+            }
+            catch (Exception ex)
             {
-                Essentials.Log.Info( "Freed slot from: " + remoteUserId );
-                _reservedPlayers.Remove( remoteUserId );
-                Essentials.Log.Info( "{0} slots of {1} allocated.", _reservedPlayers.Count,
-                                     PluginSettings.Instance.ReservedSlotsCount );
+                Essentials.Log.Error(ex);
             }
-
-            if ( _waitingPlayers.Contains( remoteUserId ) )
-                _waitingPlayers.Remove( remoteUserId );
         }
 
-        private static void RefreshPlayers( List<IMyPlayer> connectedPlayers )
+        private static void UserRejected(ulong steamId, JoinResult joinResult)
         {
-            List<ulong> steamIds = connectedPlayers.Select( x => x.SteamUserId ).ToList( );
-            _reservedPlayers.Clear( );
-            _reservedPlayers = steamIds.Where( x => PluginSettings.Instance.ReservedSlotsPlayers.Contains( x.ToString(  ) ) ).ToList( );
+            MethodInfo userRejectedMethod = typeof(MyDedicatedServerBase).GetMethod("UserRejected", BindingFlags.NonPublic | BindingFlags.Instance);
+            userRejectedMethod.Invoke(MyMultiplayer.Static, new object[] {steamId, joinResult});
+        }
+
+        private static void UserAccepted(ulong steamId)
+        {
+            MethodInfo userAcceptedMethod = typeof(MyDedicatedServerBase).GetMethod("UserAccepted", BindingFlags.NonPublic | BindingFlags.Instance);
+            userAcceptedMethod.Invoke(MyMultiplayer.Static, new object[] {steamId});
+        }
+
+        private static bool IsClientBanned(ulong steamId)
+        {
+            return (bool)typeof(MyMultiplayerBase).GetMethod("IsClientBanned", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(MyMultiplayer.Static, new object[] {steamId});
+        }
+
+        private static bool IsClientKicked(ulong steamId)
+        {
+            return (bool)typeof(MyMultiplayerBase).GetMethod("IsClientKicked", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(MyMultiplayer.Static, new object[] {steamId});
+        }
+
+        private static void RaiseClientKicked(ulong steamId)
+        {
+            typeof(MyMultiplayerBase).GetMethod("RaiseClientKicked", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(MyMultiplayer.Static, new object[] {steamId});
+        }
+
+        private static void GameServer_UserGroupStatus(ulong userId, ulong groupId, bool member, bool officier)
+        {
+            if (PluginSettings.Instance.ReservedSlotsEnabled && groupId == PluginSettings.Instance.ReservedSlotsGroup && _waitingForWhitelistGroup.Remove(userId))
+            {
+                if (member || officier)
+                {
+                    Essentials.Log.Info("Whitelisted player connected: " + userId);
+                    UserAccepted(userId);
+                }
+                else
+                    UserRejected(userId, JoinResult.ServerFull);
+            }
+            else
+            {
+                if (groupId == m_groupId && m_waitingForGroup.Remove(userId))
+                {
+                    if (member || officier)
+                        UserAccepted(userId);
+                    else
+                        UserRejected(userId, JoinResult.NotInGroup);
+                }
+            }
         }
     }
 }

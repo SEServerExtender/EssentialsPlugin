@@ -36,7 +36,7 @@
 
         public static void SendPublicInformation( string infoText )
         {
-            if ( infoText == "" )
+            if ( string.IsNullOrEmpty( infoText ) )
                 return;
 
             ScriptedChatMsg msg = new ScriptedChatMsg
@@ -69,7 +69,7 @@
 
         public static void SendPrivateInformation( ulong playerId, string infoText, string from = null )
         {
-            if ( infoText == "" )
+            if ( string.IsNullOrEmpty( infoText ))
                 return;
 
             ulong steamId = from == null ? 0 : PlayerMap.Instance.GetSteamIdFromPlayerName( from );

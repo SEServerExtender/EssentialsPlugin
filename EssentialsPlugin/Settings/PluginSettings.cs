@@ -847,18 +847,18 @@
             }
         }
 
-        public int ReservedSlotsCount
-        {
-            get
-            {
-                return _reservedSlotsCount;
-            }
-            set
-            {
-                _reservedSlotsCount = value;
-                Save( );
-            }
-        }
+        //public int ReservedSlotsCount
+        //{
+        //    get
+        //    {
+        //        return _reservedSlotsCount;
+        //    }
+        //    set
+        //    {
+        //        _reservedSlotsCount = value;
+        //        Save( );
+        //    }
+        //}
 
         public ulong ReservedSlotsGroup
         {

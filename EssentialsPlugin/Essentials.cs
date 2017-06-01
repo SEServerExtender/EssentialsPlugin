@@ -951,21 +951,21 @@
             }
         }
 
-        [Category( "Reserved Slots" )]
-        [Description( "Number of slots to reserve." )]
-        [Browsable( true )]
-        [ReadOnly( false )]
-        public int ReservedSlotsCount
-        {
-            get
-            {
-                return PluginSettings.Instance.ReservedSlotsCount;
-            }
-            set
-            {
-                PluginSettings.Instance.ReservedSlotsCount = value;
-            }
-        }
+        //[Category( "Reserved Slots" )]
+        //[Description( "Number of slots to reserve." )]
+        //[Browsable( true )]
+        //[ReadOnly( false )]
+        //public int ReservedSlotsCount
+        //{
+        //    get
+        //    {
+        //        return PluginSettings.Instance.ReservedSlotsCount;
+        //    }
+        //    set
+        //    {
+        //        PluginSettings.Instance.ReservedSlotsCount = value;
+        //    }
+        //}
 
         [Category( "Reserved Slots" )]
         [Description( "Group ID number. Players in this group can occupy a reserved slot." )]

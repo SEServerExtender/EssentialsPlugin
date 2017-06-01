@@ -61,44 +61,44 @@
         {
             //TODO
             return false;
-            MyPropertySyncStateGroup sync = (MyPropertySyncStateGroup)obj;
+            //MyPropertySyncStateGroup sync = (MyPropertySyncStateGroup)obj;
 
-            var properties = (ListReader<SyncBase>)sync.GetType().GetField("m_properties", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(sync);
+            //var properties = (ListReader<SyncBase>)sync.GetType().GetField("m_properties", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(sync);
 
-            byte index = 0;
-            BitReaderWriter bits = new BitReaderWriter();
+            //byte index = 0;
+            //BitReaderWriter bits = new BitReaderWriter();
 
-            Serialize(site.MethodInfo, stream, ref index, ref bits);
+            //Serialize(site.MethodInfo, stream, ref index, ref bits);
 
-            MyTerminalBlock entity = null;
+            //MyTerminalBlock entity = null;
 
-            MyExternalReplicable<MySyncedBlock> rep = sync.Owner as MyExternalReplicable<MySyncedBlock>;
+            //MyExternalReplicable<MySyncedBlock> rep = sync.Owner as MyExternalReplicable<MySyncedBlock>;
 
-            if ( rep == null )
-            {
-                //there are lots of reasons this wouldn't be MySyncedBlock, so just ignore it and move on
-                return false;
-            }
+            //if ( rep == null )
+            //{
+            //    //there are lots of reasons this wouldn't be MySyncedBlock, so just ignore it and move on
+            //    return false;
+            //}
 
-            entity = rep.Instance as MyTerminalBlock;
+            //entity = rep.Instance as MyTerminalBlock;
             
-            MyCubeGrid grid = entity?.CubeGrid;
+            //MyCubeGrid grid = entity?.CubeGrid;
 
-            if ( grid == null )
-            {
-                Essentials.Log.Info( "Null grid in SyncPropertyHandler" );
-                return false;
-            }
+            //if ( grid == null )
+            //{
+            //    Essentials.Log.Info( "Null grid in SyncPropertyHandler" );
+            //    return false;
+            //}
 
 
-            Essentials.Log.Warn( $"{entity.CustomName} | {index} | {properties[index].ValueType}" );
+            //Essentials.Log.Warn( $"{entity.CustomName} | {index} | {properties[index].ValueType}" );
 
-            if (entity is MyLandingGear)
-            {
-                //clients sometimes send updates for landing gear for no discernable reason?
-                //just ignore it, it's mostly harmless
-                return false;
-            }
+            //if (entity is MyLandingGear)
+            //{
+            //    //clients sometimes send updates for landing gear for no discernable reason?
+            //    //just ignore it, it's mostly harmless
+            //    return false;
+            //}
 
             //bool found = false;
             //foreach ( ProtectedItem item in PluginSettings.Instance.ProtectedItems )
